@@ -96,7 +96,7 @@ TICKETS: List[Ticket] = [
         lot="L01",
         titre="Matérialiser le modèle de données Prisma et la migration initiale",
         sp=5,
-        status="À faire",
+        status="En cours",
         deps=['TAKT-L01-02'],
         exigences=['PLAN_MACRO E1.2', 'ST_TAKT §2', 'TE-DB-*', 'GG-08', 'docs/DOC_MIGRATION_DB.md.'],
     ),
