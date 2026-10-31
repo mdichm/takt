@@ -1,0 +1,106 @@
+# ============================================================================
+# TAKT — Docker Compose Test (E2E)
+# Fichier : docker-compose.test.yml
+# Étape : G2 — Stratégie CI/CD
+# ============================================================================
+
+version: '3.8'
+
+services:
+  # ------------------------------------------------------------
+  # Base de données — PostgreSQL 16 (test)
+  # ------------------------------------------------------------
+  postgres:
+    image: postgres:16-alpine
+    container_name: takt-postgres-test
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=takt_test
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d takt_test"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+    tmpfs:
+      - /var/lib/postgresql/data
+    networks:
+      - takt-test-network
+
+  # ------------------------------------------------------------
+  # Backend — NestJS API (test)
+  # ------------------------------------------------------------
+  backend:
+    build:
+      context: .
+      dockerfile: apps/backend/Dockerfile
+      target: builder
+    container_name: takt-backend-test
+    command: sh -c "pnpm --filter @takt/db prisma migrate deploy && node dist/main.js"
+    environment:
+      - NODE_ENV=test
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/takt_test
+      - JWT_ACCESS_SECRET=test-access-secret-key-for-testing-only
+      - JWT_REFRESH_SECRET=test-refresh-secret-key-for-testing-only
+      - JWT_ACCESS_TTL=15m
+      - JWT_REFRESH_TTL=7d
+      - SMTP_HOST=mock-smtp
+      - SMTP_PORT=1025
+      - SMTP_USER=test
+      - SMTP_PASSWORD=test
+      - DERIVED_DIR=/tmp/derived
+      - SCENARIOS_DIR=/tmp/scenarios
+      - SOLVER_COMMAND=echo "mock solver"
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - takt-test-network
+    volumes:
+      - ./apps/backend:/app/apps/backend:ro
+      - ./packages/db:/app/packages/db:ro
+
+  # ------------------------------------------------------------
+  # Frontend — React + Vite (test, served by Nginx)
+  # ------------------------------------------------------------
+  frontend:
+    build:
+      context: .
+      dockerfile: apps/frontend/Dockerfile
+      target: builder
+    container_name: takt-frontend-test
+    command: sh -c "pnpm --filter @takt/frontend preview --host 0.0.0.0 --port 8080"
+    environment:
+      - NODE_ENV=test
+      - VITE_API_URL=http://localhost:3000/api/v1
+      - VITE_WS_URL=ws://localhost:3000
+    ports:
+      - "8080:8080"
+    depends_on:
+      - backend
+    networks:
+      - takt-test-network
+    volumes:
+      - ./apps/frontend:/app/apps/frontend:ro
+      - ./packages/design-tokens:/app/packages/design-tokens:ro
+
+  # ------------------------------------------------------------
+  # Mock SMTP (pour tests notifications)
+  # ------------------------------------------------------------
+  mock-smtp:
+    image: mailhog/mailhog:v1.0.1
+    container_name: takt-mock-smtp-test
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    networks:
+      - takt-test-network
+
+networks:
+  takt-test-network:
+    driver: bridge

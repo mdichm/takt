@@ -1,0 +1,311 @@
+# ============================================================================
+# TAKT — Pipeline d'Intégration Continue (CI)
+# Fichier : .github/workflows/ci.yml
+# Étape : G2 — Stratégie CI/CD
+# Déclencheur : Push sur toute branche, Pull Request vers main/develop
+# ============================================================================
+
+name: CI — TAKT
+
+on:
+  push:
+    branches: ['main', 'develop', 'feat/**', 'fix/**']
+  pull_request:
+    branches: ['main', 'develop']
+
+env:
+  NODE_VERSION: '24'
+  PNPM_VERSION: '9'
+  DATABASE_URL: postgresql://postgres:postgres@localhost:5432/takt_test
+
+jobs:
+  # ------------------------------------------------------------
+  # LINT & TYPECHECK
+  # ------------------------------------------------------------
+  lint-and-typecheck:
+    name: Lint + TypeCheck
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint (ESLint)
+        run: pnpm lint
+
+      - name: TypeCheck (TypeScript)
+        run: pnpm typecheck
+# ------------------------------------------------------------
+  # TESTS UNITAIRES + INTÉGRATION
+  # ------------------------------------------------------------
+  test:
+    name: Tests (Unit + Intégration)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: takt_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Prisma Generate
+        run: pnpm --filter @takt/db prisma generate
+
+      - name: Prisma Migrate Dev (test DB)
+        run: pnpm --filter @takt/db prisma migrate dev --name test_migration
+        env:
+          DATABASE_URL: ${{ env.DATABASE_URL }}
+
+      - name: Run Unit Tests
+        run: pnpm test:unit --run
+        env:
+          DATABASE_URL: ${{ env.DATABASE_URL }}
+
+      - name: Run Integration Tests
+        run: pnpm test:integration --run
+        env:
+          DATABASE_URL: ${{ env.DATABASE_URL }}
+
+      - name: Upload Coverage
+        uses: codecov/codecov-action@v4
+        if: always()
+        with:
+          files: ./coverage/lcov.info
+          fail_ci_if_error: false
+
+  # ------------------------------------------------------------
+  # BUILD (Backend + Frontend)
+  # ------------------------------------------------------------
+  build:
+    name: Build Applications
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: [lint-and-typecheck, test]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Prisma Generate
+        run: pnpm --filter @takt/db prisma generate
+
+      - name: Build Backend (NestJS)
+        run: pnpm --filter @takt/backend build
+
+      - name: Build Frontend (Vite + React)
+        run: pnpm --filter @takt/frontend build
+
+      - name: Upload Backend Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-dist
+          path: apps/backend/dist/
+          retention-days: 1
+
+      - name: Upload Frontend Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist
+          path: apps/frontend/dist/
+          retention-days: 1
+# ------------------------------------------------------------
+  # DOCKER BUILD (Validation des images)
+  # ------------------------------------------------------------
+  docker-build:
+    name: Docker Build Validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: build
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download Backend Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-dist
+          path: apps/backend/dist/
+
+      - name: Download Frontend Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-dist
+          path: apps/frontend/dist/
+
+      - name: Build Backend Docker Image
+        run: |
+          docker build -t takt/backend:${{ github.sha }} -f apps/backend/Dockerfile apps/backend
+
+      - name: Build Frontend Docker Image
+        run: |
+          docker build -t takt/frontend:${{ github.sha }} -f apps/frontend/Dockerfile apps/frontend
+
+      - name: Test Backend Image Starts
+        run: |
+          docker run --rm -d --name backend-test -p 3000:3000 \
+            -e DATABASE_URL=postgresql://postgres:postgres@host.docker.internal:5432/takt_test \
+            -e JWT_ACCESS_SECRET=test-secret \
+            -e JWT_REFRESH_SECRET=test-refresh-secret \
+            takt/backend:${{ github.sha }}
+          sleep 10
+          curl -f http://localhost:3000/health || (docker logs backend-test && exit 1)
+          docker stop backend-test
+
+      - name: Test Frontend Image Starts
+        run: |
+          docker run --rm -d --name frontend-test -p 8080:80 takt/frontend:${{ github.sha }}
+          sleep 5
+          curl -f http://localhost:8080/ || (docker logs frontend-test && exit 1)
+          docker stop frontend-test
+
+  # ------------------------------------------------------------
+  # TESTS E2E (Playwright)
+  # ------------------------------------------------------------
+  e2e:
+    name: Tests E2E (Playwright)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: docker-build
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: takt_e2e
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright Browsers
+        run: pnpm --filter @takt/frontend exec playwright install --with-deps chromium
+
+      - name: Start Full Stack (Docker Compose)
+        run: |
+          docker-compose -f docker-compose.test.yml up -d
+          sleep 15
+
+      - name: Run E2E Tests
+        run: pnpm --filter @takt/frontend test:e2e
+        env:
+          BASE_URL: http://localhost:3000
+          API_URL: http://localhost:3000/api/v1
+
+      - name: Upload E2E Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: apps/frontend/test-results/
+          retention-days: 7
+
+      - name: Cleanup
+        if: always()
+        run: docker-compose -f docker-compose.test.yml down -v
+
+  # ------------------------------------------------------------
+  # DEPLOY RECIETTE (sur push main)
+  # ------------------------------------------------------------
+  deploy-recette:
+    name: Deploy Recette
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: [lint-and-typecheck, test, build, docker-build, e2e]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    environment: recette
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Deploy to Recette (SSH + Docker Compose)
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.RECETTE_HOST }}
+          username: ${{ secrets.RECETTE_USER }}
+          key: ${{ secrets.RECETTE_SSH_KEY }}
+          script: |
+            cd /opt/takt
+            git pull origin main
+            docker-compose -f docker-compose.recette.yml pull
+            docker-compose -f docker-compose.recette.yml up -d --remove-orphans
+            # Attendre healthcheck
+            sleep 10
+            curl -f https://recette.takt.internal/health || exit 1
+
+      - name: Run Smoke Tests on Recette
+        run: |
+          sleep 5
+          curl -f https://recette.takt.internal/health
+          curl -f https://recette.takt.internal/api/v1/health
