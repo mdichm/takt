@@ -1,0 +1,44 @@
+# Copyright (C) 2026 TAKT
+# SPDX-License-Identifier: AGPL-3.0-only
+#
+# ============================================================================
+# TAKT — Déploiement de la recette
+# Déclencheur : Push sur main uniquement
+# ============================================================================
+
+name: Deploy Recette — TAKT
+
+on:
+  push:
+    branches: ['main']
+
+jobs:
+  deploy-recette:
+    name: Deploy Recette
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: recette
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Deploy to Recette (SSH + Docker Compose)
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.RECETTE_HOST }}
+          username: ${{ secrets.RECETTE_USER }}
+          key: ${{ secrets.RECETTE_SSH_KEY }}
+          script: |
+            cd /opt/takt
+            git pull origin main
+            docker compose -f docker-compose.recette.yml pull
+            docker compose -f docker-compose.recette.yml up -d --remove-orphans
+            # Attendre healthcheck
+            sleep 10
+            curl -f https://recette.takt.internal/health || exit 1
+
+      - name: Run Smoke Tests on Recette
+        run: |
+          sleep 5
+          curl -f https://recette.takt.internal/health
+          curl -f https://recette.takt.internal/api/v1/health

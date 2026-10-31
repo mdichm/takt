@@ -1,0 +1,2161 @@
+openapi: 3.0.0
+info:
+  title: TAKT API
+  version: 1.0.0
+  description: |
+    API de l'application TAKT — Planification et gestion des emplois du temps pédagogiques.
+    Conforme à la spécification technique docs/ST_TAKT.md (étape E0.6).
+    Authentification par Bearer JWT (access token 15 min + refresh token rotatif 7 j).
+  contact:
+    name: Équipe TAKT
+    email: dev@takt.internal
+  license:
+    name: GNU AGPL v3
+    url: https://www.gnu.org/licenses/agpl-3.0.html
+
+servers:
+  - url: http://localhost:3000/api/v1
+    description: Serveur de développement (NestJS local)
+  - url: https://api.takt.internal/api/v1
+    description: Serveur de production (Nginx reverse proxy)
+
+tags:
+  - name: Auth
+    description: Authentification et gestion de session
+  - name: Utilisateurs
+    description: Gestion des comptes utilisateurs (CRUD)
+  - name: Versions
+    description: Gestion des versions de planning et workflow (10 états, 19 transitions)
+  - name: Seances
+    description: Gestion des séances de cours (CRUD, détection de conflits)
+  - name: Verrous
+    description: Gestion des baux d'édition sur les séances
+  - name: Generations
+    description: Génération d'emplois du temps par CP-SAT et scénarios
+  - name: Exports
+    description: Génération d'exports (XLSX, PDF, ICS)
+  - name: Audit
+    description: Journal d'audit des actions utilisateurs
+
+security:
+  - BearerAuth: []
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        Token d'accès JWT obtenu via POST /auth/login.
+        Durée de vie : 15 minutes. Renouvelable via POST /auth/refresh.
+
+  schemas:
+    ErreurRFC9457:
+      type: object
+      required:
+        - type
+        - title
+        - status
+        - detail
+      properties:
+        type:
+          type: string
+          description: URI d'identification du type d'erreur
+          example: https://api.takt.internal/errors/validation-error
+        title:
+          type: string
+          description: Titre court et lisible de l'erreur
+          example: Erreur de validation
+        status:
+          type: integer
+          description: Code HTTP de l'erreur
+          example: 400
+        detail:
+          type: string
+          description: Description détaillée de l'erreur
+          example: Le champ email est requis.
+        instance:
+          type: string
+          description: URI spécifique à l'occurrence de l'erreur
+          example: /api/v1/users/123
+
+    EnveloppeReponse:
+      type: object
+      required:
+        - data
+        - error
+        - meta
+      properties:
+        data:
+          description: Données de la réponse (null en cas d'erreur)
+        error:
+          $ref: '#/components/schemas/ErreurRFC9457'
+          nullable: true
+        meta:
+          $ref: '#/components/schemas/MetaReponse'
+
+    MetaReponse:
+      type: object
+      properties:
+        requestId:
+          type: string
+          format: uuid
+        timestamp:
+          type: string
+          format: date-time
+        page:
+          type: integer
+        pageSize:
+          type: integer
+        total:
+          type: integer
+
+    Utilisateur:
+      type: object
+      required:
+        - id
+        - email
+        - nom
+        - prenom
+        - roleId
+        - estActif
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        nom:
+          type: string
+        prenom:
+          type: string
+        roleId:
+          type: string
+          format: uuid
+        departementId:
+          type: string
+          format: uuid
+          nullable: true
+        estActif:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    Role:
+      type: object
+      required:
+        - id
+        - code
+        - libelle
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+          enum: [admin, gest, rdep, dir]
+        libelle:
+          type: string
+
+    Departement:
+      type: object
+      required:
+        - id
+        - code
+        - libelle
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        libelle:
+          type: string
+
+    AnneeUniversitaire:
+      type: object
+      required:
+        - id
+        - libelle
+        - dateDebut
+        - dateFin
+      properties:
+        id:
+          type: string
+          format: uuid
+        libelle:
+          type: string
+        dateDebut:
+          type: string
+          format: date-time
+        dateFin:
+          type: string
+          format: date-time
+
+    Semestre:
+      type: object
+      required:
+        - id
+        - numero
+        - anneeUniversitaireId
+        - dateDebut
+        - dateFin
+      properties:
+        id:
+          type: string
+          format: uuid
+        numero:
+          type: integer
+          enum: [1, 2]
+        anneeUniversitaireId:
+          type: string
+          format: uuid
+        dateDebut:
+          type: string
+          format: date-time
+        dateFin:
+          type: string
+
+    Version:
+      type: object
+      required:
+        - id
+        - semestreId
+        - etat
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        semestreId:
+          type: string
+          format: uuid
+        etat:
+          type: string
+          enum: [initial, rep_pedag, brouillon, generation, edition, valid_pedag, valid_dir, valide, publie, archive]
+        snapshotId:
+          type: string
+          format: uuid
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    Snapshot:
+      type: object
+      required:
+        - id
+        - versionId
+        - donnees
+        - hash
+        - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        versionId:
+          type: string
+          format: uuid
+        donnees:
+          type: object
+          description: Données JSONB du snapshot
+        hash:
+          type: string
+          description: Hash d'intégrité du snapshot
+        createdAt:
+          type: string
+          format: date-time
+
+    AffectationPedagogique:
+      type: object
+      required:
+        - id
+        - semestreId
+        - departementId
+        - enseignantId
+        - matiereId
+        - groupeId
+        - volumeHoraire
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        semestreId:
+          type: string
+          format: uuid
+        departementId:
+          type: string
+          format: uuid
+        enseignantId:
+          type: string
+          format: uuid
+        matiereId:
+          type: string
+          format: uuid
+        groupeId:
+          type: string
+          format: uuid
+        volumeHoraire:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    Seance:
+      type: object
+      required:
+        - id
+        - versionId
+        - jour
+        - creneauDebut
+        - nbCreneaux
+        - estVerrouillee
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        versionId:
+          type: string
+          format: uuid
+        jour:
+          type: integer
+          minimum: 1
+          maximum: 6
+          description: 1=lundi … 6=samedi
+        creneauDebut:
+          type: integer
+          minimum: 0
+          description: Index du créneau (0-based par jour)
+        nbCreneaux:
+          type: integer
+          minimum: 1
+          description: Nombre de créneaux consécutifs
+        salleId:
+          type: string
+          format: uuid
+          nullable: true
+        enseignantId:
+          type: string
+          format: uuid
+          nullable: true
+        groupeId:
+          type: string
+          format: uuid
+          nullable: true
+        activiteId:
+          type: string
+          format: uuid
+          nullable: true
+        estVerrouillee:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    VerrouSeance:
+      type: object
+      required:
+        - id
+        - seanceId
+        - utilisateurId
+        - type
+        - heurePose
+        - heureExpiration
+      properties:
+        id:
+          type: string
+          format: uuid
+        seanceId:
+          type: string
+          format: uuid
+        utilisateurId:
+          type: string
+          format: uuid
+        type:
+          type: string
+          enum: [CRENEAU, SALLE, ENSEIGNANT, ACTIVITE]
+        heurePose:
+          type: string
+          format: date-time
+        heureExpiration:
+          type: string
+          format: date-time
+
+    Contrainte:
+      type: object
+      required:
+        - id
+        - versionId
+        - type
+        - cibleId
+        - valeur
+        - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        versionId:
+          type: string
+          format: uuid
+        type:
+          type: string
+          enum: [INDISPONIBILITE, EXIGENCE_SALLE, CONTRAINTE_ENSEIGNANT]
+        cibleId:
+          type: string
+        valeur:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    Generation:
+      type: object
+      required:
+        - id
+        - versionId
+        - statut
+        - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        versionId:
+          type: string
+          format: uuid
+        statut:
+          type: string
+          enum: [EN_COURS, TERMINEE, ECHEC]
+        fichierDerivesId:
+          type: string
+          format: uuid
+          nullable: true
+        scores:
+          type: object
+          description: score_global et sous_scores
+        createdAt:
+          type: string
+          format: date-time
+
+    Scenario:
+      type: object
+      required:
+        - id
+        - generationId
+        - scoreGlobal
+        - sousScores
+        - selectionne
+        - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        generationId:
+          type: string
+          format: uuid
+        scoreGlobal:
+          type: integer
+          minimum: 0
+          maximum: 100
+        sousScores:
+          type: object
+          description: Sous-scores détaillés (respect créneaux, salles, enseignants, couverture)
+        selectionne:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+
+    Export:
+      type: object
+      required:
+        - id
+        - versionId
+        - format
+        - cheminFichier
+        - dateGeneration
+      properties:
+        id:
+          type: string
+          format: uuid
+        versionId:
+          type: string
+          format: uuid
+        format:
+          type: string
+          enum: [xlsx, pdf, ics]
+        cheminFichier:
+          type: string
+        dateGeneration:
+          type: string
+          format: date-time
+
+    JournalAudit:
+      type: object
+      required:
+        - id
+        - action
+        - horodatage
+        - entite
+      properties:
+        id:
+          type: string
+          format: uuid
+        action:
+          type: string
+        horodatage:
+          type: string
+          format: date-time
+        utilisateurId:
+          type: string
+          format: uuid
+          nullable: true
+        entite:
+          type: string
+        entiteId:
+          type: string
+          nullable: true
+        metadonnees:
+          type: object
+          nullable: true
+
+    # ------------------------------------------------------------------------
+    # DTOs de demande (Request bodies)
+    # ------------------------------------------------------------------------
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - motDePasse
+      properties:
+        email:
+          type: string
+          format: email
+        motDePasse:
+          type: string
+          format: password
+
+    RefreshRequest:
+      type: object
+      required:
+        - refreshToken
+      properties:
+        refreshToken:
+          type: string
+
+    TransitionRequest:
+      type: object
+      required:
+        - transition
+      properties:
+        transition:
+          type: string
+          description: "Nom de la transition du workflow (ex: valider_repartition, lancer_generation)"
+
+    SeanceCreateRequest:
+      type: object
+      required:
+        - versionId
+        - jour
+        - creneauDebut
+        - nbCreneaux
+      properties:
+        versionId:
+          type: string
+          format: uuid
+        jour:
+          type: integer
+          minimum: 1
+          maximum: 6
+        creneauDebut:
+          type: integer
+          minimum: 0
+        nbCreneaux:
+          type: integer
+          minimum: 1
+        salleId:
+          type: string
+          format: uuid
+          nullable: true
+        enseignantId:
+          type: string
+          format: uuid
+          nullable: true
+        groupeId:
+          type: string
+          format: uuid
+          nullable: true
+        activiteId:
+          type: string
+          format: uuid
+          nullable: true
+
+    SeanceUpdateRequest:
+      type: object
+      properties:
+        jour:
+          type: integer
+          minimum: 1
+          maximum: 6
+        creneauDebut:
+          type: integer
+          minimum: 0
+        nbCreneaux:
+          type: integer
+          minimum: 1
+        salleId:
+          type: string
+          format: uuid
+          nullable: true
+        enseignantId:
+          type: string
+          format: uuid
+          nullable: true
+        groupeId:
+          type: string
+          format: uuid
+          nullable: true
+        activiteId:
+          type: string
+          format: uuid
+          nullable: true
+
+    LockRequest:
+      type: object
+      required:
+        - seanceId
+        - type
+      properties:
+        seanceId:
+          type: string
+          format: uuid
+        type:
+          type: string
+          enum: [CRENEAU, SALLE, ENSEIGNANT, ACTIVITE]
+
+    GenerationRequest:
+      type: object
+      required:
+        - versionId
+      properties:
+        versionId:
+          type: string
+          format: uuid
+
+    ScenarioSelectRequest:
+      type: object
+      required:
+        - scenarioId
+      properties:
+        scenarioId:
+          type: string
+          format: uuid
+
+    ExportRequest:
+      type: object
+      required:
+        - versionId
+        - format
+      properties:
+        versionId:
+          type: string
+          format: uuid
+        format:
+          type: string
+          enum: [xlsx, pdf, ics]
+
+    # ------------------------------------------------------------------------
+    # DTOs de réponse
+    # ------------------------------------------------------------------------
+    TokenResponse:
+      type: object
+      required:
+        - accessToken
+        - refreshToken
+      properties:
+        accessToken:
+          type: string
+          description: JWT d'accès (durée 15 min)
+        refreshToken:
+          type: string
+          description: JWT de refresh rotatif (durée 7 j)
+
+    UtilisateurResponse:
+      allOf:
+        - $ref: '#/components/schemas/Utilisateur'
+
+    SeanceResponse:
+      allOf:
+        - $ref: '#/components/schemas/Seance'
+
+    VersionResponse:
+      allOf:
+        - $ref: '#/components/schemas/Version'
+
+    GenerationResponse:
+      allOf:
+        - $ref: '#/components/schemas/Generation'
+
+    ScenarioResponse:
+      allOf:
+        - $ref: '#/components/schemas/Scenario'
+
+    ExportResponse:
+      allOf:
+        - $ref: '#/components/schemas/Export'
+
+paths:
+  # ============================================================================
+  # AUTH
+  # ============================================================================
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: Connexion utilisateur
+      description: Authentifie un utilisateur et retourne un access token + refresh token.
+      operationId: authLogin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Connexion réussie
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/EnveloppeReponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/TokenResponse'
+        '400':
+          description: Données de requête invalides
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+        '401':
+          description: Identifiants invalides
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+
+  /auth/refresh:
+    post:
+      tags: [Auth]
+      summary: Renouvellement du token d'accès
+      description: Renouvelle le token d'accès à l'aide du refresh token rotatif.
+      operationId: authRefresh
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshRequest'
+      responses:
+        '200':
+          description: Token renouvelé
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/EnveloppeReponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/TokenResponse'
+        '400':
+          description: Requête invalide
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+        '401':
+          description: Refresh token invalide ou expiré
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+
+  /auth/logout:
+    post:
+      tags: [Auth]
+      summary: Déconnexion
+      description: Invalide le refresh token de la session courante.
+      operationId: authLogout
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshRequest'
+      responses:
+        '200':
+          description: Déconnexion réussie
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnveloppeReponse'
+        '401':
+          description: Non authentifié
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+
+  # ============================================================================
+  # UTILISATEURS
+  # ============================================================================
+  /users:
+    get:
+      tags: [Utilisateurs]
+      summary: Liste des utilisateurs
+      description: Retourne la liste paginée des utilisateurs avec filtres optionnels.
+      operationId: usersList
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+        - in: query
+          name: pageSize
+          schema:
+            type: integer
+            default: 20
+        - in: query
+          name: role
+          schema:
+            type: string
+            enum: [admin, gest, rdep, dir]
+        - in: query
+          name: departementId
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Liste des utilisateurs
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/EnveloppeReponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/UtilisateurResponse'
+        '401':
+          description: Non authentifié
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+        '403':
+          description: Interdit (rôle insuffisant)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+
+    post:
+      tags: [Utilisateurs]
+      summary: Créer un utilisateur
+      description: Crée un nouveau compte utilisateur.
+      operationId: usersCreate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - motDePasse
+                - nom
+                - prenom
+                - roleId
+              properties:
+                email:
+                  type: string
+                  format: email
+                motDePasse:
+                  type: string
+                  format: password
+                nom:
+                  type: string
+                prenom:
+                  type: string
+                roleId:
+                  type: string
+                  format: uuid
+                departementId:
+                  type: string
+                  format: uuid
+                  nullable: true
+      responses:
+        '201':
+          description: Utilisateur créé
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/EnveloppeReponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/UtilisateurResponse'
+        '400':
+          description: Données invalides
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+        '401':
+          description: Non authentifié
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+        '403':
+          description: Interdit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+
+  /users/{id}:
+    get:
+      tags: [Utilisateurs]
+      summary: Détail d'un utilisateur
+      operationId: usersGet
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Détail utilisateur
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/EnveloppeReponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/UtilisateurResponse'
+        '401':
+          description: Non authentifié
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+        '403':
+          description: Interdit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+        '404':
+          description: Utilisateur non trouvé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+
+    put:
+      tags: [Utilisateurs]
+      summary: Modifier un utilisateur
+      operationId: usersUpdate
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                nom:
+                  type: string
+                prenom:
+                  type: string
+                roleId:
+                  type: string
+                  format: uuid
+                departementId:
+                  type: string
+                  format: uuid
+                  nullable: true
+                estActif:
+                  type: boolean
+      responses:
+        '200':
+          description: Utilisateur modifié
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/EnveloppeReponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/UtilisateurResponse'
+        '400':
+          description: Données invalides
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+        '401':
+          description: Non authentifié
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+        '403':
+          description: Interdit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+        '404':
+          description: Utilisateur non trouvé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+
+    delete:
+      tags: [Utilisateurs]
+      summary: Supprimer un utilisateur
+      operationId: usersDelete
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Utilisateur supprimé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnveloppeReponse'
+        '401':
+          description: Non authentifié
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+        '403':
+          description: Interdit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+        '404':
+          description: Utilisateur non trouvé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+
+  # ============================================================================
+  # VERSIONS
+  # ============================================================================
+  /versions:
+    get:
+      tags: [Versions]
+      summary: Liste des versions
+      description: Retourne la liste des versions de planning avec filtres.
+      operationId: versionsList
+      parameters:
+        - in: query
+          name: semestreId
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: etat
+          schema:
+            type: string
+            enum: [initial, rep_pedag, brouillon, generation, edition, valid_pedag, valid_dir, valide, publie, archive]
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+        - in: query
+          name: pageSize
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: Liste des versions
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/EnveloppeReponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/VersionResponse'
+        '401':
+          description: Non authentifié
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+
+    post:
+      tags: [Versions]
+      summary: Créer une version
+      description: Crée une nouvelle version de planning pour un semestre.
+      operationId: versionsCreate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - semestreId
+              properties:
+                semestreId:
+                  type: string
+                  format: uuid
+      responses:
+        '201':
+          description: Version créée
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/EnveloppeReponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/VersionResponse'
+        '400':
+          description: Données invalides
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+        '401':
+          description: Non authentifié
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+        '403':
+          description: Interdit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+
+  /versions/{id}:
+    get:
+      tags: [Versions]
+      summary: Détail d'une version
+      operationId: versionsGet
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Détail version
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/EnveloppeReponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/VersionResponse'
+        '401':
+          description: Non authentifié
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+        '403':
+          description: Interdit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+        '404':
+          description: Version non trouvée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+
+    put:
+      tags: [Versions]
+      summary: Modifier une version
+      operationId: versionsUpdate
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                etat:
+                  type: string
+                  enum: [initial, rep_pedag, brouillon, generation, edition, valid_pedag, valid_dir, valide, publie, archive]
+                snapshotId:
+                  type: string
+                  format: uuid
+                  nullable: true
+      responses:
+        '200':
+          description: Version modifiée
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/EnveloppeReponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/VersionResponse'
+        '400':
+          description: Données invalides
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+        '401':
+          description: Non authentifié
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+        '403':
+          description: Interdit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+        '404':
+          description: Version non trouvée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+
+    delete:
+      tags: [Versions]
+      summary: Supprimer une version
+      operationId: versionsDelete
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Version supprimée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnveloppeReponse'
+        '401':
+          description: Non authentifié
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+        '403':
+          description: Interdit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+        '404':
+          description: Version non trouvée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+
+  /versions/{id}/transition:
+    post:
+      tags: [Versions]
+      summary: Transition d'état du workflow
+      description: Applique une transition d'état sur la version (19 transitions possibles).
+      operationId: versionsTransition
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransitionRequest'
+      responses:
+        '200':
+          description: Transition effectuée
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/EnveloppeReponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/VersionResponse'
+        '400':
+          description: Transition invalide
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+        '401':
+          description: Non authentifié
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+        '403':
+          description: Interdit (droits insuffisants)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+        '404':
+          description: Version non trouvée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+        '409':
+          description: Conflit (transition non autorisée pour l'état courant)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+
+  # ============================================================================
+  # SEANCES
+  # ============================================================================
+  /seances:
+    get:
+      tags: [Seances]
+      summary: Liste des séances
+      description: Retourne la liste des séances d'une version avec filtres.
+      operationId: seancesList
+      parameters:
+        - in: query
+          name: versionId
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: jour
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 6
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+        - in: query
+          name: pageSize
+          schema:
+            type: integer
+            default: 50
+      responses:
+        '200':
+          description: Liste des séances
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/EnveloppeReponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/SeanceResponse'
+        '400':
+          description: Paramètres invalides
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+        '401':
+          description: Non authentifié
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+
+    post:
+      tags: [Seances]
+      summary: Créer une séance
+      description: Crée une nouvelle séance dans une version.
+      operationId: seancesCreate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SeanceCreateRequest'
+      responses:
+        '201':
+          description: Séance créée
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/EnveloppeReponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/SeanceResponse'
+        '400':
+          description: Données invalides ou conflit de créneau
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+        '401':
+          description: Non authentifié
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+        '403':
+          description: Interdit (séance verrouillée ou droits insuffisants)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+        '409':
+          description: Conflit de créneau (salle, enseignant ou groupe déjà occupé)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+
+  /seances/{id}:
+    get:
+      tags: [Seances]
+      summary: Détail d'une séance
+      operationId: seancesGet
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Détail séance
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/EnveloppeReponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/SeanceResponse'
+        '401':
+          description: Non authentifié
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+        '404':
+          description: Séance non trouvée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+
+    put:
+      tags: [Seances]
+      summary: Modifier une séance
+      operationId: seancesUpdate
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SeanceUpdateRequest'
+      responses:
+        '200':
+          description: Séance modifiée
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/EnveloppeReponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/SeanceResponse'
+        '400':
+          description: Données invalides
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+        '401':
+          description: Non authentifié
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+        '403':
+          description: Interdit (séance verrouillée)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+        '404':
+          description: Séance non trouvée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+        '409':
+          description: Conflit de créneau
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+
+    patch:
+      tags: [Seances]
+      summary: Modification partielle d'une séance
+      operationId: seancesPatch
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SeanceUpdateRequest'
+      responses:
+        '200':
+          description: Séance modifiée
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/EnveloppeReponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/SeanceResponse'
+        '400':
+          description: Données invalides
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+        '401':
+          description: Non authentifié
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+        '403':
+          description: Interdit (séance verrouillée)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+        '404':
+          description: Séance non trouvée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+        '409':
+          description: Conflit de créneau
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+
+    delete:
+      tags: [Seances]
+      summary: Supprimer une séance
+      operationId: seancesDelete
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Séance supprimée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnveloppeReponse'
+        '401':
+          description: Non authentifié
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+        '403':
+          description: Interdit (séance verrouillée)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+        '404':
+          description: Séance non trouvée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+
+  # ============================================================================
+  # VERROUS
+  # ============================================================================
+  /locks:
+    post:
+      tags: [Verrous]
+      summary: Poser un verrou sur une séance
+      description: Crée un bail d'édition exclusif sur une séance (30 min, renouvelable).
+      operationId: locksCreate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LockRequest'
+      responses:
+        '201':
+          description: Verrou posé
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/EnveloppeReponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/VerrouSeance'
+        '400':
+          description: Données invalides
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+        '401':
+          description: Non authentifié
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+        '403':
+          description: Interdit (séance déjà verrouillée par un autre utilisateur)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+        '404':
+          description: Séance non trouvée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+        '423':
+          description: Verrouillé (bail d'édition actif par un autre utilisateur)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+
+  /locks/{id}:
+    delete:
+      tags: [Verrous]
+      summary: Lever un verrou
+      description: Libère le bail d'édition sur une séance.
+      operationId: locksDelete
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Verrou levé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnveloppeReponse'
+        '401':
+          description: Non authentifié
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+        '403':
+          description: Interdit (pas le propriétaire du verrou)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+        '404':
+          description: Verrou non trouvé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+
+  # ============================================================================
+  # GENERATIONS
+  # ============================================================================
+  /generations:
+    get:
+      tags: [Generations]
+      summary: Liste des générations
+      description: Retourne la liste des jobs de génération CP-SAT.
+      operationId: generationsList
+      parameters:
+        - in: query
+          name: versionId
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: statut
+          schema:
+            type: string
+            enum: [EN_COURS, TERMINEE, ECHEC]
+      responses:
+        '200':
+          description: Liste des générations
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/EnveloppeReponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/GenerationResponse'
+        '400':
+          description: Paramètres invalides
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+        '401':
+          description: Non authentifié
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+
+    post:
+      tags: [Generations]
+      summary: Lancer une génération CP-SAT
+      description: Déclenche la génération d'emplois du temps pour une version.
+      operationId: generationsCreate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenerationRequest'
+      responses:
+        '202':
+          description: Génération lancée (job en file d'attente)
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/EnveloppeReponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/GenerationResponse'
+        '400':
+          description: Prérequis non remplis
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+        '401':
+          description: Non authentifié
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+        '403':
+          description: Interdit (tous départements n'ont pas validé)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+        '409':
+          description: Conflit (génération déjà en cours)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+
+  /generations/{id}/scenarios:
+    get:
+      tags: [Generations]
+      summary: Scénarios d'une génération
+      description: Retourne les scénarios produits par le solver pour une génération.
+      operationId: generationsScenarios
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Liste des scénarios
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/EnveloppeReponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/ScenarioResponse'
+        '401':
+          description: Non authentifié
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+        '404':
+          description: Génération non trouvée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+
+  /generations/{id}/select:
+    post:
+      tags: [Generations]
+      summary: Sélectionner un scénario
+      description: Sélectionne un scénario produit par le solver et crée une version en édition.
+      operationId: generationsSelect
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScenarioSelectRequest'
+      responses:
+        '200':
+          description: Scénario sélectionné
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/EnveloppeReponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/VersionResponse'
+        '400':
+          description: Données invalides
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+        '401':
+          description: Non authentifié
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+        '403':
+          description: Interdit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+        '404':
+          description: Génération ou scénario non trouvé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+
+  # ============================================================================
+  # EXPORTS
+  # ============================================================================
+  /exports:
+    get:
+      tags: [Exports]
+      summary: Liste des exports
+      description: Retourne la liste des fichiers d'export générés.
+      operationId: exportsList
+      parameters:
+        - in: query
+          name: versionId
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: format
+          schema:
+            type: string
+            enum: [xlsx, pdf, ics]
+      responses:
+        '200':
+          description: Liste des exports
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/EnveloppeReponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/ExportResponse'
+        '400':
+          description: Paramètres invalides
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+        '401':
+          description: Non authentifié
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+
+    post:
+      tags: [Exports]
+      summary: Lancer un export
+      description: Génère un fichier d'export (XLSX, PDF ou ICS) pour une version publiée.
+      operationId: exportsCreate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExportRequest'
+      responses:
+        '202':
+          description: Export lancé (job en file d'attente)
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/EnveloppeReponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/ExportResponse'
+        '400':
+          description: Données invalides
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+        '401':
+          description: Non authentifié
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+        '403':
+          description: Interdit (version non publiée)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+        '404':
+          description: Version non trouvée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+
+  # ============================================================================
+  # AUDIT
+  # ============================================================================
+  /audit:
+    get:
+      tags: [Audit]
+      summary: Journal d'audit
+      description: Retourne les entrées du journal d'audit avec filtres.
+      operationId: auditList
+      parameters:
+        - in: query
+          name: action
+          schema:
+            type: string
+        - in: query
+          name: entite
+          schema:
+            type: string
+        - in: query
+          name: utilisateurId
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+        - in: query
+          name: pageSize
+          schema:
+            type: integer
+            default: 50
+      responses:
+        '200':
+          description: Liste des entrées d'audit
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/EnveloppeReponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/JournalAudit'
+        '400':
+          description: Paramètres invalides
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+        '401':
+          description: Non authentifié
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+        '403':
+          description: Interdit (droits insuffisants)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          format: date-time

@@ -1,0 +1,249 @@
+# ============================================================================
+# TAKT — Docker Compose Production
+# Fichier : docker-compose.prod.yml
+# Étape : G2 — Stratégie CI/CD / G4 — Gestion des secrets
+# ============================================================================
+
+version: '3.8'
+
+services:
+  # ------------------------------------------------------------
+  # Reverse Proxy — Nginx (TLS termination, rate limiting)
+  # ------------------------------------------------------------
+  nginx:
+    image: nginx:alpine
+    container_name: takt-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.prod.conf:/etc/nginx/nginx.conf:ro
+      - ./certs:/etc/nginx/certs:ro
+      - /var/log/nginx:/var/log/nginx
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - takt-network
+
+  # ------------------------------------------------------------
+  # Frontend — React + Vite (servi par Nginx)
+  # ------------------------------------------------------------
+  frontend:
+    image: takt/frontend:${IMAGE_TAG:-latest}
+    container_name: takt-frontend
+    restart: unless-stopped
+    expose:
+      - "80"
+    networks:
+      - takt-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+# ------------------------------------------------------------
+  # Backend — NestJS API
+  # ------------------------------------------------------------
+  backend:
+    image: takt/backend:${IMAGE_TAG:-latest}
+    container_name: takt-backend
+    restart: unless-stopped
+    expose:
+      - "3000"
+    env_file:
+      - .env.prod
+    secrets:
+      - jwt_access_secret
+      - jwt_refresh_secret
+      - smtp_password
+      - database_url
+    environment:
+      - NODE_ENV=production
+      - JWT_ACCESS_SECRET_FILE=/run/secrets/jwt_access_secret
+      - JWT_REFRESH_SECRET_FILE=/run/secrets/jwt_refresh_secret
+      - SMTP_PASSWORD_FILE=/run/secrets/smtp_password
+      - DATABASE_URL_FILE=/run/secrets/database_url
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - takt-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  # ------------------------------------------------------------
+  # Worker CP-SAT — Génération d'emplois du temps (isolé)
+  # ------------------------------------------------------------
+  solver-worker:
+    image: takt/solver-worker:${IMAGE_TAG:-latest}
+    container_name: takt-solver-worker
+    restart: unless-stopped
+    env_file:
+      - .env.prod
+    secrets:
+      - database_url
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL_FILE=/run/secrets/database_url
+      - WORKER_CONCURRENCY=2
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - takt-network
+    deploy:
+      resources:
+        limits:
+          cpus: '4'
+          memory: 4G
+        reservations:
+          cpus: '2'
+          memory: 2G
+
+  # ------------------------------------------------------------
+  # Base de données — PostgreSQL 16
+  # ------------------------------------------------------------
+  postgres:
+    image: postgres:16-alpine
+    container_name: takt-postgres
+    restart: unless-stopped
+    env_file:
+      - .env.prod
+    secrets:
+      - postgres_password
+    environment:
+      - POSTGRES_PASSWORD_FILE=/run/secrets/postgres_password
+      - POSTGRES_DB=takt
+      - POSTGRES_USER=takt
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./init-scripts:/docker-entrypoint-initdb.d:ro
+    networks:
+      - takt-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U takt -d takt"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+        reservations:
+          cpus: '1'
+          memory: 1G
+
+  # ------------------------------------------------------------
+  # pgBackRest — Sauvegardes
+  # ------------------------------------------------------------
+  pgbackrest:
+    image: pgbackrest/pgbackrest:latest
+    container_name: takt-pgbackrest
+    restart: unless-stopped
+    env_file:
+      - .env.prod
+    secrets:
+      - postgres_password
+      - pgbackrest_s3_key
+      - pgbackrest_s3_secret
+    environment:
+      - PGPASSWORD_FILE=/run/secrets/postgres_password
+      - PGBACKREST_S3_KEY_FILE=/run/secrets/pgbackrest_s3_key
+      - PGBACKREST_S3_SECRET_FILE=/run/secrets/pgbackrest_s3_secret
+      - PGBACKREST_REPO1_TYPE=s3
+      - PGBACKREST_REPO1_S3_BUCKET=takt-backups
+      - PGBACKREST_REPO1_S3_REGION=fr-par
+      - PGBACKREST_REPO1_S3_ENDPOINT=s3.fr-par.scw.cloud
+      - PGBACKREST_LOG_LEVEL_CONSOLE=info
+    volumes:
+      - pgbackrest-data:/var/lib/pgbackrest
+      - ./pgbackrest.conf:/etc/pgbackrest/pgbackrest.conf:ro
+    depends_on:
+      - postgres
+    networks:
+      - takt-network
+
+  # ------------------------------------------------------------
+  # Prometheus — Métriques
+  # ------------------------------------------------------------
+  prometheus:
+    image: prom/prometheus:v2.47
+    container_name: takt-prometheus
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=30d'
+      - '--web.enable-lifecycle'
+    networks:
+      - takt-network
+
+  # ------------------------------------------------------------
+  # Grafana — Dashboards
+  # ------------------------------------------------------------
+  grafana:
+    image: grafana/grafana:10.2
+    container_name: takt-grafana
+    restart: unless-stopped
+    ports:
+      - "3001:3000"
+    env_file:
+      - .env.prod
+    secrets:
+      - grafana_admin_password
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD_FILE=/run/secrets/grafana_admin_password
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./grafana/datasources:/etc/grafana/provisioning/datasources:ro
+    depends_on:
+      - prometheus
+    networks:
+      - takt-network
+
+networks:
+  takt-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+volumes:
+  postgres-data:
+  pgbackrest-data:
+  prometheus-data:
+  grafana-data:
+
+secrets:
+  jwt_access_secret:
+    file: ./secrets/jwt_access_secret.txt
+  jwt_refresh_secret:
+    file: ./secrets/jwt_refresh_secret.txt
+  smtp_password:
+    file: ./secrets/smtp_password.txt
+  database_url:
+    file: ./secrets/database_url.txt
+  postgres_password:
+    file: ./secrets/postgres_password.txt
+  pgbackrest_s3_key:
+    file: ./secrets/pgbackrest_s3_key.txt
+  pgbackrest_s3_secret:
+    file: ./secrets/pgbackrest_s3_secret.txt
+  grafana_admin_password:
+    file: ./secrets/grafana_admin_password.txt
