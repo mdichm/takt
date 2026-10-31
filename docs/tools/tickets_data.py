@@ -78,7 +78,7 @@ TICKETS: List[Ticket] = [
         lot="L01",
         titre="Initialiser le monorepo pnpm + Turborepo",
         sp=5,
-        status="À faire",
+        status="En cours",
         deps=['TAKT-L01-01'],
         exigences=['ST_TAKT §0.1', 'ST_TAKT §1.2', 'PLAN_MACRO E1.1', 'GG-02.'],
     ),
