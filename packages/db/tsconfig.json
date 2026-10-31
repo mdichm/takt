@@ -11,8 +11,8 @@
     "declaration": true,
     "declarationMap": true,
     "outDir": "./dist",
-    "rootDir": "./src"
+    "rootDir": "."
   },
-  "include": ["prisma/seed.ts", "prisma/prisma.config.ts"],
+  "include": ["prisma/seed.ts", "prisma/prisma.config.ts", "src/**/*"],
   "exclude": ["node_modules", "dist"]
 }

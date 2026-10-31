@@ -7,6 +7,10 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
+      '@takt/contracts': path.resolve(__dirname, '../../packages/contracts/src'),
+      '@takt/design-tokens': path.resolve(__dirname, '../../packages/design-tokens/src'),
+      '@takt/db': path.resolve(__dirname, '../../packages/db'),
+      '@takt/solver-client': path.resolve(__dirname, '../../packages/solver-client/src'),
     },
   },
   test: {
