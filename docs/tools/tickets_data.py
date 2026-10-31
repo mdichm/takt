@@ -87,7 +87,7 @@ TICKETS: List[Ticket] = [
         lot="L01",
         titre="Créer le squelette du backend NestJS (santé, Swagger, configuration)",
         sp=3,
-        status="À faire",
+        status="En cours",
         deps=['TAKT-L01-02'],
         exigences=['ST_TAKT §1.2', 'ST_TAKT §3.1', 'PLAN_MACRO E1.3', 'TE-API-06.'],
     ),

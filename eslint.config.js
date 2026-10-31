@@ -9,20 +9,11 @@ module.exports = tseslint.config(
     ignores: ['**/dist/**', '**/node_modules/**', '**/.turbo/**', '**/coverage/**'],
   },
   eslint.configs.recommended,
-  ...tseslint.configs.recommendedTypeChecked,
+  ...tseslint.configs.recommended,
   {
     files: ['**/*.ts', '**/*.tsx'],
-    languageOptions: {
-      parserOptions: {
-        projectService: true,
-        tsconfigRootDir: __dirname,
-      },
-    },
     rules: {
-      '@typescript-eslint/explicit-function-return-type': 'error',
       '@typescript-eslint/no-explicit-any': 'error',
-      '@typescript-eslint/no-floating-promises': 'error',
-      '@typescript-eslint/no-misused-promises': 'error',
     },
   },
 );

@@ -35,7 +35,12 @@ describe('ZodValidationPipe (global)', () => {
 
   it('laisse passer la valeur si aucun schéma n’est attaché à la route', () => {
     const valeur = { libre: true };
-    expect(pipe.transform(valeur, metadonnees('body', function sansSchema() {}))).toBe(valeur);
+    expect(
+      pipe.transform(
+        valeur,
+        metadonnees('body', function sansSchema() {}),
+      ),
+    ).toBe(valeur);
   });
 
   it('valide et transforme le corps de la requête', () => {
@@ -49,7 +54,10 @@ describe('ZodValidationPipe (global)', () => {
   it('rejette un corps invalide avec une erreur 400 VALIDATION_ERROR', () => {
     let exception: unknown;
     try {
-      pipe.transform({ email: 'pas-un-email' }, metadonnees('body', ControleurTest.prototype.creerCorps));
+      pipe.transform(
+        { email: 'pas-un-email' },
+        metadonnees('body', ControleurTest.prototype.creerCorps),
+      );
     } catch (err: unknown) {
       exception = err;
     }
@@ -60,8 +68,8 @@ describe('ZodValidationPipe (global)', () => {
       details: { champ: string; message: string }[];
     };
     expect(reponse.code).toBe('VALIDATION_ERROR');
-    expect(reponse.details[0].champ).toBe('email');
-    expect(reponse.details[0].message).toBe('Email invalide');
+    expect(reponse.details[0]!.champ).toBe('email');
+    expect(reponse.details[0]!.message).toBe('Email invalide');
   });
 
   it('valide la query string lorsque le schéma est attaché à la query', () => {
