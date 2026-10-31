@@ -1,0 +1,39 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "pipeline": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**", ".next/**", "apps/backend/dist/**"],
+      "cache": true
+    },
+    "lint": {
+      "outputs": []
+    },
+    "test": {
+      "outputs": []
+    },
+    "typecheck": {
+      "outputs": []
+    },
+    "db:generate": {
+      "outputs": []
+    },
+    "db:migrate:dev": {
+      "outputs": []
+    },
+    "db:migrate:deploy": {
+      "outputs": []
+    },
+    "db:verify": {
+      "outputs": []
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    }
+  },
+  "globalDependencies": [
+    ".env.local",
+    ".env.*.local"
+  ]
+}

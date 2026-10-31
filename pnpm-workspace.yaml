@@ -1,0 +1,10 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+
+# Exclude generated artifacts
+exclude:
+  - "dist/**"
+  - "node_modules"
+  - ".turbo"
+  - "coverage"
