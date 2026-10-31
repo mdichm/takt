@@ -16,3 +16,9 @@ coverage/
 vercel.env
 __pycache__/
 *.pyc
+
+# Rapports et artefacts Playwright (E2E)
+playwright-report/
+test-results/
+blob-report/
+.playwright/

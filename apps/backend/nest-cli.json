@@ -1,0 +1,12 @@
+{
+  "collection": "@nestjs/schematics",
+  "sourceRoot": "src",
+  "entryFile": "src/main.ts",
+  "language": "ts",
+  "generate": {
+    "lib": {
+      "entryFile": "src/index.ts",
+      "sourceRoot": "src"
+    }
+  }
+}

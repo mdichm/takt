@@ -1,0 +1,16 @@
+{
+  "name": "@takt/design-tokens",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Design tokens TAKT — couleurs, espacements, typographies (0 couleur en dur)",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "typescript": "5.5.x"
+  }
+}

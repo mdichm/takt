@@ -15,7 +15,6 @@ on:
 
 env:
   NODE_VERSION: '24'
-  PNPM_VERSION: '9'
   DATABASE_URL: postgresql://postgres:postgres@localhost:5432/takt_test
 
 jobs:
@@ -32,8 +31,6 @@ jobs:
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: ${{ env.PNPM_VERSION }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -43,6 +40,11 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      # Le client Prisma est généré : `@takt/db/src/index.ts` réexporte
+      # `PrismaClient`, dont les types n'existent qu'après génération.
+      - name: Prisma Generate
+        run: pnpm --filter @takt/db db:generate
 
       - name: Lint (ESLint)
         run: pnpm lint
@@ -75,8 +77,6 @@ jobs:
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: ${{ env.PNPM_VERSION }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -88,20 +88,22 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Prisma Generate
-        run: pnpm --filter @takt/db prisma generate
+        run: pnpm --filter @takt/db db:generate
 
-      - name: Prisma Migrate Dev (test DB)
-        run: pnpm --filter @takt/db prisma migrate dev --name test_migration
+      # Les migrations Prisma n'existent pas encore (ticket TAKT-L01-04) :
+      # `db push` synchronise le schéma sans créer de fichier de migration.
+      - name: Prisma Sync Schema (test DB)
+        run: pnpm --filter @takt/db db:push
         env:
           DATABASE_URL: ${{ env.DATABASE_URL }}
 
       - name: Run Unit Tests
-        run: pnpm test:unit --run
+        run: pnpm test:unit
         env:
           DATABASE_URL: ${{ env.DATABASE_URL }}
 
       - name: Run Integration Tests
-        run: pnpm test:integration --run
+        run: pnpm test:integration
         env:
           DATABASE_URL: ${{ env.DATABASE_URL }}
 
@@ -126,8 +128,6 @@ jobs:
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: ${{ env.PNPM_VERSION }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -139,13 +139,12 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Prisma Generate
-        run: pnpm --filter @takt/db prisma generate
+        run: pnpm --filter @takt/db db:generate
 
-      - name: Build Backend (NestJS)
-        run: pnpm --filter @takt/backend build
-
-      - name: Build Frontend (Vite + React)
-        run: pnpm --filter @takt/frontend build
+      # Turbo construit les packages de workspace dans l'ordre des dependances
+      # (contracts, design-tokens, db, solver-client) avant les applications.
+      - name: Build All Applications (Turbo)
+        run: pnpm build
 
       - name: Upload Backend Artifact
         uses: actions/upload-artifact@v4
@@ -186,11 +185,11 @@ jobs:
 
       - name: Build Backend Docker Image
         run: |
-          docker build -t takt/backend:${{ github.sha }} -f apps/backend/Dockerfile apps/backend
+          docker build -t takt/backend:${{ github.sha }} -f apps/backend/Dockerfile .
 
       - name: Build Frontend Docker Image
         run: |
-          docker build -t takt/frontend:${{ github.sha }} -f apps/frontend/Dockerfile apps/frontend
+          docker build -t takt/frontend:${{ github.sha }} -f apps/frontend/Dockerfile .
 
       - name: Test Backend Image Starts
         run: |
@@ -218,27 +217,14 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     needs: docker-build
-    services:
-      postgres:
-        image: postgres:16-alpine
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: takt_e2e
-        ports: ['5432:5432']
-        options: >-
-          --health-cmd="pg_isready -U postgres"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=5
+    # Pas de service PostgreSQL ici : la stack docker-compose.test.yml fournit
+    # sa propre base (interne au reseau du compose, sans port publie).
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: ${{ env.PNPM_VERSION }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -254,13 +240,24 @@ jobs:
 
       - name: Start Full Stack (Docker Compose)
         run: |
-          docker-compose -f docker-compose.test.yml up -d
-          sleep 15
+          docker compose -f docker-compose.test.yml up -d
+          sleep 20
+
+      - name: Wait for backend health
+        run: |
+          for i in $(seq 1 30); do
+            if curl -f http://localhost:3000/health; then
+              echo "Backend prêt"
+              break
+            fi
+            sleep 2
+          done
+          curl -f http://localhost:3000/health
 
       - name: Run E2E Tests
         run: pnpm --filter @takt/frontend test:e2e
         env:
-          BASE_URL: http://localhost:3000
+          BASE_URL: http://localhost:8080
           API_URL: http://localhost:3000/api/v1
 
       - name: Upload E2E Report
@@ -268,12 +265,14 @@ jobs:
         if: always()
         with:
           name: playwright-report
-          path: apps/frontend/test-results/
+          path: |
+            apps/frontend/playwright-report/
+            apps/frontend/test-results/
           retention-days: 7
 
       - name: Cleanup
         if: always()
-        run: docker-compose -f docker-compose.test.yml down -v
+        run: docker compose -f docker-compose.test.yml down -v
 
   # ------------------------------------------------------------
   # DEPLOY RECIETTE (sur push main)
@@ -298,8 +297,8 @@ jobs:
           script: |
             cd /opt/takt
             git pull origin main
-            docker-compose -f docker-compose.recette.yml pull
-            docker-compose -f docker-compose.recette.yml up -d --remove-orphans
+            docker compose -f docker-compose.recette.yml pull
+            docker compose -f docker-compose.recette.yml up -d --remove-orphans
             # Attendre healthcheck
             sleep 10
             curl -f https://recette.takt.internal/health || exit 1

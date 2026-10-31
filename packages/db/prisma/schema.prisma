@@ -1,0 +1,283 @@
+// ============================================================================
+// TAKT — Modèle de données (MLD/MDP)
+// Fichier : packages/db/prisma/contract.prisma
+// Étape E0.5 — Conforme à docs/ST_TAKT.md §2
+// Générateur : Prisma Client (@takt/db)
+// ============================================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ----------------------------------------------------------------------------
+// 1. Utilisateur — Comptes applicatifs (admin, gest, rdep, dir)
+// ----------------------------------------------------------------------------
+model Utilisateur {
+  id             String   @id @default(uuid()) @db.Uuid
+  email          String   @unique
+  nom            String
+  prenom         String
+  roleId         String   @db.Uuid
+  departementId  String?  @db.Uuid
+  estActif       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  role           Role       @relation(fields: [roleId], references: [id])
+  departement    Departement? @relation(fields: [departementId], references: [id])
+  verrous        VerrouSeance[]
+  journalAudit   JournalAudit[]
+  affectations   AffectationPedagogique[]
+
+  @@index([email])
+  @@index([roleId])
+  @@index([departementId])
+}
+
+// ----------------------------------------------------------------------------
+// 2. Role — Référentiel des rôles (admin, gest, rdep, dir)
+// ----------------------------------------------------------------------------
+model Role {
+  id        String   @id @default(uuid()) @db.Uuid
+  code      String   @unique // admin, gest, rdep, dir
+  libelle   String
+  utilisateurs Utilisateur[]
+
+  @@index([code])
+}
+
+// ----------------------------------------------------------------------------
+// 3. Departement — Référentiel des départements
+// ----------------------------------------------------------------------------
+model Departement {
+  id          String   @id @default(uuid()) @db.Uuid
+  code        String   @unique
+  libelle     String
+  utilisateurs Utilisateur[]
+  affectations AffectationPedagogique[]
+
+  @@index([code])
+}
+
+// ----------------------------------------------------------------------------
+// 4. AnneeUniversitaire — Années académiques
+// ----------------------------------------------------------------------------
+model AnneeUniversitaire {
+  id        String   @id @default(uuid()) @db.Uuid
+  libelle   String   @unique
+  dateDebut DateTime
+  dateFin   DateTime
+  semestres Semestre[]
+
+  @@index([libelle])
+}
+
+// ----------------------------------------------------------------------------
+// 5. Semestre — Semestres (1 ou 2 par année)
+// ----------------------------------------------------------------------------
+model Semestre {
+  id                String   @id @default(uuid()) @db.Uuid
+  numero            Int      // 1 ou 2
+  anneeUniversitaireId String @db.Uuid
+  dateDebut         DateTime
+  dateFin           DateTime
+  anneeUniversitaire AnneeUniversitaire @relation(fields: [anneeUniversitaireId], references: [id])
+  versions          Version[]
+  affectations      AffectationPedagogique[]
+
+  @@index([anneeUniversitaireId])
+  @@index([numero])
+}
+
+// ----------------------------------------------------------------------------
+// 6. Version — Version de planning pour un semestre (10 états)
+// ----------------------------------------------------------------------------
+model Version {
+  id          String   @id @default(uuid()) @db.Uuid
+  semestreId  String   @db.Uuid
+  etat        String   // initial, rep_pedag, brouillon, generation, edition, valid_pedag, valid_dir, valide, publie, archive
+  snapshotId  String?  @db.Uuid
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  semestre    Semestre    @relation(fields: [semestreId], references: [id])
+  snapshot    Snapshot?   @relation()
+  seances     Seance[]
+  generations Generation[]
+  exports     Export[]
+  contraintes Contrainte[]
+
+  @@index([semestreId])
+  @@index([etat])
+}
+
+// ----------------------------------------------------------------------------
+// 7. Snapshot — Snapshot immuable des données d'une version
+// ----------------------------------------------------------------------------
+model Snapshot {
+  id        String   @id @default(uuid()) @db.Uuid
+  versionId String   @db.Uuid @unique
+  donnees   Json     // données JSONB du snapshot
+  hash      String   // hash d'intégrité du snapshot
+  createdAt DateTime @default(now())
+
+  version   Version  @relation(fields: [versionId], references: [id])
+}
+
+// ----------------------------------------------------------------------------
+// 8. AffectationPedagogique — Enseignant ↔ Matière ↔ Groupe, volume horaire
+// ----------------------------------------------------------------------------
+model AffectationPedagogique {
+  id                String   @id @default(uuid()) @db.Uuid
+  semestreId        String   @db.Uuid
+  departementId     String   @db.Uuid
+  enseignantId      String   @db.Uuid
+  matiereId         String   @db.Uuid
+  groupeId          String   @db.Uuid
+  volumeHoraire     Int      // volume horaire annuel ou semestriel
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  semestre    Semestre        @relation(fields: [semestreId], references: [id])
+  departement Departement     @relation(fields: [departementId], references: [id])
+  enseignant  Utilisateur     @relation(fields: [enseignantId], references: [id])
+
+  @@index([semestreId])
+  @@index([departementId])
+  @@index([enseignantId])
+}
+
+// ----------------------------------------------------------------------------
+// 9. Seance — Séance de cours (créneau récurrent)
+// ----------------------------------------------------------------------------
+model Seance {
+  id             String   @id @default(uuid()) @db.Uuid
+  versionId      String   @db.Uuid
+  jour           Int      // 1=lundi … 6=samedi
+  creneauDebut   Int      // index du créneau (0-based par jour)
+  nbCreneaux     Int      // nombre de créneaux consécutifs
+  salleId        String?  @db.Uuid
+  enseignantId   String?  @db.Uuid
+  groupeId       String?  @db.Uuid
+  activiteId     String?  @db.Uuid
+  estVerrouillee Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  version   Version     @relation(fields: [versionId], references: [id])
+  verrous   VerrouSeance[]
+
+  @@index([versionId])
+  @@index([versionId, jour])
+  @@unique([versionId, jour, creneauDebut, nbCreneaux])
+}
+
+// ----------------------------------------------------------------------------
+// 10. VerrouSeance — Verrou sur une séance (créneau, salle, enseignant, activité)
+// ----------------------------------------------------------------------------
+model VerrouSeance {
+  id             String   @id @default(uuid()) @db.Uuid
+  seanceId       String   @db.Uuid
+  utilisateurId  String   @db.Uuid
+  type           String   // CRENEAU, SALLE, ENSEIGNANT, ACTIVITE
+  heurePose      DateTime @default(now())
+  heureExpiration DateTime // +30 min par défaut
+
+  seance     Seance      @relation(fields: [seanceId], references: [id])
+  utilisateur Utilisateur @relation(fields: [utilisateurId], references: [id])
+
+  @@index([seanceId])
+  @@index([utilisateurId])
+  @@index([heureExpiration])
+}
+
+// ----------------------------------------------------------------------------
+// 11. Contrainte — Contrainte de planification (indisponibilité, exigence salle)
+// ----------------------------------------------------------------------------
+model Contrainte {
+  id        String   @id @default(uuid()) @db.Uuid
+  versionId String   @db.Uuid
+  type      String   // ex: INDISPONIBILITE, EXIGENCE_SALLE, CONTRAINTE_ENSEIGNANT
+  cibleId   String   // identifiant de la cible (enseignant, salle, groupe, etc.)
+  valeur    String   // valeur de la contrainte (JSON ou texte selon le type)
+  createdAt DateTime @default(now())
+
+  version Version @relation(fields: [versionId], references: [id])
+
+  @@index([versionId])
+  @@index([type])
+}
+
+// ----------------------------------------------------------------------------
+// 12. Generation — Job de génération CP-SAT
+// ----------------------------------------------------------------------------
+model Generation {
+  id              String   @id @default(uuid()) @db.Uuid
+  versionId       String   @db.Uuid
+  statut          String   // EN_COURS, TERMINEE, ECHEC
+  fichierDerivesId String? @db.Uuid
+  scores          Json     // score_global, sous_scores
+  createdAt       DateTime @default(now())
+
+  version   Version   @relation(fields: [versionId], references: [id])
+  scenarios Scenario[]
+
+  @@index([versionId])
+  @@index([statut])
+}
+
+// ----------------------------------------------------------------------------
+// 13. Scenario — Scénario produit par le solver
+// ----------------------------------------------------------------------------
+model Scenario {
+  id            String  @id @default(uuid()) @db.Uuid
+  generationId  String  @db.Uuid
+  scoreGlobal   Int     // score global 0-100
+  sousScores    Json    // sous-scores détaillés (respect créneaux, salles, enseignants, couverture)
+  selectionne   Boolean @default(false)
+  createdAt     DateTime @default(now())
+
+  generation Generation @relation(fields: [generationId], references: [id])
+
+  @@index([generationId])
+  @@index([selectionne])
+}
+
+// ----------------------------------------------------------------------------
+// 14. Export — Fichier d'export généré
+// ----------------------------------------------------------------------------
+model Export {
+  id             String   @id @default(uuid()) @db.Uuid
+  versionId      String   @db.Uuid
+  format         String   // xlsx, pdf, ics
+  cheminFichier  String   // chemin vers le fichier généré
+  dateGeneration DateTime @default(now())
+
+  version Version @relation(fields: [versionId], references: [id])
+
+  @@index([versionId])
+  @@index([format])
+}
+
+// ----------------------------------------------------------------------------
+// 15. JournalAudit — Journal d'audit (immuable)
+// ----------------------------------------------------------------------------
+model JournalAudit {
+  id          String   @id @default(uuid()) @db.Uuid
+  action      String   // ex: VERSION_TRANSITION, SEANCE_DEPLACEE, VERROU_POSE, EXPORT_GENERE
+  horodatage  DateTime @default(now())
+  utilisateurId String? @db.Uuid
+  entite      String   // ex: Version, Seance, Export
+  entiteId    String?
+  metadonnees Json?    // métadonnées optionnelles (motif de rejet, etc.)
+
+  utilisateur Utilisateur? @relation(fields: [utilisateurId], references: [id])
+
+  @@index([horodatage])
+  @@index([action])
+  @@index([utilisateurId])
+}

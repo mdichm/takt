@@ -1,0 +1,33 @@
+{
+  "name": "takt",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev --parallel",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "test:unit": "turbo run test --filter=@takt/backend --filter=@takt/frontend",
+    "test:integration": "turbo run test:integration --filter=@takt/backend",
+    "typecheck": "turbo run typecheck",
+    "db:generate": "turbo run db:generate --filter=@takt/db",
+    "db:migrate:dev": "turbo run db:migrate:dev --filter=@takt/db",
+    "db:migrate:deploy": "turbo run db:migrate:deploy --filter=@takt/db",
+    "db:verify": "turbo run db:verify --filter=@takt/db"
+  },
+  "devDependencies": {
+    "turbo": "^2.4.4",
+    "typescript": "5.5.x"
+  },
+  "engines": {
+    "node": ">=24.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "packageManager": "pnpm@9.15.0",
+  "publishConfig": {
+    "access": "private"
+  }
+}
