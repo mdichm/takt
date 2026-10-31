@@ -20,6 +20,5 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["src"],
-  "references": [{ "path": "../packages/contracts" }, { "path": "../packages/design-tokens" }]
+  "include": ["src"]
 }
