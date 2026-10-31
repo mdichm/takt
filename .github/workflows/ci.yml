@@ -41,6 +41,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # Le client Prisma est généré : `@takt/db/src/index.ts` réexporte
+      # `PrismaClient`, dont les types n'existent qu'après génération.
+      - name: Prisma Generate
+        run: pnpm --filter @takt/db db:generate
+
       - name: Lint (ESLint)
         run: pnpm lint
 
@@ -136,11 +141,10 @@ jobs:
       - name: Prisma Generate
         run: pnpm --filter @takt/db db:generate
 
-      - name: Build Backend (NestJS)
-        run: pnpm --filter @takt/backend build
-
-      - name: Build Frontend (Vite + React)
-        run: pnpm --filter @takt/frontend build
+      # Turbo construit les packages de workspace dans l'ordre des dependances
+      # (contracts, design-tokens, db, solver-client) avant les applications.
+      - name: Build All Applications (Turbo)
+        run: pnpm build
 
       - name: Upload Backend Artifact
         uses: actions/upload-artifact@v4
