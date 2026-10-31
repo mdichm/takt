@@ -1,17 +1,13 @@
 /** @type {import('tailwindcss').Config} */
+import { colors, spacing, radius } from '@takt/design-tokens';
+
 export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
-      colors: {
-        ...require('@takt/design-tokens').colors,
-      },
-      spacing: {
-        ...require('@takt/design-tokens').spacing,
-      },
-      borderRadius: {
-        ...require('@takt/design-tokens').radius,
-      },
+      colors,
+      spacing,
+      borderRadius: radius,
     },
   },
   plugins: [],
