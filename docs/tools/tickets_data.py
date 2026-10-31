@@ -69,7 +69,7 @@ TICKETS: List[Ticket] = [
         lot="L01",
         titre="Initialiser le dépôt Git et la gouvernance de branches",
         sp=2,
-        status="À faire",
+        status="En cours",
         deps=['TAKT-L00-04'],
         exigences=['PLAN_MACRO §6', 'GG-12', 'TAKT-L00-04.'],
     ),
