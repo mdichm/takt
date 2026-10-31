@@ -10,6 +10,8 @@
     "dev": "turbo run dev --parallel",
     "lint": "turbo run lint",
     "test": "turbo run test",
+    "test:unit": "turbo run test --filter=@takt/backend --filter=@takt/frontend",
+    "test:integration": "turbo run test:integration --filter=@takt/backend",
     "typecheck": "turbo run typecheck",
     "db:generate": "turbo run db:generate --filter=@takt/db",
     "db:migrate:dev": "turbo run db:migrate:dev --filter=@takt/db",
@@ -24,7 +26,6 @@
     "node": ">=24.0.0",
     "pnpm": ">=9.0.0"
   },
-  "packageManager": "pnpm@9.15.0",
   "publishConfig": {
     "access": "private"
   }

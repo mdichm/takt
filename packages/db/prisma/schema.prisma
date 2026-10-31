@@ -31,6 +31,7 @@ model Utilisateur {
   departement    Departement? @relation(fields: [departementId], references: [id])
   verrous        VerrouSeance[]
   journalAudit   JournalAudit[]
+  affectations   AffectationPedagogique[]
 
   @@index([email])
   @@index([roleId])
@@ -86,6 +87,7 @@ model Semestre {
   dateFin           DateTime
   anneeUniversitaire AnneeUniversitaire @relation(fields: [anneeUniversitaireId], references: [id])
   versions          Version[]
+  affectations      AffectationPedagogique[]
 
   @@index([anneeUniversitaireId])
   @@index([numero])
@@ -103,12 +105,11 @@ model Version {
   updatedAt   DateTime @updatedAt
 
   semestre    Semestre    @relation(fields: [semestreId], references: [id])
-  snapshot    Snapshot?   @relation(fields: [snapshotId], references: [id])
+  snapshot    Snapshot?   @relation()
   seances     Seance[]
   generations Generation[]
   exports     Export[]
   contraintes Contrainte[]
-  affectations AffectationPedagogique[]
 
   @@index([semestreId])
   @@index([etat])
@@ -119,7 +120,7 @@ model Version {
 // ----------------------------------------------------------------------------
 model Snapshot {
   id        String   @id @default(uuid()) @db.Uuid
-  versionId String   @db.Uuid
+  versionId String   @db.Uuid @unique
   donnees   Json     // données JSONB du snapshot
   hash      String   // hash d'intégrité du snapshot
   createdAt DateTime @default(now())
