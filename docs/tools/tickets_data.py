@@ -105,7 +105,7 @@ TICKETS: List[Ticket] = [
         lot="L01",
         titre="Créer le squelette du frontend Vite (React, TypeScript strict, design system vide)",
         sp=3,
-        status="À faire",
+        status="En cours",
         deps=['TAKT-L01-02'],
         exigences=['ST_TAKT §0.1', 'UI_FRONTEND_SPECS §2', 'GG-03', 'GG-04.'],
     ),
