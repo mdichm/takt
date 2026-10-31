@@ -12,6 +12,9 @@
     "test": {
       "outputs": []
     },
+    "test:integration": {
+      "outputs": []
+    },
     "typecheck": {
       "outputs": []
     },
