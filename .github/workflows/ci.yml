@@ -15,7 +15,6 @@ on:
 
 env:
   NODE_VERSION: '24'
-  PNPM_VERSION: '9'
   DATABASE_URL: postgresql://postgres:postgres@localhost:5432/takt_test
 
 jobs:
@@ -84,10 +83,12 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Prisma Generate
-        run: pnpm --filter @takt/db prisma generate
+        run: pnpm --filter @takt/db db:generate
 
-      - name: Prisma Migrate Dev (test DB)
-        run: pnpm --filter @takt/db prisma migrate dev --name test_migration
+      # Les migrations Prisma n'existent pas encore (ticket TAKT-L01-04) :
+      # `db push` synchronise le schéma sans créer de fichier de migration.
+      - name: Prisma Sync Schema (test DB)
+        run: pnpm --filter @takt/db db:push
         env:
           DATABASE_URL: ${{ env.DATABASE_URL }}
 
@@ -122,8 +123,6 @@ jobs:
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: ${{ env.PNPM_VERSION }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -135,7 +134,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Prisma Generate
-        run: pnpm --filter @takt/db prisma generate
+        run: pnpm --filter @takt/db db:generate
 
       - name: Build Backend (NestJS)
         run: pnpm --filter @takt/backend build
@@ -182,11 +181,11 @@ jobs:
 
       - name: Build Backend Docker Image
         run: |
-          docker build -t takt/backend:${{ github.sha }} -f apps/backend/Dockerfile apps/backend
+          docker build -t takt/backend:${{ github.sha }} -f apps/backend/Dockerfile .
 
       - name: Build Frontend Docker Image
         run: |
-          docker build -t takt/frontend:${{ github.sha }} -f apps/frontend/Dockerfile apps/frontend
+          docker build -t takt/frontend:${{ github.sha }} -f apps/frontend/Dockerfile .
 
       - name: Test Backend Image Starts
         run: |
@@ -248,13 +247,24 @@ jobs:
 
       - name: Start Full Stack (Docker Compose)
         run: |
-          docker-compose -f docker-compose.test.yml up -d
-          sleep 15
+          docker compose -f docker-compose.test.yml up -d
+          sleep 20
+
+      - name: Wait for backend health
+        run: |
+          for i in $(seq 1 30); do
+            if curl -f http://localhost:3000/health; then
+              echo "Backend prêt"
+              break
+            fi
+            sleep 2
+          done
+          curl -f http://localhost:3000/health
 
       - name: Run E2E Tests
         run: pnpm --filter @takt/frontend test:e2e
         env:
-          BASE_URL: http://localhost:3000
+          BASE_URL: http://localhost:8080
           API_URL: http://localhost:3000/api/v1
 
       - name: Upload E2E Report
@@ -267,7 +277,7 @@ jobs:
 
       - name: Cleanup
         if: always()
-        run: docker-compose -f docker-compose.test.yml down -v
+        run: docker compose -f docker-compose.test.yml down -v
 
   # ------------------------------------------------------------
   # DEPLOY RECIETTE (sur push main)
@@ -292,8 +302,8 @@ jobs:
           script: |
             cd /opt/takt
             git pull origin main
-            docker-compose -f docker-compose.recette.yml pull
-            docker-compose -f docker-compose.recette.yml up -d --remove-orphans
+            docker compose -f docker-compose.recette.yml pull
+            docker compose -f docker-compose.recette.yml up -d --remove-orphans
             # Attendre healthcheck
             sleep 10
             curl -f https://recette.takt.internal/health || exit 1

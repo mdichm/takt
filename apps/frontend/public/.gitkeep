@@ -1,0 +1,5 @@
+# ============================================================================
+# TAKT — Fichiers statiques publics du frontend
+# Ce dossier est requis par le Dockerfile (COPY) et sert de point d'entrée
+# aux ressources statiques servies par Vite puis Nginx.
+# ============================================================================

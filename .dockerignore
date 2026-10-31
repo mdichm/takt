@@ -1,0 +1,39 @@
+# ============================================================================
+# TAKT — Fichiers exclus du contexte Docker
+# Fichier : .dockerignore
+# ============================================================================
+
+# Dépendances installées (reconstruites dans l'image)
+**/node_modules
+**/.pnpm-store
+
+# Artefacts de build (reconstruits dans l'image)
+**/dist
+**/.turbo
+**/coverage
+**/test-results
+**/playwright-report
+
+# Contrôle de version et IDE
+.git
+.gitignore
+.github
+.vscode
+.idea
+
+# Fichiers d'environnement (secrets — GG-11)
+.env
+.env.*
+!.env.example
+
+# Artefacts de backlog générés
+dist/
+docs/tools/__pycache__
+**/__pycache__
+*.pyc
+
+# Logs et temporaires
+*.log
+npm-debug.log*
+pnpm-debug.log*
+.DS_Store
