@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import { z } from 'zod';
-import { zDateIso, zEtatVersion, zUuid } from './common';
+import { creerSchemaTri, zDateIso, zEtatVersion, zPaginationQuery, zSearchFilter, zUuid } from './common';
 
 /** Données de création d’une version de planning. */
 export const zVersion = z.object({
@@ -10,6 +10,14 @@ export const zVersion = z.object({
   etat: zEtatVersion.default('initial'),
   snapshotId: zUuid.nullish(),
 });
+
+/** Filtres de la liste des versions. */
+export const zVersionList = zPaginationQuery
+  .extend(zSearchFilter.shape)
+  .extend(creerSchemaTri(['etat', 'createdAt', 'updatedAt']).shape)
+  .extend({
+    etat: zEtatVersion.optional(),
+  });
 
 /** Transition d’état demandée. */
 export const zTransition = z.object({
@@ -70,6 +78,7 @@ export const zAudit = z
   );
 
 export type VersionInput = z.infer<typeof zVersion>;
+export type VersionListFilters = z.infer<typeof zVersionList>;
 export type TransitionInput = z.infer<typeof zTransition>;
 export type GenerationInput = z.infer<typeof zGeneration>;
 export type Scenario = z.infer<typeof zScenario>;
