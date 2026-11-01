@@ -15,7 +15,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "lint": "eslint src tests --max-warnings=0",
-    "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.spec.json",
+    "typecheck": "pnpm build && tsc --noEmit && tsc --noEmit -p tsconfig.spec.json",
     "test": "pnpm build && vitest run"
   },
   "dependencies": {

@@ -2,7 +2,15 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import { z } from 'zod';
-import { zEmail, zPaginationQuery, zRoleCode, zSearchFilter, zUuid } from './common';
+import {
+  creerSchemaTri,
+  zBooleanQuery,
+  zEmail,
+  zPaginationQuery,
+  zRoleCode,
+  zSearchFilter,
+  zUuid,
+} from './common';
 
 /** Rôle applicatif durable. */
 export const zRole = z.object({
@@ -31,10 +39,11 @@ export const zUser = z.object({
 /** Filtres de la liste des utilisateurs. */
 export const zUserList = zPaginationQuery
   .extend(zSearchFilter.shape)
+  .extend(creerSchemaTri(['nom', 'prenom', 'email', 'createdAt']).shape)
   .extend({
     role: zRoleCode.optional(),
     departementId: zUuid.optional(),
-    estActif: z.boolean().optional(),
+    estActif: zBooleanQuery.optional(),
   });
 
 export type Role = z.infer<typeof zRole>;

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import { z } from 'zod';
-import { zPaginationQuery, zUuid } from './common';
+import { creerSchemaTri, zBooleanQuery, zPaginationQuery, zUuid } from './common';
 
 /** Données de création ou de modification d’une séance. */
 export const zSeance = z.object({
@@ -17,14 +17,16 @@ export const zSeance = z.object({
 });
 
 /** Filtres de la liste des séances. */
-export const zSeanceList = zPaginationQuery.extend({
-  versionId: zUuid,
-  jour: z.coerce.number().int().min(1).max(6).optional(),
-  salleId: zUuid.optional(),
-  enseignantId: zUuid.optional(),
-  groupeId: zUuid.optional(),
-  estVerrouillee: z.boolean().optional(),
-});
+export const zSeanceList = zPaginationQuery
+  .extend(creerSchemaTri(['jour', 'creneauDebut', 'createdAt']).shape)
+  .extend({
+    versionId: zUuid.optional(),
+    jour: z.coerce.number().int().min(1).max(6).optional(),
+    salleId: zUuid.optional(),
+    enseignantId: zUuid.optional(),
+    groupeId: zUuid.optional(),
+    estVerrouillee: zBooleanQuery.optional(),
+  });
 
 /** Pose d’un verrou sur une séance. */
 export const zLock = z.object({
