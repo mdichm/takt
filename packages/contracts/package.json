@@ -14,9 +14,9 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "lint": "eslint src --max-warnings=0",
-    "typecheck": "tsc --noEmit",
-    "test": "vitest run --passWithNoTests"
+    "lint": "eslint src tests --max-warnings=0",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.spec.json",
+    "test": "pnpm build && vitest run"
   },
   "dependencies": {
     "zod": "3.25.76"

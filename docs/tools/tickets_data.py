@@ -141,7 +141,7 @@ TICKETS: List[Ticket] = [
         lot="L02",
         titre="Créer le package de contrats Zod partagés",
         sp=5,
-        status="En cours",
+        status="Terminé",
         deps=['TAKT-L01-02'],
         exigences=['TE-API-02', 'ST_TAKT §3.1', 'ST_TAKT §6.1 (risque « cohérence frontend/backend »)', 'UI_FRONTEND_SPECS §4.'],
     ),
