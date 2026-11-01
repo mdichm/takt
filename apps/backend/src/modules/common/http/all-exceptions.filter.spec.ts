@@ -35,7 +35,7 @@ describe('AllExceptionsFilter', () => {
     filter.catch(new HttpException('Not Found', HttpStatus.NOT_FOUND), host);
 
     expect(status).toHaveBeenCalledWith(404);
-    const corps = json.mock.calls[0][0] as {
+    const corps = json.mock.calls[0]![0] as {
       data: unknown;
       error: { code: string; message?: string };
       meta: { requestId: string; timestamp: string };
@@ -55,11 +55,9 @@ describe('AllExceptionsFilter', () => {
 
     filter.catch(exception, host);
 
-    const corps = json.mock.calls[0][0] as { error: { code: string; details: unknown } };
+    const corps = json.mock.calls[0]![0] as { error: { code: string; details: unknown } };
     expect(corps.error.code).toBe('VALIDATION_ERROR');
-    expect(corps.error.details).toEqual([
-      { champ: 'email', message: 'Email invalide' },
-    ]);
+    expect(corps.error.details).toEqual([{ champ: 'email', message: 'Email invalide' }]);
   });
 
   it('ne divulgue jamais de stack trace (TE-API-06)', () => {
@@ -67,7 +65,7 @@ describe('AllExceptionsFilter', () => {
 
     filter.catch(new Error('boom interne secret'), host);
 
-    const corps = json.mock.calls[0][0] as Record<string, unknown>;
+    const corps = json.mock.calls[0]![0] as Record<string, unknown>;
     expect(JSON.stringify(corps)).not.toContain('boom interne secret');
     expect(JSON.stringify(corps)).not.toContain('stack');
     expect(corps.error).toMatchObject({ code: 'INTERNAL_ERROR' });
@@ -78,7 +76,7 @@ describe('AllExceptionsFilter', () => {
 
     filter.catch(new Error('detail interne'), host);
 
-    const corps = json.mock.calls[0][0] as { error: { message?: string } };
+    const corps = json.mock.calls[0]![0] as { error: { message?: string } };
     expect(corps.error.message).toBeUndefined();
   });
 
@@ -89,7 +87,7 @@ describe('AllExceptionsFilter', () => {
     // utilise le code HTTP littéral du catalogue ST_TAKT §3.4.
     filter.catch(new HttpException('Séance verrouillée', 423), host);
 
-    const corps = json.mock.calls[0][0] as { error: { code: string; message?: string } };
+    const corps = json.mock.calls[0]![0] as { error: { code: string; message?: string } };
     expect(corps.error.code).toBe('SEANCE_LOCKED');
     expect(corps.error.message).toBe('Séance verrouillée');
   });
@@ -100,7 +98,7 @@ describe('AllExceptionsFilter', () => {
     filter.catch(new TypeError('oups'), host);
 
     expect(status).toHaveBeenCalledWith(500);
-    const corps = json.mock.calls[0][0] as { error: { code: string } };
+    const corps = json.mock.calls[0]![0] as { error: { code: string } };
     expect(corps.error.code).toBe('INTERNAL_ERROR');
   });
 });

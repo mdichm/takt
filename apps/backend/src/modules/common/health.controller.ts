@@ -7,7 +7,7 @@
 // préfixe `/api/v1` et renvoie un corps simple, non enveloppé.
 // ============================================================================
 
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Inject } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { HealthService } from './health.service';
 import { HealthStatusDto } from './health-status.dto';
@@ -16,7 +16,7 @@ import { RawResponse } from './http/raw-response.decorator';
 @ApiTags('health')
 @Controller('health')
 export class HealthController {
-  constructor(private readonly healthService: HealthService) {}
+  constructor(@Inject(HealthService) private readonly healthService: HealthService) {}
 
   @Get()
   @RawResponse()

@@ -103,7 +103,29 @@ TAKT déploie trois environnements distincts sur site (réseau interne instituti
 | Identifiants SMTP | Fichier secret | /run/secrets/smtp_credentials |
 | Clés TLS | Fichier secret | /etc/letsencrypt/live/takt.internal/ |
 
-### 2.5 Règles d'infrastructure
+### 2.5 Démarrage local avec Docker
+
+1. Copier `.env.example` vers `.env.local`.
+2. Remplacer tous les secrets `CHANGE_ME` par des valeurs locales générées.
+3. Démarrer la stack :
+
+```bash
+docker compose --env-file .env.local up -d --build --wait
+```
+
+Le smoke test reproductible est disponible via :
+
+```bash
+ENV_CI=.env.local scripts/smoke-dev.sh
+```
+
+Arrêt et suppression des données :
+
+```bash
+docker compose --env-file .env.local down -v
+```
+
+### 2.6 Règles d'infrastructure
 
 | Règle | Description |
 |-------|-------------|

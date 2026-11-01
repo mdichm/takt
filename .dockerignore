@@ -1,0 +1,22 @@
+# ============================================================================
+# TAKT — Contexte Docker
+# Fichier : .dockerignore
+# Tickets : TAKT-L01-06, TAKT-L01-07
+# ============================================================================
+
+.git
+.gitignore
+.env
+.env.*
+node_modules
+**/node_modules
+**/dist
+**/coverage
+**/.turbo
+**/playwright-report
+**/test-results
+dist
+coverage
+.turbo
+playwright-report
+test-results

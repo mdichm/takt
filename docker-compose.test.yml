@@ -18,9 +18,9 @@ services:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=takt_test
     ports:
-      - "5432:5432"
+      - '5432:5432'
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d takt_test"]
+      test: ['CMD-SHELL', 'pg_isready -U postgres -d takt_test']
       interval: 5s
       timeout: 3s
       retries: 10
@@ -37,9 +37,11 @@ services:
     build:
       context: .
       dockerfile: apps/backend/Dockerfile
-      target: builder
+      target: runner
     container_name: takt-backend-test
-    command: sh -c "pnpm --filter @takt/db prisma migrate deploy && node dist/main.js"
+    command: >-
+      sh -c "cd /app/packages/db && ./node_modules/.bin/prisma migrate deploy
+      && cd /app/apps/backend && node dist/main.js"
     environment:
       - NODE_ENV=test
       - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/takt_test
@@ -55,15 +57,13 @@ services:
       - SCENARIOS_DIR=/tmp/scenarios
       - SOLVER_COMMAND=echo "mock solver"
     ports:
-      - "3000:3000"
+      - '3000:3000'
     depends_on:
       postgres:
         condition: service_healthy
     networks:
       - takt-test-network
-    volumes:
-      - ./apps/backend:/app/apps/backend:ro
-      - ./packages/db:/app/packages/db:ro
+    volumes: []
 
   # ------------------------------------------------------------
   # Frontend — React + Vite (test, served by Nginx)
@@ -72,22 +72,17 @@ services:
     build:
       context: .
       dockerfile: apps/frontend/Dockerfile
-      target: builder
+      target: runner
     container_name: takt-frontend-test
-    command: sh -c "pnpm --filter @takt/frontend preview --host 0.0.0.0 --port 8080"
     environment:
       - NODE_ENV=test
-      - VITE_API_URL=http://localhost:3000/api/v1
-      - VITE_WS_URL=ws://localhost:3000
     ports:
-      - "8080:8080"
+      - '8080:80'
     depends_on:
       - backend
     networks:
       - takt-test-network
-    volumes:
-      - ./apps/frontend:/app/apps/frontend:ro
-      - ./packages/design-tokens:/app/packages/design-tokens:ro
+    volumes: []
 
   # ------------------------------------------------------------
   # Mock SMTP (pour tests notifications)
@@ -96,8 +91,8 @@ services:
     image: mailhog/mailhog:v1.0.1
     container_name: takt-mock-smtp-test
     ports:
-      - "1025:1025"
-      - "8025:8025"
+      - '1025:1025'
+      - '8025:8025'
     networks:
       - takt-test-network
 
