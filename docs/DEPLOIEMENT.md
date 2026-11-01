@@ -125,7 +125,29 @@ Arrêt et suppression des données :
 docker compose --env-file .env.local down -v
 ```
 
-### 2.6 Règles d'infrastructure
+### 2.6 Recette éphémère sur runner GitHub-hosted
+
+En attendant la provisionnement de l'hôte de recette institutionnel, le workflow
+`.github/workflows/deploy-recette.yml` valide le déploiement sur un runner GitHub-hosted :
+
+```bash
+docker compose -f docker-compose.recette.yml build
+docker compose -f docker-compose.recette.yml up -d --wait --wait-timeout 180
+```
+
+Les secrets temporaires sont générés pendant le job et la stack est détruite avec
+`docker compose -f docker-compose.recette.yml down -v --remove-orphans`, y compris en cas
+d'échec. Le mot de passe PostgreSQL est monté comme fichier secret Docker ; les variables
+applicatives restent temporaires tant que la lecture unifiée `readSecret()` n'est pas
+implémentée par le ticket `TAKT-L11-03`. Ce mode contrôle la construction des images,
+l'application des migrations, les healthchecks et les smoke tests HTTP.
+
+**Limite :** la stack est éphémère. Elle n'est pas accessible après le run, ne permet pas
+d'exécuter les parcours métier `UF-*` avec la MOA et ne remplace pas l'URL
+`https://recette.takt.internal`. La recette persistante et le rollback nécessitent
+l'infrastructure cible, qui reste hors périmètre du ticket `TAKT-L11-04`.
+
+### 2.7 Règles d'infrastructure
 
 | Règle | Description |
 |-------|-------------|
