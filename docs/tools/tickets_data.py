@@ -132,7 +132,7 @@ TICKETS: List[Ticket] = [
         lot="L02",
         titre="Implémenter l'enveloppe de réponse et la gestion d'erreurs",
         sp=5,
-        status="À faire",
+        status="Terminé",
         deps=['TAKT-L01-03'],
         exigences=['ST_TAKT §3.3', 'ST_TAKT §3.4', 'TE-API-06', 'EX-UI-01.'],
     ),

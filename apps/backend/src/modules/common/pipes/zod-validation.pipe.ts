@@ -11,7 +11,12 @@
 // inchangées.
 // ============================================================================
 
-import { ArgumentMetadata, BadRequestException, Injectable, PipeTransform } from '@nestjs/common';
+import {
+  ArgumentMetadata,
+  BadRequestException,
+  Injectable,
+  PipeTransform,
+} from '@nestjs/common';
 import { ZodType } from 'zod';
 import { SchemasRoute, schemasDeRoute } from './zod-validation.decorator';
 import { formaterErreursZod } from './zod-error';
@@ -22,6 +27,25 @@ const CLE_PAR_TYPE: Readonly<Record<string, keyof SchemasRoute>> = {
   query: 'query',
   param: 'params',
 };
+
+/** Pipe paramétrique validant une query string avec un schéma Zod fourni. */
+@Injectable()
+export class ZodQueryPipe implements PipeTransform<unknown, unknown> {
+  constructor(private readonly schema: ZodType) {}
+
+  transform(valeur: unknown): unknown {
+    const resultat = this.schema.safeParse(valeur);
+
+    if (!resultat.success) {
+      throw new BadRequestException({
+        code: 'VALIDATION_ERROR',
+        details: formaterErreursZod(resultat.error),
+      });
+    }
+
+    return resultat.data;
+  }
+}
 
 @Injectable()
 export class ZodValidationPipe implements PipeTransform<unknown, unknown> {

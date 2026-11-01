@@ -7,6 +7,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { ArgumentsHost, HttpException, HttpStatus } from '@nestjs/common';
 import { AllExceptionsFilter } from './all-exceptions.filter';
+import { ApiError } from './api-error';
 
 interface HoteSimule {
   host: ArgumentsHost;
@@ -58,6 +59,16 @@ describe('AllExceptionsFilter', () => {
     const corps = json.mock.calls[0]![0] as { error: { code: string; details: unknown } };
     expect(corps.error.code).toBe('VALIDATION_ERROR');
     expect(corps.error.details).toEqual([{ champ: 'email', message: 'Email invalide' }]);
+  });
+
+  it('conserve le code métier explicite d’une ApiError', () => {
+    const { host, json } = creerHote(null);
+    const exception = new ApiError('WORKFLOW_INVALID_TRANSITION', HttpStatus.CONFLICT);
+
+    filter.catch(exception, host);
+
+    const corps = json.mock.calls[0]![0] as { error: { code: string } };
+    expect(corps.error.code).toBe('WORKFLOW_INVALID_TRANSITION');
   });
 
   it('ne divulgue jamais de stack trace (TE-API-06)', () => {

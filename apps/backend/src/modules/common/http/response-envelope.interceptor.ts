@@ -10,7 +10,7 @@
 
 import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
 import { Observable, map } from 'rxjs';
-import { EnveloppeApi, horodatageIso } from './api-envelope';
+import { EnveloppeApi, estDonneesPaginees, horodatageIso } from './api-envelope';
 import { RequeteHttp, resoudreRequestId } from './http-types';
 import { estReponseBrute } from './raw-response.decorator';
 
@@ -27,16 +27,28 @@ export class ResponseEnvelopeInterceptor implements NestInterceptor {
     const requestId = resoudreRequestId(requete);
 
     return next.handle().pipe(
-      map(
-        (donnees: unknown): EnveloppeApi => ({
+      map((donnees: unknown): EnveloppeApi => {
+        if (estDonneesPaginees(donnees)) {
+          return {
+            data: donnees.data,
+            error: null,
+            meta: {
+              requestId,
+              timestamp: horodatageIso(),
+              ...donnees.meta,
+            },
+          };
+        }
+
+        return {
           data: donnees ?? null,
           error: null,
           meta: {
             requestId,
             timestamp: horodatageIso(),
           },
-        }),
-      ),
+        };
+      }),
     );
   }
 }

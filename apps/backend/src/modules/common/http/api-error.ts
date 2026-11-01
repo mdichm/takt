@@ -7,6 +7,8 @@
 // situation est ramenée à INTERNAL_ERROR.
 // ============================================================================
 
+import { HttpException } from '@nestjs/common';
+
 /** Catalogue officiel des codes d'erreur de l'API (ST_TAKT §3.4). */
 export const CODES_ERREUR_API = {
   BAD_REQUEST: 'VALIDATION_ERROR',
@@ -21,6 +23,40 @@ export const CODES_ERREUR_API = {
 
 /** Code d'erreur métier exposé dans l'enveloppe `{ data, error, meta }`. */
 export type CodeErreurApi = (typeof CODES_ERREUR_API)[keyof typeof CODES_ERREUR_API];
+
+/** Corps d'erreur transporté par une `ApiError`. */
+interface CorpsErreurApi {
+  code: CodeErreurApi;
+  message?: string;
+  details?: unknown;
+}
+
+/**
+ * Erreur API métier refusée par NestJS.
+ * Son code est nécessairement issu du catalogue ST_TAKT §3.4.
+ */
+export class ApiError extends HttpException {
+  constructor(
+    readonly code: CodeErreurApi,
+    status: number,
+    message?: string,
+    readonly details?: unknown,
+  ) {
+    if (!estCodeErreurApi(code)) {
+      throw new Error('Code d’erreur API hors catalogue');
+    }
+
+    const corps: CorpsErreurApi = { code };
+    if (message !== undefined) {
+      corps.message = message;
+    }
+    if (details !== undefined) {
+      corps.details = details;
+    }
+
+    super(corps, status);
+  }
+}
 
 /** Correspondance entre code HTTP et code métier du catalogue. */
 const CORRESPONDANCE_STATUT: Readonly<Record<number, CodeErreurApi>> = {

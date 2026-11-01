@@ -10,7 +10,7 @@
 
 import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus } from '@nestjs/common';
 import { Logger } from '@nestjs/common';
-import { codeErreurPourStatut, estCodeErreurApi } from './api-error';
+import { ApiError, codeErreurPourStatut, estCodeErreurApi } from './api-error';
 import { EnveloppeApi, ErreurApi, horodatageIso } from './api-envelope';
 import { RequeteHttp, ReponseHttp, resoudreRequestId } from './http-types';
 
@@ -50,14 +50,17 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
     const statut =
       exception instanceof HttpException ? exception.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR;
-    const code = codeErreurPourStatut(statut);
 
     let message: string | undefined;
     let details: unknown;
+    let code = codeErreurPourStatut(statut);
 
     if (exception instanceof HttpException) {
       const corps = extraireCorpsErreur(exception);
       details = corps.details;
+      if (exception instanceof ApiError) {
+        code = exception.code;
+      }
       // Le message applicatif n'est exposé que pour les erreurs 4xx :
       // une erreur 5xx peut contenir une information technique interne.
       if (statut < 500 && typeof corps.message === 'string') {
