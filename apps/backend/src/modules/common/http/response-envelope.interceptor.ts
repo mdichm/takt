@@ -27,14 +27,16 @@ export class ResponseEnvelopeInterceptor implements NestInterceptor {
     const requestId = resoudreRequestId(requete);
 
     return next.handle().pipe(
-      map((donnees: unknown): EnveloppeApi => ({
-        data: donnees ?? null,
-        error: null,
-        meta: {
-          requestId,
-          timestamp: horodatageIso(),
-        },
-      })),
+      map(
+        (donnees: unknown): EnveloppeApi => ({
+          data: donnees ?? null,
+          error: null,
+          meta: {
+            requestId,
+            timestamp: horodatageIso(),
+          },
+        }),
+      ),
     );
   }
 }

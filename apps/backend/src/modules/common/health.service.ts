@@ -4,13 +4,13 @@
 // Ticket : TAKT-L01-03
 // ============================================================================
 
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { HealthStatusDto } from './health-status.dto';
 
 @Injectable()
 export class HealthService {
-  constructor(private readonly configService: ConfigService) {}
+  constructor(@Inject(ConfigService) private readonly configService: ConfigService) {}
 
   /**
    * Retourne l'état de santé de l'API.

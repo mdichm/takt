@@ -6,6 +6,7 @@ dist/
 !.env.example
 coverage
 coverage/
+packages/db/src/generated/
 .turbo/
 playwright-report/
 test-results/

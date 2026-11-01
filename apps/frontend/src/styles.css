@@ -1,0 +1,12 @@
+/* Copyright (C) 2026 TAKT */
+/* SPDX-License-Identifier: AGPL-3.0-only */
+
+:root {
+  color: var(--color-text-primary);
+  background: var(--color-surface-background);
+  font-family: system-ui, sans-serif;
+}
+
+body {
+  margin: 0;
+}

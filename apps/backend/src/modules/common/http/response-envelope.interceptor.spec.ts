@@ -30,7 +30,10 @@ describe('ResponseEnvelopeInterceptor', () => {
 
   it('enveloppe une réponse réussie dans { data, error, meta }', async () => {
     const resultat = (await firstValueFrom(
-      interceptor.intercept(creerContexte(() => undefined), creerNext({ id: 42 })),
+      interceptor.intercept(
+        creerContexte(() => undefined),
+        creerNext({ id: 42 }),
+      ),
     )) as EnveloppeApi;
 
     expect(resultat.data).toEqual({ id: 42 });
@@ -41,7 +44,10 @@ describe('ResponseEnvelopeInterceptor', () => {
 
   it('normalise une réponse vide en data null', async () => {
     const resultat = (await firstValueFrom(
-      interceptor.intercept(creerContexte(() => undefined), creerNext(undefined)),
+      interceptor.intercept(
+        creerContexte(() => undefined),
+        creerNext(undefined),
+      ),
     )) as EnveloppeApi;
 
     expect(resultat.data).toBeNull();
