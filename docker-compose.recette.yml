@@ -1,0 +1,97 @@
+# Copyright (C) 2026 TAKT
+# SPDX-License-Identifier: AGPL-3.0-only
+#
+# ============================================================================
+# TAKT — Stack Docker de recette éphémère
+# Utilisée sur un runner GitHub-hosted pour valider le déploiement Compose.
+# La stack est détruite à la fin du job ; elle ne remplace pas la recette
+# métier persistante ni l'environnement de production.
+# ============================================================================
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: takt-postgres-recette
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:?POSTGRES_USER est requis}
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+      POSTGRES_DB: ${POSTGRES_DB:-takt_recette}
+    secrets:
+      - postgres_password
+    tmpfs:
+      - /var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+    networks:
+      - takt-recette-network
+
+  backend:
+    build:
+      context: .
+      dockerfile: apps/backend/Dockerfile
+      target: runner
+    container_name: takt-backend-recette
+    command: >-
+      sh -c "cd /app/packages/db && ./node_modules/.bin/prisma migrate deploy
+      && cd /app/apps/backend && node dist/main.js"
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      API_PREFIX: api/v1
+      DATABASE_URL: ${DATABASE_URL:?DATABASE_URL est requis}
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:?JWT_ACCESS_SECRET est requis}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:?JWT_REFRESH_SECRET est requis}
+      JWT_ACCESS_TTL: 15m
+      JWT_REFRESH_TTL: 7d
+      SMTP_HOST: mock-smtp
+      SMTP_PORT: 1025
+      SMTP_USER: recette
+      SMTP_PASSWORD: ${SMTP_PASSWORD:?SMTP_PASSWORD est requis}
+      DERIVED_DIR: /tmp/derived
+      SCENARIOS_DIR: /tmp/scenarios
+      SOLVER_COMMAND: echo "solveur simulé pour la recette éphémère"
+    ports:
+      - '3000:3000'
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ['CMD', 'wget', '--quiet', '--tries=1', '--spider', 'http://127.0.0.1:3000/health']
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 10s
+    networks:
+      - takt-recette-network
+
+  frontend:
+    build:
+      context: .
+      dockerfile: apps/frontend/Dockerfile
+      target: runner
+    container_name: takt-frontend-recette
+    ports:
+      - '8080:80'
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ['CMD', 'wget', '--quiet', '--tries=1', '--spider', 'http://127.0.0.1/health']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+    networks:
+      - takt-recette-network
+
+networks:
+  takt-recette-network:
+    driver: bridge
+
+secrets:
+  postgres_password:
+    file: ./secrets/postgres_password.txt

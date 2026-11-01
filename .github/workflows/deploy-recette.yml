@@ -2,8 +2,9 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 #
 # ============================================================================
-# TAKT — Déploiement de la recette
+# TAKT — Déploiement de la recette éphémère
 # Déclencheur : Push sur main uniquement
+# La stack est démarrée sur le runner GitHub-hosted puis détruite à la fin.
 # ============================================================================
 
 name: Deploy Recette — TAKT
@@ -16,59 +17,47 @@ jobs:
   deploy-recette:
     name: Deploy Recette
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     environment: recette
     env:
-      RECETTE_HOST: ${{ secrets.RECETTE_HOST }}
-      RECETTE_USER: ${{ secrets.RECETTE_USER }}
-      RECETTE_SSH_KEY: ${{ secrets.RECETTE_SSH_KEY }}
-      IMAGE_TAG: ${{ github.sha }}
+      POSTGRES_USER: takt
+      POSTGRES_DB: takt_recette
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Vérifier la configuration de la recette
-        id: configuration
+      - name: Générer les secrets temporaires
         shell: bash
         run: |
-          if [[ -n "${RECETTE_HOST}" && -n "${RECETTE_USER}" && -n "${RECETTE_SSH_KEY}" ]]; then
-            echo "configure=true" >> "${GITHUB_OUTPUT}"
-            echo "Configuration de la recette disponible."
-          else
-            echo "configure=false" >> "${GITHUB_OUTPUT}"
-            echo "::notice::Déploiement de la recette ignoré : RECETTE_HOST, RECETTE_USER et RECETTE_SSH_KEY doivent être configurés comme secrets de l'environnement GitHub « recette »."
-            {
-              echo "## Déploiement de la recette ignoré"
-              echo
-              echo "La recette n'est pas configurée dans ce dépôt."
-              echo "Secrets requis dans l'environnement GitHub \`recette\` :"
-              echo "- \`RECETTE_HOST\`"
-              echo "- \`RECETTE_USER\`"
-              echo "- \`RECETTE_SSH_KEY\`"
-            } >> "${GITHUB_STEP_SUMMARY}"
-          fi
+          umask 077
+          mkdir -p secrets
+          postgres_password="$(openssl rand -hex 32)"
+          jwt_access_secret="$(openssl rand -hex 32)"
+          jwt_refresh_secret="$(openssl rand -hex 32)"
+          smtp_password="$(openssl rand -hex 32)"
+          printf '%s' "${postgres_password}" > secrets/postgres_password.txt
+          echo "POSTGRES_PASSWORD=${postgres_password}" >> "${GITHUB_ENV}"
+          echo "DATABASE_URL=postgresql://${POSTGRES_USER}:${postgres_password}@postgres:5432/${POSTGRES_DB}" >> "${GITHUB_ENV}"
+          echo "JWT_ACCESS_SECRET=${jwt_access_secret}" >> "${GITHUB_ENV}"
+          echo "JWT_REFRESH_SECRET=${jwt_refresh_secret}" >> "${GITHUB_ENV}"
+          echo "SMTP_PASSWORD=${smtp_password}" >> "${GITHUB_ENV}"
 
-      - name: Deploy to Recette (SSH + Docker Compose)
-        if: steps.configuration.outputs.configure == 'true'
-        uses: appleboy/ssh-action@v1
-        with:
-          host: ${{ env.RECETTE_HOST }}
-          username: ${{ env.RECETTE_USER }}
-          key: ${{ env.RECETTE_SSH_KEY }}
-          envs: IMAGE_TAG
-          script: |
-            cd /opt/takt
-            git pull origin main
-            export IMAGE_TAG="${IMAGE_TAG}"
-            docker compose -f docker-compose.prod.yml pull
-            docker compose -f docker-compose.prod.yml up -d --remove-orphans
-            # Attendre healthcheck
-            sleep 10
-            curl -f https://recette.takt.internal/health || exit 1
+      - name: Construire la stack de recette
+        run: docker compose -f docker-compose.recette.yml build
 
-      - name: Run Smoke Tests on Recette
-        if: steps.configuration.outputs.configure == 'true'
+      - name: Démarrer la stack de recette
+        run: docker compose -f docker-compose.recette.yml up -d --wait --wait-timeout 180
+
+      - name: Vérifier les healthchecks
         run: |
-          sleep 5
-          curl -f https://recette.takt.internal/health
-          curl -f https://recette.takt.internal/api/v1/health
+          docker compose -f docker-compose.recette.yml ps
+          curl --fail --silent --show-error http://localhost:3000/health
+          curl --fail --silent --show-error http://localhost:8080/health
+
+      - name: Exécuter les smoke tests
+        run: |
+          curl --fail --silent --show-error http://localhost:8080/accueil | grep -q '<div id="root">'
+
+      - name: Nettoyer la stack de recette
+        if: always()
+        run: docker compose -f docker-compose.recette.yml down -v --remove-orphans

@@ -50,6 +50,7 @@ gh pr checks --watch
 - Le job requis par la protection de `develop` est `CI gate`.
 - `concurrency` annule les runs supersédés ; `develop` est mis en file d'attente.
 - Le déploiement recette est isolé dans `.github/workflows/deploy-recette.yml` et déclenché par push sur `main`.
+- En attendant l'infrastructure cible, le déploiement utilise Docker Compose sur un runner GitHub-hosted ; la stack est éphémère et détruite à la fin du job. Il ne remplace pas la recette métier persistante.
 - Images Docker taguées `sha-${GITHUB_SHA}` ; `latest` déplacé seulement après déploiement recette vert.
 
 ## 6. Sync avec `develop` (merge, pas de rebase forcé)
