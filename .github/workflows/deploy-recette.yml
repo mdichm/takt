@@ -18,26 +18,56 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     environment: recette
+    env:
+      RECETTE_HOST: ${{ secrets.RECETTE_HOST }}
+      RECETTE_USER: ${{ secrets.RECETTE_USER }}
+      RECETTE_SSH_KEY: ${{ secrets.RECETTE_SSH_KEY }}
+      IMAGE_TAG: ${{ github.sha }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Vérifier la configuration de la recette
+        id: configuration
+        shell: bash
+        run: |
+          if [[ -n "${RECETTE_HOST}" && -n "${RECETTE_USER}" && -n "${RECETTE_SSH_KEY}" ]]; then
+            echo "configure=true" >> "${GITHUB_OUTPUT}"
+            echo "Configuration de la recette disponible."
+          else
+            echo "configure=false" >> "${GITHUB_OUTPUT}"
+            echo "::notice::Déploiement de la recette ignoré : RECETTE_HOST, RECETTE_USER et RECETTE_SSH_KEY doivent être configurés comme secrets de l'environnement GitHub « recette »."
+            {
+              echo "## Déploiement de la recette ignoré"
+              echo
+              echo "La recette n'est pas configurée dans ce dépôt."
+              echo "Secrets requis dans l'environnement GitHub \`recette\` :"
+              echo "- \`RECETTE_HOST\`"
+              echo "- \`RECETTE_USER\`"
+              echo "- \`RECETTE_SSH_KEY\`"
+            } >> "${GITHUB_STEP_SUMMARY}"
+          fi
+
       - name: Deploy to Recette (SSH + Docker Compose)
+        if: steps.configuration.outputs.configure == 'true'
         uses: appleboy/ssh-action@v1
         with:
-          host: ${{ secrets.RECETTE_HOST }}
-          username: ${{ secrets.RECETTE_USER }}
-          key: ${{ secrets.RECETTE_SSH_KEY }}
+          host: ${{ env.RECETTE_HOST }}
+          username: ${{ env.RECETTE_USER }}
+          key: ${{ env.RECETTE_SSH_KEY }}
+          envs: IMAGE_TAG
           script: |
             cd /opt/takt
             git pull origin main
-            docker compose -f docker-compose.recette.yml pull
-            docker compose -f docker-compose.recette.yml up -d --remove-orphans
+            export IMAGE_TAG="${IMAGE_TAG}"
+            docker compose -f docker-compose.prod.yml pull
+            docker compose -f docker-compose.prod.yml up -d --remove-orphans
             # Attendre healthcheck
             sleep 10
             curl -f https://recette.takt.internal/health || exit 1
 
       - name: Run Smoke Tests on Recette
+        if: steps.configuration.outputs.configure == 'true'
         run: |
           sleep 5
           curl -f https://recette.takt.internal/health
