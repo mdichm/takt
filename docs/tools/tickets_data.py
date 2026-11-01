@@ -150,7 +150,7 @@ TICKETS: List[Ticket] = [
         lot="L02",
         titre="Implémenter la pagination, le filtrage et la normalisation des listes",
         sp=5,
-        status="À faire",
+        status="En cours",
         deps=['TAKT-L02-01', 'TAKT-L02-02'],
         exigences=['ST_TAKT §3.3 (meta.page', 'meta.pageSize', 'meta.total)', 'ST_TAKT §3.5', 'IX-ADM-07', 'IX-RDEP-05.'],
     ),
