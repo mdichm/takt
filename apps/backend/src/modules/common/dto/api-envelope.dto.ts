@@ -15,7 +15,7 @@ export class MetaApiDto {
   @ApiPropertyOptional({ description: 'Page courante', minimum: 1 })
   page?: number;
 
-  @ApiPropertyOptional({ description: "Taille de page", minimum: 1 })
+  @ApiPropertyOptional({ description: 'Taille de page', minimum: 1 })
   pageSize?: number;
 
   @ApiPropertyOptional({ description: "Nombre total d'éléments", minimum: 0 })
@@ -35,6 +35,7 @@ export class DetailValidationDto {
 export class ErreurApiDto {
   @ApiProperty({
     description: 'Code métier de la réponse',
+    type: 'string',
     enum: [
       'VALIDATION_ERROR',
       'UNAUTHORIZED',
@@ -51,7 +52,10 @@ export class ErreurApiDto {
   @ApiPropertyOptional({ description: 'Message destiné au client' })
   message?: string;
 
-  @ApiPropertyOptional({ description: 'Détails structurés de validation', type: [DetailValidationDto] })
+  @ApiPropertyOptional({
+    description: 'Détails structurés de validation',
+    type: [DetailValidationDto],
+  })
   details?: DetailValidationDto[];
 }
 
@@ -60,7 +64,11 @@ export class EnveloppeApiDto<T = unknown> {
   @ApiProperty({ description: 'Données métier ; null en cas d’erreur' })
   data!: T | null;
 
-  @ApiProperty({ description: 'Erreur ; null en cas de succès', type: ErreurApiDto, nullable: true })
+  @ApiProperty({
+    description: 'Erreur ; null en cas de succès',
+    type: ErreurApiDto,
+    nullable: true,
+  })
   error!: ErreurApiDto | null;
 
   @ApiProperty({ description: 'Métadonnées de la réponse', type: MetaApiDto })

@@ -159,7 +159,7 @@ TICKETS: List[Ticket] = [
         lot="L02",
         titre="Générer et maintenir la spécification OpenAPI",
         sp=4,
-        status="À faire",
+        status="Terminé",
         deps=['TAKT-L02-01'],
         exigences=['ST_TAKT §3.1', 'PLAN_MACRO E0.6', 'TE-API-01 à TE-API-06.'],
     ),
