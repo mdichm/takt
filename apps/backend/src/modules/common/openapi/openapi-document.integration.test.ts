@@ -9,8 +9,10 @@ import { CODE_ERREURS_DOCUMENTES, construireDocumentOpenApi } from './openapi-do
 const ENV_TEST = {
   NODE_ENV: 'test',
   DATABASE_URL: 'postgresql://postgres:postgres@localhost:5432/takt_test',
-  JWT_ACCESS_SECRET: 'a'.repeat(32),
-  JWT_REFRESH_SECRET: 'b'.repeat(32),
+  JWT_KEYS_DIRECTORY: '/tmp/takt-test-jwt',
+  JWT_ACTIVE_KEY_ID: 'active',
+  JWT_ISSUER: 'takt-test',
+  JWT_AUDIENCE: 'takt-api',
 };
 
 describe('Document OpenAPI de l’application', () => {

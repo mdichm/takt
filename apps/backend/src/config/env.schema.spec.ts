@@ -9,15 +9,11 @@ import { validateEnv, EnvSchema } from './env.schema';
 
 const ENV_VALIDE = {
   DATABASE_URL: 'postgresql://takt:takt@localhost:5432/takt_dev',
-  JWT_ACCESS_SECRET: 'a'.repeat(32),
-  JWT_REFRESH_SECRET: 'b'.repeat(32),
 };
 
 describe('validateEnv', () => {
   it('rejette une configuration vide et liste les variables manquantes', () => {
     expect(() => validateEnv({})).toThrowError(/DATABASE_URL/);
-    expect(() => validateEnv({})).toThrowError(/JWT_ACCESS_SECRET/);
-    expect(() => validateEnv({})).toThrowError(/JWT_REFRESH_SECRET/);
   });
 
   it('signale explicitement les variables manquantes dans le message', () => {
@@ -53,9 +49,17 @@ describe('validateEnv', () => {
     expect(validateEnv({ ...ENV_VALIDE, PORT: '8080' }).PORT).toBe(8080);
   });
 
-  it('refuse un secret JWT trop court', () => {
-    expect(() => validateEnv({ ...ENV_VALIDE, JWT_ACCESS_SECRET: 'court' })).toThrowError(
-      /JWT_ACCESS_SECRET/,
+  it('applique les valeurs RSA par défaut', () => {
+    const config = validateEnv(ENV_VALIDE);
+    expect(config.JWT_KEYS_DIRECTORY).toBe('/run/secrets/jwt');
+    expect(config.JWT_ACTIVE_KEY_ID).toBe('active');
+    expect(config.JWT_ISSUER).toBe('takt');
+    expect(config.JWT_AUDIENCE).toBe('takt-api');
+  });
+
+  it('refuse un identifiant de clé JWT vide', () => {
+    expect(() => validateEnv({ ...ENV_VALIDE, JWT_ACTIVE_KEY_ID: '' })).toThrowError(
+      /JWT_ACTIVE_KEY_ID/,
     );
   });
 

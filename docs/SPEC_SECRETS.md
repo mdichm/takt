@@ -17,29 +17,31 @@ Définir la stratégie de gestion des secrets pour l'application TAKT, conforme 
 
 ## 2. Principes
 
-| Principe | Description |
-|----------|-------------|
-| **Zéro secret en clair dans Git** | Aucun mot de passe, clé API, token, certificat privé dans le repo |
-| **Injection par fichiers montés** | Docker Secrets (fichiers montés dans `/run/secrets/`) |
-| **Chiffrement au repos** | Fichiers `.env.enc` chiffrés avec SOPS + age pour le versionnage des valeurs par défaut |
-| **Rotation programmée** | Clés JWT, mots de passe DB, clés SMTP : rotation semestrielle |
-| **Séparation par environnement** | Secrets distincts dev / recette / prod |
+| Principe                          | Description                                                                             |
+| --------------------------------- | --------------------------------------------------------------------------------------- |
+| **Zéro secret en clair dans Git** | Aucun mot de passe, clé API, token, certificat privé dans le repo                       |
+| **Injection par fichiers montés** | Docker Secrets (fichiers montés dans `/run/secrets/`)                                   |
+| **Chiffrement au repos**          | Fichiers `.env.enc` chiffrés avec SOPS + age pour le versionnage des valeurs par défaut |
+| **Rotation programmée**           | Clés JWT, mots de passe DB, clés SMTP : rotation semestrielle                           |
+| **Séparation par environnement**  | Secrets distincts dev / recette / prod                                                  |
 
 ---
 
 ## 3. Liste des secrets requis
 
-| Secret | Description | Environnement | Rotation | Génération |
-|--------|-------------|---------------|----------|------------|
-| `JWT_ACCESS_SECRET` | Clé signature JWT access token (15 min) | Tous | 6 mois | `openssl rand -base64 64` |
-| `JWT_REFRESH_SECRET` | Clé signature JWT refresh token (7 j) | Tous | 6 mois | `openssl rand -base64 64` |
-| `DATABASE_URL` | URL connexion PostgreSQL (avec mot de passe) | Tous | 6 mois | — |
-| `POSTGRES_PASSWORD` | Mot de passe utilisateur PostgreSQL | Tous | 6 mois | `openssl rand -base64 32` |
-| `SMTP_PASSWORD` | Mot de passe SMTP institutionnel (`cck.rnu.tn`) | Recette/Prod | Selon politique SI | — |
-| `PGBACKREST_S3_KEY` | Clé d'accès S3 (sauvegardes) | Prod | 12 mois | Fournisseur cloud |
-| `PGBACKREST_S3_SECRET` | Clé secrète S3 | Prod | 12 mois | Fournisseur cloud |
-| `GRAFANA_ADMIN_PASSWORD` | Mot de passe admin Grafana | Recette/Prod | 12 mois | `openssl rand -base64 24` |
-| `ARGON2ID_COST` | Paramètres argon2id (memory, time, parallelism) | Tous | Jamais | `memory=19456,time=2,parallelism=1` |
+| Secret                   | Description                                             | Environnement | Rotation           | Génération                          |
+| ------------------------ | ------------------------------------------------------- | ------------- | ------------------ | ----------------------------------- |
+| `JWT_KEYS_DIRECTORY`     | Répertoire des clés RSA PEM (accès 15 min, refresh 7 j) | Tous          | 6 mois             | `openssl genpkey`                   |
+| `JWT_ACTIVE_KEY_ID`      | Identifiant `kid` de la clé privée active               | Tous          | 6 mois             | Identifiant contrôlé                |
+| `JWT_PREVIOUS_KEY_IDS`   | Clés publiques encore acceptées pendant la rotation     | Tous          | Temporaire         | Liste de `kid`                      |
+| `DATABASE_URL`           | URL connexion PostgreSQL (avec mot de passe)            | Tous          | 6 mois             | —                                   |
+| `POSTGRES_PASSWORD`      | Mot de passe utilisateur PostgreSQL                     | Tous          | 6 mois             | `openssl rand -base64 32`           |
+| `SMTP_PASSWORD`          | Mot de passe SMTP institutionnel (`cck.rnu.tn`)         | Recette/Prod  | Selon politique SI | —                                   |
+| `PGBACKREST_S3_KEY`      | Clé d'accès S3 (sauvegardes)                            | Prod          | 12 mois            | Fournisseur cloud                   |
+| `PGBACKREST_S3_SECRET`   | Clé secrète S3                                          | Prod          | 12 mois            | Fournisseur cloud                   |
+| `GRAFANA_ADMIN_PASSWORD` | Mot de passe admin Grafana                              | Recette/Prod  | 12 mois            | `openssl rand -base64 24`           |
+| `ARGON2ID_COST`          | Paramètres argon2id (memory, time, parallelism)         | Tous          | Jamais             | `memory=19456,time=2,parallelism=1` |
+
 ---
 
 ## 4. Architecture de déploiement des secrets
@@ -73,7 +75,7 @@ cp .env.example .env.local
                     ▼ (montage Docker secrets)
 ┌─────────────────────────────────────────────────────────────┐
 │  Conteneurs                                                  │
-│  /run/secrets/jwt_access_secret  →  process.env.JWT_ACCESS_SECRET_FILE
+│  /run/secrets/jwt/active.private.pem  →  lecture PEM par JWT_KEYS_DIRECTORY
 │  /run/secrets/database_url       →  process.env.DATABASE_URL_FILE
 │  ...                                                          │
 └─────────────────────────────────────────────────────────────┘
@@ -99,9 +101,12 @@ API_PREFIX=api/v1
 DATABASE_URL=postgresql://takt:CHANGE_ME@localhost:5432/takt
 POSTGRES_PASSWORD=CHANGE_ME
 
-# JWT (rotation 6 mois)
-JWT_ACCESS_SECRET=CHANGE_ME_GENERATE_WITH_OPENSSL_RAND_BASE64_64
-JWT_REFRESH_SECRET=CHANGE_ME_GENERATE_WITH_OPENSSL_RAND_BASE64_64
+# JWT RS256 (rotation 6 mois)
+JWT_KEYS_DIRECTORY=/run/secrets/jwt
+JWT_ACTIVE_KEY_ID=active
+JWT_PREVIOUS_KEY_IDS=
+JWT_ISSUER=takt
+JWT_AUDIENCE=takt-api
 JWT_ACCESS_TTL=15m
 JWT_REFRESH_TTL=7d
 
@@ -139,6 +144,7 @@ PGBACKREST_S3_SECRET=CHANGE_ME
 VITE_API_URL=http://localhost:3000/api/v1
 VITE_WS_URL=ws://localhost:3000
 ```
+
 ---
 
 ## 6. Procédure de chiffrement/déchiffrement (SOPS + age)
@@ -188,10 +194,11 @@ sops --encrypt --age AGE-SECRET-KEY-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX \
 sops --decrypt --age $AGE_KEY_FILE .env.prod.enc > .env.prod
 
 # Puis extraire les secrets individuels pour Docker
-mkdir -p /opt/takt/secrets
-grep JWT_ACCESS_SECRET .env.prod | cut -d= -f2- > /opt/takt/secrets/jwt_access_secret.txt
-grep JWT_REFRESH_SECRET .env.prod | cut -d= -f2- > /opt/takt/secrets/jwt_refresh_secret.txt
+mkdir -p /opt/takt/secrets/jwt
 grep DATABASE_URL .env.prod | cut -d= -f2- > /opt/takt/secrets/database_url.txt
+# Les clés RSA sont extraites du coffre et écrites avec des permissions restrictives :
+# /opt/takt/secrets/jwt/active.private.pem (600)
+# /opt/takt/secrets/jwt/active.public.pem (644)
 # ... etc pour tous les secrets
 
 # Nettoyer
@@ -207,21 +214,21 @@ shred .env.prod
 services:
   backend:
     secrets:
-      - jwt_access_secret
-      - jwt_refresh_secret
+      - jwt_active_private_key
+      - jwt_active_public_key
       - database_url
       - smtp_password
     environment:
-      - JWT_ACCESS_SECRET_FILE=/run/secrets/jwt_access_secret
-      - JWT_REFRESH_SECRET_FILE=/run/secrets/jwt_refresh_secret
+      - JWT_KEYS_DIRECTORY=/run/secrets/jwt
+      - JWT_ACTIVE_KEY_ID=active
       - DATABASE_URL_FILE=/run/secrets/database_url
       - SMTP_PASSWORD_FILE=/run/secrets/smtp_password
 
 secrets:
-  jwt_access_secret:
-    file: ./secrets/jwt_access_secret.txt
-  jwt_refresh_secret:
-    file: ./secrets/jwt_refresh_secret.txt
+  jwt_active_private_key:
+    file: ./secrets/jwt/active.private.pem
+  jwt_active_public_key:
+    file: ./secrets/jwt/active.public.pem
   database_url:
     file: ./secrets/database_url.txt
   smtp_password:
@@ -252,15 +259,20 @@ export function readSecret(secretName: string): string {
   try {
     return fs.readFileSync(filePath, 'utf-8').trim();
   } catch (err) {
-    throw new Error(`Impossible de lire le secret ${secretName} depuis ${filePath}: ${err.message}`);
+    throw new Error(
+      `Impossible de lire le secret ${secretName} depuis ${filePath}: ${err.message}`,
+    );
   }
 }
 
 // Usage
 export const config = {
   jwt: {
-    accessSecret: readSecret('JWT_ACCESS_SECRET'),
-    refreshSecret: readSecret('JWT_REFRESH_SECRET'),
+    keysDirectory: process.env.JWT_KEYS_DIRECTORY || '/run/secrets/jwt',
+    activeKeyId: process.env.JWT_ACTIVE_KEY_ID || 'active',
+    previousKeyIds: (process.env.JWT_PREVIOUS_KEY_IDS || '').split(','),
+    issuer: process.env.JWT_ISSUER || 'takt',
+    audience: process.env.JWT_AUDIENCE || 'takt-api',
     accessTtl: process.env.JWT_ACCESS_TTL || '15m',
     refreshTtl: process.env.JWT_REFRESH_TTL || '7d',
   },
@@ -277,13 +289,13 @@ export const config = {
 
 ## 9. Procédure de rotation des secrets
 
-| Secret | Fréquence | Procédure |
-|--------|-----------|-----------|
-| JWT_ACCESS_SECRET / JWT_REFRESH_SECRET | 6 mois | 1. Générer nouvelles clés<br>2. Mettre à jour dans vault + fichiers secrets<br>3. Redéployer backend (rolling update)<br>4. Les tokens existants expirent naturellement (15 min / 7 j) |
-| POSTGRES_PASSWORD / DATABASE_URL | 6 mois | 1. Créer nouvel utilisateur DB<br>2. Migrer droits<br>3. Mettre à jour secrets<br>4. Redéployer tous les services<br>5. Supprimer ancien utilisateur |
-| SMTP_PASSWORD | Selon politique SI | Coordonner avec équipe messagerie |
-| PGBACKREST_S3_KEY/SECRET | 12 mois | Via console cloud provider |
-| GRAFANA_ADMIN_PASSWORD | 12 mois | Interface Grafana + mise à jour secret |
+| Secret                                                   | Fréquence          | Procédure                                                                                                                                                                                                                                                               |
+| -------------------------------------------------------- | ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Clés RSA JWT (`active.private.pem`, `active.public.pem`) | 6 mois             | 1. Générer une nouvelle paire RSA 2048 bits<br>2. Déployer sa clé publique avec un nouveau `kid` dans `JWT_PREVIOUS_KEY_IDS`<br>3. Activer la nouvelle clé privée et son `kid`<br>4. Redéployer, attendre l’expiration des jetons, puis retirer l’ancienne clé publique |
+| POSTGRES_PASSWORD / DATABASE_URL                         | 6 mois             | 1. Créer nouvel utilisateur DB<br>2. Migrer droits<br>3. Mettre à jour secrets<br>4. Redéployer tous les services<br>5. Supprimer ancien utilisateur                                                                                                                    |
+| SMTP_PASSWORD                                            | Selon politique SI | Coordonner avec équipe messagerie                                                                                                                                                                                                                                       |
+| PGBACKREST_S3_KEY/SECRET                                 | 12 mois            | Via console cloud provider                                                                                                                                                                                                                                              |
+| GRAFANA_ADMIN_PASSWORD                                   | 12 mois            | Interface Grafana + mise à jour secret                                                                                                                                                                                                                                  |
 
 ---
 
@@ -308,4 +320,4 @@ export const config = {
 
 ---
 
-*Fin du SPEC_SECRETS.md — TAKT v1.0*
+_Fin du SPEC_SECRETS.md — TAKT v1.0_

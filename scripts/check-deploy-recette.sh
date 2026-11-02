@@ -35,13 +35,15 @@ fi
 export POSTGRES_USER=takt
 export POSTGRES_DB=takt_recette
 export DATABASE_URL="postgresql://takt:test-password@postgres:5432/takt_recette"
-export JWT_ACCESS_SECRET=test-access-secret
-export JWT_REFRESH_SECRET=test-refresh-secret
+export JWT_KEYS_DIRECTORY=/run/secrets/jwt
+export JWT_ACTIVE_KEY_ID=active
 export SMTP_PASSWORD=test-smtp-password
 
-mkdir -p secrets
+mkdir -p secrets/jwt
 printf 'test-only-value\n' > secrets/postgres_password.txt
-trap 'rm -f secrets/postgres_password.txt' EXIT
+openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 -out secrets/jwt/active.private.pem 2>/dev/null
+openssl pkey -in secrets/jwt/active.private.pem -pubout -out secrets/jwt/active.public.pem 2>/dev/null
+trap 'rm -rf secrets/jwt secrets/postgres_password.txt' EXIT
 
 for service in postgres backend frontend; do
   docker compose -f "$COMPOSE" config --services | grep -qx "$service"
