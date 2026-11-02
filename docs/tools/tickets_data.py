@@ -186,7 +186,7 @@ TICKETS: List[Ticket] = [
         lot="L03",
         titre="Implémenter le service de hachage argon2id",
         sp=5,
-        status="À faire",
+        status="Terminé",
         deps=['TAKT-L01-03'],
         exigences=['EX-SEC-01', 'ST_TAKT §5.1', 'DL-TE-07', 'TESTS.md §6.1.'],
     ),
