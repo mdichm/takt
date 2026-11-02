@@ -9,6 +9,7 @@ import { AllExceptionsFilter } from './modules/common/http/all-exceptions.filter
 import { ResponseEnvelopeInterceptor } from './modules/common/http/response-envelope.interceptor';
 import { CommonModule } from './modules/common/common.module';
 import { ZodValidationPipe } from './modules/common/pipes/zod-validation.pipe';
+import { AuthModule } from './modules/auth/auth.module';
 
 /** Module racine de l'application TAKT. */
 @Module({
@@ -19,6 +20,7 @@ import { ZodValidationPipe } from './modules/common/pipes/zod-validation.pipe';
       validate: validateEnv,
     }),
     CommonModule,
+    AuthModule,
   ],
   providers: [
     { provide: APP_FILTER, useClass: AllExceptionsFilter },
