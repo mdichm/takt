@@ -177,7 +177,7 @@ TICKETS: List[Ticket] = [
         lot="L02",
         titre="Structurer les modules backend et l'injection de dépendances",
         sp=4,
-        status="À faire",
+        status="Terminé",
         deps=['TAKT-L01-03'],
         exigences=['ST_TAKT §1.2', 'ST_TAKT §1.5', 'TE-ARCH-02', 'TE-ARCH-05.'],
     ),

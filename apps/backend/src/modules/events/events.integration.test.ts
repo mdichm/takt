@@ -26,9 +26,16 @@ describe('Canal SSE', () => {
   beforeAll(async () => {
     dossierCles = mkdtempSync(join(tmpdir(), 'takt-sse-'));
     const cle = generateKeyPairSync('rsa', { modulusLength: 2048 });
-    writeFileSync(join(dossierCles, 'active.private.pem'), cle.privateKey.export({ type: 'pkcs8', format: 'pem' }));
-    writeFileSync(join(dossierCles, 'active.public.pem'), cle.publicKey.export({ type: 'spki', format: 'pem' }));
+    writeFileSync(
+      join(dossierCles, 'active.private.pem'),
+      cle.privateKey.export({ type: 'pkcs8', format: 'pem' }),
+    );
+    writeFileSync(
+      join(dossierCles, 'active.public.pem'),
+      cle.publicKey.export({ type: 'spki', format: 'pem' }),
+    );
     process.env.JWT_KEYS_DIRECTORY = dossierCles;
+    process.env.DATABASE_URL = 'postgresql://postgres:postgres@localhost:5432/takt_test';
     process.env.JWT_ACTIVE_KEY_ID = 'active';
     process.env.JWT_ISSUER = 'takt-test';
     process.env.JWT_AUDIENCE = 'takt-api';
@@ -64,18 +71,24 @@ describe('Canal SSE', () => {
       departementIds: [],
     }).token;
     expect(tokenService.verifyAccessToken(accessToken).sub).toBe(UTILISATEUR_ID);
-    const enTetes = await new Promise<Record<string, string | string[] | undefined>>((resolve, reject) => {
-      const requete = httpRequest(
-        urlBase,
-        { method: 'GET', path: '/api/v1/events', headers: { authorization: `Bearer ${accessToken}` } },
-        (reponse) => {
-          resolve(reponse.headers);
-          reponse.destroy();
-        },
-      );
-      requete.on('error', reject);
-      requete.end();
-    });
+    const enTetes = await new Promise<Record<string, string | string[] | undefined>>(
+      (resolve, reject) => {
+        const requete = httpRequest(
+          urlBase,
+          {
+            method: 'GET',
+            path: '/api/v1/events',
+            headers: { authorization: `Bearer ${accessToken}` },
+          },
+          (reponse) => {
+            resolve(reponse.headers);
+            reponse.destroy();
+          },
+        );
+        requete.on('error', reject);
+        requete.end();
+      },
+    );
 
     expect(enTetes['content-type']).toContain('text/event-stream');
   });

@@ -4,13 +4,15 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthConfig, chargerConfigAuth } from '../../config/auth.config';
+import { CommonModule } from '../common/common.module';
+import { UsersModule } from '../users/users.module';
 import { PasswordService } from './password.service';
 import { InMemoryRevokedRefreshTokenStore } from './revoked-refresh-token.store';
 import { TokenService } from './token.service';
 
 /** Module regroupant les services de sécurité de l'authentification. */
 @Module({
-  imports: [ConfigModule],
+  imports: [ConfigModule, CommonModule, UsersModule],
   providers: [
     PasswordService,
     InMemoryRevokedRefreshTokenStore,
