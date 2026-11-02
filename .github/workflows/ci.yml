@@ -292,12 +292,41 @@ jobs:
         run: docker compose -f docker-compose.test.yml down -v
 
   # ------------------------------------------------------------
+  # CONTRAT OPENAPI
+  # ------------------------------------------------------------
+  check-openapi:
+    name: Check OpenAPI
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Prisma Generate
+        run: pnpm --filter @takt/db db:generate
+
+      - name: Vérifier le contrat OpenAPI
+        run: pnpm check-openapi
+
+  # ------------------------------------------------------------
   # CHECK REQUIS POUR LA PROTECTION DE develop
   # ------------------------------------------------------------
   ci-gate:
     name: CI gate
     runs-on: ubuntu-latest
-    needs: [lint-and-typecheck, test, build, docker-build, e2e]
+    needs: [lint-and-typecheck, test, build, docker-build, e2e, check-openapi]
     if: always()
     steps:
       - name: Vérifier le résultat de la CI
@@ -306,7 +335,8 @@ jobs:
              [[ "${{ needs.test.result }}" != "success" ]] || \
              [[ "${{ needs.build.result }}" != "success" ]] || \
              [[ "${{ needs.docker-build.result }}" != "success" ]] || \
-             [[ "${{ needs.e2e.result }}" != "success" ]]; then
+             [[ "${{ needs.e2e.result }}" != "success" ]] || \
+             [[ "${{ needs.check-openapi.result }}" != "success" ]]; then
             echo "La CI comporte au moins un job en échec."
             exit 1
           fi
