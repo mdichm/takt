@@ -791,6 +791,25 @@ info:
   version: 1.0.0
 openapi: 3.0.0
 paths:
+  /api/v1/events:
+    get:
+      operationId: EventsController_fluxEvenements
+      parameters:
+        - in: query
+          name: access_token
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          content:
+            text/event-stream: {}
+          description: Flux Server-Sent Events
+        '401':
+          description: Jeton d’accès absent ou invalide
+      security:
+        - bearerAuth: []
+      summary: S’abonner aux événements temps réel de l’utilisateur
   /audit:
     get:
       description: Retourne les entrées du journal d'audit avec filtres.

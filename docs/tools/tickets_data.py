@@ -168,7 +168,7 @@ TICKETS: List[Ticket] = [
         lot="L02",
         titre="Implémenter le canal SSE (Server-Sent Events)",
         sp=4,
-        status="À faire",
+        status="Terminé",
         deps=['TAKT-L01-06', 'TAKT-L02-01'],
         exigences=['ST_TAKT §1.2', 'ST_TAKT §1.3 (étape 7)', 'TE-ARCH-05', 'EX-NOT-01', 'SPK-04.'],
     ),
