@@ -337,9 +337,9 @@ L00 → L01 → L02 → L03 → L04 → L05 → L06 → L07 → L09 → L10 → 
 - **SP :** 4 · **Dépend de :** `TAKT-L01-06`, `TAKT-L02-01` · **Bloque :** `TAKT-L07-03`, `TAKT-L10-05`.
 
 #### TAKT-L02-06 — Structurer les modules backend et l'injection de dépendances
-- **Objectif :** Fixer l'architecture modulaire NestJS (9 modules) et les règles de dépendance avant l'implémentation des domaines.
+- **Objectif :** Fixer l'architecture modulaire NestJS (11 modules) et les règles de dépendance avant l'implémentation des domaines.
 - **Exigences :** `ST_TAKT §1.2`, `ST_TAKT §1.5`, `TE-ARCH-02`, `TE-ARCH-05`.
-- **Périmètre :** `apps/backend/src/modules/**` (arborescence vide des 9 modules), `apps/backend/src/app.module.ts`, `apps/backend/src/common/di/**`. **Hors périmètre :** implémentation des modules.
+- **Périmètre :** `apps/backend/src/modules/**` (arborescence vide des 11 modules), `apps/backend/src/app.module.ts`, `apps/backend/src/common/di/**`. **Hors périmètre :** implémentation des modules.
 - **Livrables :** 9 dossiers de modules (`auth`, `users`, `referentiels`, `repartition`, `versions`, `planning`, `generation`, `exports`, `audit`, `notifications`, `events`) avec `*.module.ts` déclarant les imports ; règles de dépendance documentées (un module ne connaît que les services d'un module antérieur + `common`) ; tokens d'injection pour les collaborateurs externes (solveur, SMTP, stockage de fichiers) permettant le test par double.
 - **Critères :** *Given* un module `planning`, *When* on inspecte ses imports, *Then* il ne dépend que de `common`, `referentiels` et `versions`. *Given* un service de génération, *When* on l'instancie en test, *Then* le solveur est un double injecté (aucun appel réel).
 - **DoD :** Arborescence des 11 modules créée ; règle de dépendance écrite dans `docs/ARCHITECTURE_BACKEND.md` ; un test vérifie qu'aucun import circulaire de module n'existe (script de contrôle).
