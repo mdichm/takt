@@ -10,6 +10,7 @@ import { ResponseEnvelopeInterceptor } from './modules/common/http/response-enve
 import { CommonModule } from './modules/common/common.module';
 import { ZodValidationPipe } from './modules/common/pipes/zod-validation.pipe';
 import { AuthModule } from './modules/auth/auth.module';
+import { EventsModule } from './modules/events/events.module';
 
 /** Module racine de l'application TAKT. */
 @Module({
@@ -21,6 +22,7 @@ import { AuthModule } from './modules/auth/auth.module';
     }),
     CommonModule,
     AuthModule,
+    EventsModule,
   ],
   providers: [
     { provide: APP_FILTER, useClass: AllExceptionsFilter },

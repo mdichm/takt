@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import { Module } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthConfig, chargerConfigAuth } from '../../config/auth.config';
 import { PasswordService } from './password.service';
 import { InMemoryRevokedRefreshTokenStore } from './revoked-refresh-token.store';
@@ -10,6 +10,7 @@ import { TokenService } from './token.service';
 
 /** Module regroupant les services de sécurité de l'authentification. */
 @Module({
+  imports: [ConfigModule],
   providers: [
     PasswordService,
     InMemoryRevokedRefreshTokenStore,

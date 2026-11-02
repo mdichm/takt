@@ -1,6 +1,7 @@
 // Copyright (C) 2026 TAKT
 // SPDX-License-Identifier: AGPL-3.0-only
 
+import { Injectable } from '@nestjs/common';
 import { createSign, randomUUID } from 'node:crypto';
 import { zAccessTokenClaims, zRefreshTokenClaims } from '@takt/contracts';
 import { AuthConfig, lireClePem } from '../../config/auth.config';
@@ -21,6 +22,7 @@ export interface JetonSigne<T> {
 }
 
 /** Service de signature, validation et rotation des jetons RS256. */
+@Injectable()
 export class TokenService {
   private readonly strategy: JwtStrategy;
 
