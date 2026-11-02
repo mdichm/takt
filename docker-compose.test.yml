@@ -45,8 +45,11 @@ services:
     environment:
       - NODE_ENV=test
       - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/takt_test
-      - JWT_ACCESS_SECRET=test-access-secret-key-for-testing-only
-      - JWT_REFRESH_SECRET=test-refresh-secret-key-for-testing-only
+      - JWT_KEYS_DIRECTORY=/run/secrets/jwt
+      - JWT_ACTIVE_KEY_ID=active
+      - JWT_PREVIOUS_KEY_IDS=
+      - JWT_ISSUER=takt-test
+      - JWT_AUDIENCE=takt-api
       - JWT_ACCESS_TTL=15m
       - JWT_REFRESH_TTL=7d
       - SMTP_HOST=mock-smtp
@@ -63,7 +66,8 @@ services:
         condition: service_healthy
     networks:
       - takt-test-network
-    volumes: []
+    volumes:
+      - ./secrets/jwt:/run/secrets/jwt:ro
 
   # ------------------------------------------------------------
   # Frontend — React + Vite (test, served by Nginx)

@@ -13,8 +13,10 @@ import { PilotListsModule } from './pilots/pilot-lists.module';
 const ENV_TEST = {
   NODE_ENV: 'test',
   DATABASE_URL: 'postgresql://postgres:postgres@localhost:5432/takt_test',
-  JWT_ACCESS_SECRET: 'a'.repeat(32),
-  JWT_REFRESH_SECRET: 'b'.repeat(32),
+  JWT_KEYS_DIRECTORY: '/tmp/takt-test-jwt',
+  JWT_ACTIVE_KEY_ID: 'active',
+  JWT_ISSUER: 'takt-test',
+  JWT_AUDIENCE: 'takt-api',
 };
 
 const SUFFIXE = `pilote-${Date.now()}`;
@@ -111,9 +113,7 @@ describe('listes pilotes paginées', () => {
   });
 
   it.each(['versions', 'seances'])('expose la liste pilote %s', async (ressource) => {
-    const reponse = await request(application.getHttpServer()).get(
-      `/api/v1/pilotes/${ressource}`,
-    );
+    const reponse = await request(application.getHttpServer()).get(`/api/v1/pilotes/${ressource}`);
 
     expect(reponse.status).toBe(200);
     expect(reponse.body).toMatchObject({

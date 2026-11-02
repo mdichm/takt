@@ -13,8 +13,10 @@ import { ZodQueryPipe } from '../pipes/zod-validation.pipe';
 const ENV_TEST = {
   NODE_ENV: 'test',
   DATABASE_URL: 'postgresql://postgres:postgres@localhost:5432/takt_test',
-  JWT_ACCESS_SECRET: 'a'.repeat(32),
-  JWT_REFRESH_SECRET: 'b'.repeat(32),
+  JWT_KEYS_DIRECTORY: '/tmp/takt-test-jwt',
+  JWT_ACTIVE_KEY_ID: 'active',
+  JWT_ISSUER: 'takt-test',
+  JWT_AUDIENCE: 'takt-api',
 };
 
 const SchemaEmail = z.object({ email: z.string().email('Email invalide') });
@@ -22,7 +24,10 @@ const SchemaEmail = z.object({ email: z.string().email('Email invalide') });
 @Controller('demonstration')
 class ControleurDemonstration {
   @Get('liste')
-  liste(): { data: Array<{ id: number }>; meta: { page: number; pageSize: number; total: number } } {
+  liste(): {
+    data: Array<{ id: number }>;
+    meta: { page: number; pageSize: number; total: number };
+  } {
     return {
       data: [{ id: 1 }, { id: 2 }],
       meta: { page: 2, pageSize: 2, total: 5 },
@@ -30,7 +35,9 @@ class ControleurDemonstration {
   }
 
   @Get('validation')
-  validation(@Query(new ZodQueryPipe(SchemaEmail)) query: z.infer<typeof SchemaEmail>): { valide: boolean } {
+  validation(@Query(new ZodQueryPipe(SchemaEmail)) query: z.infer<typeof SchemaEmail>): {
+    valide: boolean;
+  } {
     void query;
     return { valide: true };
   }
