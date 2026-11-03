@@ -5,23 +5,26 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthConfig, chargerConfigAuth } from '../../config/auth.config';
 import { CommonModule } from '../common/common.module';
-import { UsersModule } from '../users/users.module';
 import { PasswordService } from './password.service';
-import { InMemoryRevokedRefreshTokenStore } from './revoked-refresh-token.store';
+import { SessionRefreshStore } from './session-refresh.store';
 import { TokenService } from './token.service';
+import { AuthController } from './auth.controller';
+import { AuthService } from './auth.service';
 
 /** Module regroupant les services de sécurité de l'authentification. */
 @Module({
-  imports: [ConfigModule, CommonModule, UsersModule],
+  imports: [ConfigModule, CommonModule],
+  controllers: [AuthController],
   providers: [
     PasswordService,
-    InMemoryRevokedRefreshTokenStore,
+    SessionRefreshStore,
+    AuthService,
     {
       provide: TokenService,
-      inject: [ConfigService, InMemoryRevokedRefreshTokenStore],
+      inject: [ConfigService, SessionRefreshStore],
       useFactory: (
         config: ConfigService,
-        revokedStore: InMemoryRevokedRefreshTokenStore,
+        revokedStore: SessionRefreshStore,
       ): TokenService => {
         const authConfig: AuthConfig = chargerConfigAuth({
           JWT_KEYS_DIRECTORY: config.get<string>('JWT_KEYS_DIRECTORY', '/run/secrets/jwt'),

@@ -159,7 +159,7 @@
 
 | Table | Description | Clé primaire | Contraintes clés |
 |-------|-------------|--------------|------------------|
-| `Utilisateur` | Comptes applicatifs (admin, gest, rdep, dir) | `id` (UUID) | email unique, rôle, département_id (nullable pour admin/dir) |
+| `Utilisateur` | Comptes applicatifs (admin, gest, rdep, dir) | `id` (UUID) | email unique, rôle, département_id (nullable), motDePasseHash (argon2id, nullable) |
 | `Role` | Référentiel des rôles | `id` (UUID) | code unique (`admin`, `gest`, `rdep`, `dir`) |
 | `Departement` | Référentiel des départements | `id` (UUID) | code unique, libellé |
 | `AnneeUniversitaire` | Années académiques | `id` (UUID) | libellé unique, dates début/fin |
@@ -174,6 +174,7 @@
 | `Scenario` | Scénario produit par le solver | `id` (UUID) | generation_id, score_global, sous_scores JSONB, selectionne (booléen) |
 | `Export` | Fichier d'export généré | `id` (UUID) | version_id, format (xlsx/pdf/ics), chemin_fichier, date_generation |
 | `JournalAudit` | Journal d'audit | `id` (UUID) | action, horodatage, utilisateur_id, entité, entité_id, métadonnées JSONB |
+| `SessionRefresh` | Famille de jetons de rafraîchissement (rotation) | `id` (UUID) | jti unique, familyId, utilisateur_id (FK), estRevoque, expiresAt |
 
 ### 2.2 Schéma Prisma (extrait clé)
 

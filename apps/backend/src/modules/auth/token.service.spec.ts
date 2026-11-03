@@ -130,16 +130,18 @@ describe('TokenService', () => {
     );
   });
 
-  it('refuse un refresh token déjà consommé et révoque sa famille', () => {
+  it('refuse un refresh token déjà consommé et révoque sa famille', async () => {
     const refresh = service.signRefreshToken(UTILISATEUR_ID);
 
-    const rotation = service.rotateRefreshToken(refresh.token);
+    const rotation = await service.rotateRefreshToken(refresh.token);
     expect(rotation.claims.familyId).toBe(refresh.claims.familyId);
 
-    expect(() => service.rotateRefreshToken(refresh.token)).toThrowError(
+    await expect(service.rotateRefreshToken(refresh.token)).rejects.toThrow(
       'Refresh token déjà utilisé',
     );
-    expect(() => service.verifyRefreshToken(rotation.token)).toThrowError('Refresh token révoqué');
+    await expect(service.verifyRefreshToken(rotation.token)).rejects.toThrow(
+      'Refresh token révoqué',
+    );
   });
 
   it('accepte une clé publique précédente pendant la rotation', () => {

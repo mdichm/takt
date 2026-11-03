@@ -5,9 +5,9 @@ import { Injectable } from '@nestjs/common';
 
 /** Persistance des jetons de rafraîchissement consommés ou révoqués. */
 export interface RevokedRefreshTokenStore {
-  consume(jti: string, familyId: string): boolean;
-  revokeFamily(familyId: string): void;
-  isRevoked(jti: string, familyId: string): boolean;
+  consume(jti: string, familyId: string): Promise<boolean>;
+  revokeFamily(familyId: string): Promise<void>;
+  isRevoked(jti: string, familyId: string): Promise<boolean>;
 }
 
 /**
@@ -21,20 +21,20 @@ export class InMemoryRevokedRefreshTokenStore implements RevokedRefreshTokenStor
   private readonly jtisConsommes = new Set<string>();
   private readonly famillesRevoquees = new Set<string>();
 
-  consume(jti: string, familyId: string): boolean {
+  async consume(jti: string, familyId: string): Promise<boolean> {
     if (this.jtisConsommes.has(jti) || this.famillesRevoquees.has(familyId)) {
-      this.revokeFamily(familyId);
+      await this.revokeFamily(familyId);
       return false;
     }
     this.jtisConsommes.add(jti);
     return true;
   }
 
-  revokeFamily(familyId: string): void {
+  async revokeFamily(familyId: string): Promise<void> {
     this.famillesRevoquees.add(familyId);
   }
 
-  isRevoked(jti: string, familyId: string): boolean {
+  async isRevoked(jti: string, familyId: string): Promise<boolean> {
     return this.jtisConsommes.has(jti) || this.famillesRevoquees.has(familyId);
   }
 }

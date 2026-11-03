@@ -204,7 +204,7 @@ TICKETS: List[Ticket] = [
         lot="L03",
         titre="Exposer les endpoints login / refresh / logout",
         sp=5,
-        status="À faire",
+        status="Terminé",
         deps=['TAKT-L02-02', 'TAKT-L03-01', 'TAKT-L03-02', 'TAKT-L00-04'],
         exigences=['EX-SEC-01', 'TE-API-01', 'ST_TAKT §3.2', 'IX-COM-01', 'IX-COM-02', 'UF-* auth.'],
     ),

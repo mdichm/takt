@@ -791,6 +791,50 @@ info:
   version: 1.0.0
 openapi: 3.0.0
 paths:
+  /api/v1/auth/login:
+    post:
+      operationId: AuthController_login
+      parameters: []
+      responses:
+        '200':
+          description: Connexion réussie
+        '401':
+          description: Identifiants invalides
+        '429':
+          description: Trop de tentatives
+      security:
+        - bearerAuth: []
+      summary: Connexion utilisateur (émet access + refresh)
+      tags:
+        - auth
+  /api/v1/auth/logout:
+    post:
+      operationId: AuthController_logout
+      parameters: []
+      responses:
+        '200':
+          description: Déconnecté
+        '401':
+          description: Refresh token invalide
+      security:
+        - bearerAuth: []
+      summary: Déconnexion (révoque la famille de rafraîchissement)
+      tags:
+        - auth
+  /api/v1/auth/refresh:
+    post:
+      operationId: AuthController_refresh
+      parameters: []
+      responses:
+        '200':
+          description: Jeton rafraîchi
+        '401':
+          description: Refresh token invalide ou révoqué
+      security:
+        - bearerAuth: []
+      summary: Rafraîchit les jetons (rotation du refresh)
+      tags:
+        - auth
   /api/v1/events:
     get:
       operationId: EventsController_fluxEvenements
