@@ -11,15 +11,26 @@ import { AuthService } from './auth.service';
 const COOKIE_REFRESH_TOKEN = 'refreshToken';
 
 /**
+ * Type de substitution pour @Req() afin que TypeScript émette des métadonnées
+ * PARAMTYPES_METADATA (requis par @nestjs/swagger). Cette classe n'est pas
+ * exposée dans OpenAPI (cachée via @ApiHideParameter).
+ */
+class ExpressRequestHolder {}
+
+/**
+ * Type de substitution pour @Res() afin que TypeScript émette des métadonnées
+ * PARAMTYPES_METADATA (requis par @nestjs/swagger). Cette classe n'est pas
+ * exposée dans OpenAPI (cachée via @ApiHideParameter).
+ */
+class ExpressResponseHolder {}
+
+/**
  * Extrait le jeton de rafraîchissement depuis le cookie `refreshToken`.
  * Aucun `cookie-parser` n'est ajouté (pas de nouvelle dépendance, GG-02) :
  * l'en-tête `Cookie` est parsé manuellement.
  */
-function extraireRefreshToken(req: any): string | undefined { // eslint-disable-line @typescript-eslint/no-explicit-any
-  // any-justify: req est l'objet Express natif injecté par NestJS (@Req). Le
-  // typage complet exigerait d'importer `express` comme dépendance directe
-  // (elle n'est que transitive via @nestjs/platform-express ; GG-02).
-  const cookieHeader = req.headers?.cookie;
+function extraireRefreshToken(req: ExpressRequestHolder): string | undefined {
+  const cookieHeader = (req as { headers?: { cookie?: string } }).headers?.cookie;
   if (!cookieHeader) {
     return undefined;
   }
@@ -56,19 +67,24 @@ export class AuthController {
   @ApiResponse({ status: 429, description: 'Trop de tentatives' })
   async login(
     @Body() corps: LoginInput,
-    @Req() req: any, // eslint-disable-line @typescript-eslint/no-explicit-any
-    @Res({ passthrough: true }) res: any, // eslint-disable-line @typescript-eslint/no-explicit-any
+    @Req() req: ExpressRequestHolder,
+    @Res({ passthrough: true }) res: ExpressResponseHolder,
   ) {
-    // any-justify: req/res sont les objets Express natifs injectés par NestJS.
-    const ip = req.ip ?? 'inconnu';
+    // any-justify: req/res sont les objets Express natifs injectés par NestJS,
+    // typés par des classes de substitution pour Swagger (cast au besoin).
+    const ip = (req as { ip?: string }).ip ?? 'inconnu';
     const resultat = await this.authService.login(corps.email, corps.motDePasse, ip);
 
-    res.cookie(COOKIE_REFRESH_TOKEN, resultat.refreshToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'strict',
-      path: '/',
-    });
+    (res as { cookie: (nom: string, valeur: string, options: { httpOnly: boolean; secure: boolean; sameSite: string; path: string }) => void }).cookie(
+      COOKIE_REFRESH_TOKEN,
+      resultat.refreshToken,
+      {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'strict',
+        path: '/',
+      },
+    );
 
     return { accessToken: resultat.accessToken, utilisateur: resultat.utilisateur };
   }
@@ -81,19 +97,23 @@ export class AuthController {
   @ApiResponse({ status: 401, description: 'Refresh token invalide ou révoqué' })
   async refresh(
     @Body() corps: RefreshInput,
-    @Req() req: any, // eslint-disable-line @typescript-eslint/no-explicit-any
-    @Res({ passthrough: true }) res: any, // eslint-disable-line @typescript-eslint/no-explicit-any
+    @Req() req: ExpressRequestHolder,
+    @Res({ passthrough: true }) res: ExpressResponseHolder,
   ) {
     // any-justify: idem.
     const refreshToken = extraireRefreshToken(req) ?? corps.refreshToken;
     const resultat = await this.authService.refresh(refreshToken);
 
-    res.cookie(COOKIE_REFRESH_TOKEN, resultat.refreshToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'strict',
-      path: '/',
-    });
+    (res as { cookie: (nom: string, valeur: string, options: { httpOnly: boolean; secure: boolean; sameSite: string; path: string }) => void }).cookie(
+      COOKIE_REFRESH_TOKEN,
+      resultat.refreshToken,
+      {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'strict',
+        path: '/',
+      },
+    );
 
     return { accessToken: resultat.accessToken };
   }
@@ -106,15 +126,15 @@ export class AuthController {
   @ApiResponse({ status: 401, description: 'Refresh token invalide' })
   async logout(
     @Body() corps: RefreshInput,
-    @Req() req: any, // eslint-disable-line @typescript-eslint/no-explicit-any
-    @Res({ passthrough: true }) res: any, // eslint-disable-line @typescript-eslint/no-explicit-any
+    @Req() req: ExpressRequestHolder,
+    @Res({ passthrough: true }) res: ExpressResponseHolder,
   ) {
     // any-justify: idem.
     const refreshToken = extraireRefreshToken(req) ?? corps.refreshToken;
     await this.authService.logout(refreshToken);
 
     // Efface le cookie côté client.
-    res.clearCookie(COOKIE_REFRESH_TOKEN, { path: '/' });
+    (res as { clearCookie: (nom: string, options: { path: string }) => void }).clearCookie(COOKIE_REFRESH_TOKEN, { path: '/' });
 
     return {};
   }

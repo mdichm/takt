@@ -281,7 +281,33 @@ export function construireDocumentOpenApi(app: INestApplication): OpenAPIObject 
     )
     .build();
 
-  const genere = SwaggerModule.createDocument(app, configuration);
+  /*
+   * @nestjs/swagger plante (TypeError: Cannot read properties of undefined)
+   * quand Reflect.getMetadata('design:paramtypes') retourne undefined pour une
+   * méthode de contrôleur (cas des paramètres typés par des interfaces
+   * TypeScript sans représentation à l'exécution, ex. Request/Response d'Express
+   * ou des DTO importés de @takt/contracts). On s'assure que la valeur retournée
+   * est toujours un tableau afin d'éviter le crash dans ParameterMetadataAccessor.
+   */
+  const originalGetMetadata = Reflect.getMetadata.bind(Reflect);
+  Reflect.getMetadata = ((metadataKey: string, target: object, propertyKey?: string | symbol) => {
+    if (propertyKey === undefined) {
+      return originalGetMetadata(metadataKey, target);
+    }
+    const valeur = originalGetMetadata(metadataKey, target, propertyKey);
+    if (metadataKey === 'design:paramtypes' && valeur === undefined) {
+      return [];
+    }
+    return valeur;
+  });
+
+  let genere: OpenAPIObject;
+  try {
+    genere = SwaggerModule.createDocument(app, configuration);
+  } finally {
+    Reflect.getMetadata = originalGetMetadata;
+  }
+
   const commitee = chargerSpecCommittee();
   const fusion = commitee ? fusionnerDocumentsOpenApi(commitee, genere) : genere;
 
