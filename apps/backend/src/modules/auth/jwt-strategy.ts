@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import { createVerify } from 'node:crypto';
+import { HttpException, HttpStatus } from '@nestjs/common';
 import { zAccessTokenClaims, zRefreshTokenClaims } from '@takt/contracts';
 import { AuthConfig, lireClePem } from '../../config/auth.config';
 
@@ -13,9 +14,9 @@ interface EnteteJwt {
 }
 
 /** Erreur applicative de validation JWT, volontairement sans détail du jeton. */
-export class ErreurJwt extends Error {
+export class ErreurJwt extends HttpException {
   constructor(message: string) {
-    super(message);
+    super(message, HttpStatus.UNAUTHORIZED);
     this.name = 'ErreurJwt';
   }
 }

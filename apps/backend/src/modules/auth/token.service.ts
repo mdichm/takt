@@ -33,6 +33,11 @@ export class TokenService {
     this.strategy = new JwtStrategy(config);
   }
 
+  /** Durée de vie (secondes) d'un refresh token. */
+  get refreshTtlSeconds(): number {
+    return this.config.refreshTtlSeconds;
+  }
+
   /** Signe un access token de durée courte. */
   signAccessToken(
     identite: IdentiteAccessToken,
@@ -74,19 +79,21 @@ export class TokenService {
   }
 
   /** Vérifie un refresh token et l'état de sa famille. */
-  verifyRefreshToken(token: string): ReturnType<typeof zRefreshTokenClaims.parse> {
+  async verifyRefreshToken(token: string): Promise<ReturnType<typeof zRefreshTokenClaims.parse>> {
     const claims = this.strategy.verifyRefreshToken(token);
-    if (this.revokedStore.isRevoked(claims.jti, claims.familyId)) {
+    if (await this.revokedStore.isRevoked(claims.jti, claims.familyId)) {
       throw new ErreurJwt('Refresh token révoqué');
     }
     return claims;
   }
 
   /** Consomme un refresh token et en émet un nouveau de même famille. */
-  rotateRefreshToken(token: string): JetonSigne<ReturnType<typeof zRefreshTokenClaims.parse>> {
+  async rotateRefreshToken(
+    token: string,
+  ): Promise<JetonSigne<ReturnType<typeof zRefreshTokenClaims.parse>>> {
     const claims = this.strategy.verifyRefreshToken(token);
-    if (!this.revokedStore.consume(claims.jti, claims.familyId)) {
-      this.revokedStore.revokeFamily(claims.familyId);
+    if (!(await this.revokedStore.consume(claims.jti, claims.familyId))) {
+      await this.revokedStore.revokeFamily(claims.familyId);
       throw new ErreurJwt('Refresh token déjà utilisé');
     }
     const maintenant = Math.floor(Date.now() / 1000);

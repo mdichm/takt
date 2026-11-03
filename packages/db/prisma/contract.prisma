@@ -24,14 +24,16 @@ model Utilisateur {
   prenom         String
   roleId         String   @db.Uuid
   departementId  String?  @db.Uuid
-  estActif       Boolean  @default(true)
-  createdAt      DateTime @default(now())
+  estActif       Boolean   @default(true)
+  motDePasseHash String?    // hash Argon2id du mot de passe (nullable : comptes externes/SSO)
+  createdAt      DateTime  @default(now())
   updatedAt      DateTime @updatedAt
 
-  role           Role       @relation(fields: [roleId], references: [id])
-  departement    Departement? @relation(fields: [departementId], references: [id])
-  verrous        VerrouSeance[]
-  journalAudit   JournalAudit[]
+  role             Role                @relation(fields: [roleId], references: [id])
+  departement      Departement?        @relation(fields: [departementId], references: [id])
+  sessionsRefresh  SessionRefresh[]    // familles de jetons de rafraîchissement (rotation)
+  verrous          VerrouSeance[]
+  journalAudit     JournalAudit[]
 
   @@index([email])
   @@index([roleId])
@@ -282,4 +284,24 @@ model JournalAudit {
   @@index([horodatage])
   @@index([action])
   @@index([utilisateurId])
+}
+
+// ----------------------------------------------------------------------------
+// 16. SessionRefresh — Famille de jetons de rafraîchissement (rotation)
+// ----------------------------------------------------------------------------
+model SessionRefresh {
+  id            String   @id @default(uuid()) @db.Uuid
+  jti           String   @unique @db.Uuid
+  familyId      String   @db.Uuid
+  utilisateurId String   @db.Uuid
+  estRevoque    Boolean  @default(false)
+  expiresAt     DateTime
+  createdAt     DateTime @default(now())
+
+  utilisateur Utilisateur @relation(fields: [utilisateurId], references: [id])
+
+  @@index([jti])
+  @@index([familyId])
+  @@index([utilisateurId])
+  @@index([expiresAt])
 }
