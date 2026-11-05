@@ -15,9 +15,20 @@ import { NiveauService } from './niveau/niveau.service';
 import { GroupeController } from './groupe/groupe.controller';
 import { GroupeService } from './groupe/groupe.service';
 import { ArbreController } from './arbre.controller';
+import { TypeEnseignementController } from './type-enseignement/type-enseignement.controller';
+import { TypeEnseignementService } from './type-enseignement/type-enseignement.service';
+import { GradeController } from './grade/grade.controller';
+import { GradeService } from './grade/grade.service';
+import { ModuleController } from './module/module.controller';
+import { ModuleService } from './module/module.service';
+import { MatiereController } from './matiere/matiere.controller';
+import { MatiereService } from './matiere/matiere.service';
+import { GradeTypeEnseignementController } from './grade-type-enseignement/grade-type-enseignement.controller';
+import { GradeTypeEnseignementService } from './grade-type-enseignement/grade-type-enseignement.service';
 
 /**
- * Module des référentiels métier (Établissement, Département, Parcours, Niveau, Groupe).
+ * Module des référentiels métier (Établissement, Département, Parcours, Niveau, Groupe,
+ * Type d’enseignement, Grade, Module, Matière, GradeTypeEnseignement).
  *
  * Dépend uniquement de CommonModule et AuditModule (pas de cycle, GG-13).
  */
@@ -30,6 +41,11 @@ import { ArbreController } from './arbre.controller';
     NiveauController,
     GroupeController,
     ArbreController,
+    TypeEnseignementController,
+    GradeController,
+    ModuleController,
+    MatiereController,
+    GradeTypeEnseignementController,
   ],
   providers: [
     EtablissementService,
@@ -37,6 +53,11 @@ import { ArbreController } from './arbre.controller';
     ParcoursService,
     NiveauService,
     GroupeService,
+    TypeEnseignementService,
+    GradeService,
+    ModuleService,
+    MatiereService,
+    GradeTypeEnseignementService,
   ],
   exports: [
     EtablissementService,
@@ -44,6 +65,11 @@ import { ArbreController } from './arbre.controller';
     ParcoursService,
     NiveauService,
     GroupeService,
+    TypeEnseignementService,
+    GradeService,
+    ModuleService,
+    MatiereService,
+    GradeTypeEnseignementService,
   ],
 })
 export class ReferentielsModule {}
