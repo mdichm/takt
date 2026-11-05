@@ -10,6 +10,7 @@ import {
   CODES_ERREUR_API,
   ApiError,
 } from '../common/http/api-error';
+import { appliquerFiltreDepartement } from '../common/rbac/filtre-departement.util';
 
 /**
  * Service de gestion des utilisateurs et de leurs rôles.
@@ -121,17 +122,20 @@ export class UsersService {
     };
   }
 
-  /** Liste paginée des utilisateurs avec filtres. */
-  async listUsers(query: {
-    page: number;
-    pageSize: number;
-    search?: string;
-    sortBy?: string;
-    sortDirection?: 'asc' | 'desc';
-    role?: string;
-    departementId?: string;
-    estActif?: boolean;
-  }) {
+  /** Liste paginée des utilisateurs avec filtres et portée par département. */
+  async listUsers(
+    query: {
+      page: number;
+      pageSize: number;
+      search?: string;
+      sortBy?: string;
+      sortDirection?: 'asc' | 'desc';
+      role?: string;
+      departementId?: string;
+      estActif?: boolean;
+    },
+    contexte?: { utilisateurId: string; departementIds: string[] },
+  ) {
     const where: Record<string, unknown> = {};
     if (query.role) {
       where.role = { code: query.role };
@@ -141,6 +145,11 @@ export class UsersService {
     }
     if (query.estActif !== undefined) {
       where.estActif = query.estActif;
+    }
+
+    // Appliquer le filtrage par département (rdep/gest ne voient que leur département)
+    if (contexte?.departementIds && contexte.departementIds.length > 0) {
+      Object.assign(where, appliquerFiltreDepartement(where, contexte.departementIds));
     }
 
     const [data, total] = await this.prisma.$transaction([
@@ -172,8 +181,15 @@ export class UsersService {
     };
   }
 
-  /** Récupère un utilisateur par son identifiant. */
-  async getUser(id: string) {
+  /** Récupère un utilisateur par son identifiant, avec vérification de portée. */
+  async getUser(
+    id: string,
+    contexte?: {
+      utilisateurIdDemandeur: string;
+      roleDemandeur: string;
+      departementIds: string[];
+    },
+  ) {
     const utilisateur = await this.prisma.utilisateur.findUnique({
       where: { id },
       include: { role: { select: { code: true } }, departement: true },
@@ -181,6 +197,40 @@ export class UsersService {
     if (!utilisateur) {
       throw new ApiError(CODES_ERREUR_API.NOT_FOUND, 404, 'Utilisateur introuvable');
     }
+
+    // Vérification de la portée par département
+    if (contexte) {
+      const { utilisateurIdDemandeur, roleDemandeur, departementIds } = contexte;
+
+      // Auto-consultation : toujours autorisé
+      if (id === utilisateurIdDemandeur) {
+        // retourne l'utilisateur
+      } else if (roleDemandeur === 'admin' || roleDemandeur === 'dir') {
+        // admin et dir voient tout
+      } else if (
+        roleDemandeur === 'gest' ||
+        roleDemandeur === 'rdep'
+      ) {
+        // gest et rdep ne voient que les utilisateurs de leur(s) département(s)
+        if (
+          !utilisateur.departementId ||
+          !departementIds.includes(utilisateur.departementId)
+        ) {
+          throw new ApiError(
+            CODES_ERREUR_API.FORBIDDEN,
+            403,
+            'Accès refusé : utilisateur hors de votre département',
+          );
+        }
+      } else {
+        throw new ApiError(
+          CODES_ERREUR_API.FORBIDDEN,
+          403,
+          'Accès refusé',
+        );
+      }
+    }
+
     return {
       id: utilisateur.id,
       email: utilisateur.email,
@@ -196,21 +246,62 @@ export class UsersService {
     };
   }
 
-  /** Met à jour un utilisateur (nom, prénom, rôle, département, actif). */
-  async updateUser(id: string, donnees: {
-    nom?: string;
-    prenom?: string;
-    roleId?: string;
-    departementId?: string | null;
-    estActif?: boolean;
-    utilisateurIdModifiePar: string;
-  }) {
+  /** Met à jour un utilisateur, avec vérification de portée par département. */
+  async updateUser(
+    id: string,
+    donnees: {
+      nom?: string;
+      prenom?: string;
+      roleId?: string;
+      departementId?: string | null;
+      estActif?: boolean;
+      utilisateurIdModifiePar: string;
+    },
+    contexte?: {
+      utilisateurIdDemandeur: string;
+      roleDemandeur: string;
+      departementIds: string[];
+    },
+  ) {
     const utilisateur = await this.prisma.utilisateur.findUnique({
       where: { id },
-      include: { role: { select: { code: true } } },
+      include: { role: { select: { code: true } }, departement: true },
     });
     if (!utilisateur) {
       throw new ApiError(CODES_ERREUR_API.NOT_FOUND, 404, 'Utilisateur introuvable');
+    }
+
+    // Vérification de la portée par département
+    if (contexte) {
+      const { utilisateurIdDemandeur, roleDemandeur, departementIds } = contexte;
+
+      // Auto-modification : toujours autorisé
+      if (id !== utilisateurIdDemandeur) {
+        if (roleDemandeur === 'admin' || roleDemandeur === 'dir') {
+          // admin et dir modifient tout
+        } else if (
+          roleDemandeur === 'gest' ||
+          roleDemandeur === 'rdep'
+        ) {
+          // gest et rdep ne modifient que les utilisateurs de leur(s) département(s)
+          if (
+            !utilisateur.departementId ||
+            !departementIds.includes(utilisateur.departementId)
+          ) {
+            throw new ApiError(
+              CODES_ERREUR_API.FORBIDDEN,
+              403,
+              'Accès refusé : utilisateur hors de votre département',
+            );
+          }
+        } else {
+          throw new ApiError(
+            CODES_ERREUR_API.FORBIDDEN,
+            403,
+            'Accès refusé',
+          );
+        }
+      }
     }
 
     if (donnees.roleId !== undefined) {

@@ -7,16 +7,17 @@ import { HealthService } from './health.service';
 import { PrismaModule } from './prisma/prisma.module';
 import { PRISMA } from './di/prisma.token';
 import { PrismaService } from './prisma/prisma.service';
+import { RbacModule } from './rbac/rbac.module';
 
 /** Module transverse exposant les endpoints opérationnels de l'API. */
 @Module({
-  imports: [PrismaModule],
+  imports: [PrismaModule, RbacModule],
   controllers: [HealthController],
   providers: [
     HealthService,
     PrismaService,
     { provide: PRISMA, useExisting: PrismaService },
   ],
-  exports: [PrismaModule, PRISMA],
+  exports: [PrismaModule, PRISMA, RbacModule],
 })
 export class CommonModule {}

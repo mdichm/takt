@@ -13,6 +13,7 @@ import {
   Patch,
   Post,
   Req,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import {
@@ -27,53 +28,34 @@ import {
 } from '@takt/contracts';
 import { ZodValidation } from '../common/pipes/zod-validation.decorator';
 import { UsersService } from './users.service';
+import {
+  JwtAuthGuard,
+  UtilisateurConnecte,
+} from '../common/guards/jwt-auth.guard';
+import { RolesGuard } from '../common/guards/roles.guard';
+import { DepartmentScopeGuard } from '../common/guards/department-scope.guard';
+import { Roles } from '../common/decorators/roles.decorator';
+import { DepartmentScope } from '../common/decorators/department-scope.decorator';
 
-/** Requête HTTP minimale, vue par le contrôleur (pas d'import express). */
-interface RequeteHttpMinimale {
+/**
+ * Requête HTTP enrichie avec l'identité utilisateur (attirée par JwtAuthGuard)
+ * et les IDs de département (attirés par DepartmentScopeGuard).
+ */
+interface RequeteAvecUtilisateur {
   /** En-têtes de la requête. */
   headers: Record<string, string | string[] | undefined>;
   /** Paramètres de query string. */
   query?: Record<string, string | string[] | undefined>;
-}
-
-/**
- * Décode le payload d'un access token JWT (sans vérification de signature)
- * pour en extraire l'identifiant utilisateur (`sub`).
- * La vérification de signature est assurée par les guards d'authentification
- * (à implémenter, ticket L06-02).
- */
-function extraireSubDepuisJwt(authorization: string | undefined): string {
-  if (!authorization) {
-    return '';
-  }
-  const correspondance = authorization.match(/^Bearer\s+(.+)$/i);
-  if (!correspondance) {
-    return '';
-  }
-  const token = correspondance[1];
-  if (!token) {
-    return '';
-  }
-  const segments = token.split('.');
-  const payloadSegment = segments[1];
-  if (!payloadSegment || segments.length < 2) {
-    return '';
-  }
-  try {
-    const payload = JSON.parse(
-      Buffer.from(payloadSegment, 'base64url').toString('utf8'),
-    );
-    return typeof payload === 'object' && payload !== null && typeof payload.sub === 'string'
-      ? payload.sub
-      : '';
-  } catch {
-    return '';
-  }
+  /** Identité utilisateur attachée par JwtAuthGuard. */
+  user?: UtilisateurConnecte;
+  /** IDs de département attachés par DepartmentScopeGuard. */
+  departementIds?: string[];
 }
 
 /**
  * Contrôleur des utilisateurs : CRUD des comptes et attribution des rôles.
  * Seuls les endpoints listés ici sont exposés (ST_TAKT §3.2).
+ * Tous les endpoints sont protégés par JwtAuthGuard + RolesGuard.
  */
 @ApiTags('Utilisateurs')
 @ApiBearerAuth()
@@ -81,22 +63,18 @@ function extraireSubDepuisJwt(authorization: string | undefined): string {
 export class UsersController {
   constructor(@Inject(UsersService) private readonly usersService: UsersService) {}
 
-  /** Extrait l'identifiant de l'utilisateur connecté depuis la requête. */
-  private utilisateurId(req: RequeteHttpMinimale): string {
-    const header = req.headers['authorization'];
-    const valeur = Array.isArray(header) ? header[0] : header;
-    return extraireSubDepuisJwt(valeur);
-  }
-
   /** Liste paginée des utilisateurs (GET /api/v1/users). */
   @Get()
+  @UseGuards(JwtAuthGuard, RolesGuard, DepartmentScopeGuard)
+  @Roles('admin', 'gest', 'rdep', 'dir')
+  @DepartmentScope()
   @HttpCode(HttpStatus.OK)
   @ZodValidation({ query: zUserList })
   @ApiOperation({ summary: 'Liste paginée des utilisateurs' })
   @ApiResponse({ status: 200, description: 'Liste des utilisateurs' })
   @ApiResponse({ status: 401, description: 'Non authentifié' })
   @ApiResponse({ status: 403, description: 'Interdit' })
-  async list(@Req() req: RequeteHttpMinimale): Promise<unknown> {
+  async list(@Req() req: RequeteAvecUtilisateur): Promise<unknown> {
     const query = (req.query ?? {}) as unknown as UserListFilters;
     const page = query.page ?? 1;
     const pageSize = query.pageSize ?? 20;
@@ -128,19 +106,19 @@ export class UsersController {
     if (query.estActif !== undefined) {
       filtres.estActif = query.estActif;
     }
-    const resultat = await this.usersService.listUsers(filtres);
-    return {
-      data: resultat.data,
-      meta: {
-        page: resultat.meta.page,
-        pageSize: resultat.meta.pageSize,
-        total: resultat.meta.total,
-      },
-    };
+
+    const departementIds = req.departementIds ?? [];
+    const resultat = await this.usersService.listUsers(filtres, {
+      utilisateurId: req.user!.sub,
+      departementIds,
+    });
+    return resultat;
   }
 
   /** Crée un utilisateur (POST /api/v1/users). */
   @Post()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin', 'gest')
   @HttpCode(HttpStatus.CREATED)
   @ZodValidation({ body: zUserCreate })
   @ApiOperation({ summary: 'Crée un utilisateur' })
@@ -150,7 +128,7 @@ export class UsersController {
   @ApiResponse({ status: 403, description: 'Interdit' })
   async create(
     @Body() corps: UserCreate,
-    @Req() req: RequeteHttpMinimale,
+    @Req() req: RequeteAvecUtilisateur,
   ): Promise<unknown> {
     const resultat = await this.usersService.createUser({
       email: corps.email,
@@ -160,13 +138,15 @@ export class UsersController {
       departementId: corps.departementId ?? null,
       motDePasse: corps.motDePasse,
       estActif: corps.estActif ?? true,
-      utilisateurIdCreePar: this.utilisateurId(req),
+      utilisateurIdCreePar: req.user!.sub,
     });
     return resultat;
   }
 
   /** Récupère un utilisateur par son ID (GET /api/v1/users/:id). */
   @Get(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin', 'gest', 'rdep', 'dir')
   @HttpCode(HttpStatus.OK)
   @ZodValidation({ params: zUserParams })
   @ApiOperation({ summary: 'Détail d’un utilisateur' })
@@ -174,13 +154,22 @@ export class UsersController {
   @ApiResponse({ status: 401, description: 'Non authentifié' })
   @ApiResponse({ status: 403, description: 'Interdit' })
   @ApiResponse({ status: 404, description: 'Utilisateur introuvable' })
-  async getOne(@Param() params: UserParams): Promise<unknown> {
-    const utilisateur = await this.usersService.getUser(params.id);
+  async getOne(
+    @Param() params: UserParams,
+    @Req() req: RequeteAvecUtilisateur,
+  ): Promise<unknown> {
+    const utilisateur = await this.usersService.getUser(params.id, {
+      utilisateurIdDemandeur: req.user!.sub,
+      roleDemandeur: req.user!.role,
+      departementIds: req.departementIds ?? [],
+    });
     return utilisateur;
   }
 
   /** Met à jour un utilisateur (PATCH /api/v1/users/:id). */
   @Patch(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin', 'gest')
   @HttpCode(HttpStatus.OK)
   @ZodValidation({ params: zUserParams, body: zUserUpdate })
   @ApiOperation({ summary: 'Modifie un utilisateur' })
@@ -192,7 +181,7 @@ export class UsersController {
   async update(
     @Param() params: UserParams,
     @Body() corps: UserUpdate,
-    @Req() req: RequeteHttpMinimale,
+    @Req() req: RequeteAvecUtilisateur,
   ): Promise<unknown> {
     const misesAJour: {
       nom?: string;
@@ -201,7 +190,7 @@ export class UsersController {
       departementId?: string | null;
       estActif?: boolean;
       utilisateurIdModifiePar: string;
-    } = { utilisateurIdModifiePar: this.utilisateurId(req) };
+    } = { utilisateurIdModifiePar: req.user!.sub };
     if (corps.nom !== undefined) {
       misesAJour.nom = corps.nom;
     }
@@ -217,12 +206,18 @@ export class UsersController {
     if (corps.estActif !== undefined) {
       misesAJour.estActif = corps.estActif;
     }
-    const resultat = await this.usersService.updateUser(params.id, misesAJour);
+    const resultat = await this.usersService.updateUser(params.id, misesAJour, {
+      utilisateurIdDemandeur: req.user!.sub,
+      roleDemandeur: req.user!.role,
+      departementIds: req.departementIds ?? [],
+    });
     return resultat;
   }
 
   /** Désactive un utilisateur (DELETE /api/v1/users/:id). */
   @Delete(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin')
   @HttpCode(HttpStatus.OK)
   @ZodValidation({ params: zUserParams })
   @ApiOperation({ summary: 'Désactive un utilisateur (soft delete)' })
@@ -233,9 +228,9 @@ export class UsersController {
   @ApiResponse({ status: 404, description: 'Utilisateur introuvable' })
   async disable(
     @Param() params: UserParams,
-    @Req() req: RequeteHttpMinimale,
+    @Req() req: RequeteAvecUtilisateur,
   ): Promise<unknown> {
-    const resultat = await this.usersService.disableUser(params.id, this.utilisateurId(req));
+    const resultat = await this.usersService.disableUser(params.id, req.user!.sub);
     return resultat;
   }
 }
