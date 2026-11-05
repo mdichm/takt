@@ -1191,6 +1191,95 @@ paths:
       summary: Modifie un département
       tags:
         - Référentiels
+  /api/v1/referentiels/enseignants:
+    get:
+      operationId: EnseignantController_list
+      parameters: []
+      responses:
+        '200':
+          description: Liste des enseignants
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Liste paginée des enseignants
+      tags:
+        - Référentiels
+    post:
+      operationId: EnseignantController_create
+      parameters: []
+      responses:
+        '201':
+          description: Enseignant créé
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Crée un enseignant
+      tags:
+        - Référentiels
+  /api/v1/referentiels/enseignants/{id}:
+    delete:
+      operationId: EnseignantController_delete
+      parameters: []
+      responses:
+        '200':
+          description: Enseignant supprimé
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Enseignant introuvable
+        '409':
+          description: Conflit (lié à des départements)
+      security:
+        - bearerAuth: []
+      summary: Supprime un enseignant
+      tags:
+        - Référentiels
+    get:
+      operationId: EnseignantController_getOne
+      parameters: []
+      responses:
+        '200':
+          description: Enseignant trouvé
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Enseignant introuvable
+      security:
+        - bearerAuth: []
+      summary: Détail d’un enseignant
+      tags:
+        - Référentiels
+    patch:
+      operationId: EnseignantController_update
+      parameters: []
+      responses:
+        '200':
+          description: Enseignant modifié
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Enseignant introuvable
+      security:
+        - bearerAuth: []
+      summary: Modifie un enseignant
+      tags:
+        - Référentiels
   /api/v1/referentiels/etablissements:
     get:
       operationId: EtablissementController_list

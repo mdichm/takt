@@ -25,6 +25,8 @@ import { MatiereController } from './matiere/matiere.controller';
 import { MatiereService } from './matiere/matiere.service';
 import { GradeTypeEnseignementController } from './grade-type-enseignement/grade-type-enseignement.controller';
 import { GradeTypeEnseignementService } from './grade-type-enseignement/grade-type-enseignement.service';
+import { EnseignantController } from './enseignant/enseignant.controller';
+import { EnseignantService } from './enseignant/enseignant.service';
 
 /**
  * Module des référentiels métier (Établissement, Département, Parcours, Niveau, Groupe,
@@ -46,6 +48,7 @@ import { GradeTypeEnseignementService } from './grade-type-enseignement/grade-ty
     ModuleController,
     MatiereController,
     GradeTypeEnseignementController,
+    EnseignantController,
   ],
   providers: [
     EtablissementService,
@@ -58,6 +61,7 @@ import { GradeTypeEnseignementService } from './grade-type-enseignement/grade-ty
     ModuleService,
     MatiereService,
     GradeTypeEnseignementService,
+    EnseignantService,
   ],
   exports: [
     EtablissementService,
@@ -70,6 +74,7 @@ import { GradeTypeEnseignementService } from './grade-type-enseignement/grade-ty
     ModuleService,
     MatiereService,
     GradeTypeEnseignementService,
+    EnseignantService,
   ],
 })
 export class ReferentielsModule {}

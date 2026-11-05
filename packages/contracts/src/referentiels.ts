@@ -5,6 +5,7 @@ import { z } from 'zod';
 import {
   creerSchemaTri,
   zBooleanQuery,
+  zDateIso,
   zEmail,
   zPaginationQuery,
   zRoleCode,
@@ -489,3 +490,63 @@ export type GradeTypeEnseignementCreate = z.infer<
 export type GradeTypeEnseignementParams = z.infer<
   typeof zGradeTypeEnseignementParams
 >;
+
+// ============================================================================
+// Enseignant
+// ============================================================================
+
+/** Enseignant (référentiel métier, FK vers Grade). */
+export const zEnseignant = z.object({
+  id: zUuid,
+  matricule: z.string().trim().min(1, 'Le matricule est requis'),
+  nom: z.string().trim().min(1, 'Le nom est requis'),
+  prenom: z.string().trim().min(1, 'Le prénom est requis'),
+  email: zEmail,
+  gradeId: zUuid.nullable(),
+  estActif: z.boolean(),
+  createdAt: zDateIso,
+  updatedAt: zDateIso,
+});
+
+/** Données de création d’un enseignant. */
+export const zEnseignantCreate = z.object({
+  matricule: z.string().trim().min(1, 'Le matricule est requis'),
+  nom: z.string().trim().min(1, 'Le nom est requis'),
+  prenom: z.string().trim().min(1, 'Le prénom est requis'),
+  email: zEmail,
+  gradeId: zUuid.optional(),
+  estActif: z.boolean().default(true),
+  departementIds: z.array(zUuid).optional(),
+});
+
+/** Données de modification d’un enseignant. */
+export const zEnseignantUpdate = z.object({
+  matricule: z.string().trim().min(1, 'Le matricule est requis').optional(),
+  nom: z.string().trim().min(1, 'Le nom est requis').optional(),
+  prenom: z.string().trim().min(1, 'Le prénom est requis').optional(),
+  email: zEmail.optional(),
+  gradeId: zUuid.nullish().optional(),
+  estActif: z.boolean().optional(),
+  departementIds: z.array(zUuid).optional(),
+});
+
+/** Identifiant d’enseignant en paramètre de route. */
+export const zEnseignantParams = z.object({
+  id: zUuid,
+});
+
+/** Filtres de la liste des enseignants. */
+export const zEnseignantList = zPaginationQuery
+  .extend(zSearchFilter.shape)
+  .extend(creerSchemaTri(['matricule', 'nom', 'prenom', 'email', 'createdAt']).shape)
+  .extend({
+    gradeId: zUuid.optional(),
+    estActif: zBooleanQuery.optional(),
+    departementId: zUuid.optional(),
+  });
+
+export type Enseignant = z.infer<typeof zEnseignant>;
+export type EnseignantCreate = z.infer<typeof zEnseignantCreate>;
+export type EnseignantUpdate = z.infer<typeof zEnseignantUpdate>;
+export type EnseignantParams = z.infer<typeof zEnseignantParams>;
+export type EnseignantListFilters = z.infer<typeof zEnseignantList>;
