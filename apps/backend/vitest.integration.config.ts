@@ -14,5 +14,6 @@ export default defineConfig({
         singleFork: true,
       },
     },
+    setupFiles: ['./test/setup-integration.ts'],
   },
 });
