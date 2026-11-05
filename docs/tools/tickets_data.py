@@ -267,7 +267,7 @@ TICKETS: List[Ticket] = [
         lot="L04",
         titre="Implémenter le référentiel Enseignant et l'association N:N Département",
         sp=5,
-        status="En cours",
+        status="Terminé",
         deps=['TAKT-L04-01', 'TAKT-L04-02'],
         exigences=['EX-REF-02', 'EX-REF-01', 'SF_TAKT §2 (400 enseignants)', 'PLAN_MACRO E2.3.'],
     ),
