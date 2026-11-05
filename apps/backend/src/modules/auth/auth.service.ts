@@ -11,6 +11,7 @@ import {
   ApiError,
   CODES_ERREUR_API,
 } from '../common/http/api-error';
+import { AuditService } from '../audit/audit.service';
 
 /** Message unique renvoyé pour tout échec d'authentification (pas d'énumération). */
 const MESSAGE_ECHEC_AUTH = 'Identifiants invalides';
@@ -37,6 +38,7 @@ export class AuthService {
     @Inject(PasswordService) private readonly passwordService: PasswordService,
     @Inject(TokenService) private readonly tokenService: TokenService,
     @Inject(SessionRefreshStore) private readonly sessionStore: SessionRefreshStore,
+    @Inject(AuditService) private readonly auditService: AuditService,
   ) {}
 
   /** Connexion : vérifie les identifiants et émet les deux jetons. */
@@ -122,14 +124,12 @@ export class AuthService {
     );
 
     // Journal d'audit (GG-07) : pas de mot de passe ni de hash dans les métadonnées.
-    await this.prisma.journalAudit.create({
-      data: {
-        action: 'LOGIN',
-        utilisateurId: utilisateur.id,
-        entite: 'Utilisateur',
-        entiteId: utilisateur.id,
-        metadonnees: { email: utilisateur.email, ip },
-      },
+    await this.auditService.record({
+      action: 'LOGIN',
+      utilisateurId: utilisateur.id,
+      entite: 'Utilisateur',
+      entiteId: utilisateur.id,
+      metadonnees: { email: utilisateur.email, ip },
     });
 
     return {
@@ -182,16 +182,14 @@ export class AuthService {
     };
     const access = this.tokenService.signAccessToken(identite);
 
-    await this.prisma.journalAudit.create({
-      data: {
-        action: 'REFRESH',
-        utilisateurId: claims.sub,
-        entite: 'Utilisateur',
-        entiteId: claims.sub,
-        metadonnees: {
-          jti: rotation.claims.jti,
-          familyId: rotation.claims.familyId,
-        },
+    await this.auditService.record({
+      action: 'REFRESH',
+      utilisateurId: claims.sub,
+      entite: 'Utilisateur',
+      entiteId: claims.sub,
+      metadonnees: {
+        jti: rotation.claims.jti,
+        familyId: rotation.claims.familyId,
       },
     });
 
@@ -203,14 +201,12 @@ export class AuthService {
     const claims = await this.tokenService.verifyRefreshToken(refreshToken);
     await this.sessionStore.revokeFamily(claims.familyId);
 
-    await this.prisma.journalAudit.create({
-      data: {
-        action: 'LOGOUT',
-        utilisateurId: claims.sub,
-        entite: 'Utilisateur',
-        entiteId: claims.sub,
-        metadonnees: { familyId: claims.familyId },
-      },
+    await this.auditService.record({
+      action: 'LOGOUT',
+      utilisateurId: claims.sub,
+      entite: 'Utilisateur',
+      entiteId: claims.sub,
+      metadonnees: { familyId: claims.familyId },
     });
   }
 }

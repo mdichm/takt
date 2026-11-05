@@ -11,6 +11,7 @@ import {
   ApiError,
 } from '../common/http/api-error';
 import { appliquerFiltreDepartement } from '../common/rbac/filtre-departement.util';
+import { AuditService } from '../audit/audit.service';
 
 /**
  * Service de gestion des utilisateurs et de leurs rôles.
@@ -23,7 +24,10 @@ import { appliquerFiltreDepartement } from '../common/rbac/filtre-departement.ut
 export class UsersService {
   private readonly logger = new Logger(UsersService.name);
 
-  constructor(@Inject(PRISMA) private readonly prisma: PrismaClient) {}
+  constructor(
+    @Inject(PRISMA) private readonly prisma: PrismaClient,
+    @Inject(AuditService) private readonly auditService: AuditService,
+  ) {}
 
   /** Rôle administrateur, protégé contre la désactivation par soi-même. */
   private static readonly ROLE_ADMIN = 'admin';
@@ -91,18 +95,16 @@ export class UsersService {
       include: { role: { select: { code: true } }, departement: true },
     });
 
-    await this.prisma.journalAudit.create({
-      data: {
-        action: 'UTILISATEUR_CREE',
-        utilisateurId: donnees.utilisateurIdCreePar,
-        entite: 'Utilisateur',
-        entiteId: utilisateur.id,
-        metadonnees: {
-          email: utilisateur.email,
-          role: role.code,
-          departementId: utilisateur.departementId,
-          creePar: donnees.utilisateurIdCreePar,
-        },
+    await this.auditService.record({
+      action: 'UTILISATEUR_CREE',
+      utilisateurId: donnees.utilisateurIdCreePar,
+      entite: 'Utilisateur',
+      entiteId: utilisateur.id,
+      metadonnees: {
+        email: utilisateur.email,
+        role: role.code,
+        departementId: utilisateur.departementId,
+        creePar: donnees.utilisateurIdCreePar,
       },
     });
 
@@ -342,16 +344,14 @@ export class UsersService {
       include: { role: { select: { code: true } }, departement: true },
     });
 
-    await this.prisma.journalAudit.create({
-      data: {
-        action: 'UTILISATEUR_MODIFIE',
-        utilisateurId: donnees.utilisateurIdModifiePar,
-        entite: 'Utilisateur',
-        entiteId: id,
-        metadonnees: {
-          modifications: donnees,
-          modifiePar: donnees.utilisateurIdModifiePar,
-        },
+    await this.auditService.record({
+      action: 'UTILISATEUR_MODIFIE',
+      utilisateurId: donnees.utilisateurIdModifiePar,
+      entite: 'Utilisateur',
+      entiteId: id,
+      metadonnees: {
+        modifications: donnees,
+        modifiePar: donnees.utilisateurIdModifiePar,
       },
     });
 
@@ -410,16 +410,14 @@ export class UsersService {
       include: { role: { select: { code: true } }, departement: true },
     });
 
-    await this.prisma.journalAudit.create({
-      data: {
-        action: 'UTILISATEUR_DESACTIVE',
-        utilisateurId: utilisateurIdDesactivePar,
-        entite: 'Utilisateur',
-        entiteId: id,
-        metadonnees: {
-          email: desactive.email,
-          desactivePar: utilisateurIdDesactivePar,
-        },
+    await this.auditService.record({
+      action: 'UTILISATEUR_DESACTIVE',
+      utilisateurId: utilisateurIdDesactivePar,
+      entite: 'Utilisateur',
+      entiteId: id,
+      metadonnees: {
+        email: desactive.email,
+        desactivePar: utilisateurIdDesactivePar,
       },
     });
 
@@ -486,16 +484,14 @@ export class UsersService {
 
     await this.prisma.utilisateur.delete({ where: { id } });
 
-    await this.prisma.journalAudit.create({
-      data: {
-        action: 'UTILISATEUR_SUPPRIME',
-        utilisateurId: utilisateurIdSupprimePar,
-        entite: 'Utilisateur',
-        entiteId: id,
-        metadonnees: {
-          email: utilisateur.email,
-          supprimePar: utilisateurIdSupprimePar,
-        },
+    await this.auditService.record({
+      action: 'UTILISATEUR_SUPPRIME',
+      utilisateurId: utilisateurIdSupprimePar,
+      entite: 'Utilisateur',
+      entiteId: id,
+      metadonnees: {
+        email: utilisateur.email,
+        supprimePar: utilisateurIdSupprimePar,
       },
     });
 
