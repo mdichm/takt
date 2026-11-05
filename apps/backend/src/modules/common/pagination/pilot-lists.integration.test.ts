@@ -35,6 +35,12 @@ describe('listes pilotes paginées', () => {
     await application.init();
 
     prisma = creerPrismaClient(ENV_TEST.DATABASE_URL);
+    // Nettoyage initial : isole les données de ce test des autres fichiers
+    // (supprime tous les utilisateurs de test, sessions et journal d'audit).
+    await prisma.sessionRefresh.deleteMany({});
+    await prisma.journalAudit.deleteMany({});
+    await prisma.utilisateur.deleteMany({ where: { email: { startsWith: 'takt-test-' } } });
+    await prisma.utilisateur.deleteMany({ where: { email: { contains: SUFFIXE } } });
     const role = await prisma.role.create({
       data: { code: `admin-${SUFFIXE}`, libelle: 'Rôle pilote' },
     });

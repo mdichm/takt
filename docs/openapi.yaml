@@ -854,6 +854,95 @@ paths:
       security:
         - bearerAuth: []
       summary: S’abonner aux événements temps réel de l’utilisateur
+  /api/v1/users:
+    get:
+      operationId: UsersController_list
+      parameters: []
+      responses:
+        '200':
+          description: Liste des utilisateurs
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Liste paginée des utilisateurs
+      tags:
+        - Utilisateurs
+    post:
+      operationId: UsersController_create
+      parameters: []
+      responses:
+        '201':
+          description: Utilisateur créé
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Crée un utilisateur
+      tags:
+        - Utilisateurs
+  /api/v1/users/{id}:
+    delete:
+      operationId: UsersController_disable
+      parameters: []
+      responses:
+        '200':
+          description: Utilisateur désactivé
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Utilisateur introuvable
+      security:
+        - bearerAuth: []
+      summary: Désactive un utilisateur (soft delete)
+      tags:
+        - Utilisateurs
+    get:
+      operationId: UsersController_getOne
+      parameters: []
+      responses:
+        '200':
+          description: Utilisateur trouvé
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Utilisateur introuvable
+      security:
+        - bearerAuth: []
+      summary: Détail d’un utilisateur
+      tags:
+        - Utilisateurs
+    patch:
+      operationId: UsersController_update
+      parameters: []
+      responses:
+        '200':
+          description: Utilisateur modifié
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Utilisateur introuvable
+      security:
+        - bearerAuth: []
+      summary: Modifie un utilisateur
+      tags:
+        - Utilisateurs
   /audit:
     get:
       description: Retourne les entrées du journal d'audit avec filtres.
