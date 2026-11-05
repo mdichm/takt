@@ -249,7 +249,7 @@ TICKETS: List[Ticket] = [
         lot="L04",
         titre="Implémenter le référentiel Établissement / Département / Parcours / Niveau / Groupe",
         sp=5,
-        status="À faire",
+        status="Terminé",
         deps=['TAKT-L03-04'],
         exigences=['EX-REF-01', 'EX-REF-04', 'ST_TAKT §2.1', 'PLAN_MACRO E2.1', 'EC-ADM-02.'],
     ),

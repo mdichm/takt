@@ -55,20 +55,90 @@ model Role {
 }
 
 // ----------------------------------------------------------------------------
-// 3. Departement — Référentiel des départements
+// 3. Etablissement — Référentiel des établissements
 // ----------------------------------------------------------------------------
-model Departement {
+model Etablissement {
   id          String   @id @default(uuid()) @db.Uuid
   code        String   @unique
   libelle     String
-  utilisateurs Utilisateur[]
-  affectations AffectationPedagogique[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  departements Departement[]
 
   @@index([code])
 }
 
 // ----------------------------------------------------------------------------
-// 4. AnneeUniversitaire — Années académiques
+// 4. Departement — Référentiel des départements
+// ----------------------------------------------------------------------------
+model Departement {
+  id              String   @id @default(uuid()) @db.Uuid
+  code            String   @unique
+  libelle         String
+  etablissementId String   @db.Uuid
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  etablissement   Etablissement @relation(fields: [etablissementId], references: [id])
+  utilisateurs    Utilisateur[]
+  affectations    AffectationPedagogique[]
+  parcours        Parcours[]
+
+  @@index([code])
+  @@index([etablissementId])
+}
+
+// ----------------------------------------------------------------------------
+// 5. Parcours — Référentiel des parcours de formation
+// ----------------------------------------------------------------------------
+model Parcours {
+  id          String   @id @default(uuid()) @db.Uuid
+  code        String   @unique
+  libelle     String
+  departementId String   @db.Uuid
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  departement Departement @relation(fields: [departementId], references: [id])
+  niveaux     Niveau[]
+
+  @@index([code])
+  @@index([departementId])
+}
+
+// ----------------------------------------------------------------------------
+// 6. Niveau — Référentiel des niveaux (Licence, Master, etc.)
+// ----------------------------------------------------------------------------
+model Niveau {
+  id        String   @id @default(uuid()) @db.Uuid
+  code      String   @unique
+  libelle   String
+  parcoursId String   @db.Uuid
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  parcours  Parcours @relation(fields: [parcoursId], references: [id])
+  groupes   Groupe[]
+
+  @@index([code])
+  @@index([parcoursId])
+}
+
+// ----------------------------------------------------------------------------
+// 7. Groupe — Référentiel des groupes d'étudiants
+// ----------------------------------------------------------------------------
+model Groupe {
+  id        String   @id @default(uuid()) @db.Uuid
+  code      String   @unique
+  libelle   String
+  niveauId  String   @db.Uuid
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  niveau    Niveau @relation(fields: [niveauId], references: [id])
+
+  @@index([code])
+  @@index([niveauId])
+}
+
+// ----------------------------------------------------------------------------
+// 8. AnneeUniversitaire — Années académiques
 // ----------------------------------------------------------------------------
 model AnneeUniversitaire {
   id        String   @id @default(uuid()) @db.Uuid
