@@ -29,7 +29,7 @@ export type GrapheModules = Partial<Record<ModuleMetier, readonly string[]>>;
 export const DEPENDANCES_AUTORISEES: Readonly<Record<ModuleMetier, readonly string[]>> = {
   auth: ['common', 'users', 'audit'],
   users: ['common', 'audit', 'auth'],
-  referentiels: ['common'],
+  referentiels: ['common', 'audit'],
   repartition: ['common', 'referentiels', 'versions'],
   versions: ['common', 'referentiels'],
   planning: ['common', 'referentiels', 'versions'],

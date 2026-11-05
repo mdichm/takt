@@ -6,6 +6,7 @@ import { zDepartement, zRole, zUser, zUserList } from '../src/referentiels';
 
 const UUID_ROLE = '11111111-1111-4111-8111-111111111111';
 const UUID_DEPARTEMENT = '22222222-2222-4222-8222-222222222222';
+const UUID_ETABLISSEMENT = '33333333-3333-4333-8333-333333333333';
 
 describe('contrats des référentiels', () => {
   it('accepte un utilisateur valide', () => {
@@ -58,7 +59,12 @@ describe('contrats des référentiels', () => {
   it('valide les ressources de référentiel', () => {
     expect(zRole.parse({ id: UUID_ROLE, code: 'admin', libelle: 'Administrateur' }).code).toBe('admin');
     expect(
-      zDepartement.parse({ id: UUID_DEPARTEMENT, code: 'INFO', libelle: 'Informatique' }).code,
+      zDepartement.parse({
+        id: UUID_DEPARTEMENT,
+        code: 'INFO',
+        libelle: 'Informatique',
+        etablissementId: UUID_ETABLISSEMENT,
+      }).code,
     ).toBe('INFO');
   });
 });

@@ -80,15 +80,20 @@ describe('RBAC service - portée par département (TAKT-L03-05)', () => {
       create: { code: 'dir', libelle: 'Directeur' },
     });
 
+    const etablissement = await prisma.etablissement.upsert({
+      where: { code: 'ETAB-TEST' },
+      update: {},
+      create: { code: 'ETAB-TEST', libelle: 'Établissement test' },
+    });
     await prisma.departement.upsert({
       where: { code: 'DEPT-A' },
       update: {},
-      create: { code: 'DEPT-A', libelle: 'Département A' },
+      create: { code: 'DEPT-A', libelle: 'Département A', etablissementId: etablissement.id },
     });
     await prisma.departement.upsert({
       where: { code: 'DEPT-B' },
       update: {},
-      create: { code: 'DEPT-B', libelle: 'Département B' },
+      create: { code: 'DEPT-B', libelle: 'Département B', etablissementId: etablissement.id },
     });
   });
 

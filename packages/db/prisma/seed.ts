@@ -82,6 +82,12 @@ async function main(): Promise<void> {
     ),
   );
 
+  const etablissement = await getPrisma().etablissement.upsert({
+    where: { code: 'TAKT' },
+    update: { libelle: 'Université de Takt' },
+    create: { code: 'TAKT', libelle: 'Université de Takt' },
+  });
+
   const departements = await Promise.all(
     [
       ['INFO', 'Informatique'],
@@ -91,7 +97,7 @@ async function main(): Promise<void> {
       getPrisma().departement.upsert({
         where: { code },
         update: { libelle },
-        create: { code, libelle },
+        create: { code, libelle, etablissementId: etablissement.id },
       }),
     ),
   );
@@ -157,6 +163,58 @@ async function main(): Promise<void> {
       },
     });
   }
+
+  // Parcours de référence liés aux départements
+  const parcours = await Promise.all([
+    getPrisma().parcours.upsert({
+      where: { code: 'L-INFO' },
+      update: { libelle: 'Licence Informatique' },
+      create: { code: 'L-INFO', libelle: 'Licence Informatique', departementId: deptByCode.get('INFO')!.id },
+    }),
+    getPrisma().parcours.upsert({
+      where: { code: 'L-MATH' },
+      update: { libelle: 'Licence Mathématiques' },
+      create: { code: 'L-MATH', libelle: 'Licence Mathématiques', departementId: deptByCode.get('MATH')!.id },
+    }),
+  ]);
+
+  // Niveaux de référence
+  const niveaux = await Promise.all([
+    getPrisma().niveau.upsert({
+      where: { code: 'L1' },
+      update: { libelle: 'Licence 1ère année' },
+      create: { code: 'L1', libelle: 'Licence 1ère année', parcoursId: parcours[0].id },
+    }),
+    getPrisma().niveau.upsert({
+      where: { code: 'L2' },
+      update: { libelle: 'Licence 2ème année' },
+      create: { code: 'L2', libelle: 'Licence 2ème année', parcoursId: parcours[0].id },
+    }),
+    getPrisma().niveau.upsert({
+      where: { code: 'L3-MATH' },
+      update: { libelle: 'Licence 3ème année Mathématiques' },
+      create: { code: 'L3-MATH', libelle: 'Licence 3ème année Mathématiques', parcoursId: parcours[1].id },
+    }),
+  ]);
+
+  // Groupes de référence
+  await Promise.all([
+    getPrisma().groupe.upsert({
+      where: { code: 'TD1-A' },
+      update: { libelle: 'TD Groupe A L1' },
+      create: { code: 'TD1-A', libelle: 'TD Groupe A L1', niveauId: niveaux[0].id },
+    }),
+    getPrisma().groupe.upsert({
+      where: { code: 'TD1-B' },
+      update: { libelle: 'TD Groupe B L1' },
+      create: { code: 'TD1-B', libelle: 'TD Groupe B L1', niveauId: niveaux[0].id },
+    }),
+    getPrisma().groupe.upsert({
+      where: { code: 'TP1-A' },
+      update: { libelle: 'TP Groupe A L1' },
+      create: { code: 'TP1-A', libelle: 'TP Groupe A L1', niveauId: niveaux[0].id },
+    }),
+  ]);
 
   console.log(
     `Seed de développement terminé. ${utilisateurs.length} comptes de démonstration créés/mis à jour.`,
