@@ -82,6 +82,7 @@ model Departement {
   utilisateurs    Utilisateur[]
   affectations    AffectationPedagogique[]
   parcours        Parcours[]
+  enseignants     EnseignantDepartement[]
 
   @@index([code])
   @@index([etablissementId])
@@ -408,6 +409,7 @@ model Grade {
   updatedAt   DateTime @updatedAt
   modules     Module[]
   gradeType   GradeTypeEnseignement[]
+  enseignants Enseignant[]
 
   @@index([code])
 }
@@ -466,7 +468,47 @@ model Matiere {
 }
 
 // ----------------------------------------------------------------------------
-// 22. ChargeRuleSet — Règles de charge horaire (amorcée, complétée en L05-03)
+// 22. Enseignant — Référentiel des enseignants (L04-03)
+// ----------------------------------------------------------------------------
+model Enseignant {
+  id          String   @id @default(uuid()) @db.Uuid
+  matricule   String   @unique
+  nom         String
+  prenom      String
+  email       String   @unique
+  gradeId     String?  @db.Uuid
+  estActif    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  grade         Grade?                 @relation(fields: [gradeId], references: [id])
+  departements  EnseignantDepartement[]
+
+  @@index([matricule])
+  @@index([email])
+  @@index([gradeId])
+  @@index([nom])
+  @@index([prenom])
+}
+
+// ----------------------------------------------------------------------------
+// 23. EnseignantDepartement — Table associative N:N Enseignant ↔ Département
+// ----------------------------------------------------------------------------
+model EnseignantDepartement {
+  enseignantId  String   @db.Uuid
+  departementId String   @db.Uuid
+  createdAt     DateTime @default(now())
+
+  enseignant    Enseignant @relation(fields: [enseignantId], references: [id])
+  departement   Departement @relation(fields: [departementId], references: [id])
+
+  @@id([enseignantId, departementId])
+  @@index([enseignantId])
+  @@index([departementId])
+}
+
+// ----------------------------------------------------------------------------
+// 22 (bis). ChargeRuleSet — Règles de charge horaire (amorcée, complétée en L05-03)
 // ----------------------------------------------------------------------------
 model ChargeRuleSet {
   id          String   @id @default(uuid()) @db.Uuid
