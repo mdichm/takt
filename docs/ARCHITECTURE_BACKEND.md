@@ -55,3 +55,38 @@ pnpm check-module-dependencies
 Le job CI `Check Module Dependencies` exécute ce contrôle et fait partie du job
 requis `CI gate`. Les fichiers de test (`*.spec.ts`, `*.test.ts`) sont exclus
 de l’analyse des imports de production.
+
+## Sécurité et autorisation (RBAC)
+
+Les endpoints métier sont protégés par une chaîne de guards NestJS située dans
+`apps/backend/src/modules/common/guards/` et des décorateurs déclaratifs dans
+`apps/backend/src/modules/common/decorators/`.
+
+| Guard / Décorateur | Fichier | Rôle |
+|--------------------|---------|------|
+| `JwtAuthGuard` | `common/guards/jwt-auth.guard.ts` | Valide l’access token JWT (signature, claims, expiration) et attache l’identité utilisateur (`req.user`). Retourne 401 en cas d’échec. Dépend du jeton `VERIFICATEUR_JWT` fourni par le module `auth` (respect de la règle common → auth). |
+| `RolesGuard` | `common/guards/roles.guard.ts` | Vérifie que le rôle de l’utilisateur figure parmi les rôles autorisés par `@Roles(...)`. Retourne 403 `FORBIDDEN` (jamais 404) en cas d’insuffisance. |
+| `DepartmentScopeGuard` | `common/guards/department-scope.guard.ts` | Vérifie la portée par département quand `@DepartmentScope()` est présent. Attache `req.departementIds` pour le filtrage Prisma en base. Retourne 403 si l’utilisateur n’a pas de département (rôles `rdep`). |
+| `VersionStateGuard` | `common/guards/version-state.guard.ts` | Vérifie que l’état courant de la version figure parmi les états autorisés par `@RequireVersionStates(...)`. Retourne 403 en cas d’état non autorisé. |
+| `@Roles(...)` | `common/decorators/roles.decorator.ts` | Déclare les rôles autorisés sur un endpoint. |
+| `@DepartmentScope()` | `common/decorators/department-scope.decorator.ts` | Marque un endpoint comme nécessitant une portée par département. |
+| `@RequireVersionStates(...)` | `common/decorators/require-version-states.decorator.ts` | Déclare les états de version autorisés sur un endpoint. |
+
+### Matrice rôle × endpoint (users)
+
+L’implémentation actuelle couvre les endpoints du module `users` :
+
+| Endpoint | Méthode | Rôles autorisés | Scope département |
+|----------|---------|-----------------|-------------------|
+| `GET /api/v1/users` | Liste | admin, gest, rdep, dir | Oui (filtrage Prisma) |
+| `GET /api/v1/users/:id` | Détail | admin, gest, rdep, dir | Oui (vérification service) |
+| `POST /api/v1/users` | Création | admin, gest | Non |
+| `PATCH /api/v1/users/:id` | Modification | admin, gest | Oui (vérification service) |
+| `DELETE /api/v1/users/:id` | Désactivation | admin | Non |
+
+Réponse en cas d’accès hors périmètre : `403 FORBIDDEN` (jamais `404`), conformément à ST_TAKT §3.4.
+
+Le module `RbacModule` (`common/rbac/rbac.module.ts`) regroupe `RolesGuard`,
+`DepartmentScopeGuard` et `VersionStateGuard`. `JwtAuthGuard` est fourni par
+le module `auth` (qui possède `TokenService`) afin de respecter la règle de
+dépendance : `common` ne doit pas importer `auth`.

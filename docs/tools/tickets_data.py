@@ -222,7 +222,7 @@ TICKETS: List[Ticket] = [
         lot="L03",
         titre="Implémenter le RBAC et la portée par département",
         sp=5,
-        status="À faire",
+        status="Terminé",
         deps=['TAKT-L03-03', 'TAKT-L03-04'],
         exigences=['EX-SEC-02', 'EX-ROL-02', 'RB-UI-01', 'ST_TAKT §5.2', 'ST_TAKT §5.3', 'TE-API-03.'],
     ),

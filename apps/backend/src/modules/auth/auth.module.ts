@@ -5,11 +5,14 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthConfig, chargerConfigAuth } from '../../config/auth.config';
 import { CommonModule } from '../common/common.module';
+import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { PasswordService } from './password.service';
 import { SessionRefreshStore } from './session-refresh.store';
 import { TokenService } from './token.service';
+import { JwtVerificateurImpl, verificateurJwtProvider } from './jwt-verificateur.impl';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { Reflector } from '@nestjs/core';
 
 /** Module regroupant les services de sécurité de l'authentification. */
 @Module({
@@ -38,7 +41,11 @@ import { AuthService } from './auth.service';
         return new TokenService(authConfig, revokedStore);
       },
     },
+    JwtVerificateurImpl,
+    verificateurJwtProvider,
+    JwtAuthGuard,
+    Reflector,
   ],
-  exports: [PasswordService, TokenService],
+  exports: [PasswordService, TokenService, verificateurJwtProvider, JwtAuthGuard, Reflector],
 })
 export class AuthModule {}
