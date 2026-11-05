@@ -284,3 +284,208 @@ export type GroupeCreate = z.infer<typeof zGroupeCreate>;
 export type GroupeUpdate = z.infer<typeof zGroupeUpdate>;
 export type GroupeParams = z.infer<typeof zGroupeParams>;
 export type GroupeListFilters = z.infer<typeof zGroupeList>;
+
+// ============================================================================
+// TypeEnseignement
+// ============================================================================
+
+/** Type d'enseignement (ex: CM, TD, TP, PROJET). */
+export const zTypeEnseignement = z.object({
+  id: zUuid,
+  code: z.string().trim().min(1, 'Le code est requis'),
+  libelle: z.string().trim().min(1, 'Le libellé est requis'),
+  couleur: z.string().trim().min(1, 'La couleur est requise'),
+});
+
+/** Données de création d’un type d’enseignement. */
+export const zTypeEnseignementCreate = z.object({
+  code: z.string().trim().min(1, 'Le code est requis'),
+  libelle: z.string().trim().min(1, 'Le libellé est requis'),
+  couleur: z.string().trim().min(1, 'La couleur est requise'),
+});
+
+/** Données de modification d’un type d’enseignement. */
+export const zTypeEnseignementUpdate = z.object({
+  code: z.string().trim().min(1, 'Le code est requis').optional(),
+  libelle: z.string().trim().min(1, 'Le libellé est requis').optional(),
+  couleur: z.string().trim().min(1, 'La couleur est requise').optional(),
+});
+
+/** Identifiant de type d’enseignement en paramètre de route. */
+export const zTypeEnseignementParams = z.object({
+  id: zUuid,
+});
+
+/** Filtres de la liste des types d’enseignement. */
+export const zTypeEnseignementList = zPaginationQuery
+  .extend(zSearchFilter.shape)
+  .extend(creerSchemaTri(['code', 'libelle', 'createdAt']).shape);
+
+export type TypeEnseignement = z.infer<typeof zTypeEnseignement>;
+export type TypeEnseignementCreate = z.infer<typeof zTypeEnseignementCreate>;
+export type TypeEnseignementUpdate = z.infer<typeof zTypeEnseignementUpdate>;
+export type TypeEnseignementParams = z.infer<typeof zTypeEnseignementParams>;
+export type TypeEnseignementListFilters = z.infer<typeof zTypeEnseignementList>;
+
+// ============================================================================
+// Grade
+// ============================================================================
+
+/** Grade académique (ex: L1, L2, L3, M1, M2). */
+export const zGrade = z.object({
+  id: zUuid,
+  code: z.string().trim().min(1, 'Le code est requis'),
+  libelle: z.string().trim().min(1, 'Le libellé est requis'),
+});
+
+/** Données de création d’un grade. */
+export const zGradeCreate = z.object({
+  code: z.string().trim().min(1, 'Le code est requis'),
+  libelle: z.string().trim().min(1, 'Le libellé est requis'),
+});
+
+/** Données de modification d’un grade. */
+export const zGradeUpdate = z.object({
+  code: z.string().trim().min(1, 'Le code est requis').optional(),
+  libelle: z.string().trim().min(1, 'Le libellé est requis').optional(),
+});
+
+/** Identifiant de grade en paramètre de route. */
+export const zGradeParams = z.object({
+  id: zUuid,
+});
+
+/** Filtres de la liste des grades. */
+export const zGradeList = zPaginationQuery
+  .extend(zSearchFilter.shape)
+  .extend(creerSchemaTri(['code', 'libelle', 'createdAt']).shape);
+
+export type Grade = z.infer<typeof zGrade>;
+export type GradeCreate = z.infer<typeof zGradeCreate>;
+export type GradeUpdate = z.infer<typeof zGradeUpdate>;
+export type GradeParams = z.infer<typeof zGradeParams>;
+export type GradeListFilters = z.infer<typeof zGradeList>;
+
+// ============================================================================
+// Module
+// ============================================================================
+
+/** Module pédagogique (lié à un type d’enseignement et un grade). */
+export const zModule = z.object({
+  id: zUuid,
+  code: z.string().trim().min(1, 'Le code est requis'),
+  libelle: z.string().trim().min(1, 'Le libellé est requis'),
+  typeEnseignementId: zUuid,
+  gradeId: zUuid,
+});
+
+/** Données de création d’un module. */
+export const zModuleCreate = z.object({
+  code: z.string().trim().min(1, 'Le code est requis'),
+  libelle: z.string().trim().min(1, 'Le libellé est requis'),
+  typeEnseignementId: zUuid,
+  gradeId: zUuid,
+});
+
+/** Données de modification d’un module. */
+export const zModuleUpdate = z.object({
+  code: z.string().trim().min(1, 'Le code est requis').optional(),
+  libelle: z.string().trim().min(1, 'Le libellé est requis').optional(),
+  typeEnseignementId: zUuid.optional(),
+  gradeId: zUuid.optional(),
+});
+
+/** Identifiant de module en paramètre de route. */
+export const zModuleParams = z.object({
+  id: zUuid,
+});
+
+/** Filtres de la liste des modules. */
+export const zModuleList = zPaginationQuery
+  .extend(zSearchFilter.shape)
+  .extend(creerSchemaTri(['code', 'libelle', 'createdAt']).shape)
+  .extend({
+    typeEnseignementId: zUuid.optional(),
+    gradeId: zUuid.optional(),
+  });
+
+export type Module = z.infer<typeof zModule>;
+export type ModuleCreate = z.infer<typeof zModuleCreate>;
+export type ModuleUpdate = z.infer<typeof zModuleUpdate>;
+export type ModuleParams = z.infer<typeof zModuleParams>;
+export type ModuleListFilters = z.infer<typeof zModuleList>;
+
+// ============================================================================
+// Matiere
+// ============================================================================
+
+/** Matière (liée à un module). */
+export const zMatiere = z.object({
+  id: zUuid,
+  code: z.string().trim().min(1, 'Le code est requis'),
+  libelle: z.string().trim().min(1, 'Le libellé est requis'),
+  moduleId: zUuid,
+});
+
+/** Données de création d’une matière. */
+export const zMatiereCreate = z.object({
+  code: z.string().trim().min(1, 'Le code est requis'),
+  libelle: z.string().trim().min(1, 'Le libellé est requis'),
+  moduleId: zUuid,
+});
+
+/** Données de modification d’une matière. */
+export const zMatiereUpdate = z.object({
+  code: z.string().trim().min(1, 'Le code est requis').optional(),
+  libelle: z.string().trim().min(1, 'Le libellé est requis').optional(),
+  moduleId: zUuid.optional(),
+});
+
+/** Identifiant de matière en paramètre de route. */
+export const zMatiereParams = z.object({
+  id: zUuid,
+});
+
+/** Filtres de la liste des matières. */
+export const zMatiereList = zPaginationQuery
+  .extend(zSearchFilter.shape)
+  .extend(creerSchemaTri(['code', 'libelle', 'createdAt']).shape)
+  .extend({
+    moduleId: zUuid.optional(),
+  });
+
+export type Matiere = z.infer<typeof zMatiere>;
+export type MatiereCreate = z.infer<typeof zMatiereCreate>;
+export type MatiereUpdate = z.infer<typeof zMatiereUpdate>;
+export type MatiereParams = z.infer<typeof zMatiereParams>;
+export type MatiereListFilters = z.infer<typeof zMatiereList>;
+
+// ============================================================================
+// GradeTypeEnseignement — Matrice type × grade
+// ============================================================================
+
+/** Couple (grade, type d’enseignement) autorisé dans la matrice. */
+export const zGradeTypeEnseignement = z.object({
+  id: zUuid,
+  gradeId: zUuid,
+  typeEnseignementId: zUuid,
+});
+
+/** Données de création d’un couple matrice. */
+export const zGradeTypeEnseignementCreate = z.object({
+  gradeId: zUuid,
+  typeEnseignementId: zUuid,
+});
+
+/** Identifiant de couple matrice en paramètre de route. */
+export const zGradeTypeEnseignementParams = z.object({
+  id: zUuid,
+});
+
+export type GradeTypeEnseignement = z.infer<typeof zGradeTypeEnseignement>;
+export type GradeTypeEnseignementCreate = z.infer<
+  typeof zGradeTypeEnseignementCreate
+>;
+export type GradeTypeEnseignementParams = z.infer<
+  typeof zGradeTypeEnseignementParams
+>;

@@ -305,3 +305,100 @@ model SessionRefresh {
   @@index([utilisateurId])
   @@index([expiresAt])
 }
+
+// ----------------------------------------------------------------------------
+// 17. TypeEnseignement — Type d'enseignement (CM, TD, TP, PROJET)
+// ----------------------------------------------------------------------------
+model TypeEnseignement {
+  id          String   @id @default(uuid()) @db.Uuid
+  code        String   @unique
+  libelle     String
+  couleur     String   // code hexadécimal #RRGGBB pour l'affichage dans la grille EDT
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  modules     Module[]
+  gradeType   GradeTypeEnseignement[]
+
+  @@index([code])
+}
+
+// ----------------------------------------------------------------------------
+// 18. Grade — Niveau/grade académique (L1, L2, L3, M1, M2)
+// ----------------------------------------------------------------------------
+model Grade {
+  id          String   @id @default(uuid()) @db.Uuid
+  code        String   @unique
+  libelle     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  modules     Module[]
+  gradeType   GradeTypeEnseignement[]
+
+  @@index([code])
+}
+
+// ----------------------------------------------------------------------------
+// 19. GradeTypeEnseignement — Matrice type × grade (couples autorisés)
+// ----------------------------------------------------------------------------
+model GradeTypeEnseignement {
+  id                 String   @id @default(uuid()) @db.Uuid
+  gradeId            String   @db.Uuid
+  typeEnseignementId String   @db.Uuid
+  createdAt          DateTime @default(now())
+
+  grade              Grade              @relation(fields: [gradeId], references: [id])
+  typeEnseignement   TypeEnseignement   @relation(fields: [typeEnseignementId], references: [id])
+
+  @@unique([gradeId, typeEnseignementId])
+  @@index([gradeId])
+  @@index([typeEnseignementId])
+}
+
+// ----------------------------------------------------------------------------
+// 20. Module — Module pédagogique (lié à un type et un grade)
+// ----------------------------------------------------------------------------
+model Module {
+  id              String   @id @default(uuid()) @db.Uuid
+  code            String   @unique
+  libelle         String
+  typeEnseignementId String @db.Uuid
+  gradeId         String   @db.Uuid
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  typeEnseignement TypeEnseignement @relation(fields: [typeEnseignementId], references: [id])
+  grade           Grade           @relation(fields: [gradeId], references: [id])
+  matieres        Matiere[]
+
+  @@index([code])
+  @@index([typeEnseignementId])
+  @@index([gradeId])
+}
+
+// ----------------------------------------------------------------------------
+// 21. Matiere — Matière (liée à un module)
+// ----------------------------------------------------------------------------
+model Matiere {
+  id          String   @id @default(uuid()) @db.Uuid
+  code        String   @unique
+  libelle     String
+  moduleId    String   @db.Uuid
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  module      Module   @relation(fields: [moduleId], references: [id])
+
+  @@index([code])
+  @@index([moduleId])
+}
+
+// ----------------------------------------------------------------------------
+// 22. ChargeRuleSet — Règles de charge horaire (amorcée, complétée en L05-03)
+// ----------------------------------------------------------------------------
+model ChargeRuleSet {
+  id          String   @id @default(uuid()) @db.Uuid
+  code        String   @unique
+  libelle     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([code])
+}

@@ -35,6 +35,11 @@ const TABLES = [
   'Semestre',
   'AnneeUniversitaire',
   'Version',
+  'Matiere',
+  'Module',
+  'GradeTypeEnseignement',
+  'Grade',
+  'TypeEnseignement',
 ];
 
 await prisma.$executeRawUnsafe('SET session_replication_role = replica;');

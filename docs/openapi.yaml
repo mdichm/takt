@@ -315,6 +315,51 @@ components:
     GenerationResponse:
       allOf:
         - $ref: '#/components/schemas/Generation'
+    Grade:
+      properties:
+        code:
+          type: string
+        couleur:
+          type: string
+        createdAt:
+          format: date-time
+          type: string
+        id:
+          format: uuid
+          type: string
+        libelle:
+          type: string
+        updatedAt:
+          format: date-time
+          type: string
+      required:
+        - id
+        - code
+        - libelle
+        - couleur
+        - createdAt
+        - updatedAt
+      type: object
+    GradeTypeEnseignement:
+      properties:
+        createdAt:
+          format: date-time
+          type: string
+        gradeId:
+          format: uuid
+          type: string
+        id:
+          format: uuid
+          type: string
+        typeEnseignementId:
+          format: uuid
+          type: string
+      required:
+        - id
+        - gradeId
+        - typeEnseignementId
+        - createdAt
+      type: object
     HealthStatusDto:
       properties:
         status:
@@ -404,6 +449,62 @@ components:
           type: string
         total:
           type: integer
+      type: object
+    Matiere:
+      properties:
+        code:
+          type: string
+        createdAt:
+          format: date-time
+          type: string
+        id:
+          format: uuid
+          type: string
+        libelle:
+          type: string
+        moduleId:
+          format: uuid
+          type: string
+        updatedAt:
+          format: date-time
+          type: string
+      required:
+        - id
+        - code
+        - libelle
+        - moduleId
+        - createdAt
+        - updatedAt
+      type: object
+    Module:
+      properties:
+        code:
+          type: string
+        createdAt:
+          format: date-time
+          type: string
+        gradeId:
+          format: uuid
+          type: string
+        id:
+          format: uuid
+          type: string
+        libelle:
+          type: string
+        typeEnseignementId:
+          format: uuid
+          type: string
+        updatedAt:
+          format: date-time
+          type: string
+      required:
+        - id
+        - code
+        - libelle
+        - typeEnseignementId
+        - gradeId
+        - createdAt
+        - updatedAt
       type: object
     RefreshRequest:
       properties:
@@ -662,6 +763,137 @@ components:
           type: string
       required:
         - transition
+      type: object
+    TypeEnseignement:
+      properties:
+        code:
+          type: string
+        couleur:
+          type: string
+        createdAt:
+          format: date-time
+          type: string
+        id:
+          format: uuid
+          type: string
+        libelle:
+          type: string
+        updatedAt:
+          format: date-time
+          type: string
+      required:
+        - id
+        - code
+        - libelle
+        - couleur
+        - createdAt
+        - updatedAt
+      type: object
+    TypeEnseignementCreateRequest:
+      properties:
+        code:
+          type: string
+        couleur:
+          type: string
+        libelle:
+          type: string
+      required:
+        - code
+        - libelle
+        - couleur
+      type: object
+    TypeEnseignementUpdateRequest:
+      properties:
+        code:
+          type: string
+        couleur:
+          type: string
+        libelle:
+          type: string
+      type: object
+    GradeCreateRequest:
+      properties:
+        code:
+          type: string
+        libelle:
+          type: string
+      required:
+        - code
+        - libelle
+      type: object
+    GradeUpdateRequest:
+      properties:
+        code:
+          type: string
+        libelle:
+          type: string
+      type: object
+    ModuleCreateRequest:
+      properties:
+        code:
+          type: string
+        gradeId:
+          format: uuid
+          type: string
+        libelle:
+          type: string
+        typeEnseignementId:
+          format: uuid
+          type: string
+      required:
+        - code
+        - libelle
+        - typeEnseignementId
+        - gradeId
+      type: object
+    ModuleUpdateRequest:
+      properties:
+        code:
+          type: string
+        gradeId:
+          format: uuid
+          type: string
+        libelle:
+          type: string
+        typeEnseignementId:
+          format: uuid
+          type: string
+      type: object
+    MatiereCreateRequest:
+      properties:
+        code:
+          type: string
+        libelle:
+          type: string
+        moduleId:
+          format: uuid
+          type: string
+      required:
+        - code
+        - libelle
+        - moduleId
+      type: object
+    MatiereUpdateRequest:
+      properties:
+        code:
+          type: string
+        libelle:
+          type: string
+        moduleId:
+          format: uuid
+          type: string
+      type: object
+    GradeTypeEnseignementCreateRequest:
+      properties:
+        gradeId:
+          format: uuid
+          type: string
+        typeEnseignementId:
+          format: uuid
+          type: string
+      required:
+        - gradeId
+        - typeEnseignementId
       type: object
     Utilisateur:
       properties:
@@ -1311,6 +1543,469 @@ paths:
       security:
         - bearerAuth: []
       summary: Modifie un parcours
+      tags:
+        - Référentiels
+  /api/v1/referentiels/type-enseignements:
+    get:
+      operationId: TypeEnseignementController_list
+      parameters: []
+      responses:
+        '200':
+          description: Liste des types d’enseignement
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Liste paginée des types d’enseignement
+      tags:
+        - Référentiels
+    post:
+      operationId: TypeEnseignementController_create
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TypeEnseignementCreateRequest'
+        required: true
+      responses:
+        '201':
+          description: Type d’enseignement créé
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Crée un type d’enseignement
+      tags:
+        - Référentiels
+  /api/v1/referentiels/type-enseignements/{id}:
+    delete:
+      operationId: TypeEnseignementController_delete
+      parameters: []
+      responses:
+        '200':
+          description: Type d’enseignement supprimé
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Type d’enseignement introuvable
+        '409':
+          description: Conflit (utilisé par un module)
+      security:
+        - bearerAuth: []
+      summary: Supprime un type d’enseignement
+      tags:
+        - Référentiels
+    get:
+      operationId: TypeEnseignementController_getOne
+      parameters: []
+      responses:
+        '200':
+          description: Type d’enseignement trouvé
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Type d’enseignement introuvable
+      security:
+        - bearerAuth: []
+      summary: Détail d’un type d’enseignement
+      tags:
+        - Référentiels
+    patch:
+      operationId: TypeEnseignementController_update
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TypeEnseignementUpdateRequest'
+        required: true
+      responses:
+        '200':
+          description: Type d’enseignement modifié
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Type d’enseignement introuvable
+      security:
+        - bearerAuth: []
+      summary: Modifie un type d’enseignement
+      tags:
+        - Référentiels
+  /api/v1/referentiels/grades:
+    get:
+      operationId: GradeController_list
+      parameters: []
+      responses:
+        '200':
+          description: Liste des grades
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Liste paginée des grades
+      tags:
+        - Référentiels
+    post:
+      operationId: GradeController_create
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GradeCreateRequest'
+        required: true
+      responses:
+        '201':
+          description: Grade créé
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Crée un grade
+      tags:
+        - Référentiels
+  /api/v1/referentiels/grades/{id}:
+    delete:
+      operationId: GradeController_delete
+      parameters: []
+      responses:
+        '200':
+          description: Grade supprimé
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Grade introuvable
+        '409':
+          description: Conflit (utilisé par un module)
+      security:
+        - bearerAuth: []
+      summary: Supprime un grade
+      tags:
+        - Référentiels
+    get:
+      operationId: GradeController_getOne
+      parameters: []
+      responses:
+        '200':
+          description: Grade trouvé
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Grade introuvable
+      security:
+        - bearerAuth: []
+      summary: Détail d’un grade
+      tags:
+        - Référentiels
+    patch:
+      operationId: GradeController_update
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GradeUpdateRequest'
+        required: true
+      responses:
+        '200':
+          description: Grade modifié
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Grade introuvable
+      security:
+        - bearerAuth: []
+      summary: Modifie un grade
+      tags:
+        - Référentiels
+  /api/v1/referentiels/modules:
+    get:
+      operationId: ModuleController_list
+      parameters: []
+      responses:
+        '200':
+          description: Liste des modules
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Liste paginée des modules
+      tags:
+        - Référentiels
+    post:
+      operationId: ModuleController_create
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModuleCreateRequest'
+        required: true
+      responses:
+        '201':
+          description: Module créé
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Crée un module
+      tags:
+        - Référentiels
+  /api/v1/referentiels/modules/{id}:
+    delete:
+      operationId: ModuleController_delete
+      parameters: []
+      responses:
+        '200':
+          description: Module supprimé
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Module introuvable
+        '409':
+          description: Conflit (utilisé par une matière)
+      security:
+        - bearerAuth: []
+      summary: Supprime un module
+      tags:
+        - Référentiels
+    get:
+      operationId: ModuleController_getOne
+      parameters: []
+      responses:
+        '200':
+          description: Module trouvé
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Module introuvable
+      security:
+        - bearerAuth: []
+      summary: Détail d’un module
+      tags:
+        - Référentiels
+    patch:
+      operationId: ModuleController_update
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModuleUpdateRequest'
+        required: true
+      responses:
+        '200':
+          description: Module modifié
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Module introuvable
+      security:
+        - bearerAuth: []
+      summary: Modifie un module
+      tags:
+        - Référentiels
+  /api/v1/referentiels/matieres:
+    get:
+      operationId: MatiereController_list
+      parameters: []
+      responses:
+        '200':
+          description: Liste des matières
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Liste paginée des matières
+      tags:
+        - Référentiels
+    post:
+      operationId: MatiereController_create
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MatiereCreateRequest'
+        required: true
+      responses:
+        '201':
+          description: Matière créée
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Crée une matière
+      tags:
+        - Référentiels
+  /api/v1/referentiels/matieres/{id}:
+    delete:
+      operationId: MatiereController_delete
+      parameters: []
+      responses:
+        '200':
+          description: Matière supprimée
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Matière introuvable
+        '409':
+          description: Conflit (utilisée par une affectation)
+      security:
+        - bearerAuth: []
+      summary: Supprime une matière
+      tags:
+        - Référentiels
+    get:
+      operationId: MatiereController_getOne
+      parameters: []
+      responses:
+        '200':
+          description: Matière trouvée
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Matière introuvable
+      security:
+        - bearerAuth: []
+      summary: Détail d’une matière
+      tags:
+        - Référentiels
+    patch:
+      operationId: MatiereController_update
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MatiereUpdateRequest'
+        required: true
+      responses:
+        '200':
+          description: Matière modifiée
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Matière introuvable
+      security:
+        - bearerAuth: []
+      summary: Modifie une matière
+      tags:
+        - Référentiels
+  /api/v1/referentiels/grade-type-enseignements:
+    get:
+      operationId: GradeTypeEnseignementController_list
+      parameters: []
+      responses:
+        '200':
+          description: Liste des couples de la matrice
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Liste des couples (grade, type d’enseignement) de la matrice
+      tags:
+        - Référentiels
+    post:
+      operationId: GradeTypeEnseignementController_create
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GradeTypeEnseignementCreateRequest'
+        required: true
+      responses:
+        '201':
+          description: Couple créé
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Crée un couple (grade, type d’enseignement) dans la matrice
+      tags:
+        - Référentiels
+  /api/v1/referentiels/grade-type-enseignements/{id}:
+    delete:
+      operationId: GradeTypeEnseignementController_delete
+      parameters: []
+      responses:
+        '200':
+          description: Couple supprimé
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Couple introuvable
+        '409':
+          description: Conflit (utilisé par un module)
+      security:
+        - bearerAuth: []
+      summary: Supprime un couple de la matrice
       tags:
         - Référentiels
   /api/v1/users:

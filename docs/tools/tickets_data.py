@@ -258,7 +258,7 @@ TICKETS: List[Ticket] = [
         lot="L04",
         titre="Implémenter le référentiel TypeEnseignement / Grade / Module / Matière",
         sp=6,
-        status="En cours",
+        status="Terminé",
         deps=['TAKT-L04-01'],
         exigences=['EX-REF-01', 'EX-REF-04', 'PLAN_MACRO E2.2', 'ST_TAKT §2.1', 'EC-ADM-02.'],
     ),
