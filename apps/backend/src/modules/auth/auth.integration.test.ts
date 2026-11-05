@@ -85,15 +85,14 @@ describe('POST /auth/login, /auth/refresh, /auth/logout (TAKT-L03-03)', () => {
       await prisma.journalAudit.deleteMany({ where: { utilisateurId: id } });
       await prisma.sessionRefresh.deleteMany({ where: { utilisateurId: id } });
     }
+    // Nettoyage ciblé via idsACleaner uniquement (évite les conflits
+    // entre fichiers de test qui partagent la même base de données).
     await prisma.utilisateur.deleteMany({
       where: {
         email: {
           in: ['gestionnaire@takt.test', 'inactif@takt.test'],
         },
       },
-    });
-    await prisma.utilisateur.deleteMany({
-      where: { email: { startsWith: 'takt-test-' } },
     });
     await prisma?.$disconnect();
     await application?.close();

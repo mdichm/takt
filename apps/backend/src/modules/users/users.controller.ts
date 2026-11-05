@@ -34,15 +34,48 @@ interface RequeteHttpMinimale {
   headers: Record<string, string | string[] | undefined>;
   /** Paramètres de query string. */
   query?: Record<string, string | string[] | undefined>;
-  /** Utilisateur authentifié (porté par le guard JWT). */
-  user?: { sub?: string };
+}
+
+/**
+ * Décode le payload d'un access token JWT (sans vérification de signature)
+ * pour en extraire l'identifiant utilisateur (`sub`).
+ * La vérification de signature est assurée par les guards d'authentification
+ * (à implémenter, ticket L06-02).
+ */
+function extraireSubDepuisJwt(authorization: string | undefined): string {
+  if (!authorization) {
+    return '';
+  }
+  const correspondance = authorization.match(/^Bearer\s+(.+)$/i);
+  if (!correspondance) {
+    return '';
+  }
+  const token = correspondance[1];
+  if (!token) {
+    return '';
+  }
+  const segments = token.split('.');
+  const payloadSegment = segments[1];
+  if (!payloadSegment || segments.length < 2) {
+    return '';
+  }
+  try {
+    const payload = JSON.parse(
+      Buffer.from(payloadSegment, 'base64url').toString('utf8'),
+    );
+    return typeof payload === 'object' && payload !== null && typeof payload.sub === 'string'
+      ? payload.sub
+      : '';
+  } catch {
+    return '';
+  }
 }
 
 /**
  * Contrôleur des utilisateurs : CRUD des comptes et attribution des rôles.
  * Seuls les endpoints listés ici sont exposés (ST_TAKT §3.2).
  */
-@ApiTags('utilisateurs')
+@ApiTags('Utilisateurs')
 @ApiBearerAuth()
 @Controller('users')
 export class UsersController {
@@ -50,7 +83,9 @@ export class UsersController {
 
   /** Extrait l'identifiant de l'utilisateur connecté depuis la requête. */
   private utilisateurId(req: RequeteHttpMinimale): string {
-    return req.user?.sub ?? '';
+    const header = req.headers['authorization'];
+    const valeur = Array.isArray(header) ? header[0] : header;
+    return extraireSubDepuisJwt(valeur);
   }
 
   /** Liste paginée des utilisateurs (GET /api/v1/users). */
@@ -96,10 +131,7 @@ export class UsersController {
     const resultat = await this.usersService.listUsers(filtres);
     return {
       data: resultat.data,
-      error: null,
       meta: {
-        requestId: (req.headers['x-request-id'] as string) ?? '',
-        timestamp: new Date().toISOString(),
         page: resultat.meta.page,
         pageSize: resultat.meta.pageSize,
         total: resultat.meta.total,
@@ -130,14 +162,7 @@ export class UsersController {
       estActif: corps.estActif ?? true,
       utilisateurIdCreePar: this.utilisateurId(req),
     });
-    return {
-      data: resultat,
-      error: null,
-      meta: {
-        requestId: (req.headers['x-request-id'] as string) ?? '',
-        timestamp: new Date().toISOString(),
-      },
-    };
+    return resultat;
   }
 
   /** Récupère un utilisateur par son ID (GET /api/v1/users/:id). */
@@ -151,14 +176,7 @@ export class UsersController {
   @ApiResponse({ status: 404, description: 'Utilisateur introuvable' })
   async getOne(@Param() params: UserParams): Promise<unknown> {
     const utilisateur = await this.usersService.getUser(params.id);
-    return {
-      data: utilisateur,
-      error: null,
-      meta: {
-        requestId: '',
-        timestamp: new Date().toISOString(),
-      },
-    };
+    return utilisateur;
   }
 
   /** Met à jour un utilisateur (PATCH /api/v1/users/:id). */
@@ -200,14 +218,7 @@ export class UsersController {
       misesAJour.estActif = corps.estActif;
     }
     const resultat = await this.usersService.updateUser(params.id, misesAJour);
-    return {
-      data: resultat,
-      error: null,
-      meta: {
-        requestId: (req.headers['x-request-id'] as string) ?? '',
-        timestamp: new Date().toISOString(),
-      },
-    };
+    return resultat;
   }
 
   /** Désactive un utilisateur (DELETE /api/v1/users/:id). */
@@ -225,13 +236,6 @@ export class UsersController {
     @Req() req: RequeteHttpMinimale,
   ): Promise<unknown> {
     const resultat = await this.usersService.disableUser(params.id, this.utilisateurId(req));
-    return {
-      data: resultat,
-      error: null,
-      meta: {
-        requestId: (req.headers['x-request-id'] as string) ?? '',
-        timestamp: new Date().toISOString(),
-      },
-    };
+    return resultat;
   }
 }

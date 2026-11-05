@@ -4,7 +4,8 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { PRISMA } from '../common/di/prisma.token';
 import { PrismaClient } from '@takt/db';
-import { PasswordService } from '../auth/password.service';
+import { hash as hacherArgon2 } from 'argon2';
+import { PASSWORD_ARGON2_OPTIONS } from '../../config/password.config';
 import {
   CODES_ERREUR_API,
   ApiError,
@@ -21,10 +22,7 @@ import {
 export class UsersService {
   private readonly logger = new Logger(UsersService.name);
 
-  constructor(
-    @Inject(PRISMA) private readonly prisma: PrismaClient,
-    @Inject(PasswordService) private readonly passwordService: PasswordService,
-  ) {}
+  constructor(@Inject(PRISMA) private readonly prisma: PrismaClient) {}
 
   /** Rôle administrateur, protégé contre la désactivation par soi-même. */
   private static readonly ROLE_ADMIN = 'admin';
@@ -78,7 +76,7 @@ export class UsersService {
       }
     }
 
-    const hash = await this.passwordService.hash(donnees.motDePasse);
+    const hash = await hacherArgon2(donnees.motDePasse, PASSWORD_ARGON2_OPTIONS);
     const utilisateur = await this.prisma.utilisateur.create({
       data: {
         email: donnees.email,
