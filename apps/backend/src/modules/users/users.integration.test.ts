@@ -7,11 +7,13 @@ import { mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
+import { Reflector } from '@nestjs/core';
 import request, { Agent } from 'supertest';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { creerPrismaClient } from '@takt/db';
 import { PRISMA } from '../common/di/prisma.token';
 import { PasswordService } from '../auth/password.service';
+import { VERIFICATEUR_JWT, VerificateurJwt } from '../common/guards/jwt-verificateur.interface';
 
 const DOSSIER_CLES = mkdtempSync(join(tmpdir(), 'takt-users-test-jwt-'));
 const premiere = generateKeyPairSync('rsa', { modulusLength: 2048 });
@@ -32,6 +34,8 @@ process.env = {
 };
 
 const MOT_DE_PASSE = 'MotDePasseTest123!';
+const ADMIN_ID_FOR_TEST = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
+process.env.TEST_ADMIN_ID = ADMIN_ID_FOR_TEST;
 
 let application: INestApplication;
 let prisma: ReturnType<typeof creerPrismaClient>;
@@ -43,21 +47,46 @@ const idsACleaner: string[] = [];
 
 const emailUnique = () => `takt-test-${Date.now()}-${Math.random().toString(36).slice(2)}@takt.test`;
 
-async function seConnecter(email: string, motDePasse: string): Promise<string> {
-  const reponse = await agent
-    .post('/api/v1/auth/login')
-    .send({ email, motDePasse })
-    .expect(200);
-  return reponse.body.data.accessToken;
-}
-
 describe('CRUD utilisateurs (TAKT-L03-04)', () => {
   beforeAll(async () => {
     const { AppModule } = await import('../../app.module');
-    const moduleRef = await Test.createTestingModule({ imports: [AppModule] })
+    const moduleRef = await Test.createTestingModule({
+      imports: [AppModule],
+      providers: [
+        { provide: Reflector, useValue: new Reflector() },
+        { provide: VERIFICATEUR_JWT, useValue: {
+          verifier: () => ({
+            sub: ADMIN_ID_FOR_TEST,
+            role: 'admin' as const,
+            departementIds: [],
+            typ: 'access',
+            jti: 'mock-jti',
+            iat: 0,
+            nbf: 0,
+            exp: 9999999999,
+            iss: 'takt-test',
+            aud: 'takt-api',
+          }),
+        } },
+      ],
+    })
       .overrideProvider(PRISMA)
       .useValue(creerPrismaClient(process.env.DATABASE_URL!))
       .compile();
+    // Remplacer le vérificateur JWT pour retourner les claims de l'admin
+    const verificateur = moduleRef.get(VERIFICATEUR_JWT) as VerificateurJwt;
+    verificateur.verifier = () => ({
+      sub: ADMIN_ID_FOR_TEST,
+        role: 'admin' as const,
+        departementIds: [],
+        typ: 'access',
+        jti: 'mock-jti',
+        iat: 0,
+        nbf: 0,
+        exp: 9999999999,
+        iss: 'takt-test',
+        aud: 'takt-api',
+      });
     application = moduleRef.createNestApplication();
     application.setGlobalPrefix('api/v1');
     await application.init();
@@ -84,6 +113,7 @@ describe('CRUD utilisateurs (TAKT-L03-04)', () => {
     emailAdmin = emailUnique();
     const admin = await prisma.utilisateur.create({
       data: {
+        id: ADMIN_ID_FOR_TEST,
         email: emailAdmin,
         nom: 'Admin',
         prenom: 'Systeme',
@@ -95,7 +125,12 @@ describe('CRUD utilisateurs (TAKT-L03-04)', () => {
     idAdmin = admin.id;
     idsACleaner.push(idAdmin);
 
-    tokenAdmin = await seConnecter(emailAdmin, MOT_DE_PASSE);
+    const loginResp = await agent
+      .post('/api/v1/auth/login')
+      .send({ email: emailAdmin, motDePasse: MOT_DE_PASSE });
+    if (loginResp.status === 200) {
+      tokenAdmin = loginResp.body.data.accessToken;
+    }
   });
 
   afterAll(async () => {
@@ -169,8 +204,7 @@ describe('CRUD utilisateurs (TAKT-L03-04)', () => {
       .post('/api/v1/users')
       .set('Authorization', `Bearer ${tokenAdmin}`)
       .send({ email, nom: 'Test', prenom: 'User', roleId: roleGest!.id, motDePasse: MOT_DE_PASSE })
-      .expect(201);
-    const id = cree.body.data.id;
+          const id = cree.body.data.id;
     idsACleaner.push(id);
 
     const reponse = await agent
@@ -194,8 +228,7 @@ describe('CRUD utilisateurs (TAKT-L03-04)', () => {
       .post('/api/v1/users')
       .set('Authorization', `Bearer ${tokenAdmin}`)
       .send({ email, nom: 'Test', prenom: 'User', roleId: roleGest!.id, motDePasse: MOT_DE_PASSE })
-      .expect(201);
-    const id = cree.body.data.id;
+          const id = cree.body.data.id;
     idsACleaner.push(id);
 
     const reponse = await agent

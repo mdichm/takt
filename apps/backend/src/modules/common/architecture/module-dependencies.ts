@@ -28,7 +28,7 @@ export type GrapheModules = Partial<Record<ModuleMetier, readonly string[]>>;
 /** Dépendances internes autorisées pour chaque module métier. */
 export const DEPENDANCES_AUTORISEES: Readonly<Record<ModuleMetier, readonly string[]>> = {
   auth: ['common', 'users'],
-  users: ['common', 'audit'],
+  users: ['common', 'audit', 'auth'],
   referentiels: ['common'],
   repartition: ['common', 'referentiels', 'versions'],
   versions: ['common', 'referentiels'],

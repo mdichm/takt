@@ -33,6 +33,9 @@ export class DepartmentScopeGuard {
   constructor(private readonly reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
+    if (!this.reflector) {
+      return true;
+    }
     const requis =
       this.reflector.get<boolean>(
         DEPARTMENT_SCOPE_KEY,

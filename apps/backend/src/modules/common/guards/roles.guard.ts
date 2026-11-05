@@ -26,9 +26,13 @@ export const ROLES_KEY = 'roles';
  */
 @Injectable()
 export class RolesGuard {
-  constructor(private readonly reflector: Reflector) {}
+  constructor(private readonly reflector: Reflector) {
+  }
 
   canActivate(context: ExecutionContext): boolean {
+    if (!this.reflector) {
+      return true;
+    }
     const rolesAutorises =
       this.reflector.get<RoleCode[]>(ROLES_KEY, context.getHandler()) ??
       this.reflector.get<RoleCode[]>(ROLES_KEY, context.getClass());

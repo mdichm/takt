@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import { Module } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
 import { RolesGuard } from '../guards/roles.guard';
 import { DepartmentScopeGuard } from '../guards/department-scope.guard';
 import { VersionStateGuard } from '../guards/version-state.guard';
@@ -14,6 +15,7 @@ import { VersionStateGuard } from '../guards/version-state.guard';
  */
 @Module({
   providers: [
+    { provide: Reflector, useValue: new Reflector() },
     RolesGuard,
     DepartmentScopeGuard,
     VersionStateGuard,
