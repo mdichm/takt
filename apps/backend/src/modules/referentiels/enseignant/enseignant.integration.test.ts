@@ -55,6 +55,7 @@ describe('Enseignant (TAKT-L04-03)', () => {
       .expect(200);
     expect(reponse.body.data).toBeDefined();
     expect(Array.isArray(reponse.body.data.items)).toBe(true);
+  });
 
   it('POST /referentiels/enseignants : crée avec 2 départements (201)', async () => {
     const reponse = await ctx.agent
@@ -72,7 +73,9 @@ describe('Enseignant (TAKT-L04-03)', () => {
     expect(reponse.body.data.id).toBeDefined();
     expect(reponse.body.data.matricule).toBe('ENS-TEST-001');
     expect(reponse.body.data.departements).toHaveLength(2);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- any-justify: réponse HTTP typée unknown, accès aux champs dynamiques
     expect(reponse.body.data.departements.map((d: any) => d.code)).toContain('INFO');
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- any-justify: réponse HTTP typée unknown, accès aux champs dynamiques
     expect(reponse.body.data.departements.map((d: any) => d.code)).toContain('MATH');
     ctx.idsACleaner.push(reponse.body.data.id);
   });
@@ -108,6 +111,7 @@ describe('Enseignant (TAKT-L04-03)', () => {
       .expect(200);
     expect(reponse.body.data.items.length).toBeGreaterThan(0);
     const trouve = reponse.body.data.items.find(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- any-justify: réponse HTTP typée unknown, accès aux champs dynamiques
       (e: any) => e.nom === 'Benoit' || e.prenom === 'Benoit',
     );
     expect(trouve).toBeDefined();
@@ -120,6 +124,7 @@ describe('Enseignant (TAKT-L04-03)', () => {
       .expect(200);
     expect(reponse.body.data.items.length).toBeGreaterThan(0);
     const trouve = reponse.body.data.items.find(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- any-justify: réponse HTTP typée unknown, accès aux champs dynamiques
       (e: any) => e.nom === 'Dupont' || e.prenom === 'Dupont',
     );
     expect(trouve).toBeDefined();
@@ -234,4 +239,3 @@ describe('Enseignant (TAKT-L04-03)', () => {
     expect(reponse409.body.error.code).toBe('WORKFLOW_INVALID_TRANSITION');
   });
 });
-  });
