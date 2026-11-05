@@ -5,13 +5,14 @@ import { generateKeyPairSync } from 'node:crypto';
 import { join } from 'node:path';
 import { mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
+import { hash as hacherArgon2 } from 'argon2';
 import { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { Reflector } from '@nestjs/core';
 import request, { Agent } from 'supertest';
 import { creerPrismaClient } from '@takt/db';
 import { PRISMA } from '../common/di/prisma.token';
-import { PasswordService } from '../auth/password.service';
+import { PASSWORD_ARGON2_OPTIONS } from '../../config/password.config';
 import { VERIFICATEUR_JWT, VerificateurJwt } from '../common/guards/jwt-verificateur.interface';
 
 const DOSSIER_CLES = mkdtempSync(join(tmpdir(), 'takt-referentiels-test-jwt-'));
@@ -70,13 +71,11 @@ export async function creerContexteTestReferentiels(): Promise<ContexteTestRefer
   const prisma = creerPrismaClient(process.env.DATABASE_URL!);
   const agent = request.agent(application.getHttpServer());
 
-  const passwordService = moduleRef.get(PasswordService);
-
   await prisma.role.upsert({ where: { code: 'admin' }, update: {}, create: { code: 'admin', libelle: 'Administrateur' } });
   await prisma.role.upsert({ where: { code: 'gest' }, update: {}, create: { code: 'gest', libelle: 'Gestionnaire' } });
 
   const roleAdmin = await prisma.role.findUnique({ where: { code: 'admin' } });
-  const hash = await passwordService.hash(MOT_DE_PASSE);
+  const hash = await hacherArgon2(MOT_DE_PASSE, PASSWORD_ARGON2_OPTIONS);
   const emailAdmin = emailUnique();
   const admin = await prisma.utilisateur.create({
     data: {
