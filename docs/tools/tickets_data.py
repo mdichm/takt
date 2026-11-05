@@ -213,7 +213,7 @@ TICKETS: List[Ticket] = [
         lot="L03",
         titre="Implémenter le CRUD utilisateurs et l'attribution des rôles",
         sp=5,
-        status="En cours",
+        status="Terminé",
         deps=['TAKT-L03-03', 'TAKT-L04-01'],
         exigences=['EX-ROL-01', 'EX-ROL-02', 'IX-ADM-01 à IX-ADM-03', 'EC-ADM-01', 'ST_TAKT §3.2.'],
     ),
