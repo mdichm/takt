@@ -62,7 +62,7 @@ export class AuditService {
    *
    * @throws si l'écriture en base échoue (l'appelant doit gérer)
    */
-  async record(donnees: DonneesAudit) {
+  async record(donnees: DonneesAudit): Promise<unknown> {
     return this.prisma.journalAudit.create({
       data: {
         action: donnees.action,
