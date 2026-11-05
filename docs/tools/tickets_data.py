@@ -240,7 +240,7 @@ TICKETS: List[Ticket] = [
         lot="L03",
         titre="Sécuriser les seeds et fournir les comptes de démonstration",
         sp=4,
-        status="À faire",
+        status="Terminé",
         deps=['TAKT-L03-04'],
         exigences=['PLAN_MACRO E2.5', 'TESTS.md §9.1', 'GG-11', 'GG-03.'],
     ),

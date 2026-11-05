@@ -3,20 +3,70 @@
 
 import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '../src/generated/prisma/client';
+import { hash, argon2id } from 'argon2';
+import crypto from 'crypto';
 
-const connectionString = process.env.DATABASE_URL;
+let connexionStringResolvee: string;
+let instancePrisma: PrismaClient;
 
-if (!connectionString) {
-  throw new Error('DATABASE_URL est requise pour exécuter le seed');
+function resoudreConnexion(): string {
+  if (connexionStringResolvee) {
+    return connexionStringResolvee;
+  }
+  const connectionString = process.env.DATABASE_URL;
+  if (!connectionString) {
+    throw new Error('DATABASE_URL est requise pour exécuter le seed');
+  }
+  connexionStringResolvee = connectionString;
+  return connexionStringResolvee;
 }
 
-if (process.env.NODE_ENV === 'production') {
-  throw new Error('Le seed de développement est interdit en production');
+function getPrisma(): PrismaClient {
+  if (instancePrisma) {
+    return instancePrisma;
+  }
+  instancePrisma = new PrismaClient({ adapter: new PrismaPg({ connectionString: resoudreConnexion() }) });
+  return instancePrisma;
 }
 
-const prisma = new PrismaClient({ adapter: new PrismaPg({ connectionString }) });
+/**
+ * Paramètres Argon2id identiques à ceux du backend (TAKT-L03-01, password.config.ts).
+ */
+const ARGON2_OPTIONS = {
+  type: argon2id,
+  memoryCost: 19_456,
+  timeCost: 2,
+  parallelism: 1,
+};
+
+/**
+ * Résout le mot de passe de démonstration.
+ *
+ * - Si `SEED_DEMO_PASSWORD` est définie et non vide : utilisée telle quelle.
+ * - Sinon (développement uniquement) : génération aléatoire, affichée une seule fois en console.
+ * Aucun mot de passe n'est jamais écrit en dur dans le code (GG-11).
+ */
+function resoudreMotDePasseDemo(): string {
+  const motDePasseEnv = process.env.SEED_DEMO_PASSWORD;
+  if (motDePasseEnv && motDePasseEnv.trim() !== '') {
+    return motDePasseEnv.trim();
+  }
+
+  const motDePasseGenere = crypto.randomBytes(16).toString('base64url');
+  console.log(
+    `SEED_DEMO_PASSWORD non définie. Mot de passe de démonstration généré (à usage unique) : ${motDePasseGenere}`,
+  );
+  return motDePasseGenere;
+}
 
 async function main(): Promise<void> {
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('Le seed de développement est interdit en production');
+  }
+
+  const motDePasseDemo = resoudreMotDePasseDemo();
+  const motDePasseHash = await hash(motDePasseDemo, ARGON2_OPTIONS);
+
   const roles = await Promise.all(
     [
       ['admin', 'Administrateur'],
@@ -24,7 +74,7 @@ async function main(): Promise<void> {
       ['rdep', 'Responsable de département'],
       ['dir', 'Direction'],
     ].map(([code, libelle]) =>
-      prisma.role.upsert({
+      getPrisma().role.upsert({
         where: { code },
         update: { libelle },
         create: { code, libelle },
@@ -38,7 +88,7 @@ async function main(): Promise<void> {
       ['MATH', 'Mathématiques'],
       ['PHYS', 'Physique'],
     ].map(([code, libelle]) =>
-      prisma.departement.upsert({
+      getPrisma().departement.upsert({
         where: { code },
         update: { libelle },
         create: { code, libelle },
@@ -46,7 +96,7 @@ async function main(): Promise<void> {
     ),
   );
 
-  const annee = await prisma.anneeUniversitaire.upsert({
+  const annee = await getPrisma().anneeUniversitaire.upsert({
     where: { libelle: '2026-2027' },
     update: {},
     create: {
@@ -57,7 +107,7 @@ async function main(): Promise<void> {
   });
 
   for (const numero of [1, 2]) {
-    await prisma.semestre.upsert({
+    await getPrisma().semestre.upsert({
       where: { anneeUniversitaireId_numero: { anneeUniversitaireId: annee.id, numero } },
       update: {},
       create: {
@@ -69,30 +119,65 @@ async function main(): Promise<void> {
     });
   }
 
-  const roleAdmin = roles.find((role) => role.code === 'admin');
-  if (!roleAdmin) {
-    throw new Error('Le rôle admin doit exister');
+  const roleByCode = new Map(roles.map((r) => [r.code, r]));
+  const deptByCode = new Map(departements.map((d) => [d.code, d]));
+
+  const utilisateurs = [
+    { email: 'admin@takt.internal', nom: 'Admin', prenom: 'Système', role: 'admin', departement: 'INFO' },
+    { email: 'gest@takt.internal', nom: 'Gestion', prenom: 'Temps', role: 'gest', departement: null },
+    { email: 'rdep@takt.internal', nom: 'Resp', prenom: 'Département', role: 'rdep', departement: 'INFO' },
+    { email: 'dir@takt.internal', nom: 'Direction', prenom: 'Établissement', role: 'dir', departement: null },
+  ];
+
+  for (const u of utilisateurs) {
+    const role = roleByCode.get(u.role);
+    if (!role) {
+      throw new Error(`Le rôle ${u.role} est introuvable`);
+    }
+    const departement = u.departement ? (deptByCode.get(u.departement) ?? null) : null;
+
+    await getPrisma().utilisateur.upsert({
+      where: { email: u.email },
+      update: {
+        motDePasseHash,
+        nom: u.nom,
+        prenom: u.prenom,
+        roleId: role.id,
+        departementId: departement?.id ?? null,
+        estActif: true,
+      },
+      create: {
+        email: u.email,
+        nom: u.nom,
+        prenom: u.prenom,
+        roleId: role.id,
+        departementId: departement?.id ?? null,
+        estActif: true,
+        motDePasseHash,
+      },
+    });
   }
 
-  await prisma.utilisateur.upsert({
-    where: { email: 'admin@takt.internal' },
-    update: {},
-    create: {
-      email: 'admin@takt.internal',
-      nom: 'Admin',
-      prenom: 'Système',
-      roleId: roleAdmin.id,
-      departementId: departements[0]?.id ?? null,
-    },
-  });
+  console.log(
+    `Seed de développement terminé. ${utilisateurs.length} comptes de démonstration créés/mis à jour.`,
+  );
 }
 
-main()
-  .then(() => console.log('Seed de développement terminé.'))
-  .catch((erreur: unknown) => {
-    console.error('Échec du seed de développement.', erreur);
-    process.exitCode = 1;
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+// Export pour les tests d'intégration
+export { main };
+
+// Exécution directe uniquement quand le fichier est lancé comme script principal
+if (require.main === module) {
+  main()
+    .then(() => {
+      console.log('Seed de développement terminé.');
+      process.exitCode = 0;
+    })
+    .catch((erreur: unknown) => {
+      console.error('Échec du seed de développement.', erreur);
+      process.exitCode = 1;
+    })
+    .finally(async () => {
+      await getPrisma().$disconnect();
+    });
+}
