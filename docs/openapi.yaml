@@ -854,6 +854,465 @@ paths:
       security:
         - bearerAuth: []
       summary: S’abonner aux événements temps réel de l’utilisateur
+  /api/v1/referentiels/arbre:
+    get:
+      operationId: ArbreController_arbre
+      parameters: []
+      responses:
+        '200':
+          description: Arbre des référentiels
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Hiérarchie complète des référentiels
+      tags:
+        - Référentiels
+  /api/v1/referentiels/departements:
+    get:
+      operationId: DepartementController_list
+      parameters: []
+      responses:
+        '200':
+          description: Liste des départements
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Liste paginée des départements
+      tags:
+        - Référentiels
+    post:
+      operationId: DepartementController_create
+      parameters: []
+      responses:
+        '201':
+          description: Département créé
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Crée un département
+      tags:
+        - Référentiels
+  /api/v1/referentiels/departements/{id}:
+    delete:
+      operationId: DepartementController_delete
+      parameters: []
+      responses:
+        '200':
+          description: Département supprimé
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Département introuvable
+        '409':
+          description: Conflit (parcours/utilisateurs associés)
+      security:
+        - bearerAuth: []
+      summary: Supprime un département
+      tags:
+        - Référentiels
+    get:
+      operationId: DepartementController_getOne
+      parameters: []
+      responses:
+        '200':
+          description: Département trouvé
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Département introuvable
+      security:
+        - bearerAuth: []
+      summary: Détail d’un département
+      tags:
+        - Référentiels
+    patch:
+      operationId: DepartementController_update
+      parameters: []
+      responses:
+        '200':
+          description: Département modifié
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Département introuvable
+      security:
+        - bearerAuth: []
+      summary: Modifie un département
+      tags:
+        - Référentiels
+  /api/v1/referentiels/etablissements:
+    get:
+      operationId: EtablissementController_list
+      parameters: []
+      responses:
+        '200':
+          description: Liste des établissements
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Liste paginée des établissements
+      tags:
+        - Référentiels
+    post:
+      operationId: EtablissementController_create
+      parameters: []
+      responses:
+        '201':
+          description: Établissement créé
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Crée un établissement
+      tags:
+        - Référentiels
+  /api/v1/referentiels/etablissements/{id}:
+    delete:
+      operationId: EtablissementController_delete
+      parameters: []
+      responses:
+        '200':
+          description: Établissement supprimé
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Établissement introuvable
+        '409':
+          description: Conflit (départements associés)
+      security:
+        - bearerAuth: []
+      summary: Supprime un établissement
+      tags:
+        - Référentiels
+    get:
+      operationId: EtablissementController_getOne
+      parameters: []
+      responses:
+        '200':
+          description: Établissement trouvé
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Établissement introuvable
+      security:
+        - bearerAuth: []
+      summary: Détail d’un établissement
+      tags:
+        - Référentiels
+    patch:
+      operationId: EtablissementController_update
+      parameters: []
+      responses:
+        '200':
+          description: Établissement modifié
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Établissement introuvable
+      security:
+        - bearerAuth: []
+      summary: Modifie un établissement
+      tags:
+        - Référentiels
+  /api/v1/referentiels/groupes:
+    get:
+      operationId: GroupeController_list
+      parameters: []
+      responses:
+        '200':
+          description: Liste des groupes
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Liste paginée des groupes
+      tags:
+        - Référentiels
+    post:
+      operationId: GroupeController_create
+      parameters: []
+      responses:
+        '201':
+          description: Groupe créé
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Crée un groupe
+      tags:
+        - Référentiels
+  /api/v1/referentiels/groupes/{id}:
+    delete:
+      operationId: GroupeController_delete
+      parameters: []
+      responses:
+        '200':
+          description: Groupe supprimé
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Groupe introuvable
+      security:
+        - bearerAuth: []
+      summary: Supprime un groupe
+      tags:
+        - Référentiels
+    get:
+      operationId: GroupeController_getOne
+      parameters: []
+      responses:
+        '200':
+          description: Groupe trouvé
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Groupe introuvable
+      security:
+        - bearerAuth: []
+      summary: Détail d’un groupe
+      tags:
+        - Référentiels
+    patch:
+      operationId: GroupeController_update
+      parameters: []
+      responses:
+        '200':
+          description: Groupe modifié
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Groupe introuvable
+      security:
+        - bearerAuth: []
+      summary: Modifie un groupe
+      tags:
+        - Référentiels
+  /api/v1/referentiels/niveaux:
+    get:
+      operationId: NiveauController_list
+      parameters: []
+      responses:
+        '200':
+          description: Liste des niveaux
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Liste paginée des niveaux
+      tags:
+        - Référentiels
+    post:
+      operationId: NiveauController_create
+      parameters: []
+      responses:
+        '201':
+          description: Niveau créé
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Crée un niveau
+      tags:
+        - Référentiels
+  /api/v1/referentiels/niveaux/{id}:
+    delete:
+      operationId: NiveauController_delete
+      parameters: []
+      responses:
+        '200':
+          description: Niveau supprimé
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Niveau introuvable
+        '409':
+          description: Conflit (groupes associés)
+      security:
+        - bearerAuth: []
+      summary: Supprime un niveau
+      tags:
+        - Référentiels
+    get:
+      operationId: NiveauController_getOne
+      parameters: []
+      responses:
+        '200':
+          description: Niveau trouvé
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Niveau introuvable
+      security:
+        - bearerAuth: []
+      summary: Détail d’un niveau
+      tags:
+        - Référentiels
+    patch:
+      operationId: NiveauController_update
+      parameters: []
+      responses:
+        '200':
+          description: Niveau modifié
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Niveau introuvable
+      security:
+        - bearerAuth: []
+      summary: Modifie un niveau
+      tags:
+        - Référentiels
+  /api/v1/referentiels/parcours:
+    get:
+      operationId: ParcoursController_list
+      parameters: []
+      responses:
+        '200':
+          description: Liste des parcours
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Liste paginée des parcours
+      tags:
+        - Référentiels
+    post:
+      operationId: ParcoursController_create
+      parameters: []
+      responses:
+        '201':
+          description: Parcours créé
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Crée un parcours
+      tags:
+        - Référentiels
+  /api/v1/referentiels/parcours/{id}:
+    delete:
+      operationId: ParcoursController_delete
+      parameters: []
+      responses:
+        '200':
+          description: Parcours supprimé
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Parcours introuvable
+        '409':
+          description: Conflit (niveaux associés)
+      security:
+        - bearerAuth: []
+      summary: Supprime un parcours
+      tags:
+        - Référentiels
+    get:
+      operationId: ParcoursController_getOne
+      parameters: []
+      responses:
+        '200':
+          description: Parcours trouvé
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Parcours introuvable
+      security:
+        - bearerAuth: []
+      summary: Détail d’un parcours
+      tags:
+        - Référentiels
+    patch:
+      operationId: ParcoursController_update
+      parameters: []
+      responses:
+        '200':
+          description: Parcours modifié
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Parcours introuvable
+      security:
+        - bearerAuth: []
+      summary: Modifie un parcours
+      tags:
+        - Référentiels
   /api/v1/users:
     get:
       operationId: UsersController_list

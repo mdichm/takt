@@ -7,22 +7,13 @@ import {
   HttpCode,
   HttpStatus,
   Inject,
-  Req,
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import {
-  JwtAuthGuard,
-  UtilisateurConnecte,
-} from '../common/guards/jwt-auth.guard';
+import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 import { EtablissementService } from './etablissement/etablissement.service';
-
-interface RequeteAvecUtilisateur {
-  headers: Record<string, string | string[] | undefined>;
-  user?: UtilisateurConnecte;
-}
 
 /**
  * Contrôleur de l'arbre hiérarchique des référentiels.
@@ -48,7 +39,7 @@ export class ArbreController {
   @ApiResponse({ status: 200, description: 'Arbre des référentiels' })
   @ApiResponse({ status: 401, description: 'Non authentifié' })
   @ApiResponse({ status: 403, description: 'Interdit' })
-  async arbre(@Req() req: RequeteAvecUtilisateur): Promise<unknown> {
+  async arbre(): Promise<unknown> {
     const etablissements = await this.etablissementService.arbre();
     return etablissements;
   }
