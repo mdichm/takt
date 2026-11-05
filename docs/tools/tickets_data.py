@@ -231,7 +231,7 @@ TICKETS: List[Ticket] = [
         lot="L03",
         titre="Implémenter le journal d'audit en écriture",
         sp=5,
-        status="En cours",
+        status="Terminé",
         deps=['TAKT-L03-05', 'TAKT-L01-04'],
         exigences=['EX-DAT-05', 'TE-API-05', 'TE-SEC-05', 'ST_TAKT §5.4', 'EC-ADM-04.'],
     ),

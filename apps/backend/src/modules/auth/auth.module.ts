@@ -5,6 +5,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthConfig, chargerConfigAuth } from '../../config/auth.config';
 import { CommonModule } from '../common/common.module';
+import { AuditModule } from '../audit/audit.module';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { PasswordService } from './password.service';
 import { SessionRefreshStore } from './session-refresh.store';
@@ -16,7 +17,7 @@ import { Reflector } from '@nestjs/core';
 
 /** Module regroupant les services de sécurité de l'authentification. */
 @Module({
-  imports: [ConfigModule, CommonModule],
+  imports: [ConfigModule, CommonModule, AuditModule],
   controllers: [AuthController],
   providers: [
     PasswordService,
