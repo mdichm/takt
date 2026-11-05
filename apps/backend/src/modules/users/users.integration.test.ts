@@ -102,9 +102,8 @@ describe('CRUD utilisateurs (TAKT-L03-04)', () => {
     for (const id of idsACleaner) {
       await prisma.journalAudit.deleteMany({ where: { utilisateurId: id } });
       await prisma.sessionRefresh.deleteMany({ where: { utilisateurId: id } });
+      await prisma.utilisateur.deleteMany({ where: { id } });
     }
-    // Nettoyage ciblé via idsACleaner uniquement (évite les conflits
-    // entre fichiers de test qui partagent la même base de données).
     await prisma.utilisateur.deleteMany({
       where: { email: { in: ['admin@takt.test', 'inactif@takt.test'] } },
     });

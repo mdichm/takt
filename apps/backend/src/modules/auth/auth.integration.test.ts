@@ -84,9 +84,8 @@ describe('POST /auth/login, /auth/refresh, /auth/logout (TAKT-L03-03)', () => {
     for (const id of idsACleaner) {
       await prisma.journalAudit.deleteMany({ where: { utilisateurId: id } });
       await prisma.sessionRefresh.deleteMany({ where: { utilisateurId: id } });
+      await prisma.utilisateur.deleteMany({ where: { id } });
     }
-    // Nettoyage ciblé via idsACleaner uniquement (évite les conflits
-    // entre fichiers de test qui partagent la même base de données).
     await prisma.utilisateur.deleteMany({
       where: {
         email: {
