@@ -81,6 +81,56 @@ export const zSearchFilter = z.object({
   search: z.string().trim().min(1).optional(),
 });
 
+/** Catalogue des 8 codes d'erreur HTTP (ST_TAKT §3.4, aligné sur apps/backend/.../api-error.ts). */
+export const zCodeErreurApi = z.enum([
+  'VALIDATION_ERROR',
+  'UNAUTHORIZED',
+  'FORBIDDEN',
+  'NOT_FOUND',
+  'WORKFLOW_INVALID_TRANSITION',
+  'SEANCE_LOCKED',
+  'RATE_LIMITED',
+  'INTERNAL_ERROR',
+]);
+
+/** Corps d'erreur métier de l'enveloppe { data, error, meta }. */
+export const zErreurApi = z.object({
+  code: zCodeErreurApi,
+  message: z.string().optional(),
+  details: z.unknown().optional(),
+});
+
+/** Métadonnées de réponse (ST_TAKT §3.3). */
+export const zMetaApi = z.object({
+  requestId: z.string(),
+  timestamp: z.string(),
+  page: z.number().int().positive().optional(),
+  pageSize: z.number().int().positive().max(200).optional(),
+  total: z.number().int().nonnegative().optional(),
+});
+
+/** Construit le schéma d'enveloppe { data, error, meta } pour un type de données T. */
+export function zEnvelope<T extends z.ZodTypeAny>(dataSchema: T): z.ZodObject<{
+  data: z.ZodNullable<T>;
+  error: z.ZodNullable<typeof zErreurApi>;
+  meta: typeof zMetaApi;
+}> {
+  return z.object({
+    data: dataSchema.nullable(),
+    error: zErreurApi.nullable(),
+    meta: zMetaApi,
+  }) as z.ZodObject<{
+    data: z.ZodNullable<T>;
+    error: z.ZodNullable<typeof zErreurApi>;
+    meta: typeof zMetaApi;
+  }>;
+}
+
+export type CodeErreurApi = z.infer<typeof zCodeErreurApi>;
+export type ErreurApi = z.infer<typeof zErreurApi>;
+export type MetaApi = z.infer<typeof zMetaApi>;
+export type EnveloppeApi<T extends z.ZodTypeAny> = z.infer<ReturnType<typeof zEnvelope<T>>>;
+
 export type RoleCode = z.infer<typeof zRoleCode>;
 export type EtatVersion = z.infer<typeof zEtatVersion>;
 export type SortDirection = z.infer<typeof zSortDirection>;

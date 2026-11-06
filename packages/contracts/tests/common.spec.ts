@@ -2,7 +2,8 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import { describe, expect, it } from 'vitest';
-import { zPaginationMeta, zPaginationQuery } from '../src/common';
+import { z } from 'zod';
+import { zCodeErreurApi, zEnvelope, zErreurApi, zMetaApi, zPaginationMeta, zPaginationQuery } from '../src/common';
 
 describe('contrats communs', () => {
   it('applique les valeurs de pagination par défaut', () => {
@@ -31,5 +32,56 @@ describe('contrats communs', () => {
     expect(
       zPaginationMeta.parse({ page: 1, pageSize: 20, total: 150 }),
     ).toEqual({ page: 1, pageSize: 20, total: 150 });
+  });
+
+  it.each([
+    'VALIDATION_ERROR',
+    'UNAUTHORIZED',
+    'FORBIDDEN',
+    'NOT_FOUND',
+    'WORKFLOW_INVALID_TRANSITION',
+    'SEANCE_LOCKED',
+    'RATE_LIMITED',
+    'INTERNAL_ERROR',
+  ])('accepte le code d’erreur %s', (code) => {
+    expect(zCodeErreurApi.parse(code)).toBe(code);
+  });
+
+  it('refuse un code d’erreur hors catalogue', () => {
+    expect(zCodeErreurApi.safeParse('CODE_INCONNU').success).toBe(false);
+  });
+
+  it('construit une enveloppe de succès avec data', () => {
+    const schema = zEnvelope(z.string());
+    const donnees = schema.parse({
+      data: 'payload',
+      error: null,
+      meta: { requestId: 'req-1', timestamp: '2026-11-06T00:00:00Z' },
+    });
+    expect(donnees.data).toBe('payload');
+    expect(donnees.error).toBeNull();
+  });
+
+  it('construit une enveloppe d’erreur sans data', () => {
+    const schema = zEnvelope(z.string());
+    const donnees = schema.parse({
+      data: null,
+      error: { code: 'UNAUTHORIZED', message: 'session expirée' },
+      meta: { requestId: 'req-2', timestamp: '2026-11-06T00:00:00Z' },
+    });
+    expect(donnees.data).toBeNull();
+    expect(donnees.error?.code).toBe('UNAUTHORIZED');
+    expect(donnees.error?.message).toBe('session expirée');
+  });
+
+  it('refuse une enveloppe avec un code d’erreur invalide', () => {
+    const schema = zEnvelope(z.string());
+    expect(
+      schema.safeParse({
+        data: null,
+        error: { code: 'CODE_INCONNU' },
+        meta: { requestId: 'req-3', timestamp: '2026-11-06T00:00:00Z' },
+      }).success,
+    ).toBe(false);
   });
 });

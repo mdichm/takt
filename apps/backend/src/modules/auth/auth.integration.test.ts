@@ -215,6 +215,18 @@ describe('POST /auth/login, /auth/refresh, /auth/logout (TAKT-L03-03)', () => {
     expect(journal).toBeDefined();
   });
 
+  it('accepte le rafraîchissement par cookie HttpOnly seul (pas de corps requis)', async () => {
+    await obtenirRefreshToken();
+
+    const reponse = await agent
+      .post('/api/v1/auth/refresh')
+      .send({})
+      .expect(200);
+
+    expect(reponse.body.error).toBeNull();
+    expect(reponse.body.data.accessToken).toBeTypeOf('string');
+  });
+
   it('rejette un refresh token déjà consommé (rejeu après rotation)', async () => {
     const refreshToken = await obtenirRefreshToken();
 

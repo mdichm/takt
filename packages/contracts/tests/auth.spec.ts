@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import { describe, expect, it } from 'vitest';
-import { zAccessTokenClaims, zLogin, zRefresh, zRefreshTokenClaims } from '../src/auth';
+import { zAccessTokenClaims, zLogin, zRefresh, zRefreshCookie, zRefreshTokenClaims } from '../src/auth';
 
 describe('contrats d’authentification', () => {
   it('accepte une charge utile de connexion valide', () => {
@@ -64,5 +64,12 @@ describe('contrats d’authentification', () => {
   it('exige un jeton de rafraîchissement non vide', () => {
     expect(zRefresh.safeParse({ refreshToken: 'jeton' }).success).toBe(true);
     expect(zRefresh.safeParse({ refreshToken: '' }).success).toBe(false);
+  });
+
+  it('accepte le renouvellement par cookie sans corps explicite', () => {
+    expect(zRefreshCookie.safeParse({}).success).toBe(true);
+    expect(zRefreshCookie.safeParse({ refreshToken: undefined }).success).toBe(true);
+    expect(zRefreshCookie.safeParse({ refreshToken: 'jeton' }).success).toBe(true);
+    expect(zRefreshCookie.safeParse({ refreshToken: '' }).success).toBe(false);
   });
 });
