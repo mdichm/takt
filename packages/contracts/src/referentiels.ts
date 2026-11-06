@@ -750,3 +750,141 @@ export type SalleCreate = z.infer<typeof zSalleCreate>;
 export type SalleUpdate = z.infer<typeof zSalleUpdate>;
 export type SalleParams = z.infer<typeof zSalleParams>;
 export type SalleListFilters = z.infer<typeof zSalleList>;
+
+// ============================================================================
+// Creneau — Créneau horaire de la grille (L04-05)
+// ============================================================================
+
+/** Variante d'affichage d'un créneau. */
+export const zVarianteAffichage = z.enum(['NORMAL', 'RAMADAN']);
+export type VarianteAffichage = z.infer<typeof zVarianteAffichage>;
+
+/** Créneau horaire de la grille. */
+export const zCreneau = z.object({
+  id: zUuid,
+  jour: z.number().int().min(1, 'Le jour doit être compris entre 1 et 6').max(6, 'Le jour doit être compris entre 1 et 6'),
+  ordre: z.number().int().positive('L\'ordre doit être supérieur à 0'),
+  heureDebut: zDateIso,
+  heureFin: zDateIso,
+  dureeMinutes: z.number().int().positive('La durée doit être supérieure à 0'),
+  createdAt: zDateIso,
+  updatedAt: zDateIso,
+});
+
+/** Données de création d'un créneau. */
+export const zCreneauCreate = z.object({
+  jour: z.number().int().min(1, 'Le jour doit être compris entre 1 et 6').max(6, 'Le jour doit être compris entre 1 et 6'),
+  ordre: z.number().int().positive('L\'ordre doit être supérieur à 0'),
+  heureDebut: zDateIso,
+  heureFin: zDateIso,
+  dureeMinutes: z.number().int().positive('La durée doit être supérieure à 0').default(30),
+});
+
+/** Données de modification d'un créneau. */
+export const zCreneauUpdate = z.object({
+  jour: z.number().int().min(1, 'Le jour doit être compris entre 1 et 6').max(6, 'Le jour doit être compris entre 1 et 6').optional(),
+  ordre: z.number().int().positive('L\'ordre doit être supérieur à 0').optional(),
+  heureDebut: zDateIso.optional(),
+  heureFin: zDateIso.optional(),
+  dureeMinutes: z.number().int().positive('La durée doit être supérieure à 0').optional(),
+});
+
+/** Identifiant de créneau en paramètre de route. */
+export const zCreneauParams = z.object({
+  id: zUuid,
+});
+
+/** Filtres de la liste des créneaux. */
+export const zCreneauList = zPaginationQuery
+  .extend(zSearchFilter.shape)
+  .extend(creerSchemaTri(['jour', 'ordre', 'heureDebut', 'createdAt']).shape)
+  .extend({
+    jour: z.coerce.number().int().min(1).max(6).optional(),
+  });
+
+export type Creneau = z.infer<typeof zCreneau>;
+export type CreneauCreate = z.infer<typeof zCreneauCreate>;
+export type CreneauUpdate = z.infer<typeof zCreneauUpdate>;
+export type CreneauParams = z.infer<typeof zCreneauParams>;
+export type CreneauListFilters = z.infer<typeof zCreneauList>;
+
+// ============================================================================
+// CreneauAffichage — Variante d'affichage (NORMAL / RAMADAN) (L04-05)
+// ============================================================================
+
+/** Variante d'affichage (NORMAL / RAMADAN). */
+export const zCreneauAffichage = z.object({
+  id: zUuid,
+  variante: zVarianteAffichage,
+  decalageMinutes: z.number().int().nonnegative('Le décalage ne peut pas être négatif'),
+  plageReduiteMinutes: z.number().int().nonnegative().optional(),
+  libelle: z.string().trim().min(1, 'Le libellé est requis'),
+  createdAt: zDateIso,
+  updatedAt: zDateIso,
+});
+
+/** Données de création d'une variante d'affichage. */
+export const zCreneauAffichageCreate = z.object({
+  variante: zVarianteAffichage,
+  decalageMinutes: z.number().int().nonnegative('Le décalage ne peut pas être négatif').default(0),
+  plageReduiteMinutes: z.number().int().nonnegative().optional(),
+  libelle: z.string().trim().min(1, 'Le libellé est requis'),
+});
+
+/** Données de modification d'une variante d'affichage. */
+export const zCreneauAffichageUpdate = z.object({
+  decalageMinutes: z.number().int().nonnegative('Le décalage ne peut pas être négatif').optional(),
+  plageReduiteMinutes: z.number().int().nonnegative().optional(),
+  libelle: z.string().trim().min(1, 'Le libellé est requis').optional(),
+});
+
+/** Identifiant de variante d'affichage en paramètre de route. */
+export const zCreneauAffichageParams = z.object({
+  id: zUuid,
+});
+
+/** Filtres de la liste des variantes d'affichage. */
+export const zCreneauAffichageList = zPaginationQuery
+  .extend(zSearchFilter.shape)
+  .extend(creerSchemaTri(['variante', 'decalageMinutes', 'libelle', 'createdAt']).shape)
+  .extend({
+    variante: zVarianteAffichage.optional(),
+  });
+
+export type CreneauAffichage = z.infer<typeof zCreneauAffichage>;
+export type CreneauAffichageCreate = z.infer<typeof zCreneauAffichageCreate>;
+export type CreneauAffichageUpdate = z.infer<typeof zCreneauAffichageUpdate>;
+export type CreneauAffichageParams = z.infer<typeof zCreneauAffichageParams>;
+export type CreneauAffichageListFilters = z.infer<typeof zCreneauAffichageList>;
+
+// ============================================================================
+// ConfigSysteme — Paramètres système (singleton) (L04-05)
+// ============================================================================
+
+/** Paramètres système (singleton). */
+export const zConfigSysteme = z.object({
+  id: zUuid,
+  pasDeTempsMinutes: z.number().int().positive('Le pas de temps doit être supérieur à 0'),
+  joursOuvres: z.string().regex(/^[1-6](,[1-6])*$/, 'Format attendu : "1,2,3,4,5,6"'),
+  creneauxParJour: z.number().int().positive('Le nombre de créneaux par jour doit être supérieur à 0'),
+  createdAt: zDateIso,
+  updatedAt: zDateIso,
+});
+
+/** Données de création des paramètres système. */
+export const zConfigSystemeCreate = z.object({
+  pasDeTempsMinutes: z.number().int().positive('Le pas de temps doit être supérieur à 0').default(30),
+  joursOuvres: z.string().regex(/^[1-6](,[1-6])*$/, 'Format attendu : "1,2,3,4,5,6"').default('1,2,3,4,5,6'),
+  creneauxParJour: z.number().int().positive('Le nombre de créneaux par jour doit être supérieur à 0').default(24),
+});
+
+/** Données de modification des paramètres système. */
+export const zConfigSystemeUpdate = z.object({
+  pasDeTempsMinutes: z.number().int().positive('Le pas de temps doit être supérieur à 0').optional(),
+  joursOuvres: z.string().regex(/^[1-6](,[1-6])*$/, 'Format attendu : "1,2,3,4,5,6"').optional(),
+  creneauxParJour: z.number().int().positive('Le nombre de créneaux par jour doit être supérieur à 0').optional(),
+});
+
+export type ConfigSysteme = z.infer<typeof zConfigSysteme>;
+export type ConfigSystemeCreate = z.infer<typeof zConfigSystemeCreate>;
+export type ConfigSystemeUpdate = z.infer<typeof zConfigSystemeUpdate>;

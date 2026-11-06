@@ -601,3 +601,45 @@ model SalleEquipement {
   @@index([salleId])
   @@index([equipementId])
 }
+
+// ----------------------------------------------------------------------------
+// 28. Creneau — Créneau horaire de la grille (L04-05)
+// ----------------------------------------------------------------------------
+model Creneau {
+  id           String   @id @default(uuid()) @db.Uuid
+  jour         Int      // 1..6 (lun–sam)
+  ordre        Int      // consécutif et unique par jour
+  heureDebut   DateTime
+  heureFin     DateTime
+  dureeMinutes Int      @default(30)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([jour, ordre])
+  @@index([jour])
+}
+
+// ----------------------------------------------------------------------------
+// 29. CreneauAffichage — Variante d'affichage (NORMAL / RAMADAN) (L04-05)
+// ----------------------------------------------------------------------------
+model CreneauAffichage {
+  id                String   @id @default(uuid()) @db.Uuid
+  variante          String   @unique // NORMAL | RAMADAN
+  decalageMinutes   Int      @default(0)
+  plageReduiteMinutes Int?   // réduction de la plage horaire (Ramadan)
+  libelle           String
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+// ----------------------------------------------------------------------------
+// 30. ConfigSysteme — Paramètres système (singleton) (L04-05)
+// ----------------------------------------------------------------------------
+model ConfigSysteme {
+  id                String   @id @default(uuid()) @db.Uuid
+  pasDeTempsMinutes Int      @default(30)
+  joursOuvres       String   // ex: "1,2,3,4,5,6"
+  creneauxParJour   Int      @default(24)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}

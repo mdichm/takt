@@ -35,11 +35,17 @@ import { EquipementController } from './equipement/equipement.controller';
 import { EquipementService } from './equipement/equipement.service';
 import { SalleController } from './salle/salle.controller';
 import { SalleService } from './salle/salle.service';
+import { CreneauController } from './creneau/creneau.controller';
+import { CreneauService } from './creneau/creneau.service';
+import { CreneauAffichageController } from './creneau-affichage/creneau-affichage.controller';
+import { CreneauAffichageService } from './creneau-affichage/creneau-affichage.service';
+import { ConfigSystemeController } from './config-systeme/config-systeme.controller';
+import { ConfigSystemeService } from './config-systeme/config-systeme.service';
 
 /**
  * Module des référentiels métier (Établissement, Département, Parcours, Niveau, Groupe,
  * Type d’enseignement, Grade, Module, Matière, GradeTypeEnseignement, Site, TypeSalle,
- * Equipement, Salle).
+ * Equipement, Salle, Creneau, CreneauAffichage, ConfigSysteme).
  *
  * Dépend uniquement de CommonModule et AuditModule (pas de cycle, GG-13).
  */
@@ -62,6 +68,9 @@ import { SalleService } from './salle/salle.service';
     TypeSalleController,
     EquipementController,
     SalleController,
+    CreneauController,
+    CreneauAffichageController,
+    ConfigSystemeController,
   ],
   providers: [
     EtablissementService,
@@ -79,6 +88,9 @@ import { SalleService } from './salle/salle.service';
     TypeSalleService,
     EquipementService,
     SalleService,
+    CreneauService,
+    CreneauAffichageService,
+    ConfigSystemeService,
   ],
   exports: [
     EtablissementService,
@@ -96,6 +108,9 @@ import { SalleService } from './salle/salle.service';
     TypeSalleService,
     EquipementService,
     SalleService,
+    CreneauService,
+    CreneauAffichageService,
+    ConfigSystemeService,
   ],
 })
 export class ReferentielsModule {}
