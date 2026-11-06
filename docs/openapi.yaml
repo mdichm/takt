@@ -1102,6 +1102,215 @@ paths:
       summary: Hiérarchie complète des référentiels
       tags:
         - Référentiels
+  /api/v1/referentiels/config-systeme:
+    get:
+      operationId: ConfigSystemeController_getOrCreate
+      parameters: []
+      responses:
+        '200':
+          description: Configuration système
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Configuration système (singleton)
+      tags:
+        - Référentiels
+    patch:
+      operationId: ConfigSystemeController_update
+      parameters: []
+      responses:
+        '200':
+          description: Configuration système modifiée
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Configuration système introuvable
+      security:
+        - bearerAuth: []
+      summary: Modifie la configuration système
+      tags:
+        - Référentiels
+  /api/v1/referentiels/creneaux:
+    get:
+      operationId: CreneauController_list
+      parameters: []
+      responses:
+        '200':
+          description: Liste des créneaux
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Liste paginée des créneaux
+      tags:
+        - Référentiels
+    post:
+      operationId: CreneauController_create
+      parameters: []
+      responses:
+        '201':
+          description: Créneau créé
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Crée un créneau
+      tags:
+        - Référentiels
+  /api/v1/referentiels/creneaux-affichage:
+    get:
+      operationId: CreneauAffichageController_list
+      parameters: []
+      responses:
+        '200':
+          description: Liste des variantes d’affichage
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Liste paginée des variantes d’affichage
+      tags:
+        - Référentiels
+    post:
+      operationId: CreneauAffichageController_create
+      parameters: []
+      responses:
+        '201':
+          description: Variante d’affichage créée
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Crée une variante d’affichage
+      tags:
+        - Référentiels
+  /api/v1/referentiels/creneaux-affichage/{id}:
+    delete:
+      operationId: CreneauAffichageController_delete
+      parameters: []
+      responses:
+        '200':
+          description: Variante d’affichage supprimée
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Variante d’affichage introuvable
+      security:
+        - bearerAuth: []
+      summary: Supprime une variante d’affichage
+      tags:
+        - Référentiels
+    get:
+      operationId: CreneauAffichageController_getOne
+      parameters: []
+      responses:
+        '200':
+          description: Variante d’affichage trouvée
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Variante d’affichage introuvable
+      security:
+        - bearerAuth: []
+      summary: Détail d’une variante d’affichage
+      tags:
+        - Référentiels
+    patch:
+      operationId: CreneauAffichageController_update
+      parameters: []
+      responses:
+        '200':
+          description: Variante d’affichage modifiée
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Variante d’affichage introuvable
+      security:
+        - bearerAuth: []
+      summary: Modifie une variante d’affichage
+      tags:
+        - Référentiels
+  /api/v1/referentiels/creneaux/{id}:
+    delete:
+      operationId: CreneauController_delete
+      parameters: []
+      responses:
+        '200':
+          description: Créneau supprimé
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Créneau introuvable
+      security:
+        - bearerAuth: []
+      summary: Supprime un créneau
+      tags:
+        - Référentiels
+    get:
+      operationId: CreneauController_getOne
+      parameters: []
+      responses:
+        '200':
+          description: Créneau trouvé
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Créneau introuvable
+      security:
+        - bearerAuth: []
+      summary: Détail d’un créneau
+      tags:
+        - Référentiels
+    patch:
+      operationId: CreneauController_update
+      parameters: []
+      responses:
+        '200':
+          description: Créneau modifié
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Créneau introuvable
+      security:
+        - bearerAuth: []
+      summary: Modifie un créneau
+      tags:
+        - Référentiels
   /api/v1/referentiels/departements:
     get:
       operationId: DepartementController_list

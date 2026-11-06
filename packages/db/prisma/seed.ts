@@ -326,6 +326,65 @@ async function main(): Promise<void> {
     });
   }
 
+  // ConfigSysteme (singleton) — paramètres par défaut (L04-05)
+  await getPrisma().configSysteme.upsert({
+    where: { id: '00000000-0000-0000-0000-000000000920' },
+    update: {},
+    create: {
+      id: '00000000-0000-0000-0000-000000000920',
+      pasDeTempsMinutes: 30,
+      joursOuvres: '1,2,3,4,5,6',
+      creneauxParJour: 24,
+    },
+  });
+
+  // CreneauAffichage — variantes NORMAL et RAMADAN (L04-05)
+  await getPrisma().creneauAffichage.upsert({
+    where: { variante: 'NORMAL' },
+    update: {},
+    create: {
+      variante: 'NORMAL',
+      decalageMinutes: 0,
+      plageReduiteMinutes: null,
+      libelle: 'Grille horaire normale',
+    },
+  });
+  await getPrisma().creneauAffichage.upsert({
+    where: { variante: 'RAMADAN' },
+    update: {},
+    create: {
+      variante: 'RAMADAN',
+      decalageMinutes: 60,
+      plageReduiteMinutes: 120,
+      libelle: 'Grille horaire Ramadan (décalée +60 min, plage réduite 120 min)',
+    },
+  });
+
+  // Creneau — 144 créneaux (6 jours × 24 créneaux de 30 min, de 08:00 à 20:00) (L04-05)
+  const HEURE_DEBUT_JOUR = 8; // 08:00
+  for (let jour = 1; jour <= 6; jour++) {
+    for (let ordre = 1; ordre <= 24; ordre++) {
+      const minutesDepuisMinuit = HEURE_DEBUT_JOUR * 60 + (ordre - 1) * 30;
+      const hDebut = Math.floor(minutesDepuisMinuit / 60);
+      const mDebut = minutesDepuisMinuit % 60;
+      const hFin = Math.floor((minutesDepuisMinuit + 30) / 60);
+      const mFin = (minutesDepuisMinuit + 30) % 60;
+      const dateRef = new Date(Date.UTC(2026, 0, 1));
+      const heureDebut = new Date(Date.UTC(2026, 0, 1, hDebut, mDebut, 0, 0));
+      const heureFin = new Date(Date.UTC(2026, 0, 1, hFin, mFin, 0, 0));
+
+      await getPrisma().creneau.create({
+        data: {
+          jour,
+          ordre,
+          heureDebut,
+          heureFin,
+          dureeMinutes: 30,
+        },
+      });
+    }
+  }
+
   console.log(
     `Seed de développement terminé. ${utilisateurs.length} comptes de démonstration créés/mis à jour.`,
   );
