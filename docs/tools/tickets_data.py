@@ -546,7 +546,7 @@ TICKETS: List[Ticket] = [
         lot="L08",
         titre="Implémenter les stores Zustand et les hooks métier",
         sp=5,
-        status="À faire",
+        status="En cours",
         deps=['TAKT-L08-02'],
         exigences=['UI_FRONTEND_SPECS §3', 'EX-DAT-01', 'GG-04.'],
     ),
