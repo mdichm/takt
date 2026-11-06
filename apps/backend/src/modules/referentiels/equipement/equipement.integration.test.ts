@@ -20,8 +20,8 @@ describe('Équipement (TAKT-L04-04)', () => {
   });
 
   afterAll(async () => {
-    await nettoyerContexteTest(ctx);
     await ctx.prisma.equipement.deleteMany({ where: { id: { in: [ID_EQUIPEMENT_EXISTANT] } } });
+    await nettoyerContexteTest(ctx);
   });
 
   it('GET /referentiels/equipements : liste (200)', async () => {

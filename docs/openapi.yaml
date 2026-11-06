@@ -1280,6 +1280,93 @@ paths:
       summary: Modifie un enseignant
       tags:
         - Référentiels
+  /api/v1/referentiels/equipements:
+    get:
+      operationId: EquipementController_list
+      parameters: []
+      responses:
+        '200':
+          description: Liste des équipements
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Liste paginée des équipements
+      tags:
+        - Référentiels
+    post:
+      operationId: EquipementController_create
+      parameters: []
+      responses:
+        '201':
+          description: Équipement créé
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Crée un équipement
+      tags:
+        - Référentiels
+  /api/v1/referentiels/equipements/{id}:
+    delete:
+      operationId: EquipementController_delete
+      parameters: []
+      responses:
+        '200':
+          description: Équipement supprimé
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Équipement introuvable
+      security:
+        - bearerAuth: []
+      summary: Supprime un équipement
+      tags:
+        - Référentiels
+    get:
+      operationId: EquipementController_getOne
+      parameters: []
+      responses:
+        '200':
+          description: Équipement trouvé
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Équipement introuvable
+      security:
+        - bearerAuth: []
+      summary: Détail d’un équipement
+      tags:
+        - Référentiels
+    patch:
+      operationId: EquipementController_update
+      parameters: []
+      responses:
+        '200':
+          description: Équipement modifié
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Équipement introuvable
+      security:
+        - bearerAuth: []
+      summary: Modifie un équipement
+      tags:
+        - Référentiels
   /api/v1/referentiels/etablissements:
     get:
       operationId: EtablissementController_list
@@ -1981,28 +2068,28 @@ paths:
       summary: Modifie un parcours
       tags:
         - Référentiels
-  /api/v1/referentiels/type-enseignements:
+  /api/v1/referentiels/salles:
     get:
-      operationId: TypeEnseignementController_list
+      operationId: SalleController_list
       parameters: []
       responses:
         '200':
-          description: Liste des types d’enseignement
+          description: Liste des salles
         '401':
           description: Non authentifié
         '403':
           description: Interdit
       security:
         - bearerAuth: []
-      summary: Liste paginée des types d’enseignement
+      summary: Liste paginée des salles
       tags:
         - Référentiels
     post:
-      operationId: TypeEnseignementController_create
+      operationId: SalleController_create
       parameters: []
       responses:
         '201':
-          description: Type d’enseignement créé
+          description: Salle créée
         '400':
           description: Requête invalide
         '401':
@@ -2011,52 +2098,52 @@ paths:
           description: Interdit
       security:
         - bearerAuth: []
-      summary: Crée un type d’enseignement
+      summary: Crée une salle
       tags:
         - Référentiels
-  /api/v1/referentiels/type-enseignements/{id}:
+  /api/v1/referentiels/salles/{id}:
     delete:
-      operationId: TypeEnseignementController_delete
+      operationId: SalleController_delete
       parameters: []
       responses:
         '200':
-          description: Type d’enseignement supprimé
+          description: Salle supprimée
         '401':
           description: Non authentifié
         '403':
           description: Interdit
         '404':
-          description: Type d’enseignement introuvable
+          description: Salle introuvable
         '409':
-          description: Conflit (utilisé par un module)
+          description: Conflit (salle utilisée)
       security:
         - bearerAuth: []
-      summary: Supprime un type d’enseignement
+      summary: Supprime une salle
       tags:
         - Référentiels
     get:
-      operationId: TypeEnseignementController_getOne
+      operationId: SalleController_getOne
       parameters: []
       responses:
         '200':
-          description: Type d’enseignement trouvé
+          description: Salle trouvée
         '401':
           description: Non authentifié
         '403':
           description: Interdit
         '404':
-          description: Type d’enseignement introuvable
+          description: Salle introuvable
       security:
         - bearerAuth: []
-      summary: Détail d’un type d’enseignement
+      summary: Détail d’une salle
       tags:
         - Référentiels
     patch:
-      operationId: TypeEnseignementController_update
+      operationId: SalleController_update
       parameters: []
       responses:
         '200':
-          description: Type d’enseignement modifié
+          description: Salle modifiée
         '400':
           description: Requête invalide
         '401':
@@ -2064,10 +2151,10 @@ paths:
         '403':
           description: Interdit
         '404':
-          description: Type d’enseignement introuvable
+          description: Salle introuvable
       security:
         - bearerAuth: []
-      summary: Modifie un type d’enseignement
+      summary: Modifie une salle
       tags:
         - Référentiels
   /api/v1/referentiels/sites:
@@ -2157,6 +2244,95 @@ paths:
       summary: Modifie un site
       tags:
         - Référentiels
+  /api/v1/referentiels/type-enseignements:
+    get:
+      operationId: TypeEnseignementController_list
+      parameters: []
+      responses:
+        '200':
+          description: Liste des types d’enseignement
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Liste paginée des types d’enseignement
+      tags:
+        - Référentiels
+    post:
+      operationId: TypeEnseignementController_create
+      parameters: []
+      responses:
+        '201':
+          description: Type d’enseignement créé
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Crée un type d’enseignement
+      tags:
+        - Référentiels
+  /api/v1/referentiels/type-enseignements/{id}:
+    delete:
+      operationId: TypeEnseignementController_delete
+      parameters: []
+      responses:
+        '200':
+          description: Type d’enseignement supprimé
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Type d’enseignement introuvable
+        '409':
+          description: Conflit (utilisé par un module)
+      security:
+        - bearerAuth: []
+      summary: Supprime un type d’enseignement
+      tags:
+        - Référentiels
+    get:
+      operationId: TypeEnseignementController_getOne
+      parameters: []
+      responses:
+        '200':
+          description: Type d’enseignement trouvé
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Type d’enseignement introuvable
+      security:
+        - bearerAuth: []
+      summary: Détail d’un type d’enseignement
+      tags:
+        - Référentiels
+    patch:
+      operationId: TypeEnseignementController_update
+      parameters: []
+      responses:
+        '200':
+          description: Type d’enseignement modifié
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Type d’enseignement introuvable
+      security:
+        - bearerAuth: []
+      summary: Modifie un type d’enseignement
+      tags:
+        - Référentiels
   /api/v1/referentiels/type-salles:
     get:
       operationId: TypeSalleController_list
@@ -2242,182 +2418,6 @@ paths:
       security:
         - bearerAuth: []
       summary: Modifie un type de salle
-      tags:
-        - Référentiels
-  /api/v1/referentiels/equipements:
-    get:
-      operationId: EquipementController_list
-      parameters: []
-      responses:
-        '200':
-          description: Liste des équipements
-        '401':
-          description: Non authentifié
-        '403':
-          description: Interdit
-      security:
-        - bearerAuth: []
-      summary: Liste paginée des équipements
-      tags:
-        - Référentiels
-    post:
-      operationId: EquipementController_create
-      parameters: []
-      responses:
-        '201':
-          description: Équipement créé
-        '400':
-          description: Requête invalide
-        '401':
-          description: Non authentifié
-        '403':
-          description: Interdit
-      security:
-        - bearerAuth: []
-      summary: Crée un équipement
-      tags:
-        - Référentiels
-  /api/v1/referentiels/equipements/{id}:
-    delete:
-      operationId: EquipementController_delete
-      parameters: []
-      responses:
-        '200':
-          description: Équipement supprimé
-        '401':
-          description: Non authentifié
-        '403':
-          description: Interdit
-        '404':
-          description: Équipement introuvable
-      security:
-        - bearerAuth: []
-      summary: Supprime un équipement
-      tags:
-        - Référentiels
-    get:
-      operationId: EquipementController_getOne
-      parameters: []
-      responses:
-        '200':
-          description: Équipement trouvé
-        '401':
-          description: Non authentifié
-        '403':
-          description: Interdit
-        '404':
-          description: Équipement introuvable
-      security:
-        - bearerAuth: []
-      summary: Détail d’un équipement
-      tags:
-        - Référentiels
-    patch:
-      operationId: EquipementController_update
-      parameters: []
-      responses:
-        '200':
-          description: Équipement modifié
-        '400':
-          description: Requête invalide
-        '401':
-          description: Non authentifié
-        '403':
-          description: Interdit
-        '404':
-          description: Équipement introuvable
-      security:
-        - bearerAuth: []
-      summary: Modifie un équipement
-      tags:
-        - Référentiels
-  /api/v1/referentiels/salles:
-    get:
-      operationId: SalleController_list
-      parameters: []
-      responses:
-        '200':
-          description: Liste des salles
-        '401':
-          description: Non authentifié
-        '403':
-          description: Interdit
-      security:
-        - bearerAuth: []
-      summary: Liste paginée des salles
-      tags:
-        - Référentiels
-    post:
-      operationId: SalleController_create
-      parameters: []
-      responses:
-        '201':
-          description: Salle créée
-        '400':
-          description: Requête invalide
-        '401':
-          description: Non authentifié
-        '403':
-          description: Interdit
-      security:
-        - bearerAuth: []
-      summary: Crée une salle
-      tags:
-        - Référentiels
-  /api/v1/referentiels/salles/{id}:
-    delete:
-      operationId: SalleController_delete
-      parameters: []
-      responses:
-        '200':
-          description: Salle supprimée
-        '401':
-          description: Non authentifié
-        '403':
-          description: Interdit
-        '404':
-          description: Salle introuvable
-        '409':
-          description: Conflit (salle utilisée)
-      security:
-        - bearerAuth: []
-      summary: Supprime une salle
-      tags:
-        - Référentiels
-    get:
-      operationId: SalleController_getOne
-      parameters: []
-      responses:
-        '200':
-          description: Salle trouvée
-        '401':
-          description: Non authentifié
-        '403':
-          description: Interdit
-        '404':
-          description: Salle introuvable
-      security:
-        - bearerAuth: []
-      summary: Détail d’une salle
-      tags:
-        - Référentiels
-    patch:
-      operationId: SalleController_update
-      parameters: []
-      responses:
-        '200':
-          description: Salle modifiée
-        '400':
-          description: Requête invalide
-        '401':
-          description: Non authentifié
-        '403':
-          description: Interdit
-        '404':
-          description: Salle introuvable
-      security:
-        - bearerAuth: []
-      summary: Modifie une salle
       tags:
         - Référentiels
   /api/v1/users:

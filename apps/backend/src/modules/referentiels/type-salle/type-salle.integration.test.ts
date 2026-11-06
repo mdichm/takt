@@ -20,8 +20,8 @@ describe('Type de salle (TAKT-L04-04)', () => {
   });
 
   afterAll(async () => {
-    await nettoyerContexteTest(ctx);
     await ctx.prisma.typeSalle.deleteMany({ where: { id: { in: [ID_TYPE_SALLE_EXISTANT] } } });
+    await nettoyerContexteTest(ctx);
   });
 
   it('GET /referentiels/type-salles : liste (200)', async () => {

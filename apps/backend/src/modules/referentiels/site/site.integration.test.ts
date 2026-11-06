@@ -20,8 +20,8 @@ describe('Site (TAKT-L04-04)', () => {
   });
 
   afterAll(async () => {
-    await nettoyerContexteTest(ctx);
     await ctx.prisma.site.deleteMany({ where: { id: { in: [ID_SITE_EXISTANT] } } });
+    await nettoyerContexteTest(ctx);
   });
 
   it('GET /referentiels/sites : liste (200)', async () => {

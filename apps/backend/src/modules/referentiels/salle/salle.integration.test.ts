@@ -45,12 +45,12 @@ describe('Salle (TAKT-L04-04)', () => {
   });
 
   afterAll(async () => {
-    await nettoyerContexteTest(ctx);
     await ctx.prisma.salleEquipement.deleteMany({ where: { salleId: ID_SALLE_EXISTANT } });
     await ctx.prisma.salle.deleteMany({ where: { id: { in: [ID_SALLE_EXISTANT] } } });
     await ctx.prisma.equipement.deleteMany({ where: { id: { in: [ID_EQUIPEMENT] } } });
     await ctx.prisma.typeSalle.deleteMany({ where: { id: { in: [ID_TYPE_SALLE] } } });
     await ctx.prisma.site.deleteMany({ where: { id: { in: [ID_SITE] } } });
+    await nettoyerContexteTest(ctx);
   });
 
   it('GET /referentiels/salles : liste (200)', async () => {
