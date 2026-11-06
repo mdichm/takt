@@ -51,6 +51,46 @@ describe('contrats communs', () => {
     expect(zCodeErreurApi.safeParse('CODE_INCONNU').success).toBe(false);
   });
 
+  it('valide un corps d’erreur métier', () => {
+    expect(
+      zErreurApi.parse({ code: 'UNAUTHORIZED', message: 'session expirée' }),
+    ).toEqual({ code: 'UNAUTHORIZED', message: 'session expirée' });
+    expect(zErreurApi.parse({ code: 'INTERNAL_ERROR' })).toEqual({
+      code: 'INTERNAL_ERROR',
+    });
+    expect(zErreurApi.safeParse({ code: 'CODE_INCONNU' }).success).toBe(false);
+  });
+
+  it('valide les métadonnées de réponse', () => {
+    expect(
+      zMetaApi.parse({
+        requestId: 'req-1',
+        timestamp: '2026-11-06T00:00:00Z',
+      }),
+    ).toEqual({
+      requestId: 'req-1',
+      timestamp: '2026-11-06T00:00:00Z',
+    });
+    expect(
+      zMetaApi.parse({
+        requestId: 'req-2',
+        timestamp: '2026-11-06T00:00:00Z',
+        page: 1,
+        pageSize: 20,
+        total: 150,
+      }),
+    ).toEqual({
+      requestId: 'req-2',
+      timestamp: '2026-11-06T00:00:00Z',
+      page: 1,
+      pageSize: 20,
+      total: 150,
+    });
+    expect(
+      zMetaApi.safeParse({ timestamp: '2026-11-06T00:00:00Z' }).success,
+    ).toBe(false); // requestId requis
+  });
+
   it('construit une enveloppe de succès avec data', () => {
     const schema = zEnvelope(z.string());
     const donnees = schema.parse({
