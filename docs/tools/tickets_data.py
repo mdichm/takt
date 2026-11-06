@@ -573,7 +573,7 @@ TICKETS: List[Ticket] = [
         lot="L08",
         titre="Mettre en place la chaîne de tests frontend (Vitest, Testing Library, axe-core)",
         sp=3,
-        status="À faire",
+        status="En cours",
         deps=['TAKT-L01-05'],
         exigences=['TE-TEST-01', 'TE-TEST-02', 'TESTS.md §1.1', 'SPEC_ACCESSIBILITE §5.2.'],
     ),
