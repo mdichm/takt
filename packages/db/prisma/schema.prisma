@@ -519,3 +519,85 @@ model ChargeRuleSet {
 
   @@index([code])
 }
+
+// ----------------------------------------------------------------------------
+// 23. Site — Site physique hébergeant des salles (L04-04)
+// ----------------------------------------------------------------------------
+model Site {
+  id          String   @id @default(uuid()) @db.Uuid
+  code        String   @unique
+  libelle     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  salles      Salle[]
+
+  @@index([code])
+}
+
+// ----------------------------------------------------------------------------
+// 24. TypeSalle — Type de salle (amphithéâtre, cours, TP, informatique…)
+// ----------------------------------------------------------------------------
+model TypeSalle {
+  id          String   @id @default(uuid()) @db.Uuid
+  code        String   @unique
+  libelle     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  salles      Salle[]
+
+  @@index([code])
+}
+
+// ----------------------------------------------------------------------------
+// 25. Equipement — Équipement installable dans une salle
+// ----------------------------------------------------------------------------
+model Equipement {
+  id             String   @id @default(uuid()) @db.Uuid
+  code           String   @unique
+  libelle        String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  salleEquipements SalleEquipement[]
+
+  @@index([code])
+}
+
+// ----------------------------------------------------------------------------
+// 26. Salle — Salle transverse (aucun departementId, EX-REF-03)
+// ----------------------------------------------------------------------------
+model Salle {
+  id           String      @id @default(uuid()) @db.Uuid
+  code         String      @unique
+  libelle      String
+  typeSalleId  String      @db.Uuid
+  capacite     Int
+  siteId       String      @db.Uuid
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  typeSalle       TypeSalle       @relation(fields: [typeSalleId], references: [id])
+  site            Site            @relation(fields: [siteId], references: [id])
+  salleEquipements SalleEquipement[]
+
+  @@index([code])
+  @@index([typeSalleId])
+  @@index([siteId])
+  @@index([capacite])
+}
+
+// ----------------------------------------------------------------------------
+// 27. SalleEquipement — Association N:N Salle ↔ Equipement avec quantité
+// ----------------------------------------------------------------------------
+model SalleEquipement {
+  salleId       String   @db.Uuid
+  equipementId  String   @db.Uuid
+  quantite      Int      @default(1)
+  createdAt     DateTime @default(now())
+
+  salle     Salle     @relation(fields: [salleId], references: [id])
+  equipement Equipement @relation(fields: [equipementId], references: [id])
+
+  @@id([salleId, equipementId])
+  @@index([salleId])
+  @@index([equipementId])
+}
