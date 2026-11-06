@@ -143,45 +143,39 @@ export class SalleService {
     const page = query.page ?? 1;
     const pageSize = query.pageSize ?? 20;
 
-    let where: Record<string, unknown> = {};
+    const where: Record<string, unknown> = {};
 
     if (query.search) {
-      where = {
-        OR: [
-          { code: { contains: query.search, mode: 'insensitive' as const } },
-          { libelle: { contains: query.search, mode: 'insensitive' as const } },
-        ],
-      };
+      where.OR = [
+        { code: { contains: query.search, mode: 'insensitive' as const } },
+        { libelle: { contains: query.search, mode: 'insensitive' as const } },
+      ];
     }
 
     if (query.typeSalleId) {
-      where = { ...where, typeSalleId: query.typeSalleId };
+      where.typeSalleId = query.typeSalleId;
     }
 
     if (query.siteId) {
-      where = { ...where, siteId: query.siteId };
+      where.siteId = query.siteId;
     }
 
-    if (query.capaciteMin !== undefined || query.capaciteMax !== undefined) {
-      where = {
-        ...where,
-        ...(query.capaciteMin !== undefined && {
-          capacite: { ...(where.capacite as object ?? {}), gte: query.capaciteMin },
-        }),
-        ...(query.capaciteMax !== undefined && {
-          capacite: { ...(where.capacite as object ?? {}), lte: query.capaciteMax },
-        }),
-      };
+    const capaciteFilter: Record<string, unknown> = {};
+    if (query.capaciteMin !== undefined) {
+      capaciteFilter.gte = Number(query.capaciteMin);
+    }
+    if (query.capaciteMax !== undefined) {
+      capaciteFilter.lte = Number(query.capaciteMax);
+    }
+    if (Object.keys(capaciteFilter).length > 0) {
+      where.capacite = capaciteFilter;
     }
 
     if (query.equipement) {
-      where = {
-        ...where,
-        salleEquipements: {
-          some: {
-            equipement: {
-              code: { equals: query.equipement, mode: 'insensitive' as const },
-            },
+      where.salleEquipements = {
+        some: {
+          equipement: {
+            code: { equals: query.equipement, mode: 'insensitive' as const },
           },
         },
       };

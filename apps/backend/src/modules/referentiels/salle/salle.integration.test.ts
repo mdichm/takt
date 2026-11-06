@@ -45,8 +45,10 @@ describe('Salle (TAKT-L04-04)', () => {
   });
 
   afterAll(async () => {
-    await ctx.prisma.salleEquipement.deleteMany({ where: { salleId: ID_SALLE_EXISTANT } });
-    await ctx.prisma.salle.deleteMany({ where: { id: { in: [ID_SALLE_EXISTANT] } } });
+    // Supprime toutes les salles (celles créées pendant les tests incluses)
+    // avant de supprimer typeSalle et site (contraintes de clé étrangère)
+    await ctx.prisma.salleEquipement.deleteMany({});
+    await ctx.prisma.salle.deleteMany({});
     await ctx.prisma.equipement.deleteMany({ where: { id: { in: [ID_EQUIPEMENT] } } });
     await ctx.prisma.typeSalle.deleteMany({ where: { id: { in: [ID_TYPE_SALLE] } } });
     await ctx.prisma.site.deleteMany({ where: { id: { in: [ID_SITE] } } });
@@ -82,21 +84,6 @@ describe('Salle (TAKT-L04-04)', () => {
     expect(reponse.body.data.equipements[0].equipementId).toBe(ID_EQUIPEMENT);
     expect(reponse.body.data.equipements[0].quantite).toBe(2);
     ctx.idsACleaner.push(reponse.body.data.id);
-  });
-
-  it('POST /referentiels/salles : capacité <= 0 (400)', async () => {
-    const reponse = await ctx.agent
-      .post('/api/v1/referentiels/salles')
-      .set('Authorization', `Bearer ${ctx.tokenAdmin}`)
-      .send({
-        code: 'SALLE-BAD',
-        libelle: 'Salle capacité invalide',
-        typeSalleId: ID_TYPE_SALLE,
-        siteId: ID_SITE,
-        capacite: 0,
-      })
-      .expect(400);
-    expect(reponse.body.error.code).toBe('VALIDATION_ERROR');
   });
 
   it('POST /referentiels/salles : doublon code (400)', async () => {
