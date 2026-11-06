@@ -1,0 +1,8 @@
+// Copyright (C) 2026 TAKT
+// SPDX-License-Identifier: AGPL-3.0-only
+
+import { EcranPlaceholder } from '@/app/components/EcranPlaceholder';
+
+export default function EC_ADM_01(): JSX.Element {
+  return <EcranPlaceholder code="EC-ADM-01" />;
+}

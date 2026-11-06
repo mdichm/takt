@@ -555,7 +555,7 @@ TICKETS: List[Ticket] = [
         lot="L08",
         titre="Implémenter le routing, les guards et la navigation par rôle",
         sp=6,
-        status="À faire",
+        status="Terminé",
         deps=['TAKT-L08-03', 'TAKT-L08-01'],
         exigences=['RB-UI-01', 'RB-UI-02', 'EX-UI-01', 'UI_ARBORESCENCE §7', 'UI_FRONTEND_SPECS §5.'],
     ),

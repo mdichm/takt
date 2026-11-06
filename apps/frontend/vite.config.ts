@@ -11,7 +11,6 @@ export default defineConfig({
     alias: {
       '@': resolve(__dirname, 'src'),
       '@takt/contracts': resolve(__dirname, '../../packages/contracts/src/index.ts'),
-      '@takt/design-tokens': resolve(__dirname, '../../packages/design-tokens/src/index.ts'),
     },
   },
   server: {
