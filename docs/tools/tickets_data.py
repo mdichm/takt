@@ -528,7 +528,7 @@ TICKETS: List[Ticket] = [
         lot="L08",
         titre="Produire les design tokens (Normal + Ramadan, contrastes AA)",
         sp=8,
-        status="En cours",
+        status="Terminé",
         deps=['TAKT-L01-05', 'TAKT-L00-03'],
         exigences=['EX-UI-05', 'DL-UI-03', 'DL-UI-04', 'SPEC_ACCESSIBILITE §4', 'UI_DESIGN_TOKENS', 'GAPS_RESOLUTION_SUMMARY (Warning Normal', 'Lock Normal', 'Accent Ramadan).'],
     ),
