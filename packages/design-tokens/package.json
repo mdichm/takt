@@ -8,15 +8,19 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
-    }
+      "types": "./src/index.ts",
+      "import": "./src/index.ts"
+    },
+    "./tokens-normal.css": "./tokens-normal.css",
+    "./tokens-ramadan.css": "./tokens-ramadan.css",
+    "./tokens.json": "./tokens.json"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "lint": "eslint src --max-warnings=0",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run --passWithNoTests"
+    "test": "vitest run --passWithNoTests",
+    "test:tokens": "vitest run"
   },
   "devDependencies": {
     "typescript": "5.5.4",
