@@ -217,6 +217,115 @@ async function main(): Promise<void> {
   ]);
   // Types d’enseignement de référence\n  const types = await Promise.all([\n    getPrisma().typeEnseignement.upsert({\n      where: { code: 'CM' },\n      update: { libelle: 'Cours magistral', couleur: '#3B82F6' },\n      create: { code: 'CM', libelle: 'Cours magistral', couleur: '#3B82F6' },\n    }),\n    getPrisma().typeEnseignement.upsert({\n      where: { code: 'TD' },\n      update: { libelle: 'Travaux dirigés', couleur: '#10B981' },\n      create: { code: 'TD', libelle: 'Travaux dirigés', couleur: '#10B981' },\n    }),\n    getPrisma().typeEnseignement.upsert({\n      where: { code: 'TP' },\n      update: { libelle: 'Travaux pratiques', couleur: '#F59E0B' },\n      create: { code: 'TP', libelle: 'Travaux pratiques', couleur: '#F59E0B' },\n    }),\n    getPrisma().typeEnseignement.upsert({\n      where: { code: 'PROJET' },\n      update: { libelle: 'Projet tutoré', couleur: '#8B5CF6' },\n      create: { code: 'PROJET', libelle: 'Projet tutoré', couleur: '#8B5CF6' },\n    }),\n  ]);\n\n  // Grades de référence\n  const grades = await Promise.all([\n    getPrisma().grade.upsert({\n      where: { code: 'L1' },\n      update: { libelle: 'Licence 1ère année' },\n      create: { code: 'L1', libelle: 'Licence 1ère année' },\n    }),\n    getPrisma().grade.upsert({\n      where: { code: 'L2' },\n      update: { libelle: 'Licence 2ème année' },\n      create: { code: 'L2', libelle: 'Licence 2ème année' },\n    }),\n    getPrisma().grade.upsert({\n      where: { code: 'L3' },\n      update: { libelle: 'Licence 3ème année' },\n      create: { code: 'L3', libelle: 'Licence 3ème année' },\n    }),\n    getPrisma().grade.upsert({\n      where: { code: 'M1' },\n      update: { libelle: 'Master 1ère année' },\n      create: { code: 'M1', libelle: 'Master 1ère année' },\n    }),\n    getPrisma().grade.upsert({\n      where: { code: 'M2' },\n      update: { libelle: 'Master 2ème année' },\n      create: { code: 'M2', libelle: 'Master 2ème année' },\n    }),\n  ]);\n\n  // Matrice Grade × Type (4 types × 5 grades = 20 couples)\n  for (const grade of grades) {\n    for (const type of types) {\n      await getPrisma().gradeTypeEnseignement.upsert({\n        where: {\n          gradeId_typeEnseignementId: {\n            gradeId: grade.id,\n            typeEnseignementId: type.id,\n          },\n        },\n        update: {},\n        create: {\n          gradeId: grade.id,\n          typeEnseignementId: type.id,\n        },\n      });\n    }\n  }\n\n
 
+  // ============================================================================
+  // Référentiel salles (TAKT-L04-04) — Sites, Types de salle, Équipements, Salles
+  // ============================================================================
+
+  // Sites (3)
+  const sites = await Promise.all([
+    getPrisma().site.upsert({
+      where: { code: 'SITE-RDC' },
+      update: { libelle: 'Bâtiment principal – RDC' },
+      create: { code: 'SITE-RDC', libelle: 'Bâtiment principal – RDC' },
+    }),
+    getPrisma().site.upsert({
+      where: { code: 'SITE-ETG1' },
+      update: { libelle: 'Bâtiment principal – Étage 1' },
+      create: { code: 'SITE-ETG1', libelle: 'Bâtiment principal – Étage 1' },
+    }),
+    getPrisma().site.upsert({
+      where: { code: 'SITE-ETG2' },
+      update: { libelle: 'Bâtiment principal – Étage 2' },
+      create: { code: 'SITE-ETG2', libelle: 'Bâtiment principal – Étage 2' },
+    }),
+  ]);
+
+  // Types de salle (4)
+  const typesSalle = await Promise.all([
+    getPrisma().typeSalle.upsert({
+      where: { code: 'CM' },
+      update: { libelle: 'Cours magistral' },
+      create: { code: 'CM', libelle: 'Cours magistral' },
+    }),
+    getPrisma().typeSalle.upsert({
+      where: { code: 'TD' },
+      update: { libelle: 'Travaux dirigés' },
+      create: { code: 'TD', libelle: 'Travaux dirigés' },
+    }),
+    getPrisma().typeSalle.upsert({
+      where: { code: 'TP' },
+      update: { libelle: 'Travaux pratiques' },
+      create: { code: 'TP', libelle: 'Travaux pratiques' },
+    }),
+    getPrisma().typeSalle.upsert({
+      where: { code: 'INFO' },
+      update: { libelle: 'Salle informatique' },
+      create: { code: 'INFO', libelle: 'Salle informatique' },
+    }),
+  ]);
+
+  // Équipements (5)
+  const equipements = await Promise.all([
+    getPrisma().equipement.upsert({
+      where: { code: 'VIDEOPRJ' },
+      update: { libelle: 'Vidéo projecteur' },
+      create: { code: 'VIDEOPRJ', libelle: 'Vidéo projecteur' },
+    }),
+    getPrisma().equipement.upsert({
+      where: { code: 'TABLEAU' },
+      update: { libelle: 'Tableau blanc' },
+      create: { code: 'TABLEAU', libelle: 'Tableau blanc' },
+    }),
+    getPrisma().equipement.upsert({
+      where: { code: 'ORDI' },
+      update: { libelle: 'Ordinateur poste prof' },
+      create: { code: 'ORDI', libelle: 'Ordinateur poste prof' },
+    }),
+    getPrisma().equipement.upsert({
+      where: { code: 'MICRO' },
+      update: { libelle: 'Micro sans fil' },
+      create: { code: 'MICRO', libelle: 'Micro sans fil' },
+    }),
+    getPrisma().equipement.upsert({
+      where: { code: 'TABLEAU_NUM' },
+      update: { libelle: 'Tableau numérique interactif' },
+      create: { code: 'TABLEAU_NUM', libelle: 'Tableau numérique interactif' },
+    }),
+  ]);
+
+  // 150 salles (SALLE-001 à SALLE-150), réparties sur 3 sites et 4 types
+  for (let i = 1; i <= 150; i++) {
+    const code = `SALLE-${String(i).padStart(3, '0')}`;
+    const site = sites[(i - 1) % 3];
+    const typeSalle = typesSalle[(i - 1) % 4];
+    const capacite =
+      typeSalle.code === 'CM' ? 120 : typeSalle.code === 'TD' ? 30 : typeSalle.code === 'TP' ? 24 : 20;
+
+    // Préparer les liens équipements selon le type de salle
+    const liensEquipements = [];
+    if (typeSalle.code === 'CM' || typeSalle.code === 'TD') {
+      liensEquipements.push({ equipement: { connect: { id: equipements[0].id } }, quantite: 1 }); // VIDEOPRJ
+      liensEquipements.push({ equipement: { connect: { id: equipements[1].id } }, quantite: 1 }); // TABLEAU
+      liensEquipements.push({ equipement: { connect: { id: equipements[2].id } }, quantite: 1 }); // ORDI
+    }
+    if (typeSalle.code === 'TP' || typeSalle.code === 'INFO') {
+      liensEquipements.push({ equipement: { connect: { id: equipements[2].id } }, quantite: 10 }); // ORDI x10
+    }
+
+    await getPrisma().salle.create({
+      data: {
+        code,
+        libelle: `Salle ${code}`,
+        typeSalleId: typeSalle.id,
+        siteId: site.id,
+        capacite,
+        ...(liensEquipements.length > 0 && {
+          salleEquipements: { create: liensEquipements },
+        }),
+      },
+    });
+  }
+
   console.log(
     `Seed de développement terminé. ${utilisateurs.length} comptes de démonstration créés/mis à jour.`,
   );

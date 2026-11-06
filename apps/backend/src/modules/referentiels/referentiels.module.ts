@@ -27,10 +27,19 @@ import { GradeTypeEnseignementController } from './grade-type-enseignement/grade
 import { GradeTypeEnseignementService } from './grade-type-enseignement/grade-type-enseignement.service';
 import { EnseignantController } from './enseignant/enseignant.controller';
 import { EnseignantService } from './enseignant/enseignant.service';
+import { SiteController } from './site/site.controller';
+import { SiteService } from './site/site.service';
+import { TypeSalleController } from './type-salle/type-salle.controller';
+import { TypeSalleService } from './type-salle/type-salle.service';
+import { EquipementController } from './equipement/equipement.controller';
+import { EquipementService } from './equipement/equipement.service';
+import { SalleController } from './salle/salle.controller';
+import { SalleService } from './salle/salle.service';
 
 /**
  * Module des référentiels métier (Établissement, Département, Parcours, Niveau, Groupe,
- * Type d’enseignement, Grade, Module, Matière, GradeTypeEnseignement).
+ * Type d’enseignement, Grade, Module, Matière, GradeTypeEnseignement, Site, TypeSalle,
+ * Equipement, Salle).
  *
  * Dépend uniquement de CommonModule et AuditModule (pas de cycle, GG-13).
  */
@@ -49,6 +58,10 @@ import { EnseignantService } from './enseignant/enseignant.service';
     MatiereController,
     GradeTypeEnseignementController,
     EnseignantController,
+    SiteController,
+    TypeSalleController,
+    EquipementController,
+    SalleController,
   ],
   providers: [
     EtablissementService,
@@ -62,6 +75,10 @@ import { EnseignantService } from './enseignant/enseignant.service';
     MatiereService,
     GradeTypeEnseignementService,
     EnseignantService,
+    SiteService,
+    TypeSalleService,
+    EquipementService,
+    SalleService,
   ],
   exports: [
     EtablissementService,
@@ -75,6 +92,10 @@ import { EnseignantService } from './enseignant/enseignant.service';
     MatiereService,
     GradeTypeEnseignementService,
     EnseignantService,
+    SiteService,
+    TypeSalleService,
+    EquipementService,
+    SalleService,
   ],
 })
 export class ReferentielsModule {}

@@ -276,7 +276,7 @@ TICKETS: List[Ticket] = [
         lot="L04",
         titre="Implémenter le référentiel Salle / Site / TypeSalle / Équipement",
         sp=6,
-        status="À faire",
+        status="Terminé",
         deps=['TAKT-L04-01'],
         exigences=['EX-REF-03', 'HC-ROOM-01', 'HC-ROOM-02', 'HC-ROOM-03', 'PLAN_MACRO E2.3.'],
     ),

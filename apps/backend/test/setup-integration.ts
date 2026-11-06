@@ -42,6 +42,11 @@ const TABLES = [
   'TypeEnseignement',
   'EnseignantDepartement',
   'Enseignant',
+  'SalleEquipement',
+  'Salle',
+  'Equipement',
+  'TypeSalle',
+  'Site',
 ];
 
 await prisma.$executeRawUnsafe('SET session_replication_role = replica;');
