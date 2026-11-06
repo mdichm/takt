@@ -3,10 +3,10 @@
 
 import { expect, test } from '@playwright/test';
 
-test('la page d’accueil présente le titre TAKT', async ({ page }) => {
-  const reponse = await page.goto('/');
-
+test('la racine redirige vers l écran de connexion pour un utilisateur non authentifié', async ({ page }) => {
+  const reponse = await page.goto('/', { waitUntil: 'networkidle' });
   expect(reponse?.status()).toBe(200);
-  await expect(page.getByRole('heading', { name: 'TAKT' })).toBeVisible();
-  await expect(page.getByText('Planification des emplois du temps pédagogiques')).toBeVisible();
+  // Pas de session : la racine redirige vers le tableau de bord puis vers /login.
+  await expect(page).toHaveURL(/\/login/);
+  await expect(page.getByText('Écran EC-COM-01')).toBeVisible();
 });

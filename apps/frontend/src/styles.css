@@ -1,6 +1,10 @@
 /* Copyright (C) 2026 TAKT */
 /* SPDX-License-Identifier: AGPL-3.0-only */
 
+/* Jetons de design TAKT (source unique des coloris, 0 couleur en dur, GG-01). */
+@import url('@takt/design-tokens/tokens-normal.css');
+@import url('@takt/design-tokens/tokens-ramadan.css');
+
 :root {
   color: var(--color-text-primary);
   background: var(--color-surface-background);
