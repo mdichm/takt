@@ -355,13 +355,48 @@ jobs:
         run: pnpm check-module-dependencies
 
   # ------------------------------------------------------------
+  # ACCESSIBILITÉ (axe-core) — job bloquant pour la protection de develop
+  # ------------------------------------------------------------
+  accessibility:
+    name: Accessibilité (axe-core)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: build
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run Unit Accessibility Tests (tokens + components)
+        run: pnpm --filter @takt/frontend test:a11y:unit
+
+      - name: Upload Axe Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: axe-report
+          path: apps/frontend/axe-results/
+          retention-days: 7
+
+  # ------------------------------------------------------------
   # CHECK REQUIS POUR LA PROTECTION DE develop
   # ------------------------------------------------------------
   ci-gate:
     name: CI gate
     runs-on: ubuntu-latest
     needs:
-      [lint-and-typecheck, test, build, docker-build, e2e, check-openapi, check-module-dependencies]
+      [lint-and-typecheck, test, build, docker-build, e2e, check-openapi, check-module-dependencies, accessibility]
     if: always()
     steps:
       - name: Vérifier le résultat de la CI
@@ -371,7 +406,9 @@ jobs:
              [[ "${{ needs.build.result }}" != "success" ]] || \
              [[ "${{ needs.docker-build.result }}" != "success" ]] || \
              [[ "${{ needs.e2e.result }}" != "success" ]] || \
-             [[ "${{ needs.check-openapi.result }}" != "success" ]]; then
+             [[ "${{ needs.check-openapi.result }}" != "success" ]] || \
+             [[ "${{ needs.check-module-dependencies.result }}" != "success" ]] || \
+             [[ "${{ needs.accessibility.result }}" != "success" ]]; then
             echo "La CI comporte au moins un job en échec."
             exit 1
           fi
