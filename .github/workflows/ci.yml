@@ -351,6 +351,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # Le client Prisma est généré : `@takt/backend` (compilé par ce job)
+      # importe `@takt/db`, dont les types n'existent qu'après génération.
+      - name: Prisma Generate
+        run: pnpm --filter @takt/db db:generate
+
       - name: Vérifier les dépendances entre modules
         run: pnpm check-module-dependencies
 
