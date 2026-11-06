@@ -285,7 +285,7 @@ TICKETS: List[Ticket] = [
         lot="L04",
         titre="Implémenter le référentiel Créneaux et l'affichage Ramadan",
         sp=5,
-        status="À faire",
+        status="En cours",
         deps=['TAKT-L00-03', 'TAKT-L04-01'],
         exigences=['EX-REF-06', 'HC-STR-01 à HC-STR-03', 'PLAN_MACRO E2.4', 'TAKT-L00-03.'],
     ),
