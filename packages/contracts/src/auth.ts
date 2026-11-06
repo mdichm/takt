@@ -15,8 +15,14 @@ export const zRefresh = z.object({
   refreshToken: z.string().min(1, 'Le jeton de rafraîchissement est requis'),
 });
 
+/** Charge utile de renouvellement par cookie HttpOnly (refresh token transmis uniquement dans l’en-tête Cookie). */
+export const zRefreshCookie = z.object({
+  refreshToken: z.string().min(1, 'Le jeton de rafraîchissement est requis').optional(),
+});
+
 export type LoginInput = z.infer<typeof zLogin>;
 export type RefreshInput = z.infer<typeof zRefresh>;
+export type RefreshCookieInput = z.infer<typeof zRefreshCookie>;
 
 /** Claims communs aux jetons TAKT. */
 const zClaimsJwtBase = z.object({

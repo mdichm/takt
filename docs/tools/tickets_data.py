@@ -537,7 +537,7 @@ TICKETS: List[Ticket] = [
         lot="L08",
         titre="Implémenter le client HTTP, l'authentification et la gestion d'erreurs",
         sp=5,
-        status="À faire",
+        status="Terminé",
         deps=['TAKT-L02-02', 'TAKT-L02-03', 'TAKT-L03-03'],
         exigences=['TE-API-01', 'TE-API-06', 'ST_TAKT §3.3', 'UI_FRONTEND_SPECS §4', 'TAKT-L00-04.'],
     ),

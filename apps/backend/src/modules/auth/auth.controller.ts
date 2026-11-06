@@ -1,9 +1,9 @@
 // Copyright (C) 2026 TAKT
 // SPDX-License-Identifier: AGPL-3.0-only
 
-import { Body, Controller, Inject, Post, Req, Res, HttpCode, HttpStatus } from '@nestjs/common';
+import { Body, Controller, Inject, Post, Req, Res, HttpCode, HttpStatus, UnauthorizedException } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { zLogin, zRefresh, LoginInput, RefreshInput } from '@takt/contracts';
+import { zLogin, zRefreshCookie, LoginInput, RefreshCookieInput } from '@takt/contracts';
 import { ZodValidation } from '../common/pipes/zod-validation.decorator';
 import { AuthService } from './auth.service';
 
@@ -91,17 +91,20 @@ export class AuthController {
 
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
-  @ZodValidation({ body: zRefresh })
+  @ZodValidation({ body: zRefreshCookie })
   @ApiOperation({ summary: 'Rafraîchit les jetons (rotation du refresh)' })
   @ApiResponse({ status: 200, description: 'Jeton rafraîchi' })
   @ApiResponse({ status: 401, description: 'Refresh token invalide ou révoqué' })
   async refresh(
-    @Body() corps: RefreshInput,
+    @Body() corps: RefreshCookieInput,
     @Req() req: ExpressRequestHolder,
     @Res({ passthrough: true }) res: ExpressResponseHolder,
   ) {
     // any-justify: idem.
     const refreshToken = extraireRefreshToken(req) ?? corps.refreshToken;
+    if (!refreshToken) {
+      throw new UnauthorizedException({ code: 'UNAUTHORIZED' });
+    }
     const resultat = await this.authService.refresh(refreshToken);
 
     (res as { cookie: (nom: string, valeur: string, options: { httpOnly: boolean; secure: boolean; sameSite: string; path: string }) => void }).cookie(
@@ -120,17 +123,20 @@ export class AuthController {
 
   @Post('logout')
   @HttpCode(HttpStatus.OK)
-  @ZodValidation({ body: zRefresh })
+  @ZodValidation({ body: zRefreshCookie })
   @ApiOperation({ summary: 'Déconnexion (révoque la famille de rafraîchissement)' })
   @ApiResponse({ status: 200, description: 'Déconnecté' })
   @ApiResponse({ status: 401, description: 'Refresh token invalide' })
   async logout(
-    @Body() corps: RefreshInput,
+    @Body() corps: RefreshCookieInput,
     @Req() req: ExpressRequestHolder,
     @Res({ passthrough: true }) res: ExpressResponseHolder,
   ) {
     // any-justify: idem.
     const refreshToken = extraireRefreshToken(req) ?? corps.refreshToken;
+    if (!refreshToken) {
+      throw new UnauthorizedException({ code: 'UNAUTHORIZED' });
+    }
     await this.authService.logout(refreshToken);
 
     // Efface le cookie côté client.
