@@ -216,10 +216,11 @@ describe('POST /auth/login, /auth/refresh, /auth/logout (TAKT-L03-03)', () => {
   });
 
   it('accepte le rafraîchissement par cookie HttpOnly seul (pas de corps requis)', async () => {
-    await obtenirRefreshToken();
+    const refreshToken = await obtenirRefreshToken();
 
     const reponse = await agent
       .post('/api/v1/auth/refresh')
+      .set('Cookie', `refreshToken=${refreshToken}`)
       .send({})
       .expect(200);
 
