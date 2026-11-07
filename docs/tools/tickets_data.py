@@ -294,7 +294,7 @@ TICKETS: List[Ticket] = [
         lot="L04",
         titre="Fournir l'UI CRUD générique des référentiels",
         sp=8,
-        status="À faire",
+        status="Terminé",
         deps=['TAKT-L02-02', 'TAKT-L02-03', 'TAKT-L08-05'],
         exigences=['EX-REF-04', 'EC-ADM-02', 'IX-ADM-04', 'IX-ADM-05', 'UI_FRONTEND_SPECS §2', 'UI_INTERACTIONS §2.'],
     ),
