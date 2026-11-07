@@ -13,6 +13,8 @@ export const DICTIONNAIRE_FR = {
     fermer: 'Fermer',
     ouvrir: 'Ouvrir',
     charger: 'Charger en cours…',
+    ajouter: 'Ajouter',
+    modifier: 'Modifier',
   },
   // Input / FormField
   champ: {
@@ -54,6 +56,17 @@ export const DICTIONNAIRE_FR = {
     fermerModal: 'Fermer la modal (Échap)',
     avancerOnglet: 'Onglet suivant (flèche droite)',
     reculerOnglet: 'Onglet précédent (flèche gauche)',
+  },
+  // Référentiels (CRUD générique)
+  referentiel: {
+    colonneActions: 'Actions',
+    vide: 'Aucun élément à afficher.',
+    recherche: 'Rechercher un élément…',
+    succesCreation: 'Élément créé avec succès.',
+    succesModification: 'Élément modifié avec succès.',
+    succesSuppression: 'Élément supprimé avec succès.',
+    erreurConflit: "Impossible d'enregistrer : un conflit a été détecté (élément déjà utilisé ou lié).",
+    confirmationSuppression: 'Voulez-vous vraiment supprimer cet élément ? Cette action est irréversible.',
   },
 } as const;
 
