@@ -59,7 +59,7 @@ describe('familles invariantes de thème', () => {
     { nom: 'BREAKPOINT', jetons: BREAKPOINT },
   ];
 
-  it.each(familles)('famille %s : codes uniques, format DT-*, valeurs non vides', ({ nom, jetons }) => {
+  it.each(familles)('famille %s : codes uniques, format DT-*, valeurs non vides', ({ jetons }) => {
     const codes = jetons.map((j) => j.code);
     expect(new Set(codes).size).toBe(codes.length);
     for (const j of jetons) {
@@ -85,9 +85,9 @@ describe('familles invariantes de thème', () => {
   });
 
   it('chaque famille est typée correctement', () => {
-    const simple: JetonSimple = ESPACEMENT[0];
+    const simple: JetonSimple = ESPACEMENT[0]!;
     expect(simple.code).toBeDefined();
-    const typo: JetonTypographie = TYPOGRAPHIE[0];
+    const typo: JetonTypographie = TYPOGRAPHIE[0]!;
     expect(typo.graisse).toBeDefined();
     expect(typo.interlignage).toBeDefined();
   });

@@ -14,9 +14,6 @@ import {
   FOCUS,
   Z_INDEX,
   BREAKPOINT,
-  type JetonCouleur,
-  type JetonTypographie,
-  type JetonSimple,
 } from './tokens.js';
 
 const __dirname = join(fileURLToPath(import.meta.url), '..');
