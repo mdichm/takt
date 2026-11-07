@@ -70,7 +70,7 @@ export const DICTIONNAIRE_FR = {
       groupe: 'Groupe',
       enseignant: 'Enseignant',
     },
-    fichier: 'Fichier CSV',
+    fichier: 'Contenu CSV',
     fichierAide: "Séparateur point-virgule (;) ou virgule (,). Première ligne = en-têtes.",
     apercu: 'Aperçu avant import',
     executer: 'Confirmer l’import',

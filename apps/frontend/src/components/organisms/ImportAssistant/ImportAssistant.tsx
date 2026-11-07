@@ -1,7 +1,7 @@
 // Copyright (C) 2026 TAKT
 // SPDX-License-Identifier: AGPL-3.0-only
 
-import { useState, useCallback, useEffect, type ChangeEvent } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { api } from '@/lib/api';
 import {
   zApercuImport,
@@ -205,7 +205,7 @@ export default function ImportAssistant(): JSX.Element {
             </select>
           </div>
           <div className="mt-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t('fichier', DICO_CSV)}</label>
+            <label htmlFor="contenu-csv" className="block text-sm font-medium text-gray-700 mb-1">{t('fichier', DICO_CSV)}</label>
             <textarea
               id="contenu-csv"
               value={contenuCsv}
@@ -226,7 +226,7 @@ export default function ImportAssistant(): JSX.Element {
             {chargement ? t('charger', DICO_CSV) : t('apercu', DICO_CSV)}
           </button>
         </>
-      )
+      )}
       {mode === 'archive' && estSaisie && (
         <>
           <div className="mt-4">
@@ -281,7 +281,7 @@ export default function ImportAssistant(): JSX.Element {
             {chargement ? t('charger', DICO_CSV) : t('apercu', DICO_ARCHIVE)}
           </button>
         </>
-      )
+      )}
       {estApercu && mode === 'csv' && apercuCsv && (
         <section className="mt-6 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
           <h3 className="text-sm font-semibold text-gray-900">{t('apercu', DICO_CSV)}</h3>
@@ -345,7 +345,7 @@ export default function ImportAssistant(): JSX.Element {
             </button>
           </div>
         </section>
-      )
+      )}
       {estApercu && mode === 'archive' && apercuArchive && (
         <section className="mt-6 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
           <h3 className="text-sm font-semibold text-gray-900">{t('apercu', DICO_ARCHIVE)}</h3>
@@ -412,7 +412,7 @@ export default function ImportAssistant(): JSX.Element {
             </button>
           </div>
         </section>
-      )
+      )}
       {estRapport && mode === 'csv' && rapportCsv && (
         <RapportImportComposant
           rapport={rapportCsv}

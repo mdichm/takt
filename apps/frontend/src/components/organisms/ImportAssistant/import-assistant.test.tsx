@@ -6,7 +6,10 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import ImportAssistant from './ImportAssistant';
 
 vi.mock('@/lib/api', () => ({
-  api: { post: vi.fn() },
+  api: {
+    post: vi.fn(),
+    get: vi.fn().mockResolvedValue({ data: [], meta: { requestId: 'x', timestamp: 't' } }),
+  },
 }));
 
 import { api } from '@/lib/api';

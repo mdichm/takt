@@ -16,7 +16,6 @@ import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagg
 import {
   zApercuImportArchiveParams,
   zImportArchiveConfirme,
-  zTypeImportArchive,
   type ApercuImportArchiveParams,
   type ImportArchiveApercu,
   type ImportArchiveConfirme,

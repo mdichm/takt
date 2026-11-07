@@ -8,12 +8,10 @@ import { CODES_ERREUR_API, ApiError } from '../../../common/http/api-error';
 import { AuditService } from '../../../audit/audit.service';
 import * as crypto from 'node:crypto';
 import {
-  zTypeImportArchive,
   type ApercuImportArchiveParams,
   type ImportArchiveApercu,
   type ImportArchiveConfirme,
   type LigneApercuArchive,
-  type ParTypeImportArchive,
   type RapportImportArchive,
   type TypeImportArchive,
 } from '@takt/contracts';
@@ -341,12 +339,11 @@ export class ArchiveImportService {
             }
             vusSet.add(cloneCode);
 
-            let cloneId: string;
-            let libelle = source.libelle ?? source.code;
+            const libelle = source.libelle ?? source.code;
 
             switch (type) {
               case 'parcours': {
-                const cree = await tx.parcours.create({
+                await tx.parcours.create({
                   data: {
                     code: cloneCode,
                     libelle,
@@ -355,11 +352,10 @@ export class ArchiveImportService {
                   },
                   select: { id: true },
                 });
-                cloneId = cree.id;
                 break;
               }
               case 'groupe': {
-                const cree = await tx.groupe.create({
+                await tx.groupe.create({
                   data: {
                     code: cloneCode,
                     libelle,
@@ -368,7 +364,6 @@ export class ArchiveImportService {
                   },
                   select: { id: true },
                 });
-                cloneId = cree.id;
                 break;
               }
               case 'module': {
@@ -382,7 +377,6 @@ export class ArchiveImportService {
                   },
                   select: { id: true },
                 });
-                cloneId = cree.id;
                 mapModuleClone.set(source.id, cree.id);
                 break;
               }
@@ -391,7 +385,7 @@ export class ArchiveImportService {
                 if (dto.types.includes('module') && mapModuleClone.has(source.moduleId!)) {
                   moduleId = mapModuleClone.get(source.moduleId!)!;
                 }
-                const cree = await tx.matiere.create({
+                await tx.matiere.create({
                   data: {
                     code: cloneCode,
                     libelle,
@@ -400,11 +394,10 @@ export class ArchiveImportService {
                   },
                   select: { id: true },
                 });
-                cloneId = cree.id;
                 break;
               }
               case 'salle': {
-                const cree = await tx.salle.create({
+                await tx.salle.create({
                   data: {
                     code: cloneCode,
                     libelle,
@@ -415,7 +408,6 @@ export class ArchiveImportService {
                   },
                   select: { id: true },
                 });
-                cloneId = cree.id;
                 break;
               }
               default:
