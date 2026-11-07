@@ -66,6 +66,8 @@ interface BoutonProps extends PropsBase {
   readonly libelle: string;
   /** Gestionnaire de clic. */
   readonly onClick?: () => void;
+  /** Contenu optionnel (icône, etc.). */
+  readonly children?: React.ReactNode;
 }
 
 export function Bouton({
