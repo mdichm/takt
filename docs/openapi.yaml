@@ -1939,6 +1939,54 @@ paths:
       summary: Aperçu d’import CSV avant confirmation
       tags:
         - Import référentiels
+  /api/v1/referentiels/import/archive/annees-source:
+    get:
+      operationId: ArchiveImportController_listerAnneesSource
+      parameters: []
+      responses:
+        '200':
+          description: Liste des années clôturées
+      security:
+        - bearerAuth: []
+      summary: Liste les années universitaires clôturées disponibles en source
+      tags:
+        - Import archive
+  /api/v1/referentiels/import/archive/apercu:
+    post:
+      operationId: ArchiveImportController_apercu
+      parameters: []
+      responses:
+        '200':
+          description: Aperçu de l’import d’archive
+      security:
+        - bearerAuth: []
+      summary: Aperçu d’import sélectif depuis une année clôturée
+      tags:
+        - Import archive
+  /api/v1/referentiels/import/archive/executer:
+    post:
+      operationId: ArchiveImportController_executer
+      parameters: []
+      responses:
+        '200':
+          description: Rapport d’import d’archive
+      security:
+        - bearerAuth: []
+      summary: Exécute un import sélectif depuis une année clôturée
+      tags:
+        - Import archive
+  /api/v1/referentiels/import/archive/types:
+    get:
+      operationId: ArchiveImportController_listerTypes
+      parameters: []
+      responses:
+        '200':
+          description: Liste des types importables
+      security:
+        - bearerAuth: []
+      summary: Types de référentiels importables depuis une année clôturée
+      tags:
+        - Import archive
   /api/v1/referentiels/import/executer:
     post:
       operationId: ImportReferentielController_executer

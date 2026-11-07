@@ -979,3 +979,91 @@ export const zRapportImport = z.object({
 });
 
 export type RapportImport = z.infer<typeof zRapportImport>;
+
+// ============================================================================
+// Import sélectif depuis une année clôturée (L04-08)
+// ============================================================================
+
+/** Types de référentiels importables depuis une année archivée (liste fermée, ST_TAKT §B5). */
+export const zTypeImportArchive = z.enum([
+  'parcours',
+  'groupe',
+  'matiere',
+  'module',
+  'salle',
+]);
+
+export type TypeImportArchive = z.infer<typeof zTypeImportArchive>;
+
+/** Statut d'une ligne d'aperçu d'import d'archive. */
+export const zStatutLigneArchive = z.enum(['aImporter', 'dejaImporte', 'rejete']);
+
+export type StatutLigneArchive = z.infer<typeof zStatutLigneArchive>;
+
+/** Ligne d'aperçu avant confirmation d'import d'archive. */
+export const zLigneApercuArchive = z.object({
+  type: zTypeImportArchive,
+  code: z.string().trim().min(1, 'Le code est requis'),
+  libelle: z.string().trim().optional(),
+  statut: zStatutLigneArchive,
+  motif: z.string().optional(),
+  originId: z.string().optional(),
+});
+
+export type LigneApercuArchive = z.infer<typeof zLigneApercuArchive>;
+
+/** Paramètres de l'aperçu d'import d'archive (entrée). */
+export const zApercuImportArchiveParams = z.object({
+  anneeSourceId: zUuid,
+  types: z.array(zTypeImportArchive).min(1, 'Au moins un type est requis'),
+});
+
+export type ApercuImportArchiveParams = z.infer<typeof zApercuImportArchiveParams>;
+
+/** Aperçu avant confirmation d'import d'archive (TE-MET-10 : aperçu obligatoire). */
+export const zImportArchiveApercu = z.object({
+  anneeSourceId: zUuid,
+  types: z.array(zTypeImportArchive),
+  empreinte: z.string().regex(/^[a-f0-9]{64}$/, 'Empreinte invalide'),
+  totalLignes: z.number().int().nonnegative(),
+  lignesValides: z.number().int().nonnegative(),
+  lignesInvalides: z.number().int().nonnegative(),
+  dejaImports: z.number().int().nonnegative(),
+  apercuLignes: z.array(zLigneApercuArchive),
+});
+
+export type ImportArchiveApercu = z.infer<typeof zImportArchiveApercu>;
+
+/** Requête de confirmation d'import d'archive (empreinte de contrôle d'intégrité). */
+export const zImportArchiveConfirme = z.object({
+  anneeSourceId: zUuid,
+  types: z.array(zTypeImportArchive).min(1, 'Au moins un type est requis'),
+  empreinte: z.string().regex(/^[a-f0-9]{64}$/, 'Empreinte invalide'),
+});
+
+export type ImportArchiveConfirme = z.infer<typeof zImportArchiveConfirme>;
+
+/** Détail par type dans le rapport d'import d'archive. */
+export const zParTypeImportArchive = z.object({
+  type: zTypeImportArchive,
+  importes: z.number().int().nonnegative(),
+  dejaImports: z.number().int().nonnegative(),
+  rejets: z.number().int().nonnegative(),
+});
+
+export type ParTypeImportArchive = z.infer<typeof zParTypeImportArchive>;
+
+/** Rapport final d'import d'archive (lignes importées, déjà importées, rejetées ligne à ligne). */
+export const zRapportImportArchive = z.object({
+  anneeSourceId: zUuid,
+  types: z.array(zTypeImportArchive),
+  empreinte: z.string().regex(/^[a-f0-9]{64}$/, 'Empreinte invalide'),
+  totalLignes: z.number().int().nonnegative(),
+  importes: z.number().int().nonnegative(),
+  dejaImports: z.number().int().nonnegative(),
+  rejets: z.number().int().nonnegative(),
+  erreurs: z.array(zErreurLigneImport),
+  parType: z.array(zParTypeImportArchive),
+});
+
+export type RapportImportArchive = z.infer<typeof zRapportImportArchive>;

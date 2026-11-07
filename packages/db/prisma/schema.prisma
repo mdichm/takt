@@ -96,6 +96,7 @@ model Parcours {
   code        String   @unique
   libelle     String
   departementId String   @db.Uuid
+  originId    String?  @db.Uuid
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   departement Departement @relation(fields: [departementId], references: [id])
@@ -103,6 +104,7 @@ model Parcours {
 
   @@index([code])
   @@index([departementId])
+  @@unique([originId])
 }
 
 // ----------------------------------------------------------------------------
@@ -130,12 +132,14 @@ model Groupe {
   code      String   @unique
   libelle   String
   niveauId  String   @db.Uuid
+  originId  String?  @db.Uuid
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   niveau    Niveau @relation(fields: [niveauId], references: [id])
 
   @@index([code])
   @@index([niveauId])
+  @@unique([originId])
 }
 
 // ----------------------------------------------------------------------------
@@ -440,6 +444,7 @@ model Module {
   libelle         String
   typeEnseignementId String @db.Uuid
   gradeId         String   @db.Uuid
+  originId        String?  @db.Uuid
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
   typeEnseignement TypeEnseignement @relation(fields: [typeEnseignementId], references: [id])
@@ -449,6 +454,7 @@ model Module {
   @@index([code])
   @@index([typeEnseignementId])
   @@index([gradeId])
+  @@unique([originId])
 }
 
 // ----------------------------------------------------------------------------
@@ -459,12 +465,14 @@ model Matiere {
   code        String   @unique
   libelle     String
   moduleId    String   @db.Uuid
+  originId    String?  @db.Uuid
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   module      Module   @relation(fields: [moduleId], references: [id])
 
   @@index([code])
   @@index([moduleId])
+  @@unique([originId])
 }
 
 // ----------------------------------------------------------------------------
@@ -572,6 +580,7 @@ model Salle {
   typeSalleId  String      @db.Uuid
   capacite     Int
   siteId       String      @db.Uuid
+  originId     String?     @db.Uuid
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt
 
@@ -583,6 +592,7 @@ model Salle {
   @@index([typeSalleId])
   @@index([siteId])
   @@index([capacite])
+  @@unique([originId])
 }
 
 // ----------------------------------------------------------------------------
