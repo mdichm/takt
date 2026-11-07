@@ -13,7 +13,7 @@ describe('Icone — accessibilité', () => {
   });
 
   it('icône avec aria-label ne produit aucune violation axe', async () => {
-    const { container } = render(<Icone nom="fermer" ariaLabel="Fermer" />);
+    render(<Icone nom="fermer" ariaLabel="Fermer" />);
     const img = screen.getByRole('img', { name: 'Fermer' });
     await expectAccessible(img);
   });

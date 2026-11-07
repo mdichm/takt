@@ -40,7 +40,6 @@ export function Input({
   const champId = id || `input-${label.toLowerCase().replace(/\s+/g, '-')}`;
   const estErreur = variante === 'erreur' || !!messageErreur;
   const bordure = estErreur ? 'var(--color-error)' : 'var(--color-border)';
-  const texteAide = messageErreur ?? (required ? 'Champ obligatoire' : undefined);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-xxs)' }}>

@@ -564,7 +564,7 @@ TICKETS: List[Ticket] = [
         lot="L08",
         titre="Construire le design system (atomes, molécules, organismes)",
         sp=8,
-        status="En cours",
+        status="Terminé",
         deps=['TAKT-L08-01'],
         exigences=['UI_FRONTEND_SPECS §2', 'UI_WIREFRAMES §2', 'DL-UI-04', 'EX-UI-05', 'SPEC_ACCESSIBILITE §3.'],
     ),
