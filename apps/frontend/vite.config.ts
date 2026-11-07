@@ -13,6 +13,10 @@ export default defineConfig({
       '@takt/contracts': resolve(__dirname, '../../packages/contracts/src/index.ts'),
     },
   },
+  test: {
+    environment: 'jsdom',
+    include: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
+  },
   server: {
     proxy: {
       '/api': {
