@@ -303,7 +303,7 @@ TICKETS: List[Ticket] = [
         lot="L04",
         titre="Implémenter l'import CSV des référentiels avec rapport d'erreurs",
         sp=5,
-        status="En cours",
+        status="Terminé",
         deps=['TAKT-L04-03', 'TAKT-L04-04', 'TAKT-L02-02'],
         exigences=['EX-REF-05', 'PLAN_MACRO E2.3', 'IX-GES-02', 'EC-GES-01.'],
     ),
