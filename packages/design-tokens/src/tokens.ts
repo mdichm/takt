@@ -159,13 +159,13 @@ export interface JetonSimple {
 }
 
 /** Jeton de focus (anneau de clavier). */
-export interface JetonFocus extends JetonSimple {}
+export type JetonFocus = JetonSimple;
 
 /** Jeton de z-index. */
-export interface JetonZIndex extends JetonSimple {}
+export type JetonZIndex = JetonSimple;
 
 /** Jeton de breakpoint. */
-export interface JetonBreakpoint extends JetonSimple {}
+export type JetonBreakpoint = JetonSimple;
 
 /** Tokens de typographie (§3 UI_DESIGN_TOKENS). */
 export const TYPOGRAPHIE: readonly JetonTypographie[] = [
