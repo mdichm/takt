@@ -3,7 +3,6 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Alerte } from '../../atoms/Alerte';
-import { Bouton } from '../../atoms/Bouton';
 import { Icone } from '../../atoms/Icone';
 import { EtatChargement } from '../EtatChargement';
 import { EtatErreur } from '../EtatErreur';
@@ -81,11 +80,16 @@ export function DataTable<T>({
       colonnes.some((colonne) => {
         const valeur = lireValeur(item, colonne);
         return String(valeur).toLowerCase().includes(terme);
-      })
+      }),
     );
   }, [donnees, recherche, filtrerLocalement, colonnes]);
 
-  const totalPages = Math.max(1, Math.ceil((meta?.total ?? donneesAffichées.length) / ((meta?.pageSize ?? donneesAffichées.length) || 1)));
+  const totalPages = Math.max(
+    1,
+    Math.ceil(
+      (meta?.total ?? donneesAffichées.length) / ((meta?.pageSize ?? donneesAffichées.length) || 1),
+    ),
+  );
 
   const activerTri = useCallback(
     (cle: string) => {
@@ -138,7 +142,12 @@ export function DataTable<T>({
         <Alerte variante="succès" titre="Succès" message={messageSucces} fermable />
       )}
       {(surRecherche || filtrerLocalement) && (
-        <SearchBar value={recherche} onChange={gererRecherche} onSearch={gererRecherche} placeholder="Rechercher…" />
+        <SearchBar
+          value={recherche}
+          onChange={gererRecherche}
+          onSearch={gererRecherche}
+          placeholder="Rechercher…"
+        />
       )}
       <table
         role="grid"
@@ -169,7 +178,13 @@ export function DataTable<T>({
                 key={colonne.cle}
                 scope="col"
                 role="columnheader"
-                aria-sort={tri?.cle === colonne.cle ? (tri.direction === 'asc' ? 'ascending' : 'descending') : 'none'}
+                aria-sort={
+                  tri?.cle === colonne.cle
+                    ? tri.direction === 'asc'
+                      ? 'ascending'
+                      : 'descending'
+                    : 'none'
+                }
                 style={{
                   textAlign: ALIGNEMENT_CSS[colonne.alignement ?? 'gauche'] ?? 'left',
                   padding: '0 var(--space-m)',
@@ -214,7 +229,11 @@ export function DataTable<T>({
               </th>
             ))}
             {actions && (
-              <th scope="col" role="columnheader" style={{ textAlign: 'center', padding: '0 var(--space-m)' }}>
+              <th
+                scope="col"
+                role="columnheader"
+                style={{ textAlign: 'center', padding: '0 var(--space-m)' }}
+              >
                 Actions
               </th>
             )}
@@ -222,7 +241,12 @@ export function DataTable<T>({
         </thead>
         <tbody>
           {donneesAffichées.map((item, indexLigne) => (
-            <tr key={indexLigne} role="row" aria-rowindex={indexLigne + 1} style={{ borderBottom: 'var(--border-width) solid var(--color-divider)' }}>
+            <tr
+              key={indexLigne}
+              role="row"
+              aria-rowindex={indexLigne + 1}
+              style={{ borderBottom: 'var(--border-width) solid var(--color-divider)' }}
+            >
               {colonnes.map((colonne) => (
                 <td
                   key={colonne.cle}
@@ -248,11 +272,18 @@ export function DataTable<T>({
         </tbody>
       </table>
       {meta && (
-        <nav aria-label="Pagination" style={{ marginTop: 'var(--space-xs)', display: 'flex', justifyContent: 'flex-end' }}>
-          <Paginator page={meta.page} total={totalPages} totalItems={meta.total} onChange={(page) => surChangementPage?.(page)} />
+        <nav
+          aria-label="Pagination"
+          style={{ marginTop: 'var(--space-xs)', display: 'flex', justifyContent: 'flex-end' }}
+        >
+          <Paginator
+            page={meta.page}
+            total={totalPages}
+            totalItems={meta.total}
+            onChange={(page) => surChangementPage?.(page)}
+          />
         </nav>
       )}
     </section>
   );
 }
-

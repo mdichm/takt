@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import { ZodTypeAny } from 'zod';
-import { ColonneDataTable, MetaPagination, TriDataTable } from '../DataTable/DataTable.types';
+import { ColonneDataTable } from '../DataTable/DataTable.types';
 
 /** Déclaration d’un champ du formulaire d’édition d’un référentiel. */
 export interface ChampFormulaireReferentiel {

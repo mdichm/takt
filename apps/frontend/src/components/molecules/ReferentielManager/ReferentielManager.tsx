@@ -7,19 +7,12 @@ import { z } from 'zod';
 import { api, versPagination } from '@/lib/api';
 import { zReponseListe } from '@/lib/validation';
 import { ErreurHttp } from '@/lib/errors';
-import {
-  EtatDonnees,
-  VarianteBouton,
-  VarianteInput,
-  TailleComposant,
-  VarianteAlerte,
-} from '../../types';
+import { EtatDonnees } from '../../types';
 import { TriDataTable, MetaPagination } from '../DataTable/DataTable.types';
 import { traduction, DICTIONNAIRE_FR } from '@/i18n/fr';
 import { ConfigurationReferentiel } from './ReferentielManager.types';
 import { DataTable } from '../DataTable/DataTable';
 import { SearchBar } from '../SearchBar';
-import { Paginator } from '../Paginator';
 import { Modal } from '../Modal';
 import { FormulaireReferentiel } from './FormulaireReferentiel';
 import { ConfirmationSuppression } from './ConfirmationSuppression';
@@ -45,13 +38,12 @@ function messageErreurApi(erreur: unknown): string {
 
 export function ReferentielManager<T>({ configuration }: ReferentielManagerProps<T>): JSX.Element {
   const cleId = configuration.cleId ?? 'id';
-  const dictBouton = traduction('bouton') as typeof DICTIONNAIRE_FR['bouton'];
-  const dictReferentiel = traduction('referentiel') as typeof DICTIONNAIRE_FR['referentiel'];
-  const dictEtat = traduction('etat') as typeof DICTIONNAIRE_FR['etat'];
-  const dictAlerte = traduction('alerte') as typeof DICTIONNAIRE_FR['alerte'];
+  const dictBouton = traduction('bouton') as (typeof DICTIONNAIRE_FR)['bouton'];
+  const dictReferentiel = traduction('referentiel') as (typeof DICTIONNAIRE_FR)['referentiel'];
+  const dictAlerte = traduction('alerte') as (typeof DICTIONNAIRE_FR)['alerte'];
 
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(20);
+  const [pageSize] = useState(20);
   const [search, setSearch] = useState('');
   const [tri, setTri] = useState<TriDataTable | null>(null);
   const [modaleOuverte, setModaleOuverte] = useState(false);
@@ -70,15 +62,7 @@ export function ReferentielManager<T>({ configuration }: ReferentielManagerProps
     error: erreurListe,
     refetch: refetchListe,
   } = useQuery({
-    queryKey: [
-      'referentiels',
-      configuration.cle,
-      page,
-      pageSize,
-      search,
-      tri?.cle,
-      tri?.direction,
-    ],
+    queryKey: ['referentiels', configuration.cle, page, pageSize, search, tri?.cle, tri?.direction],
     queryFn: async () => {
       const params = new URLSearchParams();
       params.set(configuration.paramPage ?? 'page', String(page));
@@ -156,9 +140,7 @@ export function ReferentielManager<T>({ configuration }: ReferentielManagerProps
       await api.del(`${configuration.endpoint}/${id}`, { schema: z.object({}) });
     },
     onSuccess: async () => {
-      setMessageSucces(
-        configuration.libelleSuccesSuppression ?? dictReferentiel.succesSuppression,
-      );
+      setMessageSucces(configuration.libelleSuccesSuppression ?? dictReferentiel.succesSuppression);
       await refetchListe();
       setIdASupprimer(null);
     },
@@ -186,15 +168,12 @@ export function ReferentielManager<T>({ configuration }: ReferentielManagerProps
     setModaleOuverte(true);
   }, []);
 
-  const ouvrirModification = useCallback(
-    (item: T) => {
-      setMode('modification');
-      setItemEnEdition(item);
-      setErreurMetier(undefined);
-      setModaleOuverte(true);
-    },
-    [],
-  );
+  const ouvrirModification = useCallback((item: T) => {
+    setMode('modification');
+    setItemEnEdition(item);
+    setErreurMetier(undefined);
+    setModaleOuverte(true);
+  }, []);
 
   const demanderSuppression = useCallback(
     (item: T) => {
@@ -225,7 +204,7 @@ export function ReferentielManager<T>({ configuration }: ReferentielManagerProps
         ]),
       ) as Record<string, unknown>;
     }
-    return (itemEnEdition as Record<string, unknown> ?? {});
+    return (itemEnEdition as Record<string, unknown>) ?? {};
   }, [mode, itemEnEdition, configuration.champsFormulaire]);
 
   const gererSoumission = useCallback(
@@ -310,7 +289,12 @@ export function ReferentielManager<T>({ configuration }: ReferentielManagerProps
         >
           {configuration.libelle}
         </h2>
-        <Bouton variante="primaire" taille="moyenne" libelle={dictBouton.ajouter} onClick={ouvrirCreation} />
+        <Bouton
+          variante="primaire"
+          taille="moyenne"
+          libelle={dictBouton.ajouter}
+          onClick={ouvrirCreation}
+        />
       </header>
 
       {erreurMetier && (
@@ -336,7 +320,7 @@ export function ReferentielManager<T>({ configuration }: ReferentielManagerProps
         placeholder={dictReferentiel.recherche}
       />
 
-              <DataTable<T>
+      <DataTable<T>
         colonnes={configuration.colonnes}
         donnees={donnees}
         etat={etat}
@@ -344,13 +328,16 @@ export function ReferentielManager<T>({ configuration }: ReferentielManagerProps
         valeurRecherche={search as string | undefined}
         {...(messageErreurProp ? { messageErreur: messageErreurProp } : {})}
         surTri={(cle: string, direction: 'asc' | 'desc' | null) =>
-          setTri(direction ? { cle, direction } : null)}
-        surChangementPage={((page: number) => setPage(page)) as ((page: number) => void) | undefined}
-        surReessayer={(refetchListe as (() => void) | undefined)}
-        actions={(actionsLigne as ((item: T) => React.ReactNode) | undefined)}
+          setTri(direction ? { cle, direction } : null)
+        }
+        surChangementPage={
+          ((page: number) => setPage(page)) as ((page: number) => void) | undefined
+        }
+        surReessayer={refetchListe as (() => void) | undefined}
+        actions={actionsLigne as ((item: T) => React.ReactNode) | undefined}
         libelleVide={(configuration.messageVide ?? dictReferentiel.vide) as string | undefined}
         {...(messageSuccesProp ? { messageSucces: messageSuccesProp } : {})}
-        ariaLabel={(`Liste des ${configuration.libelle.toLowerCase()}`) as string | undefined}
+        ariaLabel={`Liste des ${configuration.libelle.toLowerCase()}` as string | undefined}
       />
 
       {modaleOuverte && (
