@@ -321,7 +321,7 @@ TICKETS: List[Ticket] = [
         lot="L05",
         titre="Implémenter le plan d'études (parcours → niveaux → matières → volumes)",
         sp=5,
-        status="À faire",
+        status="Terminé",
         deps=['TAKT-L04-01', 'TAKT-L04-02'],
         exigences=['EX-REP-01', 'EX-DAT-02', 'PLAN_MACRO E2.2', 'EC-GES-02', 'IX-GES-03.'],
     ),

@@ -82,6 +82,7 @@ model Departement {
   utilisateurs    Utilisateur[]
   affectations    AffectationPedagogique[]
   parcours        Parcours[]
+  planEtudes      PlanEtudes[]
   enseignants     EnseignantDepartement[]
 
   @@index([code])
@@ -101,6 +102,7 @@ model Parcours {
   updatedAt   DateTime @updatedAt
   departement Departement @relation(fields: [departementId], references: [id])
   niveaux     Niveau[]
+  planEtudes  PlanEtudes[]
 
   @@index([code])
   @@index([departementId])
@@ -119,10 +121,17 @@ model Niveau {
   updatedAt DateTime @updatedAt
   parcours  Parcours @relation(fields: [parcoursId], references: [id])
   groupes   Groupe[]
+  planEtudes PlanEtudes[]
 
   @@index([code])
   @@index([parcoursId])
 }
+
+// ----------------------------------------------------------------------------
+// 10. Groupe — dépréciation du lien direct avec le plan d'études
+// ----------------------------------------------------------------------------
+// Un groupe hérite du plan d'études de son niveau (Groupe → Niveau → PlanEtudes).
+// Aucune FK directe Groupe.planEtudesId n'est créée (TAKT-L05-01, héritage par niveau).
 
 // ----------------------------------------------------------------------------
 // 7. Groupe — Référentiel des groupes d'étudiants
@@ -143,6 +152,58 @@ model Groupe {
 }
 
 // ----------------------------------------------------------------------------
+// 8. PlanEtudes — Plan d'études d'un niveau pour une année et un semestre
+// ----------------------------------------------------------------------------
+model PlanEtudes {
+  id                 String   @id @default(uuid()) @db.Uuid
+  parcoursId         String   @db.Uuid
+  niveauId           String   @db.Uuid
+  anneeUniversitaireId String @db.Uuid
+  semestreId         String   @db.Uuid
+  departementId      String   @db.Uuid
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  parcours             Parcours             @relation(fields: [parcoursId], references: [id])
+  niveau               Niveau               @relation(fields: [niveauId], references: [id])
+  anneeUniversitaire   AnneeUniversitaire   @relation(fields: [anneeUniversitaireId], references: [id])
+  semestre             Semestre             @relation(fields: [semestreId], references: [id])
+  departement          Departement          @relation(fields: [departementId], references: [id])
+  planEtudesMatieres   PlanEtudesMatiere[]
+
+  @@index([parcoursId])
+  @@index([niveauId])
+  @@index([anneeUniversitaireId])
+  @@index([semestreId])
+  @@index([departementId])
+  @@unique([niveauId, anneeUniversitaireId, semestreId])
+}
+
+// ----------------------------------------------------------------------------
+// 9. PlanEtudesMatiere — Matière d'un plan d'études avec volume horaire
+// ----------------------------------------------------------------------------
+model PlanEtudesMatiere {
+  id               String   @id @default(uuid()) @db.Uuid
+  planEtudesId     String   @db.Uuid
+  matiereId        String   @db.Uuid
+  typeEnseignementId String @db.Uuid
+  volumeHoraire    Int      // volume horaire hebdomadaire, strictement positif
+  dureeCreneaux    Int      // durée d'un créneau en minutes, strictement positive
+  coefficient      Int      // coefficient pédagogique, strictement positif
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  planEtudes       PlanEtudes       @relation(fields: [planEtudesId], references: [id])
+  matiere          Matiere          @relation(fields: [matiereId], references: [id])
+  typeEnseignement TypeEnseignement @relation(fields: [typeEnseignementId], references: [id])
+
+  @@index([planEtudesId])
+  @@index([matiereId])
+  @@index([typeEnseignementId])
+  @@unique([planEtudesId, matiereId])
+}
+
+// ----------------------------------------------------------------------------
 // 8. AnneeUniversitaire — Années académiques
 // ----------------------------------------------------------------------------
 model AnneeUniversitaire {
@@ -151,6 +212,7 @@ model AnneeUniversitaire {
   dateDebut DateTime
   dateFin   DateTime
   semestres Semestre[]
+  planEtudes PlanEtudes[]
 
   @@index([libelle])
 }
@@ -167,6 +229,7 @@ model Semestre {
   anneeUniversitaire AnneeUniversitaire @relation(fields: [anneeUniversitaireId], references: [id])
   versions          Version[]
   affectations      AffectationPedagogique[]
+  planEtudes         PlanEtudes[]
 
   @@index([anneeUniversitaireId])
   @@index([numero])
@@ -398,6 +461,7 @@ model TypeEnseignement {
   updatedAt   DateTime @updatedAt
   modules     Module[]
   gradeType   GradeTypeEnseignement[]
+  planEtudesMatieres PlanEtudesMatiere[]
 
   @@index([code])
 }
@@ -469,6 +533,7 @@ model Matiere {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   module      Module   @relation(fields: [moduleId], references: [id])
+  planEtudesMatieres PlanEtudesMatiere[]
 
   @@index([code])
   @@index([moduleId])

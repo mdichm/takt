@@ -1086,6 +1086,230 @@ paths:
       security:
         - bearerAuth: []
       summary: S’abonner aux événements temps réel de l’utilisateur
+  /api/v1/plans-etudes:
+    get:
+      operationId: PlanEtudesController_list
+      parameters: []
+      responses:
+        '200':
+          description: Liste des plans d’études
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Liste paginée des plans d’études
+      tags:
+        - Plans d’études
+    post:
+      operationId: PlanEtudesController_create
+      parameters: []
+      responses:
+        '201':
+          description: Plan d’études créé
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '409':
+          description: Conflit (plan déjà existant)
+      security:
+        - bearerAuth: []
+      summary: Crée un plan d’études
+      tags:
+        - Plans d’études
+  /api/v1/plans-etudes/{id}:
+    delete:
+      operationId: PlanEtudesController_delete
+      parameters: []
+      responses:
+        '200':
+          description: Plan d’études supprimé
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Plan d’études introuvable
+        '409':
+          description: Conflit (matières associées)
+      security:
+        - bearerAuth: []
+      summary: Supprime un plan d’études
+      tags:
+        - Plans d’études
+    get:
+      operationId: PlanEtudesController_getOne
+      parameters: []
+      responses:
+        '200':
+          description: Plan d’études trouvé
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit ou hors périmètre
+        '404':
+          description: Plan d’études introuvable
+      security:
+        - bearerAuth: []
+      summary: Détail d’un plan d’études
+      tags:
+        - Plans d’études
+    patch:
+      operationId: PlanEtudesController_update
+      parameters: []
+      responses:
+        '200':
+          description: Plan d’études modifié
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Plan d’études introuvable
+        '409':
+          description: Conflit (plan déjà existant)
+      security:
+        - bearerAuth: []
+      summary: Modifie un plan d’études
+      tags:
+        - Plans d’études
+  /api/v1/plans-etudes/{id}/groupes-herites:
+    get:
+      operationId: PlanEtudesController_groupesHerites
+      parameters: []
+      responses:
+        '200':
+          description: Liste des groupes héritiers
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit ou hors périmètre
+        '404':
+          description: Plan d’études introuvable
+      security:
+        - bearerAuth: []
+      summary: Groupes héritant du plan d’études
+      tags:
+        - Plans d’études
+  /api/v1/plans-etudes/{id}/volume-total:
+    get:
+      operationId: PlanEtudesController_volumeTotal
+      parameters: []
+      responses:
+        '200':
+          description: Volume total du plan d’études
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit ou hors périmètre
+        '404':
+          description: Plan d’études introuvable
+      security:
+        - bearerAuth: []
+      summary: Volume total hebdomadaire d’un plan d’études
+      tags:
+        - Plans d’études
+  /api/v1/plans-etudes/{planEtudesId}/matieres:
+    get:
+      operationId: PlanEtudesController_listMatieres
+      parameters: []
+      responses:
+        '200':
+          description: Liste des matières du plan
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit ou hors périmètre
+        '404':
+          description: Plan d’études introuvable
+      security:
+        - bearerAuth: []
+      summary: Liste des matières d’un plan d’études
+      tags:
+        - Plans d’études
+    post:
+      operationId: PlanEtudesController_ajouterMatiere
+      parameters: []
+      responses:
+        '201':
+          description: Matière ajoutée
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Plan d’études introuvable
+        '409':
+          description: Conflit (matière déjà présente)
+      security:
+        - bearerAuth: []
+      summary: Ajoute une matière à un plan d’études
+      tags:
+        - Plans d’études
+  /api/v1/plans-etudes/{planEtudesId}/matieres/{id}:
+    delete:
+      operationId: PlanEtudesController_deleteMatiere
+      parameters: []
+      responses:
+        '200':
+          description: Matière supprimée
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Matière introuvable
+      security:
+        - bearerAuth: []
+      summary: Supprime une matière de plan d’études
+      tags:
+        - Plans d’études
+    get:
+      operationId: PlanEtudesController_getMatiere
+      parameters: []
+      responses:
+        '200':
+          description: Matière du plan d’études
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit ou hors périmètre
+        '404':
+          description: Matière introuvable
+      security:
+        - bearerAuth: []
+      summary: Détail d’une matière de plan d’études
+      tags:
+        - Plans d’études
+    patch:
+      operationId: PlanEtudesController_updateMatiere
+      parameters: []
+      responses:
+        '200':
+          description: Matière modifiée
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Matière introuvable
+        '409':
+          description: Conflit (matière déjà présente)
+      security:
+        - bearerAuth: []
+      summary: Modifie une matière de plan d’études
+      tags:
+        - Plans d’études
   /api/v1/referentiels/arbre:
     get:
       operationId: ArbreController_arbre

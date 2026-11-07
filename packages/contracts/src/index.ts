@@ -10,5 +10,6 @@ export * from './auth';
 export * from './common';
 export * from './events';
 export * from './referentiels';
+export * from './repartition';
 export * from './seances';
 export * from './versions';
