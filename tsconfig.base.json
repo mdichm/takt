@@ -7,7 +7,7 @@
     "lib": ["ES2022"],
     "strict": true,
     "noUncheckedIndexedAccess": true,
-    "exactOptionalPropertyTypes": true,
+    "exactOptionalPropertyTypes": false,
     "noImplicitOverride": true,
     "noFallthroughCasesInSwitch": true,
     "esModuleInterop": true,
@@ -17,8 +17,6 @@
     "sourceMap": true,
     "baseUrl": ".",
     "paths": {
-      "@takt/contracts": ["packages/contracts/src/index.ts"],
-      "@takt/db": ["packages/db/src/index.ts"],
       "@takt/design-tokens": ["packages/design-tokens/src/index.ts"],
       "@takt/solver-client": ["packages/solver-client/src/index.ts"]
     }

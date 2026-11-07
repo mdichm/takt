@@ -32,14 +32,13 @@ jobs:
           umask 077
           mkdir -p secrets
           postgres_password="$(openssl rand -hex 32)"
-          jwt_access_secret="$(openssl rand -hex 32)"
-          jwt_refresh_secret="$(openssl rand -hex 32)"
           smtp_password="$(openssl rand -hex 32)"
           printf '%s' "${postgres_password}" > secrets/postgres_password.txt
+          mkdir -p secrets/jwt
+          openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 -out secrets/jwt/active.private.pem 2>/dev/null
+          openssl pkey -in secrets/jwt/active.private.pem -pubout -out secrets/jwt/active.public.pem 2>/dev/null
           echo "POSTGRES_PASSWORD=${postgres_password}" >> "${GITHUB_ENV}"
           echo "DATABASE_URL=postgresql://${POSTGRES_USER}:${postgres_password}@postgres:5432/${POSTGRES_DB}" >> "${GITHUB_ENV}"
-          echo "JWT_ACCESS_SECRET=${jwt_access_secret}" >> "${GITHUB_ENV}"
-          echo "JWT_REFRESH_SECRET=${jwt_refresh_secret}" >> "${GITHUB_ENV}"
           echo "SMTP_PASSWORD=${smtp_password}" >> "${GITHUB_ENV}"
 
       - name: Construire la stack de recette

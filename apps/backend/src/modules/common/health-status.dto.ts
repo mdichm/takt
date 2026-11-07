@@ -8,12 +8,16 @@ import { ApiProperty } from '@nestjs/swagger';
 
 /** Corps de la réponse `GET /health` (ST_TAKT §3.1). */
 export class HealthStatusDto {
-  @ApiProperty({ description: "État de l'API", example: 'ok' })
+  @ApiProperty({ description: "État de l'API", type: 'string', example: 'ok' })
   status!: 'ok';
 
-  @ApiProperty({ description: 'Durée de fonctionnement en secondes', example: 1234 })
+  @ApiProperty({
+    description: 'Durée de fonctionnement en secondes',
+    type: 'number',
+    example: 1234,
+  })
   uptime!: number;
 
-  @ApiProperty({ description: 'Version de l’API', example: '1.0.0' })
+  @ApiProperty({ description: 'Version de l’API', type: 'string', example: '1.0.0' })
   version!: string;
 }

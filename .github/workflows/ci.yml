@@ -212,8 +212,10 @@ jobs:
         run: |
           docker run --rm -d --name backend-test --network host \
             -e DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:5432/takt_test \
-            -e JWT_ACCESS_SECRET=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa \
-            -e JWT_REFRESH_SECRET=bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb \
+            -e JWT_KEYS_DIRECTORY=/run/secrets/jwt \
+            -e JWT_ACTIVE_KEY_ID=active \
+            -e JWT_ISSUER=takt-test \
+            -e JWT_AUDIENCE=takt-api \
             takt/backend:${{ github.sha }}
           sleep 10
           curl -f http://localhost:3000/health || (docker logs backend-test && exit 1)
@@ -255,6 +257,12 @@ jobs:
       - name: Install Playwright Browsers
         run: pnpm --filter @takt/frontend exec playwright install --with-deps chromium
 
+      - name: Generate JWT Test Keys
+        run: |
+          mkdir -p secrets/jwt
+          openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 -out secrets/jwt/active.private.pem 2>/dev/null
+          openssl pkey -in secrets/jwt/active.private.pem -pubout -out secrets/jwt/active.public.pem 2>/dev/null
+
       - name: Start Full Stack (Docker Compose)
         run: |
           docker compose -f docker-compose.test.yml up -d
@@ -292,12 +300,108 @@ jobs:
         run: docker compose -f docker-compose.test.yml down -v
 
   # ------------------------------------------------------------
+  # CONTRAT OPENAPI
+  # ------------------------------------------------------------
+  check-openapi:
+    name: Check OpenAPI
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Prisma Generate
+        run: pnpm --filter @takt/db db:generate
+
+      - name: Vérifier le contrat OpenAPI
+        run: pnpm check-openapi
+
+  # ------------------------------------------------------------
+  # ARCHITECTURE MODULAIRE
+  # ------------------------------------------------------------
+  check-module-dependencies:
+    name: Check Module Dependencies
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # Le client Prisma est généré : `@takt/backend` (compilé par ce job)
+      # importe `@takt/db`, dont les types n'existent qu'après génération.
+      - name: Prisma Generate
+        run: pnpm --filter @takt/db db:generate
+
+      - name: Vérifier les dépendances entre modules
+        run: pnpm check-module-dependencies
+
+  # ------------------------------------------------------------
+  # ACCESSIBILITÉ (axe-core) — job bloquant pour la protection de develop
+  # ------------------------------------------------------------
+  accessibility:
+    name: Accessibilité (axe-core)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: build
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run Unit Accessibility Tests (tokens + components)
+        run: pnpm --filter @takt/frontend test:a11y:unit
+
+      - name: Upload Axe Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: axe-report
+          path: apps/frontend/axe-results/
+          retention-days: 7
+
+  # ------------------------------------------------------------
   # CHECK REQUIS POUR LA PROTECTION DE develop
   # ------------------------------------------------------------
   ci-gate:
     name: CI gate
     runs-on: ubuntu-latest
-    needs: [lint-and-typecheck, test, build, docker-build, e2e]
+    needs:
+      [lint-and-typecheck, test, build, docker-build, e2e, check-openapi, check-module-dependencies, accessibility]
     if: always()
     steps:
       - name: Vérifier le résultat de la CI
@@ -306,7 +410,10 @@ jobs:
              [[ "${{ needs.test.result }}" != "success" ]] || \
              [[ "${{ needs.build.result }}" != "success" ]] || \
              [[ "${{ needs.docker-build.result }}" != "success" ]] || \
-             [[ "${{ needs.e2e.result }}" != "success" ]]; then
+             [[ "${{ needs.e2e.result }}" != "success" ]] || \
+             [[ "${{ needs.check-openapi.result }}" != "success" ]] || \
+             [[ "${{ needs.check-module-dependencies.result }}" != "success" ]] || \
+             [[ "${{ needs.accessibility.result }}" != "success" ]]; then
             echo "La CI comporte au moins un job en échec."
             exit 1
           fi

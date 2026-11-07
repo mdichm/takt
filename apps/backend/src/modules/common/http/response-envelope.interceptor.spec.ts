@@ -54,6 +54,27 @@ describe('ResponseEnvelopeInterceptor', () => {
     expect(resultat.error).toBeNull();
   });
 
+  it('conserve les métadonnées de pagination dans meta', async () => {
+    const resultat = (await firstValueFrom(
+      interceptor.intercept(
+        creerContexte(() => undefined),
+        creerNext({
+          data: [{ id: 1 }, { id: 2 }],
+          meta: { page: 2, pageSize: 2, total: 5 },
+        }),
+      ),
+    )) as EnveloppeApi;
+
+    expect(resultat.data).toEqual([{ id: 1 }, { id: 2 }]);
+    expect(resultat.error).toBeNull();
+    expect(resultat.meta).toMatchObject({
+      requestId: 'req-abc',
+      page: 2,
+      pageSize: 2,
+      total: 5,
+    });
+  });
+
   it('ne touche pas aux routes décorées avec @RawResponse()', async () => {
     class Controleur {
       @RawResponse()

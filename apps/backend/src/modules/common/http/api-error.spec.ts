@@ -5,7 +5,8 @@
 // ============================================================================
 
 import { describe, it, expect } from 'vitest';
-import { codeErreurPourStatut, CODES_ERREUR_API } from './api-error';
+import { HttpStatus } from '@nestjs/common';
+import { ApiError, codeErreurPourStatut, CODES_ERREUR_API } from './api-error';
 
 describe('codeErreurPourStatut', () => {
   it('associe chaque code HTTP du catalogue à son code métier', () => {
@@ -37,6 +38,32 @@ describe('codeErreurPourStatut', () => {
         'VALIDATION_ERROR',
         'WORKFLOW_INVALID_TRANSITION',
       ].sort(),
+    );
+  });
+
+  it('expose un code du catalogue et le statut HTTP associé', () => {
+    const erreur = new ApiError('NOT_FOUND', HttpStatus.NOT_FOUND, 'Ressource introuvable');
+
+    expect(erreur.getStatus()).toBe(HttpStatus.NOT_FOUND);
+    expect(erreur.getResponse()).toMatchObject({
+      code: 'NOT_FOUND',
+      message: 'Ressource introuvable',
+    });
+  });
+
+  it('accepte les détails structurés de validation', () => {
+    const details = [{ champ: 'email', message: 'Email invalide' }];
+    const erreur = new ApiError('VALIDATION_ERROR', HttpStatus.BAD_REQUEST, undefined, details);
+
+    expect(erreur.getResponse()).toMatchObject({
+      code: 'VALIDATION_ERROR',
+      details,
+    });
+  });
+
+  it('refuse un code hors catalogue', () => {
+    expect(() => new ApiError('CODE_INCONNU' as never, HttpStatus.INTERNAL_SERVER_ERROR)).toThrow(
+      'Code d’erreur API hors catalogue',
     );
   });
 });

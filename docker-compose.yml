@@ -32,8 +32,11 @@ services:
       NODE_ENV: development
       PORT: 3000
       DATABASE_URL: ${DATABASE_URL:?DATABASE_URL est requis}
-      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:?JWT_ACCESS_SECRET est requis}
-      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:?JWT_REFRESH_SECRET est requis}
+      JWT_KEYS_DIRECTORY: ${JWT_KEYS_DIRECTORY:-/run/secrets/jwt}
+      JWT_ACTIVE_KEY_ID: ${JWT_ACTIVE_KEY_ID:-active}
+      JWT_PREVIOUS_KEY_IDS: ${JWT_PREVIOUS_KEY_IDS:-}
+      JWT_ISSUER: ${JWT_ISSUER:-takt}
+      JWT_AUDIENCE: ${JWT_AUDIENCE:-takt-api}
       JWT_ACCESS_TTL: ${JWT_ACCESS_TTL:-15m}
       JWT_REFRESH_TTL: ${JWT_REFRESH_TTL:-7d}
     command: >-
@@ -50,6 +53,8 @@ services:
       timeout: 3s
       retries: 10
       start_period: 5s
+    volumes:
+      - ./secrets/jwt:/run/secrets/jwt:ro
 
   frontend:
     build:

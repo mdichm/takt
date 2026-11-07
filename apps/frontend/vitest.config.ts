@@ -10,6 +10,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': resolve(__dirname, 'src'),
+      '@takt/contracts': resolve(__dirname, '../../packages/contracts/src/index.ts'),
     },
   },
   test: {
@@ -17,5 +18,26 @@ export default defineConfig({
     globals: true,
     setupFiles: ['./src/test/setup.ts'],
     include: ['src/**/*.test.{ts,tsx}'],
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'lcov', 'html'],
+      reportsDirectory: './coverage',
+      thresholds: {
+        lines: 75,
+        branches: 75,
+        functions: 75,
+        statements: 75,
+      },
+      exclude: [
+        'src/main.tsx',
+        'src/test/**',
+        '*.config.ts',
+        'vitest.config.ts',
+        '**/*.test.*',
+        '**/*.d.ts',
+        'e2e/**',
+        'dist/**',
+      ],
+    },
   },
 });

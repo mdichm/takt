@@ -9,9 +9,6 @@
 
 import { z } from 'zod';
 
-/** Longueur minimale d'un secret JWT (octets de randomness ASCII). */
-export const LONGUEUR_SECRET_MIN = 32;
-
 /**
  * Schéma Zod de l'environnement applicatif.
  * Les variables marquées « requise » sont absentes de `.env.example` en
@@ -28,13 +25,12 @@ export const EnvSchema = z.object({
   // -- Base de données (requis) ---------------------------------------------
   DATABASE_URL: z.string().min(1, 'URL de connexion à la base de données absente'),
 
-  // -- JWT (requis) ---------------------------------------------------------
-  JWT_ACCESS_SECRET: z
-    .string()
-    .min(LONGUEUR_SECRET_MIN, `Secret JWT trop court (minimum ${LONGUEUR_SECRET_MIN} caractères)`),
-  JWT_REFRESH_SECRET: z
-    .string()
-    .min(LONGUEUR_SECRET_MIN, `Secret JWT trop court (minimum ${LONGUEUR_SECRET_MIN} caractères)`),
+  // -- JWT RS256 (requis) ----------------------------------------------------
+  JWT_KEYS_DIRECTORY: z.string().min(1).default('/run/secrets/jwt'),
+  JWT_ACTIVE_KEY_ID: z.string().min(1).default('active'),
+  JWT_PREVIOUS_KEY_IDS: z.string().default(''),
+  JWT_ISSUER: z.string().min(1).default('takt'),
+  JWT_AUDIENCE: z.string().min(1).default('takt-api'),
   JWT_ACCESS_TTL: z.string().min(1).default('15m'),
   JWT_REFRESH_TTL: z.string().min(1).default('7d'),
 

@@ -20,6 +20,35 @@ export interface MetaApi {
   total?: number;
 }
 
+/** Réponse métier paginée, à utiliser explicitement dans les contrôleurs. */
+export interface DonneesPaginees<T> {
+  /** Éléments de la page courante. */
+  data: T[];
+  /** Métadonnées de pagination. */
+  meta: {
+    page: number;
+    pageSize: number;
+    total: number;
+  };
+}
+
+/** Vérifie si une valeur respecte la forme explicite `DonneesPaginees`. */
+export function estDonneesPaginees(valeur: unknown): valeur is DonneesPaginees<unknown> {
+  if (typeof valeur !== 'object' || valeur === null) {
+    return false;
+  }
+
+  const candidat = valeur as Partial<DonneesPaginees<unknown>>;
+  return (
+    Array.isArray(candidat.data) &&
+    typeof candidat.meta === 'object' &&
+    candidat.meta !== null &&
+    typeof candidat.meta.page === 'number' &&
+    typeof candidat.meta.pageSize === 'number' &&
+    typeof candidat.meta.total === 'number'
+  );
+}
+
 /** Corps de l'erreur, conformément au catalogue ST_TAKT §3.4. */
 export interface ErreurApi {
   /** Code métier parmi les 8 codes du catalogue. */

@@ -1,285 +1,98 @@
-openapi: 3.0.0
-info:
-  title: TAKT API
-  version: 1.0.0
-  description: |
-    API de l'application TAKT — Planification et gestion des emplois du temps pédagogiques.
-    Conforme à la spécification technique docs/ST_TAKT.md (étape E0.6).
-    Authentification par Bearer JWT (access token 15 min + refresh token rotatif 7 j).
-  contact:
-    name: Équipe TAKT
-    email: dev@takt.internal
-  license:
-    name: GNU AGPL v3
-    url: https://www.gnu.org/licenses/agpl-3.0.html
-
-servers:
-  - url: http://localhost:3000/api/v1
-    description: Serveur de développement (NestJS local)
-  - url: https://api.takt.internal/api/v1
-    description: Serveur de production (Nginx reverse proxy)
-
-tags:
-  - name: Auth
-    description: Authentification et gestion de session
-  - name: Utilisateurs
-    description: Gestion des comptes utilisateurs (CRUD)
-  - name: Versions
-    description: Gestion des versions de planning et workflow (10 états, 19 transitions)
-  - name: Seances
-    description: Gestion des séances de cours (CRUD, détection de conflits)
-  - name: Verrous
-    description: Gestion des baux d'édition sur les séances
-  - name: Generations
-    description: Génération d'emplois du temps par CP-SAT et scénarios
-  - name: Exports
-    description: Génération d'exports (XLSX, PDF, ICS)
-  - name: Audit
-    description: Journal d'audit des actions utilisateurs
-
-security:
-  - BearerAuth: []
-
 components:
-  securitySchemes:
-    BearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
-      description: |
-        Token d'accès JWT obtenu via POST /auth/login.
-        Durée de vie : 15 minutes. Renouvelable via POST /auth/refresh.
-
+  responses:
+    '400':
+      content:
+        application/json:
+          example:
+            code: VALIDATION_ERROR
+          schema:
+            $ref: '#/components/schemas/ErreurApi'
+      description: Requête invalide
+    '401':
+      content:
+        application/json:
+          example:
+            code: UNAUTHORIZED
+          schema:
+            $ref: '#/components/schemas/ErreurApi'
+      description: Non authentifié
+    '403':
+      content:
+        application/json:
+          example:
+            code: FORBIDDEN
+          schema:
+            $ref: '#/components/schemas/ErreurApi'
+      description: Interdit
+    '404':
+      content:
+        application/json:
+          example:
+            code: NOT_FOUND
+          schema:
+            $ref: '#/components/schemas/ErreurApi'
+      description: Ressource non trouvée
+    '409':
+      content:
+        application/json:
+          example:
+            code: WORKFLOW_INVALID_TRANSITION
+          schema:
+            $ref: '#/components/schemas/ErreurApi'
+      description: Conflit
+    '423':
+      content:
+        application/json:
+          example:
+            code: SEANCE_LOCKED
+          schema:
+            $ref: '#/components/schemas/ErreurApi'
+      description: Ressource verrouillée
+    '429':
+      content:
+        application/json:
+          example:
+            code: RATE_LIMITED
+          schema:
+            $ref: '#/components/schemas/ErreurApi'
+      description: Trop de requêtes
+    '500':
+      content:
+        application/json:
+          example:
+            code: INTERNAL_ERROR
+          schema:
+            $ref: '#/components/schemas/ErreurApi'
+      description: Erreur interne
   schemas:
-    ErreurRFC9457:
-      type: object
-      required:
-        - type
-        - title
-        - status
-        - detail
-      properties:
-        type:
-          type: string
-          description: URI d'identification du type d'erreur
-          example: https://api.takt.internal/errors/validation-error
-        title:
-          type: string
-          description: Titre court et lisible de l'erreur
-          example: Erreur de validation
-        status:
-          type: integer
-          description: Code HTTP de l'erreur
-          example: 400
-        detail:
-          type: string
-          description: Description détaillée de l'erreur
-          example: Le champ email est requis.
-        instance:
-          type: string
-          description: URI spécifique à l'occurrence de l'erreur
-          example: /api/v1/users/123
-
-    EnveloppeReponse:
-      type: object
-      required:
-        - data
-        - error
-        - meta
-      properties:
-        data:
-          description: Données de la réponse (null en cas d'erreur)
-        error:
-          $ref: '#/components/schemas/ErreurRFC9457'
-          nullable: true
-        meta:
-          $ref: '#/components/schemas/MetaReponse'
-
-    MetaReponse:
-      type: object
-      properties:
-        requestId:
-          type: string
-          format: uuid
-        timestamp:
-          type: string
-          format: date-time
-        page:
-          type: integer
-        pageSize:
-          type: integer
-        total:
-          type: integer
-
-    Utilisateur:
-      type: object
-      required:
-        - id
-        - email
-        - nom
-        - prenom
-        - roleId
-        - estActif
-        - createdAt
-        - updatedAt
-      properties:
-        id:
-          type: string
-          format: uuid
-        email:
-          type: string
-          format: email
-        nom:
-          type: string
-        prenom:
-          type: string
-        roleId:
-          type: string
-          format: uuid
-        departementId:
-          type: string
-          format: uuid
-          nullable: true
-        estActif:
-          type: boolean
-        createdAt:
-          type: string
-          format: date-time
-        updatedAt:
-          type: string
-          format: date-time
-
-    Role:
-      type: object
-      required:
-        - id
-        - code
-        - libelle
-      properties:
-        id:
-          type: string
-          format: uuid
-        code:
-          type: string
-          enum: [admin, gest, rdep, dir]
-        libelle:
-          type: string
-
-    Departement:
-      type: object
-      required:
-        - id
-        - code
-        - libelle
-      properties:
-        id:
-          type: string
-          format: uuid
-        code:
-          type: string
-        libelle:
-          type: string
-
-    AnneeUniversitaire:
-      type: object
-      required:
-        - id
-        - libelle
-        - dateDebut
-        - dateFin
-      properties:
-        id:
-          type: string
-          format: uuid
-        libelle:
-          type: string
-        dateDebut:
-          type: string
-          format: date-time
-        dateFin:
-          type: string
-          format: date-time
-
-    Semestre:
-      type: object
-      required:
-        - id
-        - numero
-        - anneeUniversitaireId
-        - dateDebut
-        - dateFin
-      properties:
-        id:
-          type: string
-          format: uuid
-        numero:
-          type: integer
-          enum: [1, 2]
-        anneeUniversitaireId:
-          type: string
-          format: uuid
-        dateDebut:
-          type: string
-          format: date-time
-        dateFin:
-          type: string
-
-    Version:
-      type: object
-      required:
-        - id
-        - semestreId
-        - etat
-        - createdAt
-        - updatedAt
-      properties:
-        id:
-          type: string
-          format: uuid
-        semestreId:
-          type: string
-          format: uuid
-        etat:
-          type: string
-          enum: [initial, rep_pedag, brouillon, generation, edition, valid_pedag, valid_dir, valide, publie, archive]
-        snapshotId:
-          type: string
-          format: uuid
-          nullable: true
-        createdAt:
-          type: string
-          format: date-time
-        updatedAt:
-          type: string
-          format: date-time
-
-    Snapshot:
-      type: object
-      required:
-        - id
-        - versionId
-        - donnees
-        - hash
-        - createdAt
-      properties:
-        id:
-          type: string
-          format: uuid
-        versionId:
-          type: string
-          format: uuid
-        donnees:
-          type: object
-          description: Données JSONB du snapshot
-        hash:
-          type: string
-          description: Hash d'intégrité du snapshot
-        createdAt:
-          type: string
-          format: date-time
-
     AffectationPedagogique:
-      type: object
+      properties:
+        createdAt:
+          format: date-time
+          type: string
+        departementId:
+          format: uuid
+          type: string
+        enseignantId:
+          format: uuid
+          type: string
+        groupeId:
+          format: uuid
+          type: string
+        id:
+          format: uuid
+          type: string
+        matiereId:
+          format: uuid
+          type: string
+        semestreId:
+          format: uuid
+          type: string
+        updatedAt:
+          format: date-time
+          type: string
+        volumeHoraire:
+          type: integer
       required:
         - id
         - semestreId
@@ -290,36 +103,603 @@ components:
         - volumeHoraire
         - createdAt
         - updatedAt
-      properties:
-        id:
-          type: string
-          format: uuid
-        semestreId:
-          type: string
-          format: uuid
-        departementId:
-          type: string
-          format: uuid
-        enseignantId:
-          type: string
-          format: uuid
-        matiereId:
-          type: string
-          format: uuid
-        groupeId:
-          type: string
-          format: uuid
-        volumeHoraire:
-          type: integer
-        createdAt:
-          type: string
-          format: date-time
-        updatedAt:
-          type: string
-          format: date-time
-
-    Seance:
       type: object
+    AnneeUniversitaire:
+      properties:
+        dateDebut:
+          format: date-time
+          type: string
+        dateFin:
+          format: date-time
+          type: string
+        id:
+          format: uuid
+          type: string
+        libelle:
+          type: string
+      required:
+        - id
+        - libelle
+        - dateDebut
+        - dateFin
+      type: object
+    Contrainte:
+      properties:
+        cibleId:
+          type: string
+        createdAt:
+          format: date-time
+          type: string
+        id:
+          format: uuid
+          type: string
+        type:
+          enum:
+            - INDISPONIBILITE
+            - EXIGENCE_SALLE
+            - CONTRAINTE_ENSEIGNANT
+          type: string
+        valeur:
+          type: string
+        versionId:
+          format: uuid
+          type: string
+      required:
+        - id
+        - versionId
+        - type
+        - cibleId
+        - valeur
+        - createdAt
+      type: object
+    Departement:
+      properties:
+        code:
+          type: string
+        id:
+          format: uuid
+          type: string
+        libelle:
+          type: string
+      required:
+        - id
+        - code
+        - libelle
+      type: object
+    EnveloppeReponse:
+      properties:
+        data:
+          description: Données de la réponse (null en cas d'erreur)
+        error:
+          $ref: '#/components/schemas/ErreurRFC9457'
+          nullable: true
+        meta:
+          $ref: '#/components/schemas/MetaReponse'
+      required:
+        - data
+        - error
+        - meta
+      type: object
+    ErreurApi:
+      properties:
+        code:
+          enum:
+            - VALIDATION_ERROR
+            - UNAUTHORIZED
+            - FORBIDDEN
+            - NOT_FOUND
+            - WORKFLOW_INVALID_TRANSITION
+            - SEANCE_LOCKED
+            - RATE_LIMITED
+            - INTERNAL_ERROR
+          type: string
+        details:
+          items:
+            type: object
+          type: array
+        message:
+          type: string
+      required:
+        - code
+      type: object
+    ErreurRFC9457:
+      properties:
+        detail:
+          description: Description détaillée de l'erreur
+          example: Le champ email est requis.
+          type: string
+        instance:
+          description: URI spécifique à l'occurrence de l'erreur
+          example: /api/v1/users/123
+          type: string
+        status:
+          description: Code HTTP de l'erreur
+          example: 400
+          type: integer
+        title:
+          description: Titre court et lisible de l'erreur
+          example: Erreur de validation
+          type: string
+        type:
+          description: URI d'identification du type d'erreur
+          example: https://api.takt.internal/errors/validation-error
+          type: string
+      required:
+        - type
+        - title
+        - status
+        - detail
+      type: object
+    Export:
+      properties:
+        cheminFichier:
+          type: string
+        dateGeneration:
+          format: date-time
+          type: string
+        format:
+          enum:
+            - xlsx
+            - pdf
+            - ics
+          type: string
+        id:
+          format: uuid
+          type: string
+        versionId:
+          format: uuid
+          type: string
+      required:
+        - id
+        - versionId
+        - format
+        - cheminFichier
+        - dateGeneration
+      type: object
+    ExportRequest:
+      properties:
+        format:
+          enum:
+            - xlsx
+            - pdf
+            - ics
+          type: string
+        versionId:
+          format: uuid
+          type: string
+      required:
+        - versionId
+        - format
+      type: object
+    ExportResponse:
+      allOf:
+        - $ref: '#/components/schemas/Export'
+    Generation:
+      properties:
+        createdAt:
+          format: date-time
+          type: string
+        fichierDerivesId:
+          format: uuid
+          nullable: true
+          type: string
+        id:
+          format: uuid
+          type: string
+        scores:
+          description: score_global et sous_scores
+          type: object
+        statut:
+          enum:
+            - EN_COURS
+            - TERMINEE
+            - ECHEC
+          type: string
+        versionId:
+          format: uuid
+          type: string
+      required:
+        - id
+        - versionId
+        - statut
+        - createdAt
+      type: object
+    GenerationRequest:
+      properties:
+        versionId:
+          format: uuid
+          type: string
+      required:
+        - versionId
+      type: object
+    GenerationResponse:
+      allOf:
+        - $ref: '#/components/schemas/Generation'
+    Grade:
+      properties:
+        code:
+          type: string
+        couleur:
+          type: string
+        createdAt:
+          format: date-time
+          type: string
+        id:
+          format: uuid
+          type: string
+        libelle:
+          type: string
+        updatedAt:
+          format: date-time
+          type: string
+      required:
+        - id
+        - code
+        - libelle
+        - couleur
+        - createdAt
+        - updatedAt
+      type: object
+    GradeCreateRequest:
+      properties:
+        code:
+          type: string
+        libelle:
+          type: string
+      required:
+        - code
+        - libelle
+      type: object
+    GradeTypeEnseignement:
+      properties:
+        createdAt:
+          format: date-time
+          type: string
+        gradeId:
+          format: uuid
+          type: string
+        id:
+          format: uuid
+          type: string
+        typeEnseignementId:
+          format: uuid
+          type: string
+      required:
+        - id
+        - gradeId
+        - typeEnseignementId
+        - createdAt
+      type: object
+    GradeTypeEnseignementCreateRequest:
+      properties:
+        gradeId:
+          format: uuid
+          type: string
+        typeEnseignementId:
+          format: uuid
+          type: string
+      required:
+        - gradeId
+        - typeEnseignementId
+      type: object
+    GradeUpdateRequest:
+      properties:
+        code:
+          type: string
+        libelle:
+          type: string
+      type: object
+    HealthStatusDto:
+      properties:
+        status:
+          description: État de l'API
+          example: ok
+          type: string
+        uptime:
+          description: Durée de fonctionnement en secondes
+          example: 1234
+          type: number
+        version:
+          description: Version de l’API
+          example: 1.0.0
+          type: string
+      required:
+        - status
+        - uptime
+        - version
+      type: object
+    JournalAudit:
+      properties:
+        action:
+          type: string
+        entite:
+          type: string
+        entiteId:
+          nullable: true
+          type: string
+        horodatage:
+          format: date-time
+          type: string
+        id:
+          format: uuid
+          type: string
+        metadonnees:
+          nullable: true
+          type: object
+        utilisateurId:
+          format: uuid
+          nullable: true
+          type: string
+      required:
+        - id
+        - action
+        - horodatage
+        - entite
+      type: object
+    LockRequest:
+      properties:
+        seanceId:
+          format: uuid
+          type: string
+        type:
+          enum:
+            - CRENEAU
+            - SALLE
+            - ENSEIGNANT
+            - ACTIVITE
+          type: string
+      required:
+        - seanceId
+        - type
+      type: object
+    LoginRequest:
+      properties:
+        email:
+          format: email
+          type: string
+        motDePasse:
+          format: password
+          type: string
+      required:
+        - email
+        - motDePasse
+      type: object
+    Matiere:
+      properties:
+        code:
+          type: string
+        createdAt:
+          format: date-time
+          type: string
+        id:
+          format: uuid
+          type: string
+        libelle:
+          type: string
+        moduleId:
+          format: uuid
+          type: string
+        updatedAt:
+          format: date-time
+          type: string
+      required:
+        - id
+        - code
+        - libelle
+        - moduleId
+        - createdAt
+        - updatedAt
+      type: object
+    MatiereCreateRequest:
+      properties:
+        code:
+          type: string
+        libelle:
+          type: string
+        moduleId:
+          format: uuid
+          type: string
+      required:
+        - code
+        - libelle
+        - moduleId
+      type: object
+    MatiereUpdateRequest:
+      properties:
+        code:
+          type: string
+        libelle:
+          type: string
+        moduleId:
+          format: uuid
+          type: string
+      type: object
+    MetaReponse:
+      properties:
+        page:
+          type: integer
+        pageSize:
+          type: integer
+        requestId:
+          format: uuid
+          type: string
+        timestamp:
+          format: date-time
+          type: string
+        total:
+          type: integer
+      type: object
+    Module:
+      properties:
+        code:
+          type: string
+        createdAt:
+          format: date-time
+          type: string
+        gradeId:
+          format: uuid
+          type: string
+        id:
+          format: uuid
+          type: string
+        libelle:
+          type: string
+        typeEnseignementId:
+          format: uuid
+          type: string
+        updatedAt:
+          format: date-time
+          type: string
+      required:
+        - id
+        - code
+        - libelle
+        - typeEnseignementId
+        - gradeId
+        - createdAt
+        - updatedAt
+      type: object
+    ModuleCreateRequest:
+      properties:
+        code:
+          type: string
+        gradeId:
+          format: uuid
+          type: string
+        libelle:
+          type: string
+        typeEnseignementId:
+          format: uuid
+          type: string
+      required:
+        - code
+        - libelle
+        - typeEnseignementId
+        - gradeId
+      type: object
+    ModuleUpdateRequest:
+      properties:
+        code:
+          type: string
+        gradeId:
+          format: uuid
+          type: string
+        libelle:
+          type: string
+        typeEnseignementId:
+          format: uuid
+          type: string
+      type: object
+    RefreshRequest:
+      properties:
+        refreshToken:
+          type: string
+      required:
+        - refreshToken
+      type: object
+    Role:
+      properties:
+        code:
+          enum:
+            - admin
+            - gest
+            - rdep
+            - dir
+          type: string
+        id:
+          format: uuid
+          type: string
+        libelle:
+          type: string
+      required:
+        - id
+        - code
+        - libelle
+      type: object
+    Scenario:
+      properties:
+        createdAt:
+          format: date-time
+          type: string
+        generationId:
+          format: uuid
+          type: string
+        id:
+          format: uuid
+          type: string
+        scoreGlobal:
+          maximum: 100
+          minimum: 0
+          type: integer
+        selectionne:
+          type: boolean
+        sousScores:
+          description: Sous-scores détaillés (respect créneaux, salles, enseignants, couverture)
+          type: object
+      required:
+        - id
+        - generationId
+        - scoreGlobal
+        - sousScores
+        - selectionne
+        - createdAt
+      type: object
+    ScenarioResponse:
+      allOf:
+        - $ref: '#/components/schemas/Scenario'
+    ScenarioSelectRequest:
+      properties:
+        scenarioId:
+          format: uuid
+          type: string
+      required:
+        - scenarioId
+      type: object
+    Seance:
+      properties:
+        activiteId:
+          format: uuid
+          nullable: true
+          type: string
+        createdAt:
+          format: date-time
+          type: string
+        creneauDebut:
+          description: Index du créneau (0-based par jour)
+          minimum: 0
+          type: integer
+        enseignantId:
+          format: uuid
+          nullable: true
+          type: string
+        estVerrouillee:
+          type: boolean
+        groupeId:
+          format: uuid
+          nullable: true
+          type: string
+        id:
+          format: uuid
+          type: string
+        jour:
+          description: 1=lundi … 6=samedi
+          maximum: 6
+          minimum: 1
+          type: integer
+        nbCreneaux:
+          description: Nombre de créneaux consécutifs
+          minimum: 1
+          type: integer
+        salleId:
+          format: uuid
+          nullable: true
+          type: string
+        updatedAt:
+          format: date-time
+          type: string
+        versionId:
+          format: uuid
+          type: string
       required:
         - id
         - versionId
@@ -329,53 +709,256 @@ components:
         - estVerrouillee
         - createdAt
         - updatedAt
-      properties:
-        id:
-          type: string
-          format: uuid
-        versionId:
-          type: string
-          format: uuid
-        jour:
-          type: integer
-          minimum: 1
-          maximum: 6
-          description: 1=lundi … 6=samedi
-        creneauDebut:
-          type: integer
-          minimum: 0
-          description: Index du créneau (0-based par jour)
-        nbCreneaux:
-          type: integer
-          minimum: 1
-          description: Nombre de créneaux consécutifs
-        salleId:
-          type: string
-          format: uuid
-          nullable: true
-        enseignantId:
-          type: string
-          format: uuid
-          nullable: true
-        groupeId:
-          type: string
-          format: uuid
-          nullable: true
-        activiteId:
-          type: string
-          format: uuid
-          nullable: true
-        estVerrouillee:
-          type: boolean
-        createdAt:
-          type: string
-          format: date-time
-        updatedAt:
-          type: string
-          format: date-time
-
-    VerrouSeance:
       type: object
+    SeanceCreateRequest:
+      properties:
+        activiteId:
+          format: uuid
+          nullable: true
+          type: string
+        creneauDebut:
+          minimum: 0
+          type: integer
+        enseignantId:
+          format: uuid
+          nullable: true
+          type: string
+        groupeId:
+          format: uuid
+          nullable: true
+          type: string
+        jour:
+          maximum: 6
+          minimum: 1
+          type: integer
+        nbCreneaux:
+          minimum: 1
+          type: integer
+        salleId:
+          format: uuid
+          nullable: true
+          type: string
+        versionId:
+          format: uuid
+          type: string
+      required:
+        - versionId
+        - jour
+        - creneauDebut
+        - nbCreneaux
+      type: object
+    SeanceResponse:
+      allOf:
+        - $ref: '#/components/schemas/Seance'
+    SeanceUpdateRequest:
+      properties:
+        activiteId:
+          format: uuid
+          nullable: true
+          type: string
+        creneauDebut:
+          minimum: 0
+          type: integer
+        enseignantId:
+          format: uuid
+          nullable: true
+          type: string
+        groupeId:
+          format: uuid
+          nullable: true
+          type: string
+        jour:
+          maximum: 6
+          minimum: 1
+          type: integer
+        nbCreneaux:
+          minimum: 1
+          type: integer
+        salleId:
+          format: uuid
+          nullable: true
+          type: string
+      type: object
+    Semestre:
+      properties:
+        anneeUniversitaireId:
+          format: uuid
+          type: string
+        dateDebut:
+          format: date-time
+          type: string
+        dateFin:
+          type: string
+        id:
+          format: uuid
+          type: string
+        numero:
+          enum:
+            - 1
+            - 2
+          type: integer
+      required:
+        - id
+        - numero
+        - anneeUniversitaireId
+        - dateDebut
+        - dateFin
+      type: object
+    Snapshot:
+      properties:
+        createdAt:
+          format: date-time
+          type: string
+        donnees:
+          description: Données JSONB du snapshot
+          type: object
+        hash:
+          description: Hash d'intégrité du snapshot
+          type: string
+        id:
+          format: uuid
+          type: string
+        versionId:
+          format: uuid
+          type: string
+      required:
+        - id
+        - versionId
+        - donnees
+        - hash
+        - createdAt
+      type: object
+    TokenResponse:
+      properties:
+        accessToken:
+          description: JWT d'accès (durée 15 min)
+          type: string
+        refreshToken:
+          description: JWT de refresh rotatif (durée 7 j)
+          type: string
+      required:
+        - accessToken
+        - refreshToken
+      type: object
+    TransitionRequest:
+      properties:
+        transition:
+          description: 'Nom de la transition du workflow (ex: valider_repartition, lancer_generation)'
+          type: string
+      required:
+        - transition
+      type: object
+    TypeEnseignement:
+      properties:
+        code:
+          type: string
+        couleur:
+          type: string
+        createdAt:
+          format: date-time
+          type: string
+        id:
+          format: uuid
+          type: string
+        libelle:
+          type: string
+        updatedAt:
+          format: date-time
+          type: string
+      required:
+        - id
+        - code
+        - libelle
+        - couleur
+        - createdAt
+        - updatedAt
+      type: object
+    TypeEnseignementCreateRequest:
+      properties:
+        code:
+          type: string
+        couleur:
+          type: string
+        libelle:
+          type: string
+      required:
+        - code
+        - libelle
+        - couleur
+      type: object
+    TypeEnseignementUpdateRequest:
+      properties:
+        code:
+          type: string
+        couleur:
+          type: string
+        libelle:
+          type: string
+      type: object
+    Utilisateur:
+      properties:
+        createdAt:
+          format: date-time
+          type: string
+        departementId:
+          format: uuid
+          nullable: true
+          type: string
+        email:
+          format: email
+          type: string
+        estActif:
+          type: boolean
+        id:
+          format: uuid
+          type: string
+        nom:
+          type: string
+        prenom:
+          type: string
+        roleId:
+          format: uuid
+          type: string
+        updatedAt:
+          format: date-time
+          type: string
+      required:
+        - id
+        - email
+        - nom
+        - prenom
+        - roleId
+        - estActif
+        - createdAt
+        - updatedAt
+      type: object
+    UtilisateurResponse:
+      allOf:
+        - $ref: '#/components/schemas/Utilisateur'
+    VerrouSeance:
+      properties:
+        heureExpiration:
+          format: date-time
+          type: string
+        heurePose:
+          format: date-time
+          type: string
+        id:
+          format: uuid
+          type: string
+        seanceId:
+          format: uuid
+          type: string
+        type:
+          enum:
+            - CRENEAU
+            - SALLE
+            - ENSEIGNANT
+            - ACTIVITE
+          type: string
+        utilisateurId:
+          format: uuid
+          type: string
       required:
         - id
         - seanceId
@@ -383,1723 +966,1862 @@ components:
         - type
         - heurePose
         - heureExpiration
-      properties:
-        id:
-          type: string
-          format: uuid
-        seanceId:
-          type: string
-          format: uuid
-        utilisateurId:
-          type: string
-          format: uuid
-        type:
-          type: string
-          enum: [CRENEAU, SALLE, ENSEIGNANT, ACTIVITE]
-        heurePose:
-          type: string
-          format: date-time
-        heureExpiration:
-          type: string
-          format: date-time
-
-    Contrainte:
       type: object
-      required:
-        - id
-        - versionId
-        - type
-        - cibleId
-        - valeur
-        - createdAt
+    Version:
       properties:
-        id:
-          type: string
-          format: uuid
-        versionId:
-          type: string
-          format: uuid
-        type:
-          type: string
-          enum: [INDISPONIBILITE, EXIGENCE_SALLE, CONTRAINTE_ENSEIGNANT]
-        cibleId:
-          type: string
-        valeur:
-          type: string
         createdAt:
-          type: string
           format: date-time
-
-    Generation:
-      type: object
+          type: string
+        etat:
+          enum:
+            - initial
+            - rep_pedag
+            - brouillon
+            - generation
+            - edition
+            - valid_pedag
+            - valid_dir
+            - valide
+            - publie
+            - archive
+          type: string
+        id:
+          format: uuid
+          type: string
+        semestreId:
+          format: uuid
+          type: string
+        snapshotId:
+          format: uuid
+          nullable: true
+          type: string
+        updatedAt:
+          format: date-time
+          type: string
       required:
         - id
-        - versionId
-        - statut
+        - semestreId
+        - etat
         - createdAt
-      properties:
-        id:
-          type: string
-          format: uuid
-        versionId:
-          type: string
-          format: uuid
-        statut:
-          type: string
-          enum: [EN_COURS, TERMINEE, ECHEC]
-        fichierDerivesId:
-          type: string
-          format: uuid
-          nullable: true
-        scores:
-          type: object
-          description: score_global et sous_scores
-        createdAt:
-          type: string
-          format: date-time
-
-    Scenario:
+        - updatedAt
       type: object
-      required:
-        - id
-        - generationId
-        - scoreGlobal
-        - sousScores
-        - selectionne
-        - createdAt
-      properties:
-        id:
-          type: string
-          format: uuid
-        generationId:
-          type: string
-          format: uuid
-        scoreGlobal:
-          type: integer
-          minimum: 0
-          maximum: 100
-        sousScores:
-          type: object
-          description: Sous-scores détaillés (respect créneaux, salles, enseignants, couverture)
-        selectionne:
-          type: boolean
-        createdAt:
-          type: string
-          format: date-time
-
-    Export:
-      type: object
-      required:
-        - id
-        - versionId
-        - format
-        - cheminFichier
-        - dateGeneration
-      properties:
-        id:
-          type: string
-          format: uuid
-        versionId:
-          type: string
-          format: uuid
-        format:
-          type: string
-          enum: [xlsx, pdf, ics]
-        cheminFichier:
-          type: string
-        dateGeneration:
-          type: string
-          format: date-time
-
-    JournalAudit:
-      type: object
-      required:
-        - id
-        - action
-        - horodatage
-        - entite
-      properties:
-        id:
-          type: string
-          format: uuid
-        action:
-          type: string
-        horodatage:
-          type: string
-          format: date-time
-        utilisateurId:
-          type: string
-          format: uuid
-          nullable: true
-        entite:
-          type: string
-        entiteId:
-          type: string
-          nullable: true
-        metadonnees:
-          type: object
-          nullable: true
-
-    # ------------------------------------------------------------------------
-    # DTOs de demande (Request bodies)
-    # ------------------------------------------------------------------------
-    LoginRequest:
-      type: object
-      required:
-        - email
-        - motDePasse
-      properties:
-        email:
-          type: string
-          format: email
-        motDePasse:
-          type: string
-          format: password
-
-    RefreshRequest:
-      type: object
-      required:
-        - refreshToken
-      properties:
-        refreshToken:
-          type: string
-
-    TransitionRequest:
-      type: object
-      required:
-        - transition
-      properties:
-        transition:
-          type: string
-          description: "Nom de la transition du workflow (ex: valider_repartition, lancer_generation)"
-
-    SeanceCreateRequest:
-      type: object
-      required:
-        - versionId
-        - jour
-        - creneauDebut
-        - nbCreneaux
-      properties:
-        versionId:
-          type: string
-          format: uuid
-        jour:
-          type: integer
-          minimum: 1
-          maximum: 6
-        creneauDebut:
-          type: integer
-          minimum: 0
-        nbCreneaux:
-          type: integer
-          minimum: 1
-        salleId:
-          type: string
-          format: uuid
-          nullable: true
-        enseignantId:
-          type: string
-          format: uuid
-          nullable: true
-        groupeId:
-          type: string
-          format: uuid
-          nullable: true
-        activiteId:
-          type: string
-          format: uuid
-          nullable: true
-
-    SeanceUpdateRequest:
-      type: object
-      properties:
-        jour:
-          type: integer
-          minimum: 1
-          maximum: 6
-        creneauDebut:
-          type: integer
-          minimum: 0
-        nbCreneaux:
-          type: integer
-          minimum: 1
-        salleId:
-          type: string
-          format: uuid
-          nullable: true
-        enseignantId:
-          type: string
-          format: uuid
-          nullable: true
-        groupeId:
-          type: string
-          format: uuid
-          nullable: true
-        activiteId:
-          type: string
-          format: uuid
-          nullable: true
-
-    LockRequest:
-      type: object
-      required:
-        - seanceId
-        - type
-      properties:
-        seanceId:
-          type: string
-          format: uuid
-        type:
-          type: string
-          enum: [CRENEAU, SALLE, ENSEIGNANT, ACTIVITE]
-
-    GenerationRequest:
-      type: object
-      required:
-        - versionId
-      properties:
-        versionId:
-          type: string
-          format: uuid
-
-    ScenarioSelectRequest:
-      type: object
-      required:
-        - scenarioId
-      properties:
-        scenarioId:
-          type: string
-          format: uuid
-
-    ExportRequest:
-      type: object
-      required:
-        - versionId
-        - format
-      properties:
-        versionId:
-          type: string
-          format: uuid
-        format:
-          type: string
-          enum: [xlsx, pdf, ics]
-
-    # ------------------------------------------------------------------------
-    # DTOs de réponse
-    # ------------------------------------------------------------------------
-    TokenResponse:
-      type: object
-      required:
-        - accessToken
-        - refreshToken
-      properties:
-        accessToken:
-          type: string
-          description: JWT d'accès (durée 15 min)
-        refreshToken:
-          type: string
-          description: JWT de refresh rotatif (durée 7 j)
-
-    UtilisateurResponse:
-      allOf:
-        - $ref: '#/components/schemas/Utilisateur'
-
-    SeanceResponse:
-      allOf:
-        - $ref: '#/components/schemas/Seance'
-
     VersionResponse:
       allOf:
         - $ref: '#/components/schemas/Version'
-
-    GenerationResponse:
-      allOf:
-        - $ref: '#/components/schemas/Generation'
-
-    ScenarioResponse:
-      allOf:
-        - $ref: '#/components/schemas/Scenario'
-
-    ExportResponse:
-      allOf:
-        - $ref: '#/components/schemas/Export'
-
+  securitySchemes:
+    bearerAuth:
+      bearerFormat: JWT
+      scheme: bearer
+      type: http
+info:
+  contact: {}
+  description: API de planification et gestion des emplois du temps pédagogiques
+  license:
+    name: GNU AGPL v3
+    url: https://www.gnu.org/licenses/agpl-3.0.html
+  title: TAKT API
+  version: 1.0.0
+openapi: 3.0.0
 paths:
-  # ============================================================================
-  # AUTH
-  # ============================================================================
-  /auth/login:
+  /api/v1/auth/login:
     post:
-      tags: [Auth]
-      summary: Connexion utilisateur
-      description: Authentifie un utilisateur et retourne un access token + refresh token.
-      operationId: authLogin
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/LoginRequest'
+      operationId: AuthController_login
+      parameters: []
       responses:
         '200':
           description: Connexion réussie
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/EnveloppeReponse'
-                  - type: object
-                    properties:
-                      data:
-                        $ref: '#/components/schemas/TokenResponse'
-        '400':
-          description: Données de requête invalides
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
         '401':
           description: Identifiants invalides
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-
-  /auth/refresh:
+        '429':
+          description: Trop de tentatives
+      security:
+        - bearerAuth: []
+      summary: Connexion utilisateur (émet access + refresh)
+      tags:
+        - auth
+  /api/v1/auth/logout:
     post:
-      tags: [Auth]
-      summary: Renouvellement du token d'accès
-      description: Renouvelle le token d'accès à l'aide du refresh token rotatif.
-      operationId: authRefresh
-      security: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/RefreshRequest'
+      operationId: AuthController_logout
+      parameters: []
       responses:
         '200':
-          description: Token renouvelé
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/EnveloppeReponse'
-                  - type: object
-                    properties:
-                      data:
-                        $ref: '#/components/schemas/TokenResponse'
-        '400':
-          description: Requête invalide
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Déconnecté
         '401':
-          description: Refresh token invalide ou expiré
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-
-  /auth/logout:
+          description: Refresh token invalide
+      security:
+        - bearerAuth: []
+      summary: Déconnexion (révoque la famille de rafraîchissement)
+      tags:
+        - auth
+  /api/v1/auth/refresh:
     post:
-      tags: [Auth]
-      summary: Déconnexion
-      description: Invalide le refresh token de la session courante.
-      operationId: authLogout
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/RefreshRequest'
+      operationId: AuthController_refresh
+      parameters: []
       responses:
         '200':
-          description: Déconnexion réussie
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/EnveloppeReponse'
+          description: Jeton rafraîchi
         '401':
-          description: Non authentifié
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-
-  # ============================================================================
-  # UTILISATEURS
-  # ============================================================================
-  /users:
+          description: Refresh token invalide ou révoqué
+      security:
+        - bearerAuth: []
+      summary: Rafraîchit les jetons (rotation du refresh)
+      tags:
+        - auth
+  /api/v1/events:
     get:
-      tags: [Utilisateurs]
-      summary: Liste des utilisateurs
-      description: Retourne la liste paginée des utilisateurs avec filtres optionnels.
-      operationId: usersList
+      operationId: EventsController_fluxEvenements
       parameters:
         - in: query
-          name: page
-          schema:
-            type: integer
-            default: 1
-        - in: query
-          name: pageSize
-          schema:
-            type: integer
-            default: 20
-        - in: query
-          name: role
+          name: access_token
+          required: false
           schema:
             type: string
-            enum: [admin, gest, rdep, dir]
-        - in: query
-          name: departementId
+      responses:
+        '200':
+          content:
+            text/event-stream: {}
+          description: Flux Server-Sent Events
+        '401':
+          description: Jeton d’accès absent ou invalide
+      security:
+        - bearerAuth: []
+      summary: S’abonner aux événements temps réel de l’utilisateur
+  /api/v1/referentiels/arbre:
+    get:
+      operationId: ArbreController_arbre
+      parameters: []
+      responses:
+        '200':
+          description: Arbre des référentiels
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Hiérarchie complète des référentiels
+      tags:
+        - Référentiels
+  /api/v1/referentiels/config-systeme:
+    get:
+      operationId: ConfigSystemeController_getOrCreate
+      parameters: []
+      responses:
+        '200':
+          description: Configuration système
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Configuration système (singleton)
+      tags:
+        - Référentiels
+    patch:
+      operationId: ConfigSystemeController_update
+      parameters: []
+      responses:
+        '200':
+          description: Configuration système modifiée
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Configuration système introuvable
+      security:
+        - bearerAuth: []
+      summary: Modifie la configuration système
+      tags:
+        - Référentiels
+  /api/v1/referentiels/creneaux:
+    get:
+      operationId: CreneauController_list
+      parameters: []
+      responses:
+        '200':
+          description: Liste des créneaux
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Liste paginée des créneaux
+      tags:
+        - Référentiels
+    post:
+      operationId: CreneauController_create
+      parameters: []
+      responses:
+        '201':
+          description: Créneau créé
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Crée un créneau
+      tags:
+        - Référentiels
+  /api/v1/referentiels/creneaux-affichage:
+    get:
+      operationId: CreneauAffichageController_list
+      parameters: []
+      responses:
+        '200':
+          description: Liste des variantes d’affichage
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Liste paginée des variantes d’affichage
+      tags:
+        - Référentiels
+    post:
+      operationId: CreneauAffichageController_create
+      parameters: []
+      responses:
+        '201':
+          description: Variante d’affichage créée
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Crée une variante d’affichage
+      tags:
+        - Référentiels
+  /api/v1/referentiels/creneaux-affichage/{id}:
+    delete:
+      operationId: CreneauAffichageController_delete
+      parameters: []
+      responses:
+        '200':
+          description: Variante d’affichage supprimée
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Variante d’affichage introuvable
+      security:
+        - bearerAuth: []
+      summary: Supprime une variante d’affichage
+      tags:
+        - Référentiels
+    get:
+      operationId: CreneauAffichageController_getOne
+      parameters: []
+      responses:
+        '200':
+          description: Variante d’affichage trouvée
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Variante d’affichage introuvable
+      security:
+        - bearerAuth: []
+      summary: Détail d’une variante d’affichage
+      tags:
+        - Référentiels
+    patch:
+      operationId: CreneauAffichageController_update
+      parameters: []
+      responses:
+        '200':
+          description: Variante d’affichage modifiée
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Variante d’affichage introuvable
+      security:
+        - bearerAuth: []
+      summary: Modifie une variante d’affichage
+      tags:
+        - Référentiels
+  /api/v1/referentiels/creneaux/{id}:
+    delete:
+      operationId: CreneauController_delete
+      parameters: []
+      responses:
+        '200':
+          description: Créneau supprimé
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Créneau introuvable
+      security:
+        - bearerAuth: []
+      summary: Supprime un créneau
+      tags:
+        - Référentiels
+    get:
+      operationId: CreneauController_getOne
+      parameters: []
+      responses:
+        '200':
+          description: Créneau trouvé
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Créneau introuvable
+      security:
+        - bearerAuth: []
+      summary: Détail d’un créneau
+      tags:
+        - Référentiels
+    patch:
+      operationId: CreneauController_update
+      parameters: []
+      responses:
+        '200':
+          description: Créneau modifié
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Créneau introuvable
+      security:
+        - bearerAuth: []
+      summary: Modifie un créneau
+      tags:
+        - Référentiels
+  /api/v1/referentiels/departements:
+    get:
+      operationId: DepartementController_list
+      parameters: []
+      responses:
+        '200':
+          description: Liste des départements
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Liste paginée des départements
+      tags:
+        - Référentiels
+    post:
+      operationId: DepartementController_create
+      parameters: []
+      responses:
+        '201':
+          description: Département créé
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Crée un département
+      tags:
+        - Référentiels
+  /api/v1/referentiels/departements/{id}:
+    delete:
+      operationId: DepartementController_delete
+      parameters: []
+      responses:
+        '200':
+          description: Département supprimé
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Département introuvable
+        '409':
+          description: Conflit (parcours/utilisateurs associés)
+      security:
+        - bearerAuth: []
+      summary: Supprime un département
+      tags:
+        - Référentiels
+    get:
+      operationId: DepartementController_getOne
+      parameters: []
+      responses:
+        '200':
+          description: Département trouvé
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Département introuvable
+      security:
+        - bearerAuth: []
+      summary: Détail d’un département
+      tags:
+        - Référentiels
+    patch:
+      operationId: DepartementController_update
+      parameters: []
+      responses:
+        '200':
+          description: Département modifié
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Département introuvable
+      security:
+        - bearerAuth: []
+      summary: Modifie un département
+      tags:
+        - Référentiels
+  /api/v1/referentiels/enseignants:
+    get:
+      operationId: EnseignantController_list
+      parameters: []
+      responses:
+        '200':
+          description: Liste des enseignants
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Liste paginée des enseignants
+      tags:
+        - Référentiels
+    post:
+      operationId: EnseignantController_create
+      parameters: []
+      responses:
+        '201':
+          description: Enseignant créé
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Crée un enseignant
+      tags:
+        - Référentiels
+  /api/v1/referentiels/enseignants/{id}:
+    delete:
+      operationId: EnseignantController_delete
+      parameters: []
+      responses:
+        '200':
+          description: Enseignant supprimé
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Enseignant introuvable
+        '409':
+          description: Conflit (lié à des départements)
+      security:
+        - bearerAuth: []
+      summary: Supprime un enseignant
+      tags:
+        - Référentiels
+    get:
+      operationId: EnseignantController_getOne
+      parameters: []
+      responses:
+        '200':
+          description: Enseignant trouvé
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Enseignant introuvable
+      security:
+        - bearerAuth: []
+      summary: Détail d’un enseignant
+      tags:
+        - Référentiels
+    patch:
+      operationId: EnseignantController_update
+      parameters: []
+      responses:
+        '200':
+          description: Enseignant modifié
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Enseignant introuvable
+      security:
+        - bearerAuth: []
+      summary: Modifie un enseignant
+      tags:
+        - Référentiels
+  /api/v1/referentiels/equipements:
+    get:
+      operationId: EquipementController_list
+      parameters: []
+      responses:
+        '200':
+          description: Liste des équipements
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Liste paginée des équipements
+      tags:
+        - Référentiels
+    post:
+      operationId: EquipementController_create
+      parameters: []
+      responses:
+        '201':
+          description: Équipement créé
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Crée un équipement
+      tags:
+        - Référentiels
+  /api/v1/referentiels/equipements/{id}:
+    delete:
+      operationId: EquipementController_delete
+      parameters: []
+      responses:
+        '200':
+          description: Équipement supprimé
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Équipement introuvable
+      security:
+        - bearerAuth: []
+      summary: Supprime un équipement
+      tags:
+        - Référentiels
+    get:
+      operationId: EquipementController_getOne
+      parameters: []
+      responses:
+        '200':
+          description: Équipement trouvé
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Équipement introuvable
+      security:
+        - bearerAuth: []
+      summary: Détail d’un équipement
+      tags:
+        - Référentiels
+    patch:
+      operationId: EquipementController_update
+      parameters: []
+      responses:
+        '200':
+          description: Équipement modifié
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Équipement introuvable
+      security:
+        - bearerAuth: []
+      summary: Modifie un équipement
+      tags:
+        - Référentiels
+  /api/v1/referentiels/etablissements:
+    get:
+      operationId: EtablissementController_list
+      parameters: []
+      responses:
+        '200':
+          description: Liste des établissements
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Liste paginée des établissements
+      tags:
+        - Référentiels
+    post:
+      operationId: EtablissementController_create
+      parameters: []
+      responses:
+        '201':
+          description: Établissement créé
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Crée un établissement
+      tags:
+        - Référentiels
+  /api/v1/referentiels/etablissements/{id}:
+    delete:
+      operationId: EtablissementController_delete
+      parameters: []
+      responses:
+        '200':
+          description: Établissement supprimé
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Établissement introuvable
+        '409':
+          description: Conflit (départements associés)
+      security:
+        - bearerAuth: []
+      summary: Supprime un établissement
+      tags:
+        - Référentiels
+    get:
+      operationId: EtablissementController_getOne
+      parameters: []
+      responses:
+        '200':
+          description: Établissement trouvé
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Établissement introuvable
+      security:
+        - bearerAuth: []
+      summary: Détail d’un établissement
+      tags:
+        - Référentiels
+    patch:
+      operationId: EtablissementController_update
+      parameters: []
+      responses:
+        '200':
+          description: Établissement modifié
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Établissement introuvable
+      security:
+        - bearerAuth: []
+      summary: Modifie un établissement
+      tags:
+        - Référentiels
+  /api/v1/referentiels/grade-type-enseignements:
+    get:
+      operationId: GradeTypeEnseignementController_list
+      parameters: []
+      responses:
+        '200':
+          description: Liste des couples de la matrice
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Liste des couples (grade, type d’enseignement) de la matrice
+      tags:
+        - Référentiels
+    post:
+      operationId: GradeTypeEnseignementController_create
+      parameters: []
+      responses:
+        '201':
+          description: Couple créé
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Crée un couple (grade, type d’enseignement) dans la matrice
+      tags:
+        - Référentiels
+  /api/v1/referentiels/grade-type-enseignements/{id}:
+    delete:
+      operationId: GradeTypeEnseignementController_delete
+      parameters:
+        - in: path
+          name: id
+          required: true
           schema:
             type: string
-            format: uuid
+      responses:
+        '200':
+          description: Couple supprimé
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Couple introuvable
+        '409':
+          description: Conflit (utilisé par un module)
+      security:
+        - bearerAuth: []
+      summary: Supprime un couple de la matrice
+      tags:
+        - Référentiels
+    get:
+      operationId: GradeTypeEnseignementController_getOne
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Couple trouvé
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Couple introuvable
+      security:
+        - bearerAuth: []
+      summary: Détail d’un couple (grade, type d’enseignement)
+      tags:
+        - Référentiels
+  /api/v1/referentiels/grades:
+    get:
+      operationId: GradeController_list
+      parameters: []
+      responses:
+        '200':
+          description: Liste des grades
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Liste paginée des grades
+      tags:
+        - Référentiels
+    post:
+      operationId: GradeController_create
+      parameters: []
+      responses:
+        '201':
+          description: Grade créé
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Crée un grade
+      tags:
+        - Référentiels
+  /api/v1/referentiels/grades/{id}:
+    delete:
+      operationId: GradeController_delete
+      parameters: []
+      responses:
+        '200':
+          description: Grade supprimé
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Grade introuvable
+        '409':
+          description: Conflit (utilisé par un module)
+      security:
+        - bearerAuth: []
+      summary: Supprime un grade
+      tags:
+        - Référentiels
+    get:
+      operationId: GradeController_getOne
+      parameters: []
+      responses:
+        '200':
+          description: Grade trouvé
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Grade introuvable
+      security:
+        - bearerAuth: []
+      summary: Détail d’un grade
+      tags:
+        - Référentiels
+    patch:
+      operationId: GradeController_update
+      parameters: []
+      responses:
+        '200':
+          description: Grade modifié
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Grade introuvable
+      security:
+        - bearerAuth: []
+      summary: Modifie un grade
+      tags:
+        - Référentiels
+  /api/v1/referentiels/groupes:
+    get:
+      operationId: GroupeController_list
+      parameters: []
+      responses:
+        '200':
+          description: Liste des groupes
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Liste paginée des groupes
+      tags:
+        - Référentiels
+    post:
+      operationId: GroupeController_create
+      parameters: []
+      responses:
+        '201':
+          description: Groupe créé
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Crée un groupe
+      tags:
+        - Référentiels
+  /api/v1/referentiels/groupes/{id}:
+    delete:
+      operationId: GroupeController_delete
+      parameters: []
+      responses:
+        '200':
+          description: Groupe supprimé
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Groupe introuvable
+      security:
+        - bearerAuth: []
+      summary: Supprime un groupe
+      tags:
+        - Référentiels
+    get:
+      operationId: GroupeController_getOne
+      parameters: []
+      responses:
+        '200':
+          description: Groupe trouvé
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Groupe introuvable
+      security:
+        - bearerAuth: []
+      summary: Détail d’un groupe
+      tags:
+        - Référentiels
+    patch:
+      operationId: GroupeController_update
+      parameters: []
+      responses:
+        '200':
+          description: Groupe modifié
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Groupe introuvable
+      security:
+        - bearerAuth: []
+      summary: Modifie un groupe
+      tags:
+        - Référentiels
+  /api/v1/referentiels/import/apercu:
+    post:
+      operationId: ImportReferentielController_apercu
+      parameters: []
+      responses:
+        '200':
+          description: Aperçu de l’import
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Aperçu d’import CSV avant confirmation
+      tags:
+        - Import référentiels
+  /api/v1/referentiels/import/archive/annees-source:
+    get:
+      operationId: ArchiveImportController_listerAnneesSource
+      parameters: []
+      responses:
+        '200':
+          description: Liste des années clôturées
+      security:
+        - bearerAuth: []
+      summary: Liste les années universitaires clôturées disponibles en source
+      tags:
+        - Import archive
+  /api/v1/referentiels/import/archive/apercu:
+    post:
+      operationId: ArchiveImportController_apercu
+      parameters: []
+      responses:
+        '200':
+          description: Aperçu de l’import d’archive
+      security:
+        - bearerAuth: []
+      summary: Aperçu d’import sélectif depuis une année clôturée
+      tags:
+        - Import archive
+  /api/v1/referentiels/import/archive/executer:
+    post:
+      operationId: ArchiveImportController_executer
+      parameters: []
+      responses:
+        '200':
+          description: Rapport d’import d’archive
+      security:
+        - bearerAuth: []
+      summary: Exécute un import sélectif depuis une année clôturée
+      tags:
+        - Import archive
+  /api/v1/referentiels/import/archive/types:
+    get:
+      operationId: ArchiveImportController_listerTypes
+      parameters: []
+      responses:
+        '200':
+          description: Liste des types importables
+      security:
+        - bearerAuth: []
+      summary: Types de référentiels importables depuis une année clôturée
+      tags:
+        - Import archive
+  /api/v1/referentiels/import/executer:
+    post:
+      operationId: ImportReferentielController_executer
+      parameters: []
+      responses:
+        '200':
+          description: Rapport d’import ligne à ligne
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '409':
+          description: Conflit (fichier modifié depuis l’aperçu)
+      security:
+        - bearerAuth: []
+      summary: Exécute un import CSV après aperçu
+      tags:
+        - Import référentiels
+  /api/v1/referentiels/import/types:
+    get:
+      operationId: ImportReferentielController_listerTypes
+      parameters: []
+      responses:
+        '200':
+          description: Liste des types importables
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Types de référentiels importables par CSV
+      tags:
+        - Import référentiels
+  /api/v1/referentiels/matieres:
+    get:
+      operationId: MatiereController_list
+      parameters: []
+      responses:
+        '200':
+          description: Liste des matières
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Liste paginée des matières
+      tags:
+        - Référentiels
+    post:
+      operationId: MatiereController_create
+      parameters: []
+      responses:
+        '201':
+          description: Matière créée
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Crée une matière
+      tags:
+        - Référentiels
+  /api/v1/referentiels/matieres/{id}:
+    delete:
+      operationId: MatiereController_delete
+      parameters: []
+      responses:
+        '200':
+          description: Matière supprimée
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Matière introuvable
+        '409':
+          description: Conflit (utilisée par une affectation)
+      security:
+        - bearerAuth: []
+      summary: Supprime une matière
+      tags:
+        - Référentiels
+    get:
+      operationId: MatiereController_getOne
+      parameters: []
+      responses:
+        '200':
+          description: Matière trouvée
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Matière introuvable
+      security:
+        - bearerAuth: []
+      summary: Détail d’une matière
+      tags:
+        - Référentiels
+    patch:
+      operationId: MatiereController_update
+      parameters: []
+      responses:
+        '200':
+          description: Matière modifiée
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Matière introuvable
+      security:
+        - bearerAuth: []
+      summary: Modifie une matière
+      tags:
+        - Référentiels
+  /api/v1/referentiels/modules:
+    get:
+      operationId: ModuleController_list
+      parameters: []
+      responses:
+        '200':
+          description: Liste des modules
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Liste paginée des modules
+      tags:
+        - Référentiels
+    post:
+      operationId: ModuleController_create
+      parameters: []
+      responses:
+        '201':
+          description: Module créé
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Crée un module
+      tags:
+        - Référentiels
+  /api/v1/referentiels/modules/{id}:
+    delete:
+      operationId: ModuleController_delete
+      parameters: []
+      responses:
+        '200':
+          description: Module supprimé
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Module introuvable
+        '409':
+          description: Conflit (utilisé par une matière)
+      security:
+        - bearerAuth: []
+      summary: Supprime un module
+      tags:
+        - Référentiels
+    get:
+      operationId: ModuleController_getOne
+      parameters: []
+      responses:
+        '200':
+          description: Module trouvé
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Module introuvable
+      security:
+        - bearerAuth: []
+      summary: Détail d’un module
+      tags:
+        - Référentiels
+    patch:
+      operationId: ModuleController_update
+      parameters: []
+      responses:
+        '200':
+          description: Module modifié
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Module introuvable
+      security:
+        - bearerAuth: []
+      summary: Modifie un module
+      tags:
+        - Référentiels
+  /api/v1/referentiels/niveaux:
+    get:
+      operationId: NiveauController_list
+      parameters: []
+      responses:
+        '200':
+          description: Liste des niveaux
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Liste paginée des niveaux
+      tags:
+        - Référentiels
+    post:
+      operationId: NiveauController_create
+      parameters: []
+      responses:
+        '201':
+          description: Niveau créé
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Crée un niveau
+      tags:
+        - Référentiels
+  /api/v1/referentiels/niveaux/{id}:
+    delete:
+      operationId: NiveauController_delete
+      parameters: []
+      responses:
+        '200':
+          description: Niveau supprimé
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Niveau introuvable
+        '409':
+          description: Conflit (groupes associés)
+      security:
+        - bearerAuth: []
+      summary: Supprime un niveau
+      tags:
+        - Référentiels
+    get:
+      operationId: NiveauController_getOne
+      parameters: []
+      responses:
+        '200':
+          description: Niveau trouvé
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Niveau introuvable
+      security:
+        - bearerAuth: []
+      summary: Détail d’un niveau
+      tags:
+        - Référentiels
+    patch:
+      operationId: NiveauController_update
+      parameters: []
+      responses:
+        '200':
+          description: Niveau modifié
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Niveau introuvable
+      security:
+        - bearerAuth: []
+      summary: Modifie un niveau
+      tags:
+        - Référentiels
+  /api/v1/referentiels/parcours:
+    get:
+      operationId: ParcoursController_list
+      parameters: []
+      responses:
+        '200':
+          description: Liste des parcours
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Liste paginée des parcours
+      tags:
+        - Référentiels
+    post:
+      operationId: ParcoursController_create
+      parameters: []
+      responses:
+        '201':
+          description: Parcours créé
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Crée un parcours
+      tags:
+        - Référentiels
+  /api/v1/referentiels/parcours/{id}:
+    delete:
+      operationId: ParcoursController_delete
+      parameters: []
+      responses:
+        '200':
+          description: Parcours supprimé
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Parcours introuvable
+        '409':
+          description: Conflit (niveaux associés)
+      security:
+        - bearerAuth: []
+      summary: Supprime un parcours
+      tags:
+        - Référentiels
+    get:
+      operationId: ParcoursController_getOne
+      parameters: []
+      responses:
+        '200':
+          description: Parcours trouvé
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Parcours introuvable
+      security:
+        - bearerAuth: []
+      summary: Détail d’un parcours
+      tags:
+        - Référentiels
+    patch:
+      operationId: ParcoursController_update
+      parameters: []
+      responses:
+        '200':
+          description: Parcours modifié
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Parcours introuvable
+      security:
+        - bearerAuth: []
+      summary: Modifie un parcours
+      tags:
+        - Référentiels
+  /api/v1/referentiels/salles:
+    get:
+      operationId: SalleController_list
+      parameters: []
+      responses:
+        '200':
+          description: Liste des salles
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Liste paginée des salles
+      tags:
+        - Référentiels
+    post:
+      operationId: SalleController_create
+      parameters: []
+      responses:
+        '201':
+          description: Salle créée
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Crée une salle
+      tags:
+        - Référentiels
+  /api/v1/referentiels/salles/{id}:
+    delete:
+      operationId: SalleController_delete
+      parameters: []
+      responses:
+        '200':
+          description: Salle supprimée
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Salle introuvable
+        '409':
+          description: Conflit (salle utilisée)
+      security:
+        - bearerAuth: []
+      summary: Supprime une salle
+      tags:
+        - Référentiels
+    get:
+      operationId: SalleController_getOne
+      parameters: []
+      responses:
+        '200':
+          description: Salle trouvée
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Salle introuvable
+      security:
+        - bearerAuth: []
+      summary: Détail d’une salle
+      tags:
+        - Référentiels
+    patch:
+      operationId: SalleController_update
+      parameters: []
+      responses:
+        '200':
+          description: Salle modifiée
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Salle introuvable
+      security:
+        - bearerAuth: []
+      summary: Modifie une salle
+      tags:
+        - Référentiels
+  /api/v1/referentiels/sites:
+    get:
+      operationId: SiteController_list
+      parameters: []
+      responses:
+        '200':
+          description: Liste des sites
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Liste paginée des sites
+      tags:
+        - Référentiels
+    post:
+      operationId: SiteController_create
+      parameters: []
+      responses:
+        '201':
+          description: Site créé
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Crée un site
+      tags:
+        - Référentiels
+  /api/v1/referentiels/sites/{id}:
+    delete:
+      operationId: SiteController_delete
+      parameters: []
+      responses:
+        '200':
+          description: Site supprimé
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Site introuvable
+      security:
+        - bearerAuth: []
+      summary: Supprime un site
+      tags:
+        - Référentiels
+    get:
+      operationId: SiteController_getOne
+      parameters: []
+      responses:
+        '200':
+          description: Site trouvé
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Site introuvable
+      security:
+        - bearerAuth: []
+      summary: Détail d’un site
+      tags:
+        - Référentiels
+    patch:
+      operationId: SiteController_update
+      parameters: []
+      responses:
+        '200':
+          description: Site modifié
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Site introuvable
+      security:
+        - bearerAuth: []
+      summary: Modifie un site
+      tags:
+        - Référentiels
+  /api/v1/referentiels/type-enseignements:
+    get:
+      operationId: TypeEnseignementController_list
+      parameters: []
+      responses:
+        '200':
+          description: Liste des types d’enseignement
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Liste paginée des types d’enseignement
+      tags:
+        - Référentiels
+    post:
+      operationId: TypeEnseignementController_create
+      parameters: []
+      responses:
+        '201':
+          description: Type d’enseignement créé
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Crée un type d’enseignement
+      tags:
+        - Référentiels
+  /api/v1/referentiels/type-enseignements/{id}:
+    delete:
+      operationId: TypeEnseignementController_delete
+      parameters: []
+      responses:
+        '200':
+          description: Type d’enseignement supprimé
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Type d’enseignement introuvable
+        '409':
+          description: Conflit (utilisé par un module)
+      security:
+        - bearerAuth: []
+      summary: Supprime un type d’enseignement
+      tags:
+        - Référentiels
+    get:
+      operationId: TypeEnseignementController_getOne
+      parameters: []
+      responses:
+        '200':
+          description: Type d’enseignement trouvé
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Type d’enseignement introuvable
+      security:
+        - bearerAuth: []
+      summary: Détail d’un type d’enseignement
+      tags:
+        - Référentiels
+    patch:
+      operationId: TypeEnseignementController_update
+      parameters: []
+      responses:
+        '200':
+          description: Type d’enseignement modifié
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Type d’enseignement introuvable
+      security:
+        - bearerAuth: []
+      summary: Modifie un type d’enseignement
+      tags:
+        - Référentiels
+  /api/v1/referentiels/type-salles:
+    get:
+      operationId: TypeSalleController_list
+      parameters: []
+      responses:
+        '200':
+          description: Liste des types de salle
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Liste paginée des types de salle
+      tags:
+        - Référentiels
+    post:
+      operationId: TypeSalleController_create
+      parameters: []
+      responses:
+        '201':
+          description: Type de salle créé
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Crée un type de salle
+      tags:
+        - Référentiels
+  /api/v1/referentiels/type-salles/{id}:
+    delete:
+      operationId: TypeSalleController_delete
+      parameters: []
+      responses:
+        '200':
+          description: Type de salle supprimé
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Type de salle introuvable
+      security:
+        - bearerAuth: []
+      summary: Supprime un type de salle
+      tags:
+        - Référentiels
+    get:
+      operationId: TypeSalleController_getOne
+      parameters: []
+      responses:
+        '200':
+          description: Type de salle trouvé
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Type de salle introuvable
+      security:
+        - bearerAuth: []
+      summary: Détail d’un type de salle
+      tags:
+        - Référentiels
+    patch:
+      operationId: TypeSalleController_update
+      parameters: []
+      responses:
+        '200':
+          description: Type de salle modifié
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Type de salle introuvable
+      security:
+        - bearerAuth: []
+      summary: Modifie un type de salle
+      tags:
+        - Référentiels
+  /api/v1/users:
+    get:
+      operationId: UsersController_list
+      parameters: []
       responses:
         '200':
           description: Liste des utilisateurs
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/EnveloppeReponse'
-                  - type: object
-                    properties:
-                      data:
-                        type: array
-                        items:
-                          $ref: '#/components/schemas/UtilisateurResponse'
         '401':
           description: Non authentifié
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
         '403':
-          description: Interdit (rôle insuffisant)
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Liste paginée des utilisateurs
+      tags:
+        - Utilisateurs
     post:
-      tags: [Utilisateurs]
-      summary: Créer un utilisateur
-      description: Crée un nouveau compte utilisateur.
-      operationId: usersCreate
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - email
-                - motDePasse
-                - nom
-                - prenom
-                - roleId
-              properties:
-                email:
-                  type: string
-                  format: email
-                motDePasse:
-                  type: string
-                  format: password
-                nom:
-                  type: string
-                prenom:
-                  type: string
-                roleId:
-                  type: string
-                  format: uuid
-                departementId:
-                  type: string
-                  format: uuid
-                  nullable: true
+      operationId: UsersController_create
+      parameters: []
       responses:
         '201':
           description: Utilisateur créé
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/EnveloppeReponse'
-                  - type: object
-                    properties:
-                      data:
-                        $ref: '#/components/schemas/UtilisateurResponse'
         '400':
-          description: Données invalides
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Requête invalide
         '401':
           description: Non authentifié
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
         '403':
           description: Interdit
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-
-  /users/{id}:
-    get:
-      tags: [Utilisateurs]
-      summary: Détail d'un utilisateur
-      operationId: usersGet
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: string
-            format: uuid
+      security:
+        - bearerAuth: []
+      summary: Crée un utilisateur
+      tags:
+        - Utilisateurs
+  /api/v1/users/{id}:
+    delete:
+      operationId: UsersController_disable
+      parameters: []
       responses:
         '200':
-          description: Détail utilisateur
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/EnveloppeReponse'
-                  - type: object
-                    properties:
-                      data:
-                        $ref: '#/components/schemas/UtilisateurResponse'
+          description: Utilisateur désactivé
+        '400':
+          description: Requête invalide
         '401':
           description: Non authentifié
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
         '403':
           description: Interdit
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
         '404':
-          description: Utilisateur non trouvé
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-
-    put:
-      tags: [Utilisateurs]
-      summary: Modifier un utilisateur
-      operationId: usersUpdate
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: string
-            format: uuid
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                email:
-                  type: string
-                  format: email
-                nom:
-                  type: string
-                prenom:
-                  type: string
-                roleId:
-                  type: string
-                  format: uuid
-                departementId:
-                  type: string
-                  format: uuid
-                  nullable: true
-                estActif:
-                  type: boolean
+          description: Utilisateur introuvable
+      security:
+        - bearerAuth: []
+      summary: Désactive un utilisateur (soft delete)
+      tags:
+        - Utilisateurs
+    get:
+      operationId: UsersController_getOne
+      parameters: []
+      responses:
+        '200':
+          description: Utilisateur trouvé
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Utilisateur introuvable
+      security:
+        - bearerAuth: []
+      summary: Détail d’un utilisateur
+      tags:
+        - Utilisateurs
+    patch:
+      operationId: UsersController_update
+      parameters: []
       responses:
         '200':
           description: Utilisateur modifié
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/EnveloppeReponse'
-                  - type: object
-                    properties:
-                      data:
-                        $ref: '#/components/schemas/UtilisateurResponse'
         '400':
-          description: Données invalides
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Requête invalide
         '401':
           description: Non authentifié
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
         '403':
           description: Interdit
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
         '404':
-          description: Utilisateur non trouvé
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-
-    delete:
-      tags: [Utilisateurs]
-      summary: Supprimer un utilisateur
-      operationId: usersDelete
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: string
-            format: uuid
-      responses:
-        '200':
-          description: Utilisateur supprimé
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/EnveloppeReponse'
-        '401':
-          description: Non authentifié
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-        '403':
-          description: Interdit
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-        '404':
-          description: Utilisateur non trouvé
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-
-  # ============================================================================
-  # VERSIONS
-  # ============================================================================
-  /versions:
-    get:
-      tags: [Versions]
-      summary: Liste des versions
-      description: Retourne la liste des versions de planning avec filtres.
-      operationId: versionsList
-      parameters:
-        - in: query
-          name: semestreId
-          schema:
-            type: string
-            format: uuid
-        - in: query
-          name: etat
-          schema:
-            type: string
-            enum: [initial, rep_pedag, brouillon, generation, edition, valid_pedag, valid_dir, valide, publie, archive]
-        - in: query
-          name: page
-          schema:
-            type: integer
-            default: 1
-        - in: query
-          name: pageSize
-          schema:
-            type: integer
-            default: 20
-      responses:
-        '200':
-          description: Liste des versions
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/EnveloppeReponse'
-                  - type: object
-                    properties:
-                      data:
-                        type: array
-                        items:
-                          $ref: '#/components/schemas/VersionResponse'
-        '401':
-          description: Non authentifié
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-
-    post:
-      tags: [Versions]
-      summary: Créer une version
-      description: Crée une nouvelle version de planning pour un semestre.
-      operationId: versionsCreate
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - semestreId
-              properties:
-                semestreId:
-                  type: string
-                  format: uuid
-      responses:
-        '201':
-          description: Version créée
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/EnveloppeReponse'
-                  - type: object
-                    properties:
-                      data:
-                        $ref: '#/components/schemas/VersionResponse'
-        '400':
-          description: Données invalides
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-        '401':
-          description: Non authentifié
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-        '403':
-          description: Interdit
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-
-  /versions/{id}:
-    get:
-      tags: [Versions]
-      summary: Détail d'une version
-      operationId: versionsGet
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: string
-            format: uuid
-      responses:
-        '200':
-          description: Détail version
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/EnveloppeReponse'
-                  - type: object
-                    properties:
-                      data:
-                        $ref: '#/components/schemas/VersionResponse'
-        '401':
-          description: Non authentifié
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-        '403':
-          description: Interdit
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-        '404':
-          description: Version non trouvée
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-
-    put:
-      tags: [Versions]
-      summary: Modifier une version
-      operationId: versionsUpdate
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: string
-            format: uuid
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                etat:
-                  type: string
-                  enum: [initial, rep_pedag, brouillon, generation, edition, valid_pedag, valid_dir, valide, publie, archive]
-                snapshotId:
-                  type: string
-                  format: uuid
-                  nullable: true
-      responses:
-        '200':
-          description: Version modifiée
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/EnveloppeReponse'
-                  - type: object
-                    properties:
-                      data:
-                        $ref: '#/components/schemas/VersionResponse'
-        '400':
-          description: Données invalides
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-        '401':
-          description: Non authentifié
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-        '403':
-          description: Interdit
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-        '404':
-          description: Version non trouvée
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-
-    delete:
-      tags: [Versions]
-      summary: Supprimer une version
-      operationId: versionsDelete
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: string
-            format: uuid
-      responses:
-        '200':
-          description: Version supprimée
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/EnveloppeReponse'
-        '401':
-          description: Non authentifié
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-        '403':
-          description: Interdit
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-        '404':
-          description: Version non trouvée
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-
-  /versions/{id}/transition:
-    post:
-      tags: [Versions]
-      summary: Transition d'état du workflow
-      description: Applique une transition d'état sur la version (19 transitions possibles).
-      operationId: versionsTransition
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: string
-            format: uuid
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/TransitionRequest'
-      responses:
-        '200':
-          description: Transition effectuée
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/EnveloppeReponse'
-                  - type: object
-                    properties:
-                      data:
-                        $ref: '#/components/schemas/VersionResponse'
-        '400':
-          description: Transition invalide
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-        '401':
-          description: Non authentifié
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-        '403':
-          description: Interdit (droits insuffisants)
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-        '404':
-          description: Version non trouvée
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-        '409':
-          description: Conflit (transition non autorisée pour l'état courant)
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-
-  # ============================================================================
-  # SEANCES
-  # ============================================================================
-  /seances:
-    get:
-      tags: [Seances]
-      summary: Liste des séances
-      description: Retourne la liste des séances d'une version avec filtres.
-      operationId: seancesList
-      parameters:
-        - in: query
-          name: versionId
-          required: true
-          schema:
-            type: string
-            format: uuid
-        - in: query
-          name: jour
-          schema:
-            type: integer
-            minimum: 1
-            maximum: 6
-        - in: query
-          name: page
-          schema:
-            type: integer
-            default: 1
-        - in: query
-          name: pageSize
-          schema:
-            type: integer
-            default: 50
-      responses:
-        '200':
-          description: Liste des séances
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/EnveloppeReponse'
-                  - type: object
-                    properties:
-                      data:
-                        type: array
-                        items:
-                          $ref: '#/components/schemas/SeanceResponse'
-        '400':
-          description: Paramètres invalides
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-        '401':
-          description: Non authentifié
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-
-    post:
-      tags: [Seances]
-      summary: Créer une séance
-      description: Crée une nouvelle séance dans une version.
-      operationId: seancesCreate
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/SeanceCreateRequest'
-      responses:
-        '201':
-          description: Séance créée
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/EnveloppeReponse'
-                  - type: object
-                    properties:
-                      data:
-                        $ref: '#/components/schemas/SeanceResponse'
-        '400':
-          description: Données invalides ou conflit de créneau
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-        '401':
-          description: Non authentifié
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-        '403':
-          description: Interdit (séance verrouillée ou droits insuffisants)
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-        '409':
-          description: Conflit de créneau (salle, enseignant ou groupe déjà occupé)
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-
-  /seances/{id}:
-    get:
-      tags: [Seances]
-      summary: Détail d'une séance
-      operationId: seancesGet
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: string
-            format: uuid
-      responses:
-        '200':
-          description: Détail séance
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/EnveloppeReponse'
-                  - type: object
-                    properties:
-                      data:
-                        $ref: '#/components/schemas/SeanceResponse'
-        '401':
-          description: Non authentifié
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-        '404':
-          description: Séance non trouvée
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-
-    put:
-      tags: [Seances]
-      summary: Modifier une séance
-      operationId: seancesUpdate
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: string
-            format: uuid
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/SeanceUpdateRequest'
-      responses:
-        '200':
-          description: Séance modifiée
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/EnveloppeReponse'
-                  - type: object
-                    properties:
-                      data:
-                        $ref: '#/components/schemas/SeanceResponse'
-        '400':
-          description: Données invalides
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-        '401':
-          description: Non authentifié
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-        '403':
-          description: Interdit (séance verrouillée)
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-        '404':
-          description: Séance non trouvée
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-        '409':
-          description: Conflit de créneau
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-
-    patch:
-      tags: [Seances]
-      summary: Modification partielle d'une séance
-      operationId: seancesPatch
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: string
-            format: uuid
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/SeanceUpdateRequest'
-      responses:
-        '200':
-          description: Séance modifiée
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/EnveloppeReponse'
-                  - type: object
-                    properties:
-                      data:
-                        $ref: '#/components/schemas/SeanceResponse'
-        '400':
-          description: Données invalides
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-        '401':
-          description: Non authentifié
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-        '403':
-          description: Interdit (séance verrouillée)
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-        '404':
-          description: Séance non trouvée
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-        '409':
-          description: Conflit de créneau
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-
-    delete:
-      tags: [Seances]
-      summary: Supprimer une séance
-      operationId: seancesDelete
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: string
-            format: uuid
-      responses:
-        '200':
-          description: Séance supprimée
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/EnveloppeReponse'
-        '401':
-          description: Non authentifié
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-        '403':
-          description: Interdit (séance verrouillée)
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-        '404':
-          description: Séance non trouvée
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-
-  # ============================================================================
-  # VERROUS
-  # ============================================================================
-  /locks:
-    post:
-      tags: [Verrous]
-      summary: Poser un verrou sur une séance
-      description: Crée un bail d'édition exclusif sur une séance (30 min, renouvelable).
-      operationId: locksCreate
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/LockRequest'
-      responses:
-        '201':
-          description: Verrou posé
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/EnveloppeReponse'
-                  - type: object
-                    properties:
-                      data:
-                        $ref: '#/components/schemas/VerrouSeance'
-        '400':
-          description: Données invalides
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-        '401':
-          description: Non authentifié
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-        '403':
-          description: Interdit (séance déjà verrouillée par un autre utilisateur)
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-        '404':
-          description: Séance non trouvée
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-        '423':
-          description: Verrouillé (bail d'édition actif par un autre utilisateur)
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-
-  /locks/{id}:
-    delete:
-      tags: [Verrous]
-      summary: Lever un verrou
-      description: Libère le bail d'édition sur une séance.
-      operationId: locksDelete
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: string
-            format: uuid
-      responses:
-        '200':
-          description: Verrou levé
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/EnveloppeReponse'
-        '401':
-          description: Non authentifié
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-        '403':
-          description: Interdit (pas le propriétaire du verrou)
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-        '404':
-          description: Verrou non trouvé
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-
-  # ============================================================================
-  # GENERATIONS
-  # ============================================================================
-  /generations:
-    get:
-      tags: [Generations]
-      summary: Liste des générations
-      description: Retourne la liste des jobs de génération CP-SAT.
-      operationId: generationsList
-      parameters:
-        - in: query
-          name: versionId
-          required: true
-          schema:
-            type: string
-            format: uuid
-        - in: query
-          name: statut
-          schema:
-            type: string
-            enum: [EN_COURS, TERMINEE, ECHEC]
-      responses:
-        '200':
-          description: Liste des générations
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/EnveloppeReponse'
-                  - type: object
-                    properties:
-                      data:
-                        type: array
-                        items:
-                          $ref: '#/components/schemas/GenerationResponse'
-        '400':
-          description: Paramètres invalides
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-        '401':
-          description: Non authentifié
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-
-    post:
-      tags: [Generations]
-      summary: Lancer une génération CP-SAT
-      description: Déclenche la génération d'emplois du temps pour une version.
-      operationId: generationsCreate
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/GenerationRequest'
-      responses:
-        '202':
-          description: Génération lancée (job en file d'attente)
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/EnveloppeReponse'
-                  - type: object
-                    properties:
-                      data:
-                        $ref: '#/components/schemas/GenerationResponse'
-        '400':
-          description: Prérequis non remplis
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-        '401':
-          description: Non authentifié
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-        '403':
-          description: Interdit (tous départements n'ont pas validé)
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-        '409':
-          description: Conflit (génération déjà en cours)
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-
-  /generations/{id}/scenarios:
-    get:
-      tags: [Generations]
-      summary: Scénarios d'une génération
-      description: Retourne les scénarios produits par le solver pour une génération.
-      operationId: generationsScenarios
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: string
-            format: uuid
-      responses:
-        '200':
-          description: Liste des scénarios
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/EnveloppeReponse'
-                  - type: object
-                    properties:
-                      data:
-                        type: array
-                        items:
-                          $ref: '#/components/schemas/ScenarioResponse'
-        '401':
-          description: Non authentifié
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-        '404':
-          description: Génération non trouvée
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-
-  /generations/{id}/select:
-    post:
-      tags: [Generations]
-      summary: Sélectionner un scénario
-      description: Sélectionne un scénario produit par le solver et crée une version en édition.
-      operationId: generationsSelect
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: string
-            format: uuid
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ScenarioSelectRequest'
-      responses:
-        '200':
-          description: Scénario sélectionné
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/EnveloppeReponse'
-                  - type: object
-                    properties:
-                      data:
-                        $ref: '#/components/schemas/VersionResponse'
-        '400':
-          description: Données invalides
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-        '401':
-          description: Non authentifié
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-        '403':
-          description: Interdit
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-        '404':
-          description: Génération ou scénario non trouvé
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-
-  # ============================================================================
-  # EXPORTS
-  # ============================================================================
-  /exports:
-    get:
-      tags: [Exports]
-      summary: Liste des exports
-      description: Retourne la liste des fichiers d'export générés.
-      operationId: exportsList
-      parameters:
-        - in: query
-          name: versionId
-          required: true
-          schema:
-            type: string
-            format: uuid
-        - in: query
-          name: format
-          schema:
-            type: string
-            enum: [xlsx, pdf, ics]
-      responses:
-        '200':
-          description: Liste des exports
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/EnveloppeReponse'
-                  - type: object
-                    properties:
-                      data:
-                        type: array
-                        items:
-                          $ref: '#/components/schemas/ExportResponse'
-        '400':
-          description: Paramètres invalides
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-        '401':
-          description: Non authentifié
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-
-    post:
-      tags: [Exports]
-      summary: Lancer un export
-      description: Génère un fichier d'export (XLSX, PDF ou ICS) pour une version publiée.
-      operationId: exportsCreate
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ExportRequest'
-      responses:
-        '202':
-          description: Export lancé (job en file d'attente)
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/EnveloppeReponse'
-                  - type: object
-                    properties:
-                      data:
-                        $ref: '#/components/schemas/ExportResponse'
-        '400':
-          description: Données invalides
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-        '401':
-          description: Non authentifié
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-        '403':
-          description: Interdit (version non publiée)
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-        '404':
-          description: Version non trouvée
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-
-  # ============================================================================
-  # AUDIT
-  # ============================================================================
+          description: Utilisateur introuvable
+      security:
+        - bearerAuth: []
+      summary: Modifie un utilisateur
+      tags:
+        - Utilisateurs
   /audit:
     get:
-      tags: [Audit]
-      summary: Journal d'audit
       description: Retourne les entrées du journal d'audit avec filtres.
       operationId: auditList
       parameters:
@@ -2114,48 +2836,1521 @@ paths:
         - in: query
           name: utilisateurId
           schema:
-            type: string
             format: uuid
+            type: string
         - in: query
           name: page
           schema:
-            type: integer
             default: 1
+            type: integer
         - in: query
           name: pageSize
           schema:
-            type: integer
             default: 50
+            type: integer
       responses:
         '200':
-          description: Liste des entrées d'audit
           content:
             application/json:
               schema:
                 allOf:
                   - $ref: '#/components/schemas/EnveloppeReponse'
-                  - type: object
-                    properties:
+                  - properties:
                       data:
-                        type: array
                         items:
                           $ref: '#/components/schemas/JournalAudit'
+                        type: array
+                    type: object
+          description: Liste des entrées d'audit
         '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
           description: Paramètres invalides
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
         '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
           description: Non authentifié
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
         '403':
-          description: Interdit (droits insuffisants)
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErreurRFC9457'
+          description: Interdit (droits insuffisants)
           format: date-time
+      security:
+        - bearerAuth: []
+      summary: Journal d'audit
+      tags:
+        - Audit
+  /auth/login:
+    post:
+      description: Authentifie un utilisateur et retourne un access token + refresh token.
+      operationId: authLogin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/EnveloppeReponse'
+                  - properties:
+                      data:
+                        $ref: '#/components/schemas/TokenResponse'
+                    type: object
+          description: Connexion réussie
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Données de requête invalides
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Identifiants invalides
+      security: []
+      summary: Connexion utilisateur
+      tags:
+        - Auth
+  /auth/logout:
+    post:
+      description: Invalide le refresh token de la session courante.
+      operationId: authLogout
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnveloppeReponse'
+          description: Déconnexion réussie
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Non authentifié
+      security:
+        - bearerAuth: []
+      summary: Déconnexion
+      tags:
+        - Auth
+  /auth/refresh:
+    post:
+      description: Renouvelle le token d'accès à l'aide du refresh token rotatif.
+      operationId: authRefresh
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/EnveloppeReponse'
+                  - properties:
+                      data:
+                        $ref: '#/components/schemas/TokenResponse'
+                    type: object
+          description: Token renouvelé
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Requête invalide
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Refresh token invalide ou expiré
+      security: []
+      summary: Renouvellement du token d'accès
+      tags:
+        - Auth
+  /exports:
+    get:
+      description: Retourne la liste des fichiers d'export générés.
+      operationId: exportsList
+      parameters:
+        - in: query
+          name: versionId
+          required: true
+          schema:
+            format: uuid
+            type: string
+        - in: query
+          name: format
+          schema:
+            enum:
+              - xlsx
+              - pdf
+              - ics
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/EnveloppeReponse'
+                  - properties:
+                      data:
+                        items:
+                          $ref: '#/components/schemas/ExportResponse'
+                        type: array
+                    type: object
+          description: Liste des exports
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Paramètres invalides
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Non authentifié
+      security:
+        - bearerAuth: []
+      summary: Liste des exports
+      tags:
+        - Exports
+    post:
+      description: Génère un fichier d'export (XLSX, PDF ou ICS) pour une version publiée.
+      operationId: exportsCreate
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExportRequest'
+        required: true
+      responses:
+        '202':
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/EnveloppeReponse'
+                  - properties:
+                      data:
+                        $ref: '#/components/schemas/ExportResponse'
+                    type: object
+          description: Export lancé (job en file d'attente)
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Données invalides
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Non authentifié
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Interdit (version non publiée)
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Version non trouvée
+      security:
+        - bearerAuth: []
+      summary: Lancer un export
+      tags:
+        - Exports
+  /generations:
+    get:
+      description: Retourne la liste des jobs de génération CP-SAT.
+      operationId: generationsList
+      parameters:
+        - in: query
+          name: versionId
+          required: true
+          schema:
+            format: uuid
+            type: string
+        - in: query
+          name: statut
+          schema:
+            enum:
+              - EN_COURS
+              - TERMINEE
+              - ECHEC
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/EnveloppeReponse'
+                  - properties:
+                      data:
+                        items:
+                          $ref: '#/components/schemas/GenerationResponse'
+                        type: array
+                    type: object
+          description: Liste des générations
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Paramètres invalides
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Non authentifié
+      security:
+        - bearerAuth: []
+      summary: Liste des générations
+      tags:
+        - Generations
+    post:
+      description: Déclenche la génération d'emplois du temps pour une version.
+      operationId: generationsCreate
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenerationRequest'
+        required: true
+      responses:
+        '202':
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/EnveloppeReponse'
+                  - properties:
+                      data:
+                        $ref: '#/components/schemas/GenerationResponse'
+                    type: object
+          description: Génération lancée (job en file d'attente)
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Prérequis non remplis
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Non authentifié
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Interdit (tous départements n'ont pas validé)
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Conflit (génération déjà en cours)
+      security:
+        - bearerAuth: []
+      summary: Lancer une génération CP-SAT
+      tags:
+        - Generations
+  /generations/{id}/scenarios:
+    get:
+      description: Retourne les scénarios produits par le solver pour une génération.
+      operationId: generationsScenarios
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            format: uuid
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/EnveloppeReponse'
+                  - properties:
+                      data:
+                        items:
+                          $ref: '#/components/schemas/ScenarioResponse'
+                        type: array
+                    type: object
+          description: Liste des scénarios
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Non authentifié
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Génération non trouvée
+      security:
+        - bearerAuth: []
+      summary: Scénarios d'une génération
+      tags:
+        - Generations
+  /generations/{id}/select:
+    post:
+      description: Sélectionne un scénario produit par le solver et crée une version en édition.
+      operationId: generationsSelect
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            format: uuid
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScenarioSelectRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/EnveloppeReponse'
+                  - properties:
+                      data:
+                        $ref: '#/components/schemas/VersionResponse'
+                    type: object
+          description: Scénario sélectionné
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Données invalides
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Non authentifié
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Interdit
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Génération ou scénario non trouvé
+      security:
+        - bearerAuth: []
+      summary: Sélectionner un scénario
+      tags:
+        - Generations
+  /health:
+    get:
+      operationId: HealthController_getHealth
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthStatusDto'
+          description: L'API est opérationnelle
+      security: []
+      summary: État de santé de l'API
+      tags:
+        - health
+  /locks:
+    post:
+      description: Crée un bail d'édition exclusif sur une séance (30 min, renouvelable).
+      operationId: locksCreate
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LockRequest'
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/EnveloppeReponse'
+                  - properties:
+                      data:
+                        $ref: '#/components/schemas/VerrouSeance'
+                    type: object
+          description: Verrou posé
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Données invalides
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Non authentifié
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Interdit (séance déjà verrouillée par un autre utilisateur)
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Séance non trouvée
+        '423':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Verrouillé (bail d'édition actif par un autre utilisateur)
+      security:
+        - bearerAuth: []
+      summary: Poser un verrou sur une séance
+      tags:
+        - Verrous
+  /locks/{id}:
+    delete:
+      description: Libère le bail d'édition sur une séance.
+      operationId: locksDelete
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            format: uuid
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnveloppeReponse'
+          description: Verrou levé
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Non authentifié
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Interdit (pas le propriétaire du verrou)
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Verrou non trouvé
+      security:
+        - bearerAuth: []
+      summary: Lever un verrou
+      tags:
+        - Verrous
+  /seances:
+    get:
+      description: Retourne la liste des séances d'une version avec filtres.
+      operationId: seancesList
+      parameters:
+        - in: query
+          name: versionId
+          required: true
+          schema:
+            format: uuid
+            type: string
+        - in: query
+          name: jour
+          schema:
+            maximum: 6
+            minimum: 1
+            type: integer
+        - in: query
+          name: page
+          schema:
+            default: 1
+            type: integer
+        - in: query
+          name: pageSize
+          schema:
+            default: 50
+            type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/EnveloppeReponse'
+                  - properties:
+                      data:
+                        items:
+                          $ref: '#/components/schemas/SeanceResponse'
+                        type: array
+                    type: object
+          description: Liste des séances
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Paramètres invalides
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Non authentifié
+      security:
+        - bearerAuth: []
+      summary: Liste des séances
+      tags:
+        - Seances
+    post:
+      description: Crée une nouvelle séance dans une version.
+      operationId: seancesCreate
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SeanceCreateRequest'
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/EnveloppeReponse'
+                  - properties:
+                      data:
+                        $ref: '#/components/schemas/SeanceResponse'
+                    type: object
+          description: Séance créée
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Données invalides ou conflit de créneau
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Non authentifié
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Interdit (séance verrouillée ou droits insuffisants)
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Conflit de créneau (salle, enseignant ou groupe déjà occupé)
+      security:
+        - bearerAuth: []
+      summary: Créer une séance
+      tags:
+        - Seances
+  /seances/{id}:
+    delete:
+      operationId: seancesDelete
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            format: uuid
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnveloppeReponse'
+          description: Séance supprimée
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Non authentifié
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Interdit (séance verrouillée)
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Séance non trouvée
+      security:
+        - bearerAuth: []
+      summary: Supprimer une séance
+      tags:
+        - Seances
+    get:
+      operationId: seancesGet
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            format: uuid
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/EnveloppeReponse'
+                  - properties:
+                      data:
+                        $ref: '#/components/schemas/SeanceResponse'
+                    type: object
+          description: Détail séance
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Non authentifié
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Séance non trouvée
+      security:
+        - bearerAuth: []
+      summary: Détail d'une séance
+      tags:
+        - Seances
+    patch:
+      operationId: seancesPatch
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            format: uuid
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SeanceUpdateRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/EnveloppeReponse'
+                  - properties:
+                      data:
+                        $ref: '#/components/schemas/SeanceResponse'
+                    type: object
+          description: Séance modifiée
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Données invalides
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Non authentifié
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Interdit (séance verrouillée)
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Séance non trouvée
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Conflit de créneau
+      security:
+        - bearerAuth: []
+      summary: Modification partielle d'une séance
+      tags:
+        - Seances
+    put:
+      operationId: seancesUpdate
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            format: uuid
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SeanceUpdateRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/EnveloppeReponse'
+                  - properties:
+                      data:
+                        $ref: '#/components/schemas/SeanceResponse'
+                    type: object
+          description: Séance modifiée
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Données invalides
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Non authentifié
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Interdit (séance verrouillée)
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Séance non trouvée
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Conflit de créneau
+      security:
+        - bearerAuth: []
+      summary: Modifier une séance
+      tags:
+        - Seances
+  /users:
+    get:
+      description: Retourne la liste paginée des utilisateurs avec filtres optionnels.
+      operationId: usersList
+      parameters:
+        - in: query
+          name: page
+          schema:
+            default: 1
+            type: integer
+        - in: query
+          name: pageSize
+          schema:
+            default: 20
+            type: integer
+        - in: query
+          name: role
+          schema:
+            enum:
+              - admin
+              - gest
+              - rdep
+              - dir
+            type: string
+        - in: query
+          name: departementId
+          schema:
+            format: uuid
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/EnveloppeReponse'
+                  - properties:
+                      data:
+                        items:
+                          $ref: '#/components/schemas/UtilisateurResponse'
+                        type: array
+                    type: object
+          description: Liste des utilisateurs
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Non authentifié
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Interdit (rôle insuffisant)
+      security:
+        - bearerAuth: []
+      summary: Liste des utilisateurs
+      tags:
+        - Utilisateurs
+    post:
+      description: Crée un nouveau compte utilisateur.
+      operationId: usersCreate
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                departementId:
+                  format: uuid
+                  nullable: true
+                  type: string
+                email:
+                  format: email
+                  type: string
+                motDePasse:
+                  format: password
+                  type: string
+                nom:
+                  type: string
+                prenom:
+                  type: string
+                roleId:
+                  format: uuid
+                  type: string
+              required:
+                - email
+                - motDePasse
+                - nom
+                - prenom
+                - roleId
+              type: object
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/EnveloppeReponse'
+                  - properties:
+                      data:
+                        $ref: '#/components/schemas/UtilisateurResponse'
+                    type: object
+          description: Utilisateur créé
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Données invalides
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Non authentifié
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Créer un utilisateur
+      tags:
+        - Utilisateurs
+  /users/{id}:
+    delete:
+      operationId: usersDelete
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            format: uuid
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnveloppeReponse'
+          description: Utilisateur supprimé
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Non authentifié
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Interdit
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Utilisateur non trouvé
+      security:
+        - bearerAuth: []
+      summary: Supprimer un utilisateur
+      tags:
+        - Utilisateurs
+    get:
+      operationId: usersGet
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            format: uuid
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/EnveloppeReponse'
+                  - properties:
+                      data:
+                        $ref: '#/components/schemas/UtilisateurResponse'
+                    type: object
+          description: Détail utilisateur
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Non authentifié
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Interdit
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Utilisateur non trouvé
+      security:
+        - bearerAuth: []
+      summary: Détail d'un utilisateur
+      tags:
+        - Utilisateurs
+    put:
+      operationId: usersUpdate
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            format: uuid
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                departementId:
+                  format: uuid
+                  nullable: true
+                  type: string
+                email:
+                  format: email
+                  type: string
+                estActif:
+                  type: boolean
+                nom:
+                  type: string
+                prenom:
+                  type: string
+                roleId:
+                  format: uuid
+                  type: string
+              type: object
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/EnveloppeReponse'
+                  - properties:
+                      data:
+                        $ref: '#/components/schemas/UtilisateurResponse'
+                    type: object
+          description: Utilisateur modifié
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Données invalides
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Non authentifié
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Interdit
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Utilisateur non trouvé
+      security:
+        - bearerAuth: []
+      summary: Modifier un utilisateur
+      tags:
+        - Utilisateurs
+  /versions:
+    get:
+      description: Retourne la liste des versions de planning avec filtres.
+      operationId: versionsList
+      parameters:
+        - in: query
+          name: semestreId
+          schema:
+            format: uuid
+            type: string
+        - in: query
+          name: etat
+          schema:
+            enum:
+              - initial
+              - rep_pedag
+              - brouillon
+              - generation
+              - edition
+              - valid_pedag
+              - valid_dir
+              - valide
+              - publie
+              - archive
+            type: string
+        - in: query
+          name: page
+          schema:
+            default: 1
+            type: integer
+        - in: query
+          name: pageSize
+          schema:
+            default: 20
+            type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/EnveloppeReponse'
+                  - properties:
+                      data:
+                        items:
+                          $ref: '#/components/schemas/VersionResponse'
+                        type: array
+                    type: object
+          description: Liste des versions
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Non authentifié
+      security:
+        - bearerAuth: []
+      summary: Liste des versions
+      tags:
+        - Versions
+    post:
+      description: Crée une nouvelle version de planning pour un semestre.
+      operationId: versionsCreate
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                semestreId:
+                  format: uuid
+                  type: string
+              required:
+                - semestreId
+              type: object
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/EnveloppeReponse'
+                  - properties:
+                      data:
+                        $ref: '#/components/schemas/VersionResponse'
+                    type: object
+          description: Version créée
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Données invalides
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Non authentifié
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Créer une version
+      tags:
+        - Versions
+  /versions/{id}:
+    delete:
+      operationId: versionsDelete
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            format: uuid
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnveloppeReponse'
+          description: Version supprimée
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Non authentifié
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Interdit
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Version non trouvée
+      security:
+        - bearerAuth: []
+      summary: Supprimer une version
+      tags:
+        - Versions
+    get:
+      operationId: versionsGet
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            format: uuid
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/EnveloppeReponse'
+                  - properties:
+                      data:
+                        $ref: '#/components/schemas/VersionResponse'
+                    type: object
+          description: Détail version
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Non authentifié
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Interdit
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Version non trouvée
+      security:
+        - bearerAuth: []
+      summary: Détail d'une version
+      tags:
+        - Versions
+    put:
+      operationId: versionsUpdate
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            format: uuid
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                etat:
+                  enum:
+                    - initial
+                    - rep_pedag
+                    - brouillon
+                    - generation
+                    - edition
+                    - valid_pedag
+                    - valid_dir
+                    - valide
+                    - publie
+                    - archive
+                  type: string
+                snapshotId:
+                  format: uuid
+                  nullable: true
+                  type: string
+              type: object
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/EnveloppeReponse'
+                  - properties:
+                      data:
+                        $ref: '#/components/schemas/VersionResponse'
+                    type: object
+          description: Version modifiée
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Données invalides
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Non authentifié
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Interdit
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Version non trouvée
+      security:
+        - bearerAuth: []
+      summary: Modifier une version
+      tags:
+        - Versions
+  /versions/{id}/transition:
+    post:
+      description: Applique une transition d'état sur la version (19 transitions possibles).
+      operationId: versionsTransition
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            format: uuid
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransitionRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/EnveloppeReponse'
+                  - properties:
+                      data:
+                        $ref: '#/components/schemas/VersionResponse'
+                    type: object
+          description: Transition effectuée
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Transition invalide
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Non authentifié
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Interdit (droits insuffisants)
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Version non trouvée
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Conflit (transition non autorisée pour l'état courant)
+      security:
+        - bearerAuth: []
+      summary: Transition d'état du workflow
+      tags:
+        - Versions
+security:
+  - bearerAuth: []
+servers:
+  - description: Serveur de développement (NestJS local)
+    url: http://localhost:3000/api/v1
+  - description: Serveur de production (Nginx reverse proxy)
+    url: https://api.takt.internal/api/v1
+tags:
+  - description: Authentification et gestion de session
+    name: Auth
+  - description: Gestion des comptes utilisateurs (CRUD)
+    name: Utilisateurs
+  - description: Gestion des versions de planning et workflow (10 états, 19 transitions)
+    name: Versions
+  - description: Gestion des séances de cours (CRUD, détection de conflits)
+    name: Seances
+  - description: Gestion des baux d'édition sur les séances
+    name: Verrous
+  - description: Génération d'emplois du temps par CP-SAT et scénarios
+    name: Generations
+  - description: Génération d'exports (XLSX, PDF, ICS)
+    name: Exports
+  - description: Journal d'audit des actions utilisateurs
+    name: Audit

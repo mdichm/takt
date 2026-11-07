@@ -25,15 +25,17 @@ model Utilisateur {
   prenom         String
   roleId         String   @db.Uuid
   departementId  String?  @db.Uuid
-  estActif       Boolean  @default(true)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  estActif       Boolean   @default(true)
+  motDePasseHash String?    // hash Argon2id du mot de passe (nullable : comptes externes/SSO)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
-  role           Role       @relation(fields: [roleId], references: [id])
-  departement    Departement? @relation(fields: [departementId], references: [id])
-  verrous        VerrouSeance[]
-  affectations   AffectationPedagogique[]
-  journalAudit   JournalAudit[]
+  role             Role                @relation(fields: [roleId], references: [id])
+  departement      Departement?        @relation(fields: [departementId], references: [id])
+  sessionsRefresh  SessionRefresh[]    // familles de jetons de rafraîchissement (rotation)
+  verrous          VerrouSeance[]
+  affectations     AffectationPedagogique[]
+  journalAudit     JournalAudit[]
 
   @@index([email])
   @@index([roleId])
@@ -53,20 +55,95 @@ model Role {
 }
 
 // ----------------------------------------------------------------------------
-// 3. Departement — Référentiel des départements
+// 3. Etablissement — Référentiel des établissements
 // ----------------------------------------------------------------------------
-model Departement {
+model Etablissement {
   id          String   @id @default(uuid()) @db.Uuid
   code        String   @unique
   libelle     String
-  utilisateurs Utilisateur[]
-  affectations AffectationPedagogique[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  departements Departement[]
 
   @@index([code])
 }
 
 // ----------------------------------------------------------------------------
-// 4. AnneeUniversitaire — Années académiques
+// 4. Departement — Référentiel des départements
+// ----------------------------------------------------------------------------
+model Departement {
+  id              String   @id @default(uuid()) @db.Uuid
+  code            String   @unique
+  libelle         String
+  etablissementId String   @db.Uuid
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  etablissement   Etablissement @relation(fields: [etablissementId], references: [id])
+  utilisateurs    Utilisateur[]
+  affectations    AffectationPedagogique[]
+  parcours        Parcours[]
+  enseignants     EnseignantDepartement[]
+
+  @@index([code])
+  @@index([etablissementId])
+}
+
+// ----------------------------------------------------------------------------
+// 5. Parcours — Référentiel des parcours de formation
+// ----------------------------------------------------------------------------
+model Parcours {
+  id          String   @id @default(uuid()) @db.Uuid
+  code        String   @unique
+  libelle     String
+  departementId String   @db.Uuid
+  originId    String?  @db.Uuid
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  departement Departement @relation(fields: [departementId], references: [id])
+  niveaux     Niveau[]
+
+  @@index([code])
+  @@index([departementId])
+  @@unique([originId])
+}
+
+// ----------------------------------------------------------------------------
+// 6. Niveau — Référentiel des niveaux (Licence, Master, etc.)
+// ----------------------------------------------------------------------------
+model Niveau {
+  id        String   @id @default(uuid()) @db.Uuid
+  code      String   @unique
+  libelle   String
+  parcoursId String   @db.Uuid
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  parcours  Parcours @relation(fields: [parcoursId], references: [id])
+  groupes   Groupe[]
+
+  @@index([code])
+  @@index([parcoursId])
+}
+
+// ----------------------------------------------------------------------------
+// 7. Groupe — Référentiel des groupes d'étudiants
+// ----------------------------------------------------------------------------
+model Groupe {
+  id        String   @id @default(uuid()) @db.Uuid
+  code      String   @unique
+  libelle   String
+  niveauId  String   @db.Uuid
+  originId  String?  @db.Uuid
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  niveau    Niveau @relation(fields: [niveauId], references: [id])
+
+  @@index([code])
+  @@index([niveauId])
+  @@unique([originId])
+}
+
+// ----------------------------------------------------------------------------
+// 8. AnneeUniversitaire — Années académiques
 // ----------------------------------------------------------------------------
 model AnneeUniversitaire {
   id        String   @id @default(uuid()) @db.Uuid
@@ -287,4 +364,292 @@ model JournalAudit {
   @@index([horodatage])
   @@index([action])
   @@index([utilisateurId])
+}
+
+// ----------------------------------------------------------------------------
+// 16. SessionRefresh — Famille de jetons de rafraîchissement (rotation)
+// ----------------------------------------------------------------------------
+model SessionRefresh {
+  id            String   @id @default(uuid()) @db.Uuid
+  jti           String   @unique @db.Uuid
+  familyId      String   @db.Uuid
+  utilisateurId String   @db.Uuid
+  estRevoque    Boolean  @default(false)
+  expiresAt     DateTime
+  createdAt     DateTime @default(now())
+
+  utilisateur Utilisateur @relation(fields: [utilisateurId], references: [id])
+
+  @@index([jti])
+  @@index([familyId])
+  @@index([utilisateurId])
+  @@index([expiresAt])
+}
+
+// ----------------------------------------------------------------------------
+// 17. TypeEnseignement — Type d'enseignement (CM, TD, TP, PROJET)
+// ----------------------------------------------------------------------------
+model TypeEnseignement {
+  id          String   @id @default(uuid()) @db.Uuid
+  code        String   @unique
+  libelle     String
+  couleur     String   // code hexadécimal #RRGGBB pour l'affichage dans la grille EDT
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  modules     Module[]
+  gradeType   GradeTypeEnseignement[]
+
+  @@index([code])
+}
+
+// ----------------------------------------------------------------------------
+// 18. Grade — Niveau/grade académique (L1, L2, L3, M1, M2)
+// ----------------------------------------------------------------------------
+model Grade {
+  id          String   @id @default(uuid()) @db.Uuid
+  code        String   @unique
+  libelle     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  modules     Module[]
+  gradeType   GradeTypeEnseignement[]
+  enseignants Enseignant[]
+
+  @@index([code])
+}
+
+// ----------------------------------------------------------------------------
+// 19. GradeTypeEnseignement — Matrice type × grade (couples autorisés)
+// ----------------------------------------------------------------------------
+model GradeTypeEnseignement {
+  id                 String   @id @default(uuid()) @db.Uuid
+  gradeId            String   @db.Uuid
+  typeEnseignementId String   @db.Uuid
+  createdAt          DateTime @default(now())
+
+  grade              Grade              @relation(fields: [gradeId], references: [id])
+  typeEnseignement   TypeEnseignement   @relation(fields: [typeEnseignementId], references: [id])
+
+  @@unique([gradeId, typeEnseignementId])
+  @@index([gradeId])
+  @@index([typeEnseignementId])
+}
+
+// ----------------------------------------------------------------------------
+// 20. Module — Module pédagogique (lié à un type et un grade)
+// ----------------------------------------------------------------------------
+model Module {
+  id              String   @id @default(uuid()) @db.Uuid
+  code            String   @unique
+  libelle         String
+  typeEnseignementId String @db.Uuid
+  gradeId         String   @db.Uuid
+  originId        String?  @db.Uuid
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  typeEnseignement TypeEnseignement @relation(fields: [typeEnseignementId], references: [id])
+  grade           Grade           @relation(fields: [gradeId], references: [id])
+  matieres        Matiere[]
+
+  @@index([code])
+  @@index([typeEnseignementId])
+  @@index([gradeId])
+  @@unique([originId])
+}
+
+// ----------------------------------------------------------------------------
+// 21. Matiere — Matière (liée à un module)
+// ----------------------------------------------------------------------------
+model Matiere {
+  id          String   @id @default(uuid()) @db.Uuid
+  code        String   @unique
+  libelle     String
+  moduleId    String   @db.Uuid
+  originId    String?  @db.Uuid
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  module      Module   @relation(fields: [moduleId], references: [id])
+
+  @@index([code])
+  @@index([moduleId])
+  @@unique([originId])
+}
+
+// ----------------------------------------------------------------------------
+// 22. Enseignant — Référentiel des enseignants (L04-03)
+// ----------------------------------------------------------------------------
+model Enseignant {
+  id          String   @id @default(uuid()) @db.Uuid
+  matricule   String   @unique
+  nom         String
+  prenom      String
+  email       String   @unique
+  gradeId     String?  @db.Uuid
+  estActif    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  grade         Grade?                 @relation(fields: [gradeId], references: [id])
+  departements  EnseignantDepartement[]
+
+  @@index([matricule])
+  @@index([email])
+  @@index([gradeId])
+  @@index([nom])
+  @@index([prenom])
+}
+
+// ----------------------------------------------------------------------------
+// 23. EnseignantDepartement — Table associative N:N Enseignant ↔ Département
+// ----------------------------------------------------------------------------
+model EnseignantDepartement {
+  enseignantId  String   @db.Uuid
+  departementId String   @db.Uuid
+  createdAt     DateTime @default(now())
+
+  enseignant    Enseignant @relation(fields: [enseignantId], references: [id])
+  departement   Departement @relation(fields: [departementId], references: [id])
+
+  @@id([enseignantId, departementId])
+  @@index([enseignantId])
+  @@index([departementId])
+}
+
+// ----------------------------------------------------------------------------
+// 22 (bis). ChargeRuleSet — Règles de charge horaire (amorcée, complétée en L05-03)
+// ----------------------------------------------------------------------------
+model ChargeRuleSet {
+  id          String   @id @default(uuid()) @db.Uuid
+  code        String   @unique
+  libelle     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([code])
+}
+
+// ----------------------------------------------------------------------------
+// 23. Site — Site physique hébergeant des salles (L04-04)
+// ----------------------------------------------------------------------------
+model Site {
+  id          String   @id @default(uuid()) @db.Uuid
+  code        String   @unique
+  libelle     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  salles      Salle[]
+
+  @@index([code])
+}
+
+// ----------------------------------------------------------------------------
+// 24. TypeSalle — Type de salle (amphithéâtre, cours, TP, informatique…)
+// ----------------------------------------------------------------------------
+model TypeSalle {
+  id          String   @id @default(uuid()) @db.Uuid
+  code        String   @unique
+  libelle     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  salles      Salle[]
+
+  @@index([code])
+}
+
+// ----------------------------------------------------------------------------
+// 25. Equipement — Équipement installable dans une salle
+// ----------------------------------------------------------------------------
+model Equipement {
+  id             String   @id @default(uuid()) @db.Uuid
+  code           String   @unique
+  libelle        String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  salleEquipements SalleEquipement[]
+
+  @@index([code])
+}
+
+// ----------------------------------------------------------------------------
+// 26. Salle — Salle transverse (aucun departementId, EX-REF-03)
+// ----------------------------------------------------------------------------
+model Salle {
+  id           String      @id @default(uuid()) @db.Uuid
+  code         String      @unique
+  libelle      String
+  typeSalleId  String      @db.Uuid
+  capacite     Int
+  siteId       String      @db.Uuid
+  originId     String?     @db.Uuid
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  typeSalle       TypeSalle       @relation(fields: [typeSalleId], references: [id])
+  site            Site            @relation(fields: [siteId], references: [id])
+  salleEquipements SalleEquipement[]
+
+  @@index([code])
+  @@index([typeSalleId])
+  @@index([siteId])
+  @@index([capacite])
+  @@unique([originId])
+}
+
+// ----------------------------------------------------------------------------
+// 27. SalleEquipement — Association N:N Salle ↔ Equipement avec quantité
+// ----------------------------------------------------------------------------
+model SalleEquipement {
+  salleId       String   @db.Uuid
+  equipementId  String   @db.Uuid
+  quantite      Int      @default(1)
+  createdAt     DateTime @default(now())
+
+  salle     Salle     @relation(fields: [salleId], references: [id])
+  equipement Equipement @relation(fields: [equipementId], references: [id])
+
+  @@id([salleId, equipementId])
+  @@index([salleId])
+  @@index([equipementId])
+}
+
+// ----------------------------------------------------------------------------
+// 28. Creneau — Créneau horaire de la grille (L04-05)
+// ----------------------------------------------------------------------------
+model Creneau {
+  id           String   @id @default(uuid()) @db.Uuid
+  jour         Int      // 1..6 (lun–sam)
+  ordre        Int      // consécutif et unique par jour
+  heureDebut   DateTime
+  heureFin     DateTime
+  dureeMinutes Int      @default(30)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([jour, ordre])
+  @@index([jour])
+}
+
+// ----------------------------------------------------------------------------
+// 29. CreneauAffichage — Variante d'affichage (NORMAL / RAMADAN) (L04-05)
+// ----------------------------------------------------------------------------
+model CreneauAffichage {
+  id                String   @id @default(uuid()) @db.Uuid
+  variante          String   @unique // NORMAL | RAMADAN
+  decalageMinutes   Int      @default(0)
+  plageReduiteMinutes Int?   // réduction de la plage horaire (Ramadan)
+  libelle           String
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+// ----------------------------------------------------------------------------
+// 30. ConfigSysteme — Paramètres système (singleton) (L04-05)
+// ----------------------------------------------------------------------------
+model ConfigSysteme {
+  id                String   @id @default(uuid()) @db.Uuid
+  pasDeTempsMinutes Int      @default(30)
+  joursOuvres       String   // ex: "1,2,3,4,5,6"
+  creneauxParJour   Int      @default(24)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 }
