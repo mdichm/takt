@@ -122,3 +122,128 @@ export function obtenirValeur(code: string, themeNom: 'normal' | 'ramadan'): str
   }
   return jeton.valeur;
 }
+
+// ============================================================================
+// Familles de jetons invariantes de thème (typographie, espacement, bordure,
+// composants, mouvement, focus, z-index, breakpoints).
+// Ces familles sont identiques sur Normal et Ramadan ; elles sont émises dans
+// le bloc « Variables globales » des deux fichiers CSS.
+// ============================================================================
+
+/** Jeton de typographie (taille, graisse, interlignage). */
+export interface JetonTypographie {
+  /** Code de traçabilité (ex: DT-TYPO-01). */
+  readonly code: string;
+  /** Nom lisible (ex: h1). */
+  readonly nom: string;
+  /** Taille de police (ex: 2rem). */
+  readonly taille: string;
+  /** Graisse (ex: 700). */
+  readonly graisse: number;
+  /** Interlignage (ex: 1.2). */
+  readonly interlignage: number;
+  /** Usage. */
+  readonly usage: string;
+}
+
+/** Jeton à valeur simple (espacement, bordure, composant, mouvement, etc.). */
+export interface JetonSimple {
+  /** Code de traçabilité (ex: DT-SPACE-01). */
+  readonly code: string;
+  /** Nom lisible (ex: xxs). */
+  readonly nom: string;
+  /** Valeur (ex: 0.25rem). */
+  readonly valeur: string;
+  /** Usage. */
+  readonly usage: string;
+}
+
+/** Jeton de focus (anneau de clavier). */
+export interface JetonFocus extends JetonSimple {}
+
+/** Jeton de z-index. */
+export interface JetonZIndex extends JetonSimple {}
+
+/** Jeton de breakpoint. */
+export interface JetonBreakpoint extends JetonSimple {}
+
+/** Tokens de typographie (§3 UI_DESIGN_TOKENS). */
+export const TYPOGRAPHIE: readonly JetonTypographie[] = [
+  { code: 'DT-TYPO-01', nom: 'h1', taille: '2rem', graisse: 700, interlignage: 1.2, usage: 'Titre de page' },
+  { code: 'DT-TYPO-02', nom: 'h2', taille: '1.5rem', graisse: 600, interlignage: 1.25, usage: 'Titre de section' },
+  { code: 'DT-TYPO-03', nom: 'h3', taille: '1.25rem', graisse: 600, interlignage: 1.3, usage: 'Sous-titre' },
+  { code: 'DT-TYPO-04', nom: 'body', taille: '1rem', graisse: 400, interlignage: 1.5, usage: 'Texte courant' },
+  { code: 'DT-TYPO-05', nom: 'body-small', taille: '0.875rem', graisse: 400, interlignage: 1.4, usage: 'Texte secondaire' },
+  { code: 'DT-TYPO-06', nom: 'caption', taille: '0.75rem', graisse: 400, interlignage: 1.4, usage: 'Légende, aide' },
+  { code: 'DT-TYPO-07', nom: 'button', taille: '0.875rem', graisse: 500, interlignage: 1.2, usage: 'Texte des boutons' },
+  { code: 'DT-TYPO-08', nom: 'badge', taille: '0.75rem', graisse: 600, interlignage: 1.2, usage: 'Badges d\'état' },
+];
+
+/** Tokens d'espacement (§4 UI_DESIGN_TOKENS). */
+export const ESPACEMENT: readonly JetonSimple[] = [
+  { code: 'DT-SPACE-01', nom: 'xxs', valeur: '0.25rem', usage: 'Espacement très serré' },
+  { code: 'DT-SPACE-02', nom: 'xs', valeur: '0.5rem', usage: 'Espacement serré' },
+  { code: 'DT-SPACE-03', nom: 's', valeur: '0.75rem', usage: 'Espacement standard réduit' },
+  { code: 'DT-SPACE-04', nom: 'm', valeur: '1rem', usage: 'Espacement standard' },
+  { code: 'DT-SPACE-05', nom: 'l', valeur: '1.5rem', usage: 'Espacement large' },
+  { code: 'DT-SPACE-06', nom: 'xl', valeur: '2rem', usage: 'Espacement très large' },
+  { code: 'DT-SPACE-07', nom: 'xxl', valeur: '3rem', usage: 'Espacement maximal' },
+  { code: 'DT-SPACE-08', nom: 'gutter', valeur: '1rem', usage: 'Gouttière de grille' },
+];
+
+/** Tokens de bordure et ombre (§5 UI_DESIGN_TOKENS). */
+export const BORDURE: readonly JetonSimple[] = [
+  { code: 'DT-BORDER-01', nom: 'radius-sm', valeur: '0.25rem', usage: 'Petits composants' },
+  { code: 'DT-BORDER-02', nom: 'radius-md', valeur: '0.5rem', usage: 'Boutons, cartes' },
+  { code: 'DT-BORDER-03', nom: 'radius-lg', valeur: '0.75rem', usage: 'Modals, grands panneaux' },
+  { code: 'DT-BORDER-04', nom: 'radius-xl', valeur: '1rem', usage: 'Éléments arrondis' },
+  { code: 'DT-BORDER-05', nom: 'border-width', valeur: '1px', usage: 'Épaisseur de bordure standard' },
+  { code: 'DT-BORDER-06', nom: 'shadow-sm', valeur: '0 1px 2px rgba(0,0,0,0.05)', usage: 'Ombre légère' },
+  { code: 'DT-BORDER-07', nom: 'shadow-md', valeur: '0 4px 6px rgba(0,0,0,0.07)', usage: 'Ombre standard' },
+  { code: 'DT-BORDER-08', nom: 'shadow-lg', valeur: '0 10px 15px rgba(0,0,0,0.1)', usage: 'Ombre forte (modals)' },
+];
+
+/** Tokens de composants (§6 UI_DESIGN_TOKENS). */
+export const COMPOSANT: readonly JetonSimple[] = [
+  { code: 'DT-COMP-01', nom: 'button-height', valeur: '2.5rem', usage: 'Hauteur des boutons' },
+  { code: 'DT-COMP-02', nom: 'button-padding-x', valeur: '1rem', usage: 'Padding horizontal bouton' },
+  { code: 'DT-COMP-03', nom: 'input-height', valeur: '2.5rem', usage: 'Hauteur des champs' },
+  { code: 'DT-COMP-04', nom: 'card-padding', valeur: '1.5rem', usage: 'Padding des cartes' },
+  { code: 'DT-COMP-05', nom: 'table-row-height', valeur: '3rem', usage: 'Hauteur des lignes tableau' },
+  { code: 'DT-COMP-06', nom: 'badge-padding-x', valeur: '0.5rem', usage: 'Padding horizontal badge' },
+  { code: 'DT-COMP-07', nom: 'grid-cell-height', valeur: '4rem', usage: 'Hauteur des cellules grille EDT' },
+  { code: 'DT-COMP-08', nom: 'sidebar-width', valeur: '16rem', usage: 'Largeur de la sidebar' },
+];
+
+/** Tokens de mouvement et animation (§7 UI_DESIGN_TOKENS). */
+export const MOUVEMENT: readonly JetonSimple[] = [
+  { code: 'DT-MOTION-01', nom: 'fast', valeur: '150ms ease-out', usage: 'Micro-interactions' },
+  { code: 'DT-MOTION-02', nom: 'normal', valeur: '250ms ease-in-out', usage: 'Transitions standard' },
+  { code: 'DT-MOTION-03', nom: 'slow', valeur: '350ms ease-in-out', usage: 'Ouverture de modals' },
+  { code: 'DT-MOTION-04', nom: 'drag', valeur: '200ms ease-out', usage: 'Déplacement séance' },
+  { code: 'DT-MOTION-05', nom: 'toast', valeur: '150ms ease-out', usage: 'Apparition notification' },
+];
+
+/** Tokens d'anneau de focus (clavier, WCAG 2.4.7). Invariants de thème. */
+export const FOCUS: readonly JetonFocus[] = [
+  { code: 'DT-FOCUS-01', nom: 'ring-width', valeur: '2px', usage: 'Épaisseur de l\'anneau de focus' },
+  { code: 'DT-FOCUS-02', nom: 'ring-color', valeur: 'var(--color-primary)', usage: 'Couleur de l\'anneau de focus (suit le thème)' },
+  { code: 'DT-FOCUS-03', nom: 'ring-offset', valeur: '2px', usage: 'Décalage de l\'anneau de focus' },
+];
+
+/** Tokens de z-index (stacking context). Invariants de thème. */
+export const Z_INDEX: readonly JetonZIndex[] = [
+  { code: 'DT-ZINDEX-01', nom: 'base', valeur: '0', usage: 'Élément de base' },
+  { code: 'DT-ZINDEX-02', nom: 'dropdown', valeur: '100', usage: 'Menus déroulants' },
+  { code: 'DT-ZINDEX-03', nom: 'sticky', valeur: '200', usage: 'Éléments collants' },
+  { code: 'DT-ZINDEX-04', nom: 'modal', valeur: '1000', usage: 'Modals' },
+  { code: 'DT-ZINDEX-05', nom: 'toast', valeur: '2000', usage: 'Toasts et notifications' },
+];
+
+/** Tokens de breakpoint (points de rupture responsive). Invariants de thème. */
+export const BREAKPOINT: readonly JetonBreakpoint[] = [
+  { code: 'DT-BREAKPOINT-01', nom: 'sm', valeur: '640px', usage: 'Petits écrans' },
+  { code: 'DT-BREAKPOINT-02', nom: 'md', valeur: '768px', usage: 'Tablettes' },
+  { code: 'DT-BREAKPOINT-03', nom: 'lg', valeur: '1024px', usage: 'Ordinateurs' },
+  { code: 'DT-BREAKPOINT-04', nom: 'xl', valeur: '1280px', usage: 'Grands écrans' },
+];
