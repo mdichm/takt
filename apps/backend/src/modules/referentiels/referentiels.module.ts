@@ -41,6 +41,8 @@ import { CreneauAffichageController } from './creneau-affichage/creneau-affichag
 import { CreneauAffichageService } from './creneau-affichage/creneau-affichage.service';
 import { ConfigSystemeController } from './config-systeme/config-systeme.controller';
 import { ConfigSystemeService } from './config-systeme/config-systeme.service';
+import { ImportReferentielController } from './import/import-referentiel.controller';
+import { ImportReferentielService } from './import/import-referentiel.service';
 
 /**
  * Module des référentiels métier (Établissement, Département, Parcours, Niveau, Groupe,
@@ -71,6 +73,7 @@ import { ConfigSystemeService } from './config-systeme/config-systeme.service';
     CreneauController,
     CreneauAffichageController,
     ConfigSystemeController,
+    ImportReferentielController,
   ],
   providers: [
     EtablissementService,
@@ -91,6 +94,7 @@ import { ConfigSystemeService } from './config-systeme/config-systeme.service';
     CreneauService,
     CreneauAffichageService,
     ConfigSystemeService,
+    ImportReferentielService,
   ],
   exports: [
     EtablissementService,

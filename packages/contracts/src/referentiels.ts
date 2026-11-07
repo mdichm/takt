@@ -888,3 +888,94 @@ export const zConfigSystemeUpdate = z.object({
 export type ConfigSysteme = z.infer<typeof zConfigSysteme>;
 export type ConfigSystemeCreate = z.infer<typeof zConfigSystemeCreate>;
 export type ConfigSystemeUpdate = z.infer<typeof zConfigSystemeUpdate>;
+
+// ============================================================================
+// Import CSV des référentiels (L04-07)
+// ============================================================================
+
+/** Types de référentiels importables par CSV (liste fermée, PLAN_MACRO E2.3). */
+export const zTypeReferentielImportable = z.enum([
+  'site',
+  'type-salle',
+  'equipement',
+  'salle',
+  'groupe',
+  'enseignant',
+]);
+
+export type TypeReferentielImportable = z.infer<typeof zTypeReferentielImportable>;
+
+/** En-têtes CSV attendus par type (clés normalisées : trim, minuscules, sans accents). */
+export const ENTETES_CSV_PAR_TYPE: Record<TypeReferentielImportable, readonly string[]> = {
+  site: ['code', 'libelle'],
+  'type-salle': ['code', 'libelle'],
+  equipement: ['code', 'libelle'],
+  salle: ['code', 'libelle', 'typesalle', 'capacite', 'site'],
+  groupe: ['code', 'libelle', 'niveau'],
+  enseignant: ['matricule', 'nom', 'prenom', 'email', 'grade', 'actif'],
+};
+
+/** Données brutes de l'import CSV (corps de la requête d'aperçu et d'import). */
+export const zImportReferentielCsv = z.object({
+  type: zTypeReferentielImportable,
+  contenu: z
+    .string()
+    .min(1, 'Le fichier CSV est vide')
+    .max(2_000_000, 'Le fichier dépasse 2 Mo'),
+});
+
+export type ImportReferentielCsv = z.infer<typeof zImportReferentielCsv>;
+
+/** Requête de confirmation d'import : le contenu doit être identique à l'aperçu. */
+export const zImportReferentielCsvConfirme = zImportReferentielCsv.extend({
+  empreinte: z
+    .string()
+    .regex(
+      /^[a-f0-9]{64}$/,
+      'L\'empreinte du fichier est invalide',
+    ),
+});
+
+export type ImportReferentielCsvConfirme = z.infer<
+  typeof zImportReferentielCsvConfirme
+>;
+
+/** Erreur sur une ligne du CSV importé. */
+export const zErreurLigneImport = z.object({
+  ligne: z.number().int().positive('Le numéro de ligne doit être positif'),
+  champ: z.string().min(1, 'Le champ est requis'),
+  valeur: z.string(),
+  motif: z.string().min(1, 'Le motif est requis'),
+});
+
+export type ErreurLigneImport = z.infer<typeof zErreurLigneImport>;
+
+/** Aperçu avant confirmation (TE-MET-10 : aperçu obligatoire). */
+export const zApercuImport = z.object({
+  type: zTypeReferentielImportable,
+  empreinte: z.string().regex(/^[a-f0-9]{64}$/),
+  totalLignes: z.number().int().nonnegative(),
+  lignesValides: z.number().int().nonnegative(),
+  lignesInvalides: z.number().int().nonnegative(),
+  erreurs: z.array(zErreurLigneImport),
+  apercuLignes: z.array(
+    z.object({
+      ligne: z.number().int().positive(),
+      code: z.string(),
+      libelle: z.string().optional(),
+    }),
+  ),
+});
+
+export type ApercuImport = z.infer<typeof zApercuImport>;
+
+/** Rapport final d'import (lignes importées et rejetées ligne à ligne). */
+export const zRapportImport = z.object({
+  type: zTypeReferentielImportable,
+  empreinte: z.string().regex(/^[a-f0-9]{64}$/),
+  importes: z.number().int().nonnegative(),
+  rejets: z.number().int().nonnegative(),
+  erreurs: z.array(zErreurLigneImport),
+});
+
+export type RapportImport = z.infer<typeof zRapportImport>;

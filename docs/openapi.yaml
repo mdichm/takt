@@ -1921,6 +1921,60 @@ paths:
       summary: Modifie un groupe
       tags:
         - Référentiels
+  /api/v1/referentiels/import/apercu:
+    post:
+      operationId: ImportReferentielController_apercu
+      parameters: []
+      responses:
+        '200':
+          description: Aperçu de l’import
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Aperçu d’import CSV avant confirmation
+      tags:
+        - Import référentiels
+  /api/v1/referentiels/import/executer:
+    post:
+      operationId: ImportReferentielController_executer
+      parameters: []
+      responses:
+        '200':
+          description: Rapport d’import ligne à ligne
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '409':
+          description: Conflit (fichier modifié depuis l’aperçu)
+      security:
+        - bearerAuth: []
+      summary: Exécute un import CSV après aperçu
+      tags:
+        - Import référentiels
+  /api/v1/referentiels/import/types:
+    get:
+      operationId: ImportReferentielController_listerTypes
+      parameters: []
+      responses:
+        '200':
+          description: Liste des types importables
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Types de référentiels importables par CSV
+      tags:
+        - Import référentiels
   /api/v1/referentiels/matieres:
     get:
       operationId: MatiereController_list
