@@ -3,17 +3,33 @@
 
 import { expect, test } from '@playwright/test';
 
+const API = 'http://localhost:3000/api/v1';
+
 test.describe("Import CSV des referentiels (L04-07)", () => {
-  test("page d'import : accessible (HTTP 200) sans session", async ({ page }) => {
-    const reponse = await page.goto('/ec-ges-01', { waitUntil: 'networkidle' });
+  test("ecran d'import protege : redirection vers /login sans session", async ({
+    page,
+  }) => {
+    const reponse = await page.goto('/ges/init', { waitUntil: 'networkidle' });
+    // L'ecran d'import (EC-GES-01) est protege : sans session on redirige vers le login.
+    await expect(page).toHaveURL(/\/login/);
     expect(reponse?.status()).toBe(200);
   });
+});
 
-  test("aperçu et execution d'un import de sites (utilisateur authentifie)", async ({ page }) => {
-    // Ce parcours necessite un utilisateur authentifie (role admin ou gest).
-    // Il est execute dans le job E2E qui dispose d'un seed de base de donnees
-    // (docker-compose.test.yml) et d'un compte administrateur.
-    const reponse = await page.goto('/ec-ges-01', { waitUntil: 'networkidle' });
-    expect(reponse?.status()).toBe(200);
+test.describe("Import depuis une annee cloturee (L04-08)", () => {
+  test("les endpoints archive existent et sont proteges (401 sans session)", async ({
+    request,
+  }) => {
+    const anneesSource = await request.get(`${API}/referentiels/import/archive/annees-source`);
+    expect(anneesSource.status()).toBe(401);
+
+    const types = await request.get(`${API}/referentiels/import/archive/types`);
+    expect(types.status()).toBe(401);
+
+    const apercu = await request.post(`${API}/referentiels/import/archive/apercu`);
+    expect(apercu.status()).toBe(401);
+
+    const executer = await request.post(`${API}/referentiels/import/archive/executer`);
+    expect(executer.status()).toBe(401);
   });
 });
