@@ -11,3 +11,21 @@ export { calculerRatioContrastes, estConformeWCAG, luminanceRelative } from './c
 // Génération des artefacts CSS/JSON à partir de src/tokens.ts.
 export { genererArtefacts, lireArtefact } from './generer';
 
+// Familles de jetons invariantes de thème (typographie, espacement, bordure,
+// composants, mouvement, focus, z-index, breakpoints).
+export {
+  type JetonTypographie,
+  type JetonSimple,
+  type JetonFocus,
+  type JetonZIndex,
+  type JetonBreakpoint,
+  TYPOGRAPHIE,
+  ESPACEMENT,
+  BORDURE,
+  COMPOSANT,
+  MOUVEMENT,
+  FOCUS,
+  Z_INDEX,
+  BREAKPOINT,
+} from './tokens';
+

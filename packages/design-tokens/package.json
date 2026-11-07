@@ -19,6 +19,7 @@
     "build": "tsc -p tsconfig.json",
     "lint": "eslint src --max-warnings=0",
     "typecheck": "tsc --noEmit",
+    "generate": "node dist/generer-cli.js",
     "test": "vitest run --passWithNoTests",
     "test:tokens": "vitest run"
   },

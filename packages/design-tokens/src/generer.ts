@@ -4,14 +4,27 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { THEMES, type JetonCouleur } from './tokens';
+import {
+  THEMES,
+  TYPOGRAPHIE,
+  ESPACEMENT,
+  BORDURE,
+  COMPOSANT,
+  MOUVEMENT,
+  FOCUS,
+  Z_INDEX,
+  BREAKPOINT,
+  type JetonCouleur,
+  type JetonTypographie,
+  type JetonSimple,
+} from './tokens.js';
 
 const __dirname = join(fileURLToPath(import.meta.url), '..');
 const RACINE_PACKAGE = join(__dirname, '..');
 
-/** Convertit un nom lisible en nom de variable CSS (kebab-case, préfixé --color-). */
-function nomVariableCSS(nom: string): string {
-  return `--color-${nom.toLowerCase().replace(/[^a-z0-9]+/gi, '-').replace(/^-+|-+$/g, '')}`;
+/** Convertit un nom lisible en identifiant CSS (kebab-case, sans préfixe). */
+function identifiantCSS(nom: string): string {
+  return nom.toLowerCase().replace(/[^a-z0-9]+/gi, '-').replace(/^-+|-+$/g, '');
 }
 
 /** Génère le contenu d'un fichier CSS pour un thème. */
@@ -24,48 +37,107 @@ function genererCSS(theme: (typeof THEMES)[number]): string {
   const selecteur = theme.nom === 'normal' ? ':root' : `[data-theme='${theme.nom}']`;
   lignes.push(`${selecteur} {`);
 
-  // Map nom → valeur : les surcharges du thème écrasent les valeurs par défaut
-  const valeurs = new Map<string, string>();
+  // Variables de couleur du thème (surcharges du thème écrasent les valeurs par défaut)
   for (const couleur of theme.couleurs) {
-    valeurs.set(couleur.nom, couleur.valeur);
+    lignes.push(`  --color-${identifiantCSS(couleur.nom)}: ${couleur.valeur};`);
   }
 
-  for (const [nom, valeur] of valeurs) {
-    const variable = nomVariableCSS(nom);
-    lignes.push(`  ${variable}: ${valeur};`);
-  }
-
-  // Variables globales (RB-DT-02, DL-DT-01)
+  // Variables globales (invariantes de thème, RB-DT-02, DL-DT-01)
   lignes.push('');
   lignes.push('  /* Variables globales */');
   lignes.push(`  --font-family-base: 'Inter', system-ui, sans-serif;`);
-  lignes.push('  --spacing-xs: 0.25rem;');
-  lignes.push('  --spacing-sm: 0.5rem;');
-  lignes.push('  --spacing-md: 1rem;');
-  lignes.push('  --spacing-lg: 1.5rem;');
-  lignes.push('  --spacing-xl: 2rem;');
-  lignes.push('  --radius-sm: 0.25rem;');
-  lignes.push('  --radius-md: 0.5rem;');
-  lignes.push('  --radius-lg: 0.75rem;');
-  lignes.push('  --transition-fast: 150ms ease;');
-  lignes.push('  --transition-base: 250ms ease;');
+
+  // Typographie : 3 variables par jeton (taille, graisse, interlignage)
+  for (const jeton of TYPOGRAPHIE) {
+    const id = identifiantCSS(jeton.nom);
+    lignes.push(`  --font-size-${id}: ${jeton.taille};`);
+    lignes.push(`  --font-weight-${id}: ${jeton.graisse};`);
+    lignes.push(`  --line-height-${id}: ${jeton.interlignage};`);
+  }
+
+  // Espacement
+  for (const jeton of ESPACEMENT) {
+    lignes.push(`  --space-${identifiantCSS(jeton.nom)}: ${jeton.valeur};`);
+  }
+
+  // Bordure et ombre (nom déjà préfixé : radius-sm, border-width, shadow-md…)
+  for (const jeton of BORDURE) {
+    lignes.push(`  --${identifiantCSS(jeton.nom)}: ${jeton.valeur};`);
+  }
+
+  // Composants (nom déjà préfixé : button-height, input-height…)
+  for (const jeton of COMPOSANT) {
+    lignes.push(`  --${identifiantCSS(jeton.nom)}: ${jeton.valeur};`);
+  }
+
+  // Mouvement et animation
+  for (const jeton of MOUVEMENT) {
+    lignes.push(`  --transition-${identifiantCSS(jeton.nom)}: ${jeton.valeur};`);
+  }
+
+  // Focus (nom déjà préfixé : ring-width, ring-color, ring-offset)
+  for (const jeton of FOCUS) {
+    lignes.push(`  --${identifiantCSS(jeton.nom)}: ${jeton.valeur};`);
+  }
+
+  // Z-index
+  for (const jeton of Z_INDEX) {
+    lignes.push(`  --z-${identifiantCSS(jeton.nom)}: ${jeton.valeur};`);
+  }
+
+  // Breakpoints
+  for (const jeton of BREAKPOINT) {
+    lignes.push(`  --breakpoint-${identifiantCSS(jeton.nom)}: ${jeton.valeur};`);
+  }
 
   lignes.push('}');
   lignes.push('');
   return lignes.join('\n');
 }
 
-/** Génère le contenu du fichier JSON (les deux thèmes). */
+/** Génère le contenu du fichier JSON (les deux thèmes + familles invariantes). */
 function genererJSON(): string {
   const donnees: Record<string, Record<string, string>> = {};
 
   for (const theme of THEMES) {
     const entries: Record<string, string> = {};
     for (const couleur of theme.couleurs) {
-      entries[nomVariableCSS(couleur.nom).slice(2)] = couleur.valeur;
+      entries[`color-${identifiantCSS(couleur.nom)}`] = couleur.valeur;
     }
     donnees[theme.nom] = entries;
   }
+
+  // Familles invariantes de thème (émises une fois)
+  const globales: Record<string, string> = {};
+  globales['font-family-base'] = "'Inter', system-ui, sans-serif";
+  for (const jeton of TYPOGRAPHIE) {
+    const id = identifiantCSS(jeton.nom);
+    globales[`font-size-${id}`] = jeton.taille;
+    globales[`font-weight-${id}`] = String(jeton.graisse);
+    globales[`line-height-${id}`] = String(jeton.interlignage);
+  }
+  for (const jeton of ESPACEMENT) {
+    globales[`space-${identifiantCSS(jeton.nom)}`] = jeton.valeur;
+  }
+  for (const jeton of BORDURE) {
+    globales[identifiantCSS(jeton.nom)] = jeton.valeur;
+  }
+  for (const jeton of COMPOSANT) {
+    globales[identifiantCSS(jeton.nom)] = jeton.valeur;
+  }
+  for (const jeton of MOUVEMENT) {
+    globales[`transition-${identifiantCSS(jeton.nom)}`] = jeton.valeur;
+  }
+  for (const jeton of FOCUS) {
+    globales[identifiantCSS(jeton.nom)] = jeton.valeur;
+  }
+  for (const jeton of Z_INDEX) {
+    globales[`z-${identifiantCSS(jeton.nom)}`] = jeton.valeur;
+  }
+  for (const jeton of BREAKPOINT) {
+    globales[`breakpoint-${identifiantCSS(jeton.nom)}`] = jeton.valeur;
+  }
+  donnees.globales = globales;
 
   return JSON.stringify(donnees, null, 2) + '\n';
 }
@@ -86,18 +158,3 @@ export function genererArtefacts(): void {
 export function lireArtefact(nom: string): string {
   return readFileSync(join(RACINE_PACKAGE, nom), 'utf-8');
 }
-
-/** Vérifie qu'un jeton est présent dans les deux thèmes. */
-export function obtenirValeur(code: string, themeNom: 'normal' | 'ramadan'): string {
-  const theme = THEMES.find((t) => t.nom === themeNom);
-  if (!theme) {
-    throw new Error(`Thème inconnu : ${themeNom}`);
-  }
-  const jeton = theme.couleurs.find((c) => c.code === code);
-  if (!jeton) {
-    throw new Error(`Jeton ${code} introuvable dans le thème ${themeNom}`);
-  }
-  return jeton.valeur;
-}
-
-export type { JetonCouleur };
