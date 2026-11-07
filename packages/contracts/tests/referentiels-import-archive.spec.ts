@@ -11,7 +11,6 @@ import {
   zImportArchiveConfirme,
   zParTypeImportArchive,
   zRapportImportArchive,
-  zErreurLigneImport,
 } from '../src/referentiels';
 
 const EMPREINTE = '0'.repeat(64);
