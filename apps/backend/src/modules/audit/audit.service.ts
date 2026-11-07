@@ -20,6 +20,7 @@ export type ActionAudit =
   | 'LEVEE_VERROU'
   | 'EXPORT'
   | 'IMPORT_REFERENTIEL'
+  | 'IMPORT_ARCHIVE'
   | 'PUBLICATION'
   | 'CONNEXION'
   | 'FORCAGE_BAIL'

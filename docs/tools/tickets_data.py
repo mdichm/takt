@@ -312,7 +312,7 @@ TICKETS: List[Ticket] = [
         lot="L04",
         titre="Implémenter l'import sélectif depuis une année clôturée",
         sp=4,
-        status="À faire",
+        status="Terminé",
         deps=['TAKT-L04-07'],
         exigences=['EX-REF-05', 'EX-WKF-06', 'TE-MET-10', 'IX-GES-02', 'EX-OUV-02.'],
     ),
