@@ -136,3 +136,31 @@ export const zPlanEtudesVolumeTotal = z.object({
 });
 
 export type PlanEtudesVolumeTotal = z.infer<typeof zPlanEtudesVolumeTotal>;
+
+/** Données de validation de la répartition pédagogique d'un département (TAKT-L05-04). */
+export const zRepartitionValider = z.object({
+  versionId: zUuid,
+  departementId: zUuid.optional(),
+});
+
+export type RepartitionValiderInput = z.infer<typeof zRepartitionValider>;
+
+/** Données d'annulation de la répartition pédagogique d'un département (TAKT-L05-04). */
+export const zRepartitionAnnuler = z.object({
+  versionId: zUuid,
+  departementId: zUuid.optional(),
+});
+
+export type RepartitionAnnulerInput = z.infer<typeof zRepartitionAnnuler>;
+
+/** Données de lecture d'un snapshot de répartition (TAKT-L05-04). */
+export const zRepartitionSnapshot = z.object({
+  id: zUuid,
+  versionId: zUuid,
+  departementId: zUuid.nullable(),
+  type: z.string(),
+  hash: z.string(),
+  createdAt: z.string().datetime(),
+});
+
+export type RepartitionSnapshot = z.infer<typeof zRepartitionSnapshot>;
