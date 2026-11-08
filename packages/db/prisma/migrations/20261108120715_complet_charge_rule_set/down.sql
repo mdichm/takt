@@ -15,8 +15,8 @@ ALTER TABLE "ChargeRuleSet" DROP CONSTRAINT "ChargeRuleSet_dureeDemiJournee_posi
 ALTER TABLE "ChargeRuleSet" DROP CONSTRAINT "ChargeRuleSet_toleranceEquilibrage_nonnegative";
 ALTER TABLE "ChargeRuleSet" DROP CONSTRAINT "ChargeRuleSet_arrondi_valide";
 
--- 2. Restauration de l'unicité sur code seul
-ALTER TABLE "ChargeRuleSet" ADD CONSTRAINT "ChargeRuleSet_code_key" UNIQUE ("code");
+-- 2. Restauration de l'index unique sur code seul
+CREATE UNIQUE INDEX "ChargeRuleSet_code_key" ON "ChargeRuleSet"("code");
 
 -- 3. Suppression des colonnes ajoutées
 ALTER TABLE "ChargeRuleSet" DROP COLUMN "toleranceEquilibrage";

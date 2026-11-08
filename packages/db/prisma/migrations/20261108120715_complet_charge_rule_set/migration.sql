@@ -16,8 +16,8 @@ ALTER TABLE "ChargeRuleSet" ADD COLUMN "coefficientsParType" JSONB NOT NULL DEFA
 ALTER TABLE "ChargeRuleSet" ADD COLUMN "cibleHebdomadaireParGrade" JSONB NOT NULL DEFAULT '{}';
 ALTER TABLE "ChargeRuleSet" ADD COLUMN "toleranceEquilibrage" DOUBLE PRECISION NOT NULL DEFAULT 5;
 
--- 2. Suppression de l'ancienne contrainte d'unicité sur code seul
-ALTER TABLE "ChargeRuleSet" DROP CONSTRAINT "ChargeRuleSet_code_key";
+-- 2. Suppression de l'ancien index unique sur code seul
+DROP INDEX "ChargeRuleSet_code_key";
 
 -- 3. Nouvelle contrainte d'unicité composée (code, version)
 ALTER TABLE "ChargeRuleSet" ADD CONSTRAINT "ChargeRuleSet_code_version_key" UNIQUE ("code", "version");
