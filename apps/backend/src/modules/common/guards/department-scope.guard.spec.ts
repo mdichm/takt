@@ -17,9 +17,7 @@ class ReflectorMock {
   }
 }
 
-function creerContexte(
-  utilisateur: UtilisateurConnecte | undefined,
-): ExecutionContext {
+function creerContexte(utilisateur: UtilisateurConnecte | undefined): ExecutionContext {
   const getHandler = () => ({});
   const getClass = () => ({});
   const switchToHttp = () => ({

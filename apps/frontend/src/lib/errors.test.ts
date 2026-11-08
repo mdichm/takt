@@ -2,23 +2,30 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import { describe, expect, it } from 'vitest';
-import {
-  estErreurAuth,
-  mapHttpError,
-  MESSAGES_ERREUR_FR,
-  versMessageActionnable,
-} from './errors';
+import { estErreurAuth, mapHttpError, MESSAGES_ERREUR_FR, versMessageActionnable } from './errors';
 
 describe('catalogue d’erreurs (8 codes du backend)', () => {
   it.each([
     ['VALIDATION_ERROR', 'Les informations saisies sont invalides. Vérifiez les champs indiqués.'],
     ['UNAUTHORIZED', 'Votre session a expiré. Reconnectez-vous pour continuer.'],
-    ['FORBIDDEN', "Vous n'avez pas les droits nécessaires pour cette action. Contactez un administrateur."],
+    [
+      'FORBIDDEN',
+      "Vous n'avez pas les droits nécessaires pour cette action. Contactez un administrateur.",
+    ],
     ['NOT_FOUND', 'La ressource demandée est introuvable ou a été supprimée.'],
-    ['WORKFLOW_INVALID_TRANSITION', "Cette action n’est pas autorisée dans l’état actuel de la ressource."],
-    ['SEANCE_LOCKED', 'Cette séance est verrouillée par un autre utilisateur. Déverrouillez-la ou contactez-la.'],
+    [
+      'WORKFLOW_INVALID_TRANSITION',
+      'Cette action n’est pas autorisée dans l’état actuel de la ressource.',
+    ],
+    [
+      'SEANCE_LOCKED',
+      'Cette séance est verrouillée par un autre utilisateur. Déverrouillez-la ou contactez-la.',
+    ],
     ['RATE_LIMITED', 'Trop de tentatives. Patientez quelques instants avant de réessayer.'],
-    ['INTERNAL_ERROR', 'Une erreur interne est survenue. Réessayez plus tard ou contactez le support.'],
+    [
+      'INTERNAL_ERROR',
+      'Une erreur interne est survenue. Réessayez plus tard ou contactez le support.',
+    ],
   ])('associe le code %s à son message français', (code, attendu) => {
     expect(MESSAGES_ERREUR_FR[code as keyof typeof MESSAGES_ERREUR_FR]).toBe(attendu);
   });
@@ -58,13 +65,21 @@ describe('versMessageActionnable', () => {
 
 describe('estErreurAuth', () => {
   it('retourne true pour UNAUTHORIZED', () => {
-    expect(estErreurAuth({ code: 'UNAUTHORIZED', statut: 401, message: '', details: null })).toBe(true);
+    expect(estErreurAuth({ code: 'UNAUTHORIZED', statut: 401, message: '', details: null })).toBe(
+      true,
+    );
   });
 
   it('retourne false pour les autres codes', () => {
-    expect(estErreurAuth({ code: 'FORBIDDEN', statut: 403, message: '', details: null })).toBe(false);
-    expect(estErreurAuth({ code: 'NOT_FOUND', statut: 404, message: '', details: null })).toBe(false);
-    expect(estErreurAuth({ code: 'INTERNAL_ERROR', statut: 500, message: '', details: null })).toBe(false);
+    expect(estErreurAuth({ code: 'FORBIDDEN', statut: 403, message: '', details: null })).toBe(
+      false,
+    );
+    expect(estErreurAuth({ code: 'NOT_FOUND', statut: 404, message: '', details: null })).toBe(
+      false,
+    );
+    expect(estErreurAuth({ code: 'INTERNAL_ERROR', statut: 500, message: '', details: null })).toBe(
+      false,
+    );
   });
 });
 

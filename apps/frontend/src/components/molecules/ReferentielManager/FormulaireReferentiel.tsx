@@ -43,7 +43,7 @@ export function FormulaireReferentiel({
   const { control, handleSubmit, formState } = form;
   const { errors, isSubmitting } = formState;
 
-  const dictAlerte = traduction('alerte') as typeof DICTIONNAIRE_FR['alerte'];
+  const dictAlerte = traduction('alerte') as (typeof DICTIONNAIRE_FR)['alerte'];
 
   const surSoumettreForm = (valeurs: Record<string, unknown>): void => {
     surSoumettre(valeurs);
@@ -56,9 +56,7 @@ export function FormulaireReferentiel({
       onSubmit={handleSubmit(surSoumettreForm)}
       style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-m)' }}
     >
-      {erreur && (
-        <Alerte variante="erreur" titre={dictAlerte.erreur} message={erreur ?? ''} />
-      )}
+      {erreur && <Alerte variante="erreur" titre={dictAlerte.erreur} message={erreur ?? ''} />}
       {champs.map((champ) => {
         const messageErreur = errors[champ.cle]?.message;
         const estInvalide = Boolean(messageErreur);

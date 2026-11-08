@@ -6,11 +6,7 @@ import { PRISMA } from '../../common/di/prisma.token';
 import { PrismaClient } from '@takt/db';
 import { CODES_ERREUR_API, ApiError } from '../../common/http/api-error';
 import { AuditService } from '../../audit/audit.service';
-import type {
-  EnseignantCreate,
-  EnseignantUpdate,
-  EnseignantListFilters,
-} from '@takt/contracts';
+import type { EnseignantCreate, EnseignantUpdate, EnseignantListFilters } from '@takt/contracts';
 
 /**
  * Service de gestion des enseignants (référentiel métier).
@@ -60,12 +56,9 @@ export class EnseignantService {
         where: { id: donnees.gradeId },
       });
       if (!grade) {
-        throw new ApiError(
-          CODES_ERREUR_API.BAD_REQUEST,
-          400,
-          'Le grade spécifié est introuvable',
-          { champ: 'gradeId' },
-        );
+        throw new ApiError(CODES_ERREUR_API.BAD_REQUEST, 400, 'Le grade spécifié est introuvable', {
+          champ: 'gradeId',
+        });
       }
     }
 
@@ -176,9 +169,7 @@ export class EnseignantService {
         include: {
           departements: { include: { departement: true } },
         },
-        orderBy: [
-          { [query.sortBy ?? 'matricule']: query.sortDirection ?? 'asc' },
-        ],
+        orderBy: [{ [query.sortBy ?? 'matricule']: query.sortDirection ?? 'asc' }],
         skip: (page - 1) * pageSize,
         take: pageSize,
       }),
@@ -216,11 +207,7 @@ export class EnseignantService {
       },
     });
     if (!enseignant) {
-      throw new ApiError(
-        CODES_ERREUR_API.NOT_FOUND,
-        404,
-        'Enseignant introuvable',
-      );
+      throw new ApiError(CODES_ERREUR_API.NOT_FOUND, 404, 'Enseignant introuvable');
     }
     return {
       id: enseignant.id,
@@ -230,7 +217,11 @@ export class EnseignantService {
       email: enseignant.email,
       gradeId: enseignant.gradeId,
       grade: enseignant.grade
-        ? { id: enseignant.grade.id, code: enseignant.grade.code, libelle: enseignant.grade.libelle }
+        ? {
+            id: enseignant.grade.id,
+            code: enseignant.grade.code,
+            libelle: enseignant.grade.libelle,
+          }
         : null,
       estActif: enseignant.estActif,
       departements: enseignant.departements.map((d) => ({
@@ -247,11 +238,7 @@ export class EnseignantService {
   async update(id: string, donnees: EnseignantUpdate, utilisateurIdModifiePar: string) {
     const existant = await this.prisma.enseignant.findUnique({ where: { id } });
     if (!existant) {
-      throw new ApiError(
-        CODES_ERREUR_API.NOT_FOUND,
-        404,
-        'Enseignant introuvable',
-      );
+      throw new ApiError(CODES_ERREUR_API.NOT_FOUND, 404, 'Enseignant introuvable');
     }
 
     if (donnees.matricule !== undefined && donnees.matricule !== existant.matricule) {
@@ -282,17 +269,18 @@ export class EnseignantService {
       }
     }
 
-    if (donnees.gradeId !== undefined && donnees.gradeId !== null && donnees.gradeId !== existant.gradeId) {
+    if (
+      donnees.gradeId !== undefined &&
+      donnees.gradeId !== null &&
+      donnees.gradeId !== existant.gradeId
+    ) {
       const grade = await this.prisma.grade.findUnique({
         where: { id: donnees.gradeId },
       });
       if (!grade) {
-        throw new ApiError(
-          CODES_ERREUR_API.BAD_REQUEST,
-          400,
-          'Le grade spécifié est introuvable',
-          { champ: 'gradeId' },
-        );
+        throw new ApiError(CODES_ERREUR_API.BAD_REQUEST, 400, 'Le grade spécifié est introuvable', {
+          champ: 'gradeId',
+        });
       }
     }
 
@@ -376,11 +364,7 @@ export class EnseignantService {
       include: { departements: { take: 1 } },
     });
     if (!existant) {
-      throw new ApiError(
-        CODES_ERREUR_API.NOT_FOUND,
-        404,
-        'Enseignant introuvable',
-      );
+      throw new ApiError(CODES_ERREUR_API.NOT_FOUND, 404, 'Enseignant introuvable');
     }
 
     if (existant.departements.length > 0) {

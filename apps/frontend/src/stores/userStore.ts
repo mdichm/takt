@@ -57,16 +57,13 @@ const createUtilisateurStore = (): UtilisateurStoreState => ({
 });
 
 export const userStore = create<UtilisateurStoreState>()(
-  persist(
-    () => createUtilisateurStore(),
-    {
-      name: 'takt-utilisateur',
-      storage: createJSONStorage(() => localStorage),
-      // Le jeton d'accès n'est JAMAIS persistant (GG-17).
-      partialize: (etat) => ({
-        session: etat.session,
-        estAuthentifie: etat.estAuthentifie,
-      }),
-    },
-  ),
+  persist(() => createUtilisateurStore(), {
+    name: 'takt-utilisateur',
+    storage: createJSONStorage(() => localStorage),
+    // Le jeton d'accès n'est JAMAIS persistant (GG-17).
+    partialize: (etat) => ({
+      session: etat.session,
+      estAuthentifie: etat.estAuthentifie,
+    }),
+  }),
 );

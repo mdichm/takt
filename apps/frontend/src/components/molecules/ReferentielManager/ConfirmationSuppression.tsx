@@ -26,7 +26,7 @@ export function ConfirmationSuppression({
   className,
 }: ConfirmationSuppressionProps): JSX.Element {
   const estDesactive = chargement;
-  const dict = traduction('bouton') as typeof DICTIONNAIRE_FR['bouton'];
+  const dict = traduction('bouton') as (typeof DICTIONNAIRE_FR)['bouton'];
   return (
     <div
       id={id}
@@ -50,12 +50,7 @@ export function ConfirmationSuppression({
     >
       <p style={{ fontSize: 'var(--font-size-body)', margin: 0, maxWidth: '400px' }}>{libelle}</p>
       <div style={{ display: 'flex', gap: 'var(--space-s)' }}>
-        <Bouton
-          variante="contour"
-          taille="moyenne"
-          libelle={dict.annuler}
-          onClick={surAnnuler}
-        />
+        <Bouton variante="contour" taille="moyenne" libelle={dict.annuler} onClick={surAnnuler} />
         <Bouton
           variante="danger"
           taille="moyenne"

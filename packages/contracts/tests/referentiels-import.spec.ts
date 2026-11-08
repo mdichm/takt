@@ -13,16 +13,12 @@ import {
 } from '../src/referentiels';
 
 describe('zTypeReferentielImportable (L04-07)', () => {
-  test.each([
-    'site',
-    'type-salle',
-    'equipement',
-    'salle',
-    'groupe',
-    'enseignant',
-  ] as const)('accepte le type %s', (type) => {
-    expect(zTypeReferentielImportable.safeParse(type).success).toBe(true);
-  });
+  test.each(['site', 'type-salle', 'equipement', 'salle', 'groupe', 'enseignant'] as const)(
+    'accepte le type %s',
+    (type) => {
+      expect(zTypeReferentielImportable.safeParse(type).success).toBe(true);
+    },
+  );
 
   test('refuse un type inconnu', () => {
     expect(zTypeReferentielImportable.safeParse('departement').success).toBe(false);
@@ -81,9 +77,7 @@ describe('zImportReferentielCsv (L04-07)', () => {
     });
     expect(resultat.success).toBe(false);
     if (!resultat.success) {
-      expect(resultat.error.issues[0]!.message).toBe(
-        'Le fichier dépasse 2 Mo',
-      );
+      expect(resultat.error.issues[0]!.message).toBe('Le fichier dépasse 2 Mo');
     }
   });
 });

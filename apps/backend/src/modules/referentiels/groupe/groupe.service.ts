@@ -6,11 +6,7 @@ import { PRISMA } from '../../common/di/prisma.token';
 import { PrismaClient } from '@takt/db';
 import { CODES_ERREUR_API, ApiError } from '../../common/http/api-error';
 import { AuditService } from '../../audit/audit.service';
-import type {
-  GroupeCreate,
-  GroupeUpdate,
-  GroupeListFilters,
-} from '@takt/contracts';
+import type { GroupeCreate, GroupeUpdate, GroupeListFilters } from '@takt/contracts';
 
 /**
  * Service de gestion des groupes.
@@ -33,24 +29,18 @@ export class GroupeService {
       where: { id: donnees.niveauId },
     });
     if (!niveau) {
-      throw new ApiError(
-        CODES_ERREUR_API.BAD_REQUEST,
-        400,
-        'Le niveau parent est introuvable',
-        { champ: 'niveauId' },
-      );
+      throw new ApiError(CODES_ERREUR_API.BAD_REQUEST, 400, 'Le niveau parent est introuvable', {
+        champ: 'niveauId',
+      });
     }
 
     const existant = await this.prisma.groupe.findUnique({
       where: { code: donnees.code },
     });
     if (existant) {
-      throw new ApiError(
-        CODES_ERREUR_API.BAD_REQUEST,
-        400,
-        'Un groupe avec ce code existe déjà',
-        { champ: 'code' },
-      );
+      throw new ApiError(CODES_ERREUR_API.BAD_REQUEST, 400, 'Un groupe avec ce code existe déjà', {
+        champ: 'code',
+      });
     }
 
     const groupe = await this.prisma.groupe.create({
@@ -197,12 +187,9 @@ export class GroupeService {
         where: { id: donnees.niveauId },
       });
       if (!niveau) {
-        throw new ApiError(
-          CODES_ERREUR_API.BAD_REQUEST,
-          400,
-          'Le niveau parent est introuvable',
-          { champ: 'niveauId' },
-        );
+        throw new ApiError(CODES_ERREUR_API.BAD_REQUEST, 400, 'Le niveau parent est introuvable', {
+          champ: 'niveauId',
+        });
       }
     }
 

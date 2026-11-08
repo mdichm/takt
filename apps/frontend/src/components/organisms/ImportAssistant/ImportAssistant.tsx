@@ -20,15 +20,24 @@ import RapportImportComposant from './RapportImport';
 import RapportImportArchiveComposant from './RapportImportArchive';
 
 const DICO_CSV = DICTIONNAIRE_FR.importCsv as Record<string, string | Record<string, string>>;
-const DICO_ARCHIVE = DICTIONNAIRE_FR.importArchive as Record<string, string | Record<string, string>>;
-const t = (cle: string, dico: Record<string, string | Record<string, string>> = DICO_CSV): string => {
+const DICO_ARCHIVE = DICTIONNAIRE_FR.importArchive as Record<
+  string,
+  string | Record<string, string>
+>;
+const t = (
+  cle: string,
+  dico: Record<string, string | Record<string, string>> = DICO_CSV,
+): string => {
   const valeur = (dico as Record<string, unknown>)[cle];
   return typeof valeur === 'string' ? valeur : cle;
 };
 
 type Etape = 'saisie' | 'aperçu' | 'rapport';
 
-const TYPES_CSV: readonly { readonly valeur: TypeReferentielImportable; readonly libelle: string }[] = [
+const TYPES_CSV: readonly {
+  readonly valeur: TypeReferentielImportable;
+  readonly libelle: string;
+}[] = [
   { valeur: 'site', libelle: t('types.site') },
   { valeur: 'type-salle', libelle: t('types.type-salle') },
   { valeur: 'equipement', libelle: t('types.equipement') },
@@ -49,7 +58,9 @@ export default function ImportAssistant(): JSX.Element {
   const [mode, setMode] = useState<'csv' | 'archive'>('csv');
   const [typeSelectionne, setTypeSelectionne] = useState<TypeReferentielImportable>('site');
   const [contenuCsv, setContenuCsv] = useState('');
-  const [anneesSource, setAnneesSource] = useState<{ readonly id: string; readonly libelle: string }[]>([]);
+  const [anneesSource, setAnneesSource] = useState<
+    { readonly id: string; readonly libelle: string }[]
+  >([]);
   const [anneeSourceId, setAnneeSourceId] = useState<string | null>(null);
   const [typesSelectionnes, setTypesSelectionnes] = useState<Set<TypeImportArchive>>(new Set());
   const [etape, setEtape] = useState<Etape>('saisie');
@@ -62,7 +73,8 @@ export default function ImportAssistant(): JSX.Element {
 
   useEffect(() => {
     let ignore = false;
-    api.get<{ data: unknown }>('/referentiels/import/archive/annees-source')
+    api
+      .get<{ data: unknown }>('/referentiels/import/archive/annees-source')
       .then((reponse) => {
         if (ignore) {
           return;
@@ -158,7 +170,7 @@ export default function ImportAssistant(): JSX.Element {
 
   const lignesErreurApercu = apercuCsv?.erreurs ?? [];
   const statutLibelle = (statut: string): string =>
-    t((`statut_${statut}` as keyof typeof DICO_ARCHIVE), DICO_ARCHIVE);
+    t(`statut_${statut}` as keyof typeof DICO_ARCHIVE, DICO_ARCHIVE);
 
   const estSaisie = etape === 'saisie';
   const estApercu = etape === 'aperçu';
@@ -193,19 +205,25 @@ export default function ImportAssistant(): JSX.Element {
       {mode === 'csv' && estSaisie && (
         <>
           <div className="mt-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t('type', DICO_CSV)}</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              {t('type', DICO_CSV)}
+            </label>
             <select
               value={typeSelectionne}
               onChange={(e) => setTypeSelectionne(e.target.value as TypeReferentielImportable)}
               className="w-full max-w-xs rounded-md border border-gray-300 bg-white px-3 py-2 text-sm"
             >
               {TYPES_CSV.map((type) => (
-                <option key={type.valeur} value={type.valeur}>{type.libelle}</option>
+                <option key={type.valeur} value={type.valeur}>
+                  {type.libelle}
+                </option>
               ))}
             </select>
           </div>
           <div className="mt-4">
-            <label htmlFor="contenu-csv" className="block text-sm font-medium text-gray-700 mb-1">{t('fichier', DICO_CSV)}</label>
+            <label htmlFor="contenu-csv" className="block text-sm font-medium text-gray-700 mb-1">
+              {t('fichier', DICO_CSV)}
+            </label>
             <textarea
               id="contenu-csv"
               value={contenuCsv}
@@ -216,7 +234,9 @@ export default function ImportAssistant(): JSX.Element {
             <p className="mt-1 text-xs text-gray-500">{t('fichierAide', DICO_CSV)}</p>
           </div>
           {erreurApi && (
-            <div className="mt-3 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-800">{erreurApi}</div>
+            <div className="mt-3 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-800">
+              {erreurApi}
+            </div>
           )}
           <button
             onClick={executerApercu}
@@ -230,7 +250,9 @@ export default function ImportAssistant(): JSX.Element {
       {mode === 'archive' && estSaisie && (
         <>
           <div className="mt-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t('anneeSource', DICO_ARCHIVE)}</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              {t('anneeSource', DICO_ARCHIVE)}
+            </label>
             <p className="text-xs text-gray-500 mb-2">{t('anneeSourceAide', DICO_ARCHIVE)}</p>
             <select
               value={anneeSourceId ?? ''}
@@ -239,17 +261,24 @@ export default function ImportAssistant(): JSX.Element {
             >
               <option value="">{t('anneeRequis', DICO_ARCHIVE)}</option>
               {anneesSource.map((a) => (
-                <option key={a.id} value={a.id}>{a.libelle}</option>
+                <option key={a.id} value={a.id}>
+                  {a.libelle}
+                </option>
               ))}
             </select>
           </div>
           <div className="mt-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t('types', DICO_ARCHIVE)}</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              {t('types', DICO_ARCHIVE)}
+            </label>
             <div className="grid grid-cols-2 gap-2 text-sm">
               {TYPES_ARCHIVE.map((type) => {
                 const selectionne = typesSelectionnes.has(type.valeur);
                 return (
-                  <label key={type.valeur} className="flex items-center gap-2 rounded-md border p-2 cursor-pointer hover:bg-gray-50">
+                  <label
+                    key={type.valeur}
+                    className="flex items-center gap-2 rounded-md border p-2 cursor-pointer hover:bg-gray-50"
+                  >
                     <input
                       type="checkbox"
                       checked={selectionne}
@@ -271,7 +300,9 @@ export default function ImportAssistant(): JSX.Element {
             </div>
           </div>
           {erreurApi && (
-            <div className="mt-3 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-800">{erreurApi}</div>
+            <div className="mt-3 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-800">
+              {erreurApi}
+            </div>
           )}
           <button
             onClick={executerApercu}
@@ -287,38 +318,62 @@ export default function ImportAssistant(): JSX.Element {
           <h3 className="text-sm font-semibold text-gray-900">{t('apercu', DICO_CSV)}</h3>
           <div className="mt-3 grid grid-cols-3 gap-4 text-sm">
             <div className="rounded-md border border-gray-200 p-3 text-center">
-              <div className="text-xs font-semibold text-gray-500 uppercase">{t('lignesTotales', DICO_CSV)}</div>
+              <div className="text-xs font-semibold text-gray-500 uppercase">
+                {t('lignesTotales', DICO_CSV)}
+              </div>
               <div className="mt-1 font-medium text-gray-900">{apercuCsv.totalLignes}</div>
             </div>
             <div className="rounded-md border border-green-200 bg-green-50 p-3 text-center">
-              <div className="text-xs font-semibold text-green-700 uppercase">{t('lignesValides', DICO_CSV)}</div>
+              <div className="text-xs font-semibold text-green-700 uppercase">
+                {t('lignesValides', DICO_CSV)}
+              </div>
               <div className="mt-1 font-medium text-green-900">{apercuCsv.lignesValides}</div>
             </div>
             <div className="rounded-md border border-red-200 bg-red-50 p-3 text-center">
-              <div className="text-xs font-semibold text-red-700 uppercase">{t('lignesRejetees', DICO_CSV)}</div>
+              <div className="text-xs font-semibold text-red-700 uppercase">
+                {t('lignesRejetees', DICO_CSV)}
+              </div>
               <div className="mt-1 font-medium text-red-900">{apercuCsv.lignesInvalides}</div>
             </div>
           </div>
           {lignesErreurApercu.length > 0 ? (
             <>
-              <h4 className="mt-4 mb-2 text-xs font-semibold text-gray-500 uppercase">Erreurs ligne à ligne</h4>
+              <h4 className="mt-4 mb-2 text-xs font-semibold text-gray-500 uppercase">
+                Erreurs ligne à ligne
+              </h4>
               <div className="overflow-x-auto rounded-md border border-gray-200">
                 <table className="w-full text-sm">
                   <thead>
                     <tr>
-                      <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase">{t('ligne', DICO_CSV)}</th>
-                      <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase">{t('champ', DICO_CSV)}</th>
-                      <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase">{t('valeur', DICO_CSV)}</th>
-                      <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase">{t('motif', DICO_CSV)}</th>
+                      <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase">
+                        {t('ligne', DICO_CSV)}
+                      </th>
+                      <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase">
+                        {t('champ', DICO_CSV)}
+                      </th>
+                      <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase">
+                        {t('valeur', DICO_CSV)}
+                      </th>
+                      <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase">
+                        {t('motif', DICO_CSV)}
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
                     {lignesErreurApercu.map((erreur) => (
                       <tr key={`${erreur.ligne}-${erreur.champ}`}>
-                        <td className="px-3 py-2 text-left text-sm text-gray-700">{erreur.ligne}</td>
-                        <td className="px-3 py-2 text-left text-sm text-gray-700">{erreur.champ}</td>
-                        <td className="px-3 py-2 text-left text-sm text-gray-700">{erreur.valeur}</td>
-                        <td className="px-3 py-2 text-left text-sm text-gray-700">{erreur.motif}</td>
+                        <td className="px-3 py-2 text-left text-sm text-gray-700">
+                          {erreur.ligne}
+                        </td>
+                        <td className="px-3 py-2 text-left text-sm text-gray-700">
+                          {erreur.champ}
+                        </td>
+                        <td className="px-3 py-2 text-left text-sm text-gray-700">
+                          {erreur.valeur}
+                        </td>
+                        <td className="px-3 py-2 text-left text-sm text-gray-700">
+                          {erreur.motif}
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -351,19 +406,27 @@ export default function ImportAssistant(): JSX.Element {
           <h3 className="text-sm font-semibold text-gray-900">{t('apercu', DICO_ARCHIVE)}</h3>
           <div className="mt-3 grid grid-cols-4 gap-4 text-sm">
             <div className="rounded-md border border-gray-200 p-3 text-center">
-              <div className="text-xs font-semibold text-gray-500 uppercase">{t('lignesTotales', DICO_ARCHIVE)}</div>
+              <div className="text-xs font-semibold text-gray-500 uppercase">
+                {t('lignesTotales', DICO_ARCHIVE)}
+              </div>
               <div className="mt-1 font-medium text-gray-900">{apercuArchive.totalLignes}</div>
             </div>
             <div className="rounded-md border border-green-200 bg-green-50 p-3 text-center">
-              <div className="text-xs font-semibold text-green-700 uppercase">{t('lignesValides', DICO_ARCHIVE)}</div>
+              <div className="text-xs font-semibold text-green-700 uppercase">
+                {t('lignesValides', DICO_ARCHIVE)}
+              </div>
               <div className="mt-1 font-medium text-green-900">{apercuArchive.lignesValides}</div>
             </div>
             <div className="rounded-md border border-blue-200 bg-blue-50 p-3 text-center">
-              <div className="text-xs font-semibold text-blue-700 uppercase">{t('dejaImports', DICO_ARCHIVE)}</div>
+              <div className="text-xs font-semibold text-blue-700 uppercase">
+                {t('dejaImports', DICO_ARCHIVE)}
+              </div>
               <div className="mt-1 font-medium text-blue-900">{apercuArchive.dejaImports}</div>
             </div>
             <div className="rounded-md border border-red-200 bg-red-50 p-3 text-center">
-              <div className="text-xs font-semibold text-red-700 uppercase">{t('lignesInvalides', DICO_ARCHIVE)}</div>
+              <div className="text-xs font-semibold text-red-700 uppercase">
+                {t('lignesInvalides', DICO_ARCHIVE)}
+              </div>
               <div className="mt-1 font-medium text-red-900">{apercuArchive.lignesInvalides}</div>
             </div>
           </div>
@@ -371,23 +434,39 @@ export default function ImportAssistant(): JSX.Element {
             <table className="w-full text-sm">
               <thead>
                 <tr>
-                  <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase">{t('code', DICO_ARCHIVE)}</th>
-                  <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase">Libellé</th>
-                  <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase">{t('statut', DICO_ARCHIVE)}</th>
-                  <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase">{t('motif', DICO_ARCHIVE)}</th>
+                  <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase">
+                    {t('code', DICO_ARCHIVE)}
+                  </th>
+                  <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase">
+                    Libellé
+                  </th>
+                  <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase">
+                    {t('statut', DICO_ARCHIVE)}
+                  </th>
+                  <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase">
+                    {t('motif', DICO_ARCHIVE)}
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {apercuArchive.apercuLignes.map((ligne) => (
                   <tr key={`${ligne.type}-${ligne.code}`}>
-                    <td className="px-3 py-2 text-left text-sm text-gray-700 font-mono">{ligne.code}</td>
-                    <td className="px-3 py-2 text-left text-sm text-gray-700">{ligne.libelle ?? '-'}</td>
+                    <td className="px-3 py-2 text-left text-sm text-gray-700 font-mono">
+                      {ligne.code}
+                    </td>
                     <td className="px-3 py-2 text-left text-sm text-gray-700">
-                      <span className={`px-1.5 py-0.5 rounded text-xs ${ligne.statut === 'aImporter' ? 'bg-green-100 text-green-800' : ligne.statut === 'dejaImporte' ? 'bg-blue-100 text-blue-800' : 'bg-red-100 text-red-800'}`}>
+                      {ligne.libelle ?? '-'}
+                    </td>
+                    <td className="px-3 py-2 text-left text-sm text-gray-700">
+                      <span
+                        className={`px-1.5 py-0.5 rounded text-xs ${ligne.statut === 'aImporter' ? 'bg-green-100 text-green-800' : ligne.statut === 'dejaImporte' ? 'bg-blue-100 text-blue-800' : 'bg-red-100 text-red-800'}`}
+                      >
                         {statutLibelle(ligne.statut)}
                       </span>
                     </td>
-                    <td className="px-3 py-2 text-left text-sm text-gray-500">{ligne.motif ?? '-'}</td>
+                    <td className="px-3 py-2 text-left text-sm text-gray-500">
+                      {ligne.motif ?? '-'}
+                    </td>
                   </tr>
                 ))}
               </tbody>

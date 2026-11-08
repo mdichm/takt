@@ -28,8 +28,8 @@ const UUID_LIGNE = '99999999-9999-4999-8999-999999999999';
 
 const MAINTENANT = '2026-11-07T20:50:00.000Z';
 
-describe('contrats des plans d\'études', () => {
-  it('accepte un plan d\'études valide', () => {
+describe("contrats des plans d'études", () => {
+  it("accepte un plan d'études valide", () => {
     const resultat = zPlanEtudes.parse({
       id: UUID_PLAN,
       parcoursId: UUID_PARCOURS,
@@ -44,7 +44,7 @@ describe('contrats des plans d\'études', () => {
     expect(resultat.departementId).toBe(UUID_DEPARTEMENT);
   });
 
-  it('accepte une création de plan d\'études valide', () => {
+  it("accepte une création de plan d'études valide", () => {
     expect(
       zPlanEtudesCreate.parse({
         parcoursId: UUID_PARCOURS,
@@ -56,7 +56,7 @@ describe('contrats des plans d\'études', () => {
     ).toMatchObject({ niveauId: UUID_NIVEAU });
   });
 
-  it('refuse un plan d\'études avec un UUID invalide', () => {
+  it("refuse un plan d'études avec un UUID invalide", () => {
     const donnees = {
       id: 'pas-un-uuid',
       parcoursId: UUID_PARCOURS,
@@ -80,7 +80,7 @@ describe('contrats des plans d\'études', () => {
     expect(zPlanEtudesCreate.safeParse(donnees).success).toBe(false);
   });
 
-  it('valide les filtres de liste des plans d\'études', () => {
+  it("valide les filtres de liste des plans d'études", () => {
     const resultat = zPlanEtudesList.parse({
       page: '2',
       pageSize: '10',
@@ -92,10 +92,8 @@ describe('contrats des plans d\'études', () => {
     expect(resultat.niveauId).toBe(UUID_NIVEAU);
   });
 
-  it('accepte une mise à jour partielle de plan d\'études', () => {
-    expect(
-      zPlanEtudesUpdate.parse({ libelle: 'Libellé modifié' }),
-    ).toMatchObject({});
+  it("accepte une mise à jour partielle de plan d'études", () => {
+    expect(zPlanEtudesUpdate.parse({ libelle: 'Libellé modifié' })).toMatchObject({});
   });
 
   it('refuse un volume horaire négatif sur une matière de plan', () => {
@@ -120,7 +118,7 @@ describe('contrats des plans d\'études', () => {
     expect(zPlanEtudesMatiereCreate.safeParse(donnees).success).toBe(false);
   });
 
-  it('accepte une matière de plan d\'études valide', () => {
+  it("accepte une matière de plan d'études valide", () => {
     const resultat = zPlanEtudesMatiere.parse({
       id: UUID_LIGNE,
       planEtudesId: UUID_PLAN,
@@ -136,7 +134,7 @@ describe('contrats des plans d\'études', () => {
     expect(resultat.coefficient).toBe(2);
   });
 
-  it('valide les filtres de liste des matières d\'un plan', () => {
+  it("valide les filtres de liste des matières d'un plan", () => {
     const resultat = zPlanEtudesMatiereList.parse({
       page: '1',
       pageSize: '5',
@@ -147,7 +145,7 @@ describe('contrats des plans d\'études', () => {
     expect(resultat.matiereId).toBe(UUID_MATIERE);
   });
 
-  it('valide l\'identifiant de matière de plan d\'études en paramètre', () => {
+  it("valide l'identifiant de matière de plan d'études en paramètre", () => {
     const resultat = zPlanEtudesMatiereParams.parse({
       planEtudesId: UUID_PLAN,
       id: UUID_LIGNE,
@@ -156,13 +154,11 @@ describe('contrats des plans d\'études', () => {
     expect(resultat.id).toBe(UUID_LIGNE);
   });
 
-  it('refuse un identifiant de plan d\'études invalide en paramètre', () => {
-    expect(
-      zPlanEtudesParams.safeParse({ id: 'invalide' }).success,
-    ).toBe(false);
+  it("refuse un identifiant de plan d'études invalide en paramètre", () => {
+    expect(zPlanEtudesParams.safeParse({ id: 'invalide' }).success).toBe(false);
   });
 
-  it('accepte un groupe héritier d\'un plan d\'études', () => {
+  it("accepte un groupe héritier d'un plan d'études", () => {
     const resultat = zPlanEtudesGroupeHérité.parse({
       id: UUID_PLAN,
       code: 'L1-A',
@@ -174,7 +170,7 @@ describe('contrats des plans d\'études', () => {
     expect(resultat.niveauId).toBe(UUID_NIVEAU);
   });
 
-  it('accepte un volume total de plan d\'études', () => {
+  it("accepte un volume total de plan d'études", () => {
     const resultat = zPlanEtudesVolumeTotal.parse({
       planEtudesId: UUID_PLAN,
       volumeTotalHebdomadaire: 120,

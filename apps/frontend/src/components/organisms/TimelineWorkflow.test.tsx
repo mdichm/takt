@@ -7,8 +7,20 @@ import { TimelineWorkflow } from './TimelineWorkflow';
 
 describe('TimelineWorkflow', () => {
   const etapes = [
-    { id: 'e1', libelle: 'Saisie des contraintes', statut: 'terminé' as const, date: 'Lundi', description: 'Contraintes saisies et validées' },
-    { id: 'e2', libelle: 'Génération', statut: 'en cours' as const, date: 'Mardi', description: 'Génération en cours…' },
+    {
+      id: 'e1',
+      libelle: 'Saisie des contraintes',
+      statut: 'terminé' as const,
+      date: 'Lundi',
+      description: 'Contraintes saisies et validées',
+    },
+    {
+      id: 'e2',
+      libelle: 'Génération',
+      statut: 'en cours' as const,
+      date: 'Mardi',
+      description: 'Génération en cours…',
+    },
     { id: 'e3', libelle: 'Revue', statut: 'à faire' as const, date: 'Mercredi' },
   ];
 

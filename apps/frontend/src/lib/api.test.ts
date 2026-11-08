@@ -4,13 +4,7 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
 import { z } from 'zod';
 import { zEnvelope } from '@takt/contracts';
-import {
-  api,
-  configurerApi,
-  type EvenementJournal,
-  type ReponseApi,
-  versPagination,
-} from './api';
+import { api, configurerApi, type EvenementJournal, type ReponseApi, versPagination } from './api';
 import { ErreurHttp } from './errors';
 
 const URL_BASE = 'http://test.api';
@@ -34,10 +28,7 @@ function reponseJson(statut: number, corps: unknown): Response {
   });
 }
 
-function enveloppe(
-  data: unknown,
-  erreur: { code: string; message?: string } | null,
-): unknown {
+function enveloppe(data: unknown, erreur: { code: string; message?: string } | null): unknown {
   return {
     data,
     error: erreur,
@@ -112,22 +103,10 @@ describe('client HTTP (fetch natif)', () => {
   });
 
   it('déstructure l’enveloppe et retourne data + meta', async () => {
-    fabriqueReponse = () =>
-      reponseJson(
-        200,
-        enveloppe(
-          { items: ['a'] },
-          null,
-        ),
-      );
+    fabriqueReponse = () => reponseJson(200, enveloppe({ items: ['a'] }, null));
 
-    const schema = zEnvelope(
-      z.object({ items: z.array(z.string()) }),
-    );
-    const resultat: ReponseApi<{ items: string[] }> = await api.get(
-      '/seances',
-      { schema },
-    );
+    const schema = zEnvelope(z.object({ items: z.array(z.string()) }));
+    const resultat: ReponseApi<{ items: string[] }> = await api.get('/seances', { schema });
 
     expect(resultat.data).toEqual({ items: ['a'] });
     expect(resultat.meta.requestId).toBe('req-test');
@@ -161,10 +140,7 @@ describe('intercepteur 401 → refresh', () => {
         if (!rafraichirReussit) {
           return reponseJson(401, enveloppe(null, { code: 'UNAUTHORIZED' }));
         }
-        return reponseJson(
-          200,
-          enveloppe({ accessToken: nouvelAccessToken }, null),
-        );
+        return reponseJson(200, enveloppe({ accessToken: nouvelAccessToken }, null));
       }
       const n = (appelsParUrl.get(url) ?? 0) + 1;
       appelsParUrl.set(url, n);
@@ -187,9 +163,7 @@ describe('intercepteur 401 → refresh', () => {
     for (const resultat of resultats) {
       expect(resultat.data).toEqual({ ok: true });
     }
-    const appelsSeances = appelsFetch.filter(
-      (a) => a.url === `${URL_BASE}/seances`,
-    );
+    const appelsSeances = appelsFetch.filter((a) => a.url === `${URL_BASE}/seances`);
     expect(appelsSeances.length).toBeGreaterThanOrEqual(3);
     // Chaque requête rejetée a été rejouée avec le nouveau Bearer.
     for (const appel of appelsSeances.slice(3)) {
@@ -202,10 +176,7 @@ describe('intercepteur 401 → refresh', () => {
     fabriqueReponse = (url: string) => {
       if (url.endsWith('/auth/refresh')) {
         compteurRefresh += 1;
-        return reponseJson(
-          200,
-          enveloppe({ accessToken: nouvelAccessToken }, null),
-        );
+        return reponseJson(200, enveloppe({ accessToken: nouvelAccessToken }, null));
       }
       const n = (appelsParUrl.get(url) ?? 0) + 1;
       appelsParUrl.set(url, n);
@@ -218,9 +189,7 @@ describe('intercepteur 401 → refresh', () => {
 
     expect(resultat.data).toEqual({ rejoue: true });
     expect(compteurRefresh).toBe(1);
-    const appelsSeances = appelsFetch.filter(
-      (a) => a.url === `${URL_BASE}/seances`,
-    );
+    const appelsSeances = appelsFetch.filter((a) => a.url === `${URL_BASE}/seances`);
     const headersRejoue2 = appelsSeances[1]!.init.headers as Record<string, string>;
     expect(headersRejoue2.Authorization).toBe('Bearer jeton-access-2');
   });
@@ -246,10 +215,7 @@ describe('intercepteur 401 → refresh', () => {
     fabriqueReponse = (url: string) => {
       if (url.endsWith('/auth/refresh')) {
         refreshAppeles += 1;
-        return reponseJson(
-          200,
-          enveloppe({ accessToken: 'jeton-invalide-apres-refresh' }, null),
-        );
+        return reponseJson(200, enveloppe({ accessToken: 'jeton-invalide-apres-refresh' }, null));
       }
       return reponseJson(401, enveloppe(null, { code: 'UNAUTHORIZED' }));
     };
@@ -266,14 +232,48 @@ describe('catalogue des 8 codes d’erreur', () => {
     code: string;
     attendu: string;
   }> = [
-    { statut: 400, code: 'VALIDATION_ERROR', attendu: 'Les informations saisies sont invalides. Vérifiez les champs indiqués.' },
-    { statut: 401, code: 'UNAUTHORIZED', attendu: 'Votre session a expiré. Reconnectez-vous pour continuer.' },
-    { statut: 403, code: 'FORBIDDEN', attendu: "Vous n'avez pas les droits nécessaires pour cette action. Contactez un administrateur." },
-    { statut: 404, code: 'NOT_FOUND', attendu: 'La ressource demandée est introuvable ou a été supprimée.' },
-    { statut: 409, code: 'WORKFLOW_INVALID_TRANSITION', attendu: 'Cette action n’est pas autorisée dans l’état actuel de la ressource.' },
-    { statut: 423, code: 'SEANCE_LOCKED', attendu: 'Cette séance est verrouillée par un autre utilisateur. Déverrouillez-la ou contactez-la.' },
-    { statut: 429, code: 'RATE_LIMITED', attendu: 'Trop de tentatives. Patientez quelques instants avant de réessayer.' },
-    { statut: 500, code: 'INTERNAL_ERROR', attendu: 'Une erreur interne est survenue. Réessayez plus tard ou contactez le support.' },
+    {
+      statut: 400,
+      code: 'VALIDATION_ERROR',
+      attendu: 'Les informations saisies sont invalides. Vérifiez les champs indiqués.',
+    },
+    {
+      statut: 401,
+      code: 'UNAUTHORIZED',
+      attendu: 'Votre session a expiré. Reconnectez-vous pour continuer.',
+    },
+    {
+      statut: 403,
+      code: 'FORBIDDEN',
+      attendu:
+        "Vous n'avez pas les droits nécessaires pour cette action. Contactez un administrateur.",
+    },
+    {
+      statut: 404,
+      code: 'NOT_FOUND',
+      attendu: 'La ressource demandée est introuvable ou a été supprimée.',
+    },
+    {
+      statut: 409,
+      code: 'WORKFLOW_INVALID_TRANSITION',
+      attendu: 'Cette action n’est pas autorisée dans l’état actuel de la ressource.',
+    },
+    {
+      statut: 423,
+      code: 'SEANCE_LOCKED',
+      attendu:
+        'Cette séance est verrouillée par un autre utilisateur. Déverrouillez-la ou contactez-la.',
+    },
+    {
+      statut: 429,
+      code: 'RATE_LIMITED',
+      attendu: 'Trop de tentatives. Patientez quelques instants avant de réessayer.',
+    },
+    {
+      statut: 500,
+      code: 'INTERNAL_ERROR',
+      attendu: 'Une erreur interne est survenue. Réessayez plus tard ou contactez le support.',
+    },
   ];
 
   it.each(cas)('mappe le $statut ($code) vers une ErreurApi', async ({ statut, code, attendu }) => {

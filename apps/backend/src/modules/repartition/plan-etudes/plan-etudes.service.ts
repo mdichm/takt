@@ -46,24 +46,18 @@ export class PlanEtudesService {
       include: { departement: { select: { id: true } } },
     });
     if (!parcours) {
-      throw new ApiError(
-        CODES_ERREUR_API.BAD_REQUEST,
-        400,
-        'Le parcours parent est introuvable',
-        { champ: 'parcoursId' },
-      );
+      throw new ApiError(CODES_ERREUR_API.BAD_REQUEST, 400, 'Le parcours parent est introuvable', {
+        champ: 'parcoursId',
+      });
     }
 
     const niveau = await this.prisma.niveau.findUnique({
       where: { id: donnees.niveauId },
     });
     if (!niveau) {
-      throw new ApiError(
-        CODES_ERREUR_API.BAD_REQUEST,
-        400,
-        'Le niveau parent est introuvable',
-        { champ: 'niveauId' },
-      );
+      throw new ApiError(CODES_ERREUR_API.BAD_REQUEST, 400, 'Le niveau parent est introuvable', {
+        champ: 'niveauId',
+      });
     }
     if (niveau.parcoursId !== donnees.parcoursId) {
       throw new ApiError(
@@ -94,12 +88,9 @@ export class PlanEtudesService {
       select: { id: true, anneeUniversitaireId: true },
     });
     if (!semestre) {
-      throw new ApiError(
-        CODES_ERREUR_API.BAD_REQUEST,
-        400,
-        'Le semestre est introuvable',
-        { champ: 'semestreId' },
-      );
+      throw new ApiError(CODES_ERREUR_API.BAD_REQUEST, 400, 'Le semestre est introuvable', {
+        champ: 'semestreId',
+      });
     }
     if (semestre.anneeUniversitaireId !== donnees.anneeUniversitaireId) {
       throw new ApiError(
@@ -260,11 +251,7 @@ export class PlanEtudesService {
       },
     });
     if (!plan) {
-      throw new ApiError(
-        CODES_ERREUR_API.NOT_FOUND,
-        404,
-        'Plan d’études introuvable',
-      );
+      throw new ApiError(CODES_ERREUR_API.NOT_FOUND, 404, 'Plan d’études introuvable');
     }
 
     if (departementIds.length > 0 && !departementIds.includes(plan.departementId)) {
@@ -275,10 +262,7 @@ export class PlanEtudesService {
       );
     }
 
-    const volumeTotal = plan.planEtudesMatieres.reduce(
-      (acc, m) => acc + m.volumeHoraire,
-      0,
-    );
+    const volumeTotal = plan.planEtudesMatieres.reduce((acc, m) => acc + m.volumeHoraire, 0);
 
     return {
       id: plan.id,
@@ -309,25 +293,16 @@ export class PlanEtudesService {
   }
 
   /** Met à jour un plan d'études. */
-  async update(
-    id: string,
-    donnees: PlanEtudesUpdate,
-    utilisateurIdModifiePar: string,
-  ) {
+  async update(id: string, donnees: PlanEtudesUpdate, utilisateurIdModifiePar: string) {
     const existant = await this.prisma.planEtudes.findUnique({ where: { id } });
     if (!existant) {
-      throw new ApiError(
-        CODES_ERREUR_API.NOT_FOUND,
-        404,
-        'Plan d’études introuvable',
-      );
+      throw new ApiError(CODES_ERREUR_API.NOT_FOUND, 404, 'Plan d’études introuvable');
     }
 
     const parcoursId = donnees.parcoursId ?? existant.parcoursId;
     const niveauId = donnees.niveauId ?? existant.niveauId;
     const departementId = donnees.departementId ?? existant.departementId;
-    const anneeUniversitaireId =
-      donnees.anneeUniversitaireId ?? existant.anneeUniversitaireId;
+    const anneeUniversitaireId = donnees.anneeUniversitaireId ?? existant.anneeUniversitaireId;
     const semestreId = donnees.semestreId ?? existant.semestreId;
 
     await this.verifierCohérencePlan({ parcoursId, niveauId, departementId });
@@ -405,11 +380,7 @@ export class PlanEtudesService {
       include: { planEtudesMatieres: { take: 1 } },
     });
     if (!existant) {
-      throw new ApiError(
-        CODES_ERREUR_API.NOT_FOUND,
-        404,
-        'Plan d’études introuvable',
-      );
+      throw new ApiError(CODES_ERREUR_API.NOT_FOUND, 404, 'Plan d’études introuvable');
     }
 
     if (existant.planEtudesMatieres.length > 0) {
@@ -445,17 +416,10 @@ export class PlanEtudesService {
       },
     });
     if (!plan) {
-      throw new ApiError(
-        CODES_ERREUR_API.NOT_FOUND,
-        404,
-        'Plan d’études introuvable',
-      );
+      throw new ApiError(CODES_ERREUR_API.NOT_FOUND, 404, 'Plan d’études introuvable');
     }
 
-    const volumeTotal = plan.planEtudesMatieres.reduce(
-      (acc, m) => acc + m.volumeHoraire,
-      0,
-    );
+    const volumeTotal = plan.planEtudesMatieres.reduce((acc, m) => acc + m.volumeHoraire, 0);
 
     return {
       planEtudesId: plan.id,
@@ -471,11 +435,7 @@ export class PlanEtudesService {
       select: { id: true, niveauId: true },
     });
     if (!plan) {
-      throw new ApiError(
-        CODES_ERREUR_API.NOT_FOUND,
-        404,
-        'Plan d’études introuvable',
-      );
+      throw new ApiError(CODES_ERREUR_API.NOT_FOUND, 404, 'Plan d’études introuvable');
     }
 
     const groupes = await this.prisma.groupe.findMany({
@@ -505,11 +465,7 @@ export class PlanEtudesService {
       select: { id: true },
     });
     if (!plan) {
-      throw new ApiError(
-        CODES_ERREUR_API.NOT_FOUND,
-        404,
-        'Plan d’études introuvable',
-      );
+      throw new ApiError(CODES_ERREUR_API.NOT_FOUND, 404, 'Plan d’études introuvable');
     }
 
     const matiere = await this.prisma.matiere.findUnique({
@@ -517,12 +473,9 @@ export class PlanEtudesService {
       select: { id: true, code: true, libelle: true },
     });
     if (!matiere) {
-      throw new ApiError(
-        CODES_ERREUR_API.BAD_REQUEST,
-        400,
-        'La matière est introuvable',
-        { champ: 'matiereId' },
-      );
+      throw new ApiError(CODES_ERREUR_API.BAD_REQUEST, 400, 'La matière est introuvable', {
+        champ: 'matiereId',
+      });
     }
 
     const typeEnseignement = await this.prisma.typeEnseignement.findUnique({
@@ -604,11 +557,7 @@ export class PlanEtudesService {
       select: { id: true },
     });
     if (!plan) {
-      throw new ApiError(
-        CODES_ERREUR_API.NOT_FOUND,
-        404,
-        'Plan d’études introuvable',
-      );
+      throw new ApiError(CODES_ERREUR_API.NOT_FOUND, 404, 'Plan d’études introuvable');
     }
 
     let where: Record<string, unknown> = { planEtudesId };
@@ -659,11 +608,7 @@ export class PlanEtudesService {
       },
     });
     if (!ligne || ligne.planEtudesId !== planEtudesId) {
-      throw new ApiError(
-        CODES_ERREUR_API.NOT_FOUND,
-        404,
-        'Matière du plan d’études introuvable',
-      );
+      throw new ApiError(CODES_ERREUR_API.NOT_FOUND, 404, 'Matière du plan d’études introuvable');
     }
     return {
       id: ligne.id,
@@ -691,27 +636,17 @@ export class PlanEtudesService {
       where: { id },
     });
     if (!existant || existant.planEtudesId !== planEtudesId) {
-      throw new ApiError(
-        CODES_ERREUR_API.NOT_FOUND,
-        404,
-        'Matière du plan d’études introuvable',
-      );
+      throw new ApiError(CODES_ERREUR_API.NOT_FOUND, 404, 'Matière du plan d’études introuvable');
     }
 
-    if (
-      donnees.matiereId !== undefined &&
-      donnees.matiereId !== existant.matiereId
-    ) {
+    if (donnees.matiereId !== undefined && donnees.matiereId !== existant.matiereId) {
       const matiere = await this.prisma.matiere.findUnique({
         where: { id: donnees.matiereId },
       });
       if (!matiere) {
-        throw new ApiError(
-          CODES_ERREUR_API.BAD_REQUEST,
-          400,
-          'La matière est introuvable',
-          { champ: 'matiereId' },
-        );
+        throw new ApiError(CODES_ERREUR_API.BAD_REQUEST, 400, 'La matière est introuvable', {
+          champ: 'matiereId',
+        });
       }
       const doublon = await this.prisma.planEtudesMatiere.findFirst({
         where: { planEtudesId, matiereId: donnees.matiereId },
@@ -794,20 +729,12 @@ export class PlanEtudesService {
   }
 
   /** Supprime une matière d'un plan d'études. */
-  async deleteMatiere(
-    planEtudesId: string,
-    id: string,
-    utilisateurIdSupprimePar: string,
-  ) {
+  async deleteMatiere(planEtudesId: string, id: string, utilisateurIdSupprimePar: string) {
     const existant = await this.prisma.planEtudesMatiere.findUnique({
       where: { id },
     });
     if (!existant || existant.planEtudesId !== planEtudesId) {
-      throw new ApiError(
-        CODES_ERREUR_API.NOT_FOUND,
-        404,
-        'Matière du plan d’études introuvable',
-      );
+      throw new ApiError(CODES_ERREUR_API.NOT_FOUND, 404, 'Matière du plan d’études introuvable');
     }
 
     await this.prisma.planEtudesMatiere.delete({ where: { id } });

@@ -45,7 +45,7 @@ describe('contrats des affectations pédagogiques', () => {
     expect(resultat.dureeCreneaux).toBe(60);
   });
 
-  it('accepte une affectation sans type d\'enseignement', () => {
+  it("accepte une affectation sans type d'enseignement", () => {
     const resultat = zAffectationPedagogique.parse({
       ...DONNEES_VALIDEES,
       typeEnseignementId: null,
@@ -73,7 +73,7 @@ describe('contrats des affectations pédagogiques', () => {
     expect(zAffectationPedagogique.safeParse(donnees).success).toBe(false);
   });
 
-  it('accepte une création d\'affectation valide', () => {
+  it("accepte une création d'affectation valide", () => {
     const resultat = zAffectationPedagogiqueCreate.parse({
       versionId: UUID_VERSION,
       semestreId: UUID_SEMESTRE,
@@ -144,7 +144,7 @@ describe('contrats des affectations pédagogiques', () => {
     expect(resultat.dureeCreneaux).toBeUndefined();
   });
 
-  it('accepte une mise à jour mettant le type d\'enseignement à null', () => {
+  it("accepte une mise à jour mettant le type d'enseignement à null", () => {
     const resultat = zAffectationPedagogiqueUpdate.parse({
       id: UUID_AFFECTATION,
       typeEnseignementId: null,
@@ -152,12 +152,12 @@ describe('contrats des affectations pédagogiques', () => {
     expect(resultat.typeEnseignementId).toBeNull();
   });
 
-  it('valide l\'identifiant d\'affectation en paramètre de route', () => {
+  it("valide l'identifiant d'affectation en paramètre de route", () => {
     const resultat = zAffectationPedagogiqueParams.parse({ id: UUID_AFFECTATION });
     expect(resultat.id).toBe(UUID_AFFECTATION);
   });
 
-  it('refuse un identifiant d\'affectation invalide en paramètre', () => {
+  it("refuse un identifiant d'affectation invalide en paramètre", () => {
     expect(zAffectationPedagogiqueParams.safeParse({ id: 'invalide' }).success).toBe(false);
   });
 

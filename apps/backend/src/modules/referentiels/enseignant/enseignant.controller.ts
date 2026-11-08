@@ -28,10 +28,7 @@ import {
 } from '@takt/contracts';
 import { ZodValidation } from '../../common/pipes/zod-validation.decorator';
 import { EnseignantService } from './enseignant.service';
-import {
-  JwtAuthGuard,
-  UtilisateurConnecte,
-} from '../../common/guards/jwt-auth.guard';
+import { JwtAuthGuard, UtilisateurConnecte } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { DepartmentScopeGuard } from '../../common/guards/department-scope.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
@@ -92,7 +89,10 @@ export class EnseignantController {
   @ApiResponse({ status: 400, description: 'Requête invalide' })
   @ApiResponse({ status: 401, description: 'Non authentifié' })
   @ApiResponse({ status: 403, description: 'Interdit' })
-  async create(@Body() corps: EnseignantCreate, @Req() req: RequeteAvecUtilisateur): Promise<unknown> {
+  async create(
+    @Body() corps: EnseignantCreate,
+    @Req() req: RequeteAvecUtilisateur,
+  ): Promise<unknown> {
     return this.enseignantService.create(corps, req.user!.sub);
   }
 

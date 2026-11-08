@@ -24,7 +24,7 @@ describe('ThemeProvider (switch Normal/Ramadan, sans rechargement)', () => {
     render(
       <ThemeProvider>
         <Enfant />
-      </ThemeProvider>
+      </ThemeProvider>,
     );
     expect(document.documentElement.getAttribute('data-theme')).toBe('normal');
     expect(screen.getByTestId('enfant')).toBeInTheDocument();
@@ -34,7 +34,7 @@ describe('ThemeProvider (switch Normal/Ramadan, sans rechargement)', () => {
     const { rerender } = render(
       <ThemeProvider>
         <Enfant />
-      </ThemeProvider>
+      </ThemeProvider>,
     );
     expect(document.documentElement.getAttribute('data-theme')).toBe('normal');
 
@@ -42,7 +42,7 @@ describe('ThemeProvider (switch Normal/Ramadan, sans rechargement)', () => {
     rerender(
       <ThemeProvider>
         <Enfant />
-      </ThemeProvider>
+      </ThemeProvider>,
     );
     expect(document.documentElement.getAttribute('data-theme')).toBe('ramadan');
     expect(screen.getByTestId('enfant')).toBeInTheDocument();

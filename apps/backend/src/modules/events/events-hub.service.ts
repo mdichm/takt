@@ -67,7 +67,8 @@ export class EventsHubService implements OnModuleDestroy {
     if (!utilisateurId) {
       return this.clients.size;
     }
-    return [...this.clients.values()].filter((client) => client.utilisateurId === utilisateurId).length;
+    return [...this.clients.values()].filter((client) => client.utilisateurId === utilisateurId)
+      .length;
   }
 
   /** Ferme tous les flux et libère le timer. */

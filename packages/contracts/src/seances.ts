@@ -7,7 +7,11 @@ import { creerSchemaTri, zBooleanQuery, zPaginationQuery, zUuid } from './common
 /** Données de création ou de modification d’une séance. */
 export const zSeance = z.object({
   versionId: zUuid,
-  jour: z.number().int().min(1, 'Le jour doit être compris entre 1 et 6').max(6, 'Le jour doit être compris entre 1 et 6'),
+  jour: z
+    .number()
+    .int()
+    .min(1, 'Le jour doit être compris entre 1 et 6')
+    .max(6, 'Le jour doit être compris entre 1 et 6'),
   creneauDebut: z.number().int().nonnegative('Le créneau de début doit être positif ou nul'),
   nbCreneaux: z.number().int().positive('Le nombre de créneaux doit être supérieur à 0'),
   salleId: zUuid.nullish(),

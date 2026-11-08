@@ -15,10 +15,7 @@ import { RoleCode } from '@takt/contracts';
  *
  * Chaque entrée indique si le rôle est autorisé (true) ou non (false) sur l'endpoint.
  */
-export const MATRICE_ROLES_ENDPOINTS: Record<
-  string,
-  Record<RoleCode, boolean>
-> = {
+export const MATRICE_ROLES_ENDPOINTS: Record<string, Record<RoleCode, boolean>> = {
   'GET /api/v1/users': {
     admin: true,
     gest: true,

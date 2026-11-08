@@ -36,10 +36,7 @@ import {
 } from '@takt/contracts';
 import { ZodValidation } from '../../common/pipes/zod-validation.decorator';
 import { PlanEtudesService } from './plan-etudes.service';
-import {
-  JwtAuthGuard,
-  UtilisateurConnecte,
-} from '../../common/guards/jwt-auth.guard';
+import { JwtAuthGuard, UtilisateurConnecte } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { DepartmentScopeGuard } from '../../common/guards/department-scope.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
@@ -106,9 +103,7 @@ export class PlanEtudesController {
   @ApiResponse({ status: 401, description: 'Non authentifié' })
   @ApiResponse({ status: 403, description: 'Interdit ou hors périmètre' })
   @ApiResponse({ status: 404, description: 'Plan d’études introuvable' })
-  async volumeTotal(
-    @Param() params: PlanEtudesParams,
-  ): Promise<unknown> {
+  async volumeTotal(@Param() params: PlanEtudesParams): Promise<unknown> {
     return this.service.volumeTotal(params.id);
   }
 
@@ -123,9 +118,7 @@ export class PlanEtudesController {
   @ApiResponse({ status: 401, description: 'Non authentifié' })
   @ApiResponse({ status: 403, description: 'Interdit ou hors périmètre' })
   @ApiResponse({ status: 404, description: 'Plan d’études introuvable' })
-  async groupesHerites(
-    @Param() params: PlanEtudesParams,
-  ): Promise<unknown> {
+  async groupesHerites(@Param() params: PlanEtudesParams): Promise<unknown> {
     return this.service.groupesHerites(params.id);
   }
 
@@ -218,9 +211,7 @@ export class PlanEtudesController {
   @ApiResponse({ status: 401, description: 'Non authentifié' })
   @ApiResponse({ status: 403, description: 'Interdit ou hors périmètre' })
   @ApiResponse({ status: 404, description: 'Matière introuvable' })
-  async getMatiere(
-    @Param() params: PlanEtudesMatiereParams,
-  ): Promise<unknown> {
+  async getMatiere(@Param() params: PlanEtudesMatiereParams): Promise<unknown> {
     return this.service.getMatiere(params.planEtudesId, params.id);
   }
 

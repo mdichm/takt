@@ -2,12 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import { z } from 'zod';
-import {
-  creerSchemaTri,
-  zPaginationQuery,
-  zSearchFilter,
-  zUuid,
-} from './common';
+import { creerSchemaTri, zPaginationQuery, zSearchFilter, zUuid } from './common';
 
 /** Plan d'études d'un niveau pour une année universitaire et un semestre. */
 export const zPlanEtudes = z.object({
@@ -88,8 +83,16 @@ export const zPlanEtudesMatiereCreate = z.object({
 export const zPlanEtudesMatiereUpdate = z.object({
   matiereId: zUuid.optional(),
   typeEnseignementId: zUuid.optional(),
-  volumeHoraire: z.number().int().positive('Le volume horaire doit être strictement positif').optional(),
-  dureeCreneaux: z.number().int().positive('La durée de créneau doit être strictement positive').optional(),
+  volumeHoraire: z
+    .number()
+    .int()
+    .positive('Le volume horaire doit être strictement positif')
+    .optional(),
+  dureeCreneaux: z
+    .number()
+    .int()
+    .positive('La durée de créneau doit être strictement positive')
+    .optional(),
   coefficient: z.number().int().positive('Le coefficient doit être strictement positif').optional(),
 });
 

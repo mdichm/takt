@@ -19,7 +19,11 @@ interface Props {
  * - Rôle non autorisé pour la route → redirection vers l écran par défaut du rôle.
  * - Portée département requise mais absente (rdep sans périmètre) → /login.
  */
-export function ProtectedRoute({ roles, departement = false, children }: Props): JSX.Element | null {
+export function ProtectedRoute({
+  roles,
+  departement = false,
+  children,
+}: Props): JSX.Element | null {
   const { session, estAuthentifie } = userStore((state) => ({
     session: state.session,
     estAuthentifie: state.estAuthentifie,

@@ -77,14 +77,20 @@ describe('JwtAuthGuard', () => {
       role: 'gest',
       departementIds: ['d1'],
     };
-    const verificateur = { verifier: vi.fn().mockReturnValue(claims) } as unknown as VerificateurJwt;
+    const verificateur = {
+      verifier: vi.fn().mockReturnValue(claims),
+    } as unknown as VerificateurJwt;
     const reflector = new ReflectorMock();
     reflector.set('estPublique', undefined);
     const guard = new JwtAuthGuard(verificateur, reflector as unknown as Reflector);
     const contexte = creerContexte(undefined, 'valide.token');
     const resultat = guard.canActivate(contexte);
     expect(resultat).toBe(true);
-    const request = (contexte as { switchToHttp: () => { getRequest: () => { user?: UtilisateurConnecte } } }).switchToHttp().getRequest();
+    const request = (
+      contexte as { switchToHttp: () => { getRequest: () => { user?: UtilisateurConnecte } } }
+    )
+      .switchToHttp()
+      .getRequest();
     expect(request.user).toEqual(claims);
   });
 });

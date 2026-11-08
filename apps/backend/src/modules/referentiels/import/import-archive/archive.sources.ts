@@ -155,7 +155,14 @@ export async function collecterSources(
       }
       const salleRows = await prisma.salle.findMany({
         where: { id: { in: ids as string[] } },
-        select: { id: true, code: true, libelle: true, typeSalleId: true, siteId: true, capacite: true },
+        select: {
+          id: true,
+          code: true,
+          libelle: true,
+          typeSalleId: true,
+          siteId: true,
+          capacite: true,
+        },
       });
       return salleRows.map((s) => ({
         type: 'salle' as const,

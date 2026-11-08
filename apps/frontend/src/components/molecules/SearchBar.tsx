@@ -17,17 +17,31 @@ interface SearchBarProps extends PropsBase {
 }
 
 /** Barre de recherche avec icône et bouton de validation. Accessible (role="search"). */
-export function SearchBar({ value, onChange, onSearch, placeholder = 'Rechercher…', id, className }: SearchBarProps): JSX.Element {
+export function SearchBar({
+  value,
+  onChange,
+  onSearch,
+  placeholder = 'Rechercher…',
+  id,
+  className,
+}: SearchBarProps): JSX.Element {
   const searchId = id || 'search-bar';
   return (
-    <div role="search" aria-label="Recherche" style={{ display: 'flex', gap: 'var(--space-xxs)', alignItems: 'center' }} className={className}>
+    <div
+      role="search"
+      aria-label="Recherche"
+      style={{ display: 'flex', gap: 'var(--space-xxs)', alignItems: 'center' }}
+      className={className}
+    >
       <Icone nom="recherche" ariaLabel="Icône de recherche" taille={18} />
       <input
         id={searchId}
         type="search"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        onKeyDown={(e) => { if (e.key === 'Enter') onSearch(value); }}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') onSearch(value);
+        }}
         placeholder={placeholder}
         style={{
           flex: 1,
@@ -41,7 +55,12 @@ export function SearchBar({ value, onChange, onSearch, placeholder = 'Rechercher
           outline: 'none',
         }}
       />
-      <Bouton variante="contour" taille="petite" libelle="Rechercher" onClick={() => onSearch(value)} />
+      <Bouton
+        variante="contour"
+        taille="petite"
+        libelle="Rechercher"
+        onClick={() => onSearch(value)}
+      />
     </div>
   );
 }

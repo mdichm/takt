@@ -13,10 +13,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import {
-  zConfigSystemeUpdate,
-  type ConfigSystemeUpdate,
-} from '@takt/contracts';
+import { zConfigSystemeUpdate, type ConfigSystemeUpdate } from '@takt/contracts';
 import { ZodValidation } from '../../common/pipes/zod-validation.decorator';
 import { ConfigSystemeService } from './config-systeme.service';
 import { JwtAuthGuard, UtilisateurConnecte } from '../../common/guards/jwt-auth.guard';
@@ -32,7 +29,9 @@ interface RequeteAvecUtilisateur {
 @ApiBearerAuth()
 @Controller('referentiels/config-systeme')
 export class ConfigSystemeController {
-  constructor(@Inject(ConfigSystemeService) private readonly configSystemeService: ConfigSystemeService) {}
+  constructor(
+    @Inject(ConfigSystemeService) private readonly configSystemeService: ConfigSystemeService,
+  ) {}
 
   /** Récupère (ou crée) la configuration système singleton (GET /api/v1/referentiels/config-systeme). */
   @Get()
@@ -59,7 +58,10 @@ export class ConfigSystemeController {
   @ApiResponse({ status: 401, description: 'Non authentifié' })
   @ApiResponse({ status: 403, description: 'Interdit' })
   @ApiResponse({ status: 404, description: 'Configuration système introuvable' })
-  async update(@Body() corps: ConfigSystemeUpdate, @Req() req: RequeteAvecUtilisateur): Promise<unknown> {
+  async update(
+    @Body() corps: ConfigSystemeUpdate,
+    @Req() req: RequeteAvecUtilisateur,
+  ): Promise<unknown> {
     return this.configSystemeService.update(corps, req.user!.sub);
   }
 }

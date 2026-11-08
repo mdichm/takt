@@ -13,7 +13,6 @@ function sha256(contenu: string): string {
   return createHash('sha256').update(contenu, 'utf8').digest('hex');
 }
 
-
 const URL_APERCU = '/api/v1/referentiels/import/apercu';
 const URL_EXECUTER = '/api/v1/referentiels/import/executer';
 
@@ -38,9 +37,9 @@ describe('Import référentiels — intégration (L04-07)', () => {
       lignes.push(`ITSITE${String(i).padStart(3, '0')};Site de test ${i}`);
     }
     // 3 lignes invalides : code vide, libelle vide, doublon interne
-    lignes.push(';Sans code');                                 // ligne 101
-    lignes.push('ITSITE999;');                                  // ligne 102
-    lignes.push('ITSITE001;Doublon de la ligne 1');            // ligne 103
+    lignes.push(';Sans code'); // ligne 101
+    lignes.push('ITSITE999;'); // ligne 102
+    lignes.push('ITSITE001;Doublon de la ligne 1'); // ligne 103
     const contenu = lignes.join('\n') + '\n';
     const empreinte = sha256(contenu);
 
@@ -180,4 +179,3 @@ describe('Import référentiels — intégration (L04-07)', () => {
     expect(resp.body.error.code).toBe('UNAUTHORIZED');
   });
 });
-

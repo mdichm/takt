@@ -6,10 +6,7 @@ import { PRISMA } from '../common/di/prisma.token';
 import { PrismaClient } from '@takt/db';
 import { hash as hacherArgon2 } from 'argon2';
 import { PASSWORD_ARGON2_OPTIONS } from '../../config/password.config';
-import {
-  CODES_ERREUR_API,
-  ApiError,
-} from '../common/http/api-error';
+import { CODES_ERREUR_API, ApiError } from '../common/http/api-error';
 import { appliquerFiltreDepartement } from '../common/rbac/filtre-departement.util';
 import { AuditService } from '../audit/audit.service';
 
@@ -59,12 +56,9 @@ export class UsersService {
       where: { id: donnees.roleId },
     });
     if (!role) {
-      throw new ApiError(
-        CODES_ERREUR_API.BAD_REQUEST,
-        400,
-        'Le rôle spécifié est introuvable',
-        { champ: 'roleId' },
-      );
+      throw new ApiError(CODES_ERREUR_API.BAD_REQUEST, 400, 'Le rôle spécifié est introuvable', {
+        champ: 'roleId',
+      });
     }
 
     if (donnees.departementId) {
@@ -209,15 +203,9 @@ export class UsersService {
         // retourne l'utilisateur
       } else if (roleDemandeur === 'admin' || roleDemandeur === 'dir') {
         // admin et dir voient tout
-      } else if (
-        roleDemandeur === 'gest' ||
-        roleDemandeur === 'rdep'
-      ) {
+      } else if (roleDemandeur === 'gest' || roleDemandeur === 'rdep') {
         // gest et rdep ne voient que les utilisateurs de leur(s) département(s)
-        if (
-          !utilisateur.departementId ||
-          !departementIds.includes(utilisateur.departementId)
-        ) {
+        if (!utilisateur.departementId || !departementIds.includes(utilisateur.departementId)) {
           throw new ApiError(
             CODES_ERREUR_API.FORBIDDEN,
             403,
@@ -225,11 +213,7 @@ export class UsersService {
           );
         }
       } else {
-        throw new ApiError(
-          CODES_ERREUR_API.FORBIDDEN,
-          403,
-          'Accès refusé',
-        );
+        throw new ApiError(CODES_ERREUR_API.FORBIDDEN, 403, 'Accès refusé');
       }
     }
 
@@ -281,15 +265,9 @@ export class UsersService {
       if (id !== utilisateurIdDemandeur) {
         if (roleDemandeur === 'admin' || roleDemandeur === 'dir') {
           // admin et dir modifient tout
-        } else if (
-          roleDemandeur === 'gest' ||
-          roleDemandeur === 'rdep'
-        ) {
+        } else if (roleDemandeur === 'gest' || roleDemandeur === 'rdep') {
           // gest et rdep ne modifient que les utilisateurs de leur(s) département(s)
-          if (
-            !utilisateur.departementId ||
-            !departementIds.includes(utilisateur.departementId)
-          ) {
+          if (!utilisateur.departementId || !departementIds.includes(utilisateur.departementId)) {
             throw new ApiError(
               CODES_ERREUR_API.FORBIDDEN,
               403,
@@ -297,11 +275,7 @@ export class UsersService {
             );
           }
         } else {
-          throw new ApiError(
-            CODES_ERREUR_API.FORBIDDEN,
-            403,
-            'Accès refusé',
-          );
+          throw new ApiError(CODES_ERREUR_API.FORBIDDEN, 403, 'Accès refusé');
         }
       }
     }
@@ -309,12 +283,9 @@ export class UsersService {
     if (donnees.roleId !== undefined) {
       const role = await this.prisma.role.findUnique({ where: { id: donnees.roleId } });
       if (!role) {
-        throw new ApiError(
-          CODES_ERREUR_API.BAD_REQUEST,
-          400,
-          'Le rôle spécifié est introuvable',
-          { champ: 'roleId' },
-        );
+        throw new ApiError(CODES_ERREUR_API.BAD_REQUEST, 400, 'Le rôle spécifié est introuvable', {
+          champ: 'roleId',
+        });
       }
     }
 
@@ -478,7 +449,7 @@ export class UsersService {
       throw new ApiError(
         CODES_ERREUR_API.BAD_REQUEST,
         400,
-        'Impossible de supprimer un utilisateur ayant des entrées d\'audit (utilisez la d\u00e9sactivation)',
+        "Impossible de supprimer un utilisateur ayant des entrées d'audit (utilisez la d\u00e9sactivation)",
       );
     }
 

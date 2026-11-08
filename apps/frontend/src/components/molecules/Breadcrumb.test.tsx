@@ -12,7 +12,7 @@ describe('Breadcrumb', () => {
     { libelle: 'Semaine 12' },
   ];
 
-  it('rend un fil d\'ariane avec role navigation', () => {
+  it("rend un fil d'ariane avec role navigation", () => {
     render(<Breadcrumb items={items} />);
     expect(screen.getByRole('navigation', { name: "Fil d'ariane" })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Accueil' })).toBeInTheDocument();

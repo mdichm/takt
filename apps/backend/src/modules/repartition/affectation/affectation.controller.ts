@@ -31,10 +31,7 @@ import {
 } from '@takt/contracts';
 import { ZodValidation } from '../../common/pipes/zod-validation.decorator';
 import { AffectationPedagogiqueService } from './affectation.service';
-import {
-  JwtAuthGuard,
-  UtilisateurConnecte,
-} from '../../common/guards/jwt-auth.guard';
+import { JwtAuthGuard, UtilisateurConnecte } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { DepartmentScopeGuard } from '../../common/guards/department-scope.guard';
 import { Roles } from '../../common/decorators/roles.decorator';

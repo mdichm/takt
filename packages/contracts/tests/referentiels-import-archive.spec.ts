@@ -16,15 +16,12 @@ import {
 const EMPREINTE = '0'.repeat(64);
 
 describe('zTypeImportArchive (L04-08)', () => {
-  test.each([
-    'parcours',
-    'groupe',
-    'matiere',
-    'module',
-    'salle',
-  ] as const)('accepte le type %s', (type) => {
-    expect(zTypeImportArchive.safeParse(type).success).toBe(true);
-  });
+  test.each(['parcours', 'groupe', 'matiere', 'module', 'salle'] as const)(
+    'accepte le type %s',
+    (type) => {
+      expect(zTypeImportArchive.safeParse(type).success).toBe(true);
+    },
+  );
 
   test('refuse un type inconnu', () => {
     expect(zTypeImportArchive.safeParse('seance').success).toBe(false);
@@ -195,9 +192,7 @@ describe('zRapportImportArchive (L04-08)', () => {
           motif: 'Ce code est déjà utilisé dans le fichier',
         },
       ],
-      parType: [
-        { type: 'salle', importes: 3, dejaImports: 1, rejets: 1 },
-      ],
+      parType: [{ type: 'salle', importes: 3, dejaImports: 1, rejets: 1 }],
     });
     expect(resultat.success).toBe(true);
   });

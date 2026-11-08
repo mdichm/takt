@@ -15,10 +15,7 @@ export class ErreurFiltreListe extends Error {
 }
 
 /** Configuration déclarative d'une liste compatible Prisma. */
-export interface ConfigurationRequeteListe<
-  TWhere extends object,
-  TOrderBy extends object,
-> {
+export interface ConfigurationRequeteListe<TWhere extends object, TOrderBy extends object> {
   /** Construit le filtre métier de base. */
   where: () => TWhere;
   /** Champs de recherche autorisés et construction de leur filtre. */
@@ -44,10 +41,7 @@ export interface RequetePrismaListe<TWhere extends object, TOrderBy extends obje
  * fourni par l'appelant. Seuls les champs déclarés dans la configuration
  * peuvent être utilisés pour la recherche ou le tri.
  */
-export function buildPrismaQuery<
-  TWhere extends object,
-  TOrderBy extends object,
->(
+export function buildPrismaQuery<TWhere extends object, TOrderBy extends object>(
   query: PaginationQuery & {
     search?: string | undefined;
     sortBy?: string | undefined;
@@ -68,9 +62,7 @@ export function buildPrismaQuery<
       : ({
           ...base,
           OR: fragmentsRecherche.flatMap((fragment) =>
-            'OR' in fragment && Array.isArray(fragment.OR)
-              ? fragment.OR
-              : [fragment],
+            'OR' in fragment && Array.isArray(fragment.OR) ? fragment.OR : [fragment],
           ),
         } as TWhere)
     : base;

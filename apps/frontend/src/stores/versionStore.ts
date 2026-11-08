@@ -4,11 +4,7 @@
 import { create } from 'zustand';
 import { queryClient } from '@/lib/queryClient';
 import { EtatVersion } from '@takt/contracts';
-import {
-  type VersionCourante,
-  type InterditMutation,
-  estEtatImmuable,
-} from './types';
+import { type VersionCourante, type InterditMutation, estEtatImmuable } from './types';
 
 export const versionStore = create<VersionStoreState>((set, get) => ({
   version: null,
@@ -25,10 +21,7 @@ export const versionStore = create<VersionStoreState>((set, get) => ({
 
   ajouterInterdit: (action, raison) =>
     set((etat) => ({
-      interdits: [
-        ...etat.interdits.filter((i) => i.action !== action),
-        { action, raison },
-      ],
+      interdits: [...etat.interdits.filter((i) => i.action !== action), { action, raison }],
     })),
 
   supprimerInterdit: (action) =>
@@ -48,12 +41,7 @@ interface VersionStoreState {
   version: VersionCourante | null;
   etat: EtatVersion | null;
   interdits: InterditMutation[];
-  definirVersion: (
-    id: string,
-    etat: EtatVersion,
-    semestreId?: string,
-    snapshotId?: string,
-  ) => void;
+  definirVersion: (id: string, etat: EtatVersion, semestreId?: string, snapshotId?: string) => void;
   reinitialiser: () => void;
   ajouterInterdit: (action: string, raison: string) => void;
   supprimerInterdit: (action: string) => void;

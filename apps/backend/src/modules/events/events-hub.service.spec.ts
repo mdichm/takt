@@ -25,7 +25,9 @@ describe('EventsHubService', () => {
 
   it('isole les utilisateurs', () => {
     const messages: MessageEvent[] = [];
-    hub.connecter('33333333-3333-4333-8333-333333333333').subscribe((message) => messages.push(message));
+    hub
+      .connecter('33333333-3333-4333-8333-333333333333')
+      .subscribe((message) => messages.push(message));
 
     hub.publier(UTILISATEUR_ID, { type: 'generation.done', versionId: VERSION_ID });
 
@@ -62,7 +64,11 @@ describe('EventsHubService', () => {
     hub.connecter(UTILISATEUR_ID).subscribe((message) => messages.push(message));
 
     for (let index = 0; index < 101; index += 1) {
-      hub.publier(UTILISATEUR_ID, { type: 'generation.progress', versionId: VERSION_ID, progression: index });
+      hub.publier(UTILISATEUR_ID, {
+        type: 'generation.progress',
+        versionId: VERSION_ID,
+        progression: index,
+      });
     }
 
     expect(messages).toHaveLength(101);

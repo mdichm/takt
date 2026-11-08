@@ -63,28 +63,34 @@ export function useEditionLock(versionId?: string) {
         setEtat({
           acquis: false,
           erreur423: true,
-          messageErreur: err?.details?.detenteur ?? 'Cette séance est verrouillée par un autre utilisateur.',
-          ...(err?.details?.detenteur !== undefined
-            ? { detenteur: err.details.detenteur }
-            : {}),
+          messageErreur:
+            err?.details?.detenteur ?? 'Cette séance est verrouillée par un autre utilisateur.',
+          ...(err?.details?.detenteur !== undefined ? { detenteur: err.details.detenteur } : {}),
         });
       } else {
-        setEtat({ acquis: false, erreur423: false, messageErreur: String(err?.message ?? 'Erreur lors de l’acquisition du bail.') });
+        setEtat({
+          acquis: false,
+          erreur423: false,
+          messageErreur: String(err?.message ?? 'Erreur lors de l’acquisition du bail.'),
+        });
       }
     }
   }, [versionId]);
 
-  const demarrerRenouvellement = useCallback((id: string) => {
-    if (timerRef.current) clearInterval(timerRef.current);
-    timerRef.current = setInterval(async () => {
-      try {
-        await api.post(`/versions/${id}/bail/renouveler`, undefined);
-      } catch {
-        // Échec de renouvellement : on relâche le bail.
-        await liberer();
-      }
-    }, RENOUVELLEMENT_MS);
-  }, [liberer]);
+  const demarrerRenouvellement = useCallback(
+    (id: string) => {
+      if (timerRef.current) clearInterval(timerRef.current);
+      timerRef.current = setInterval(async () => {
+        try {
+          await api.post(`/versions/${id}/bail/renouveler`, undefined);
+        } catch {
+          // Échec de renouvellement : on relâche le bail.
+          await liberer();
+        }
+      }, RENOUVELLEMENT_MS);
+    },
+    [liberer],
+  );
 
   useEffect(() => {
     if (!versionId) {

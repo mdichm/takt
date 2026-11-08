@@ -28,10 +28,7 @@ import {
 } from '@takt/contracts';
 import { ZodValidation } from '../common/pipes/zod-validation.decorator';
 import { UsersService } from './users.service';
-import {
-  JwtAuthGuard,
-  UtilisateurConnecte,
-} from '../common/guards/jwt-auth.guard';
+import { JwtAuthGuard, UtilisateurConnecte } from '../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { DepartmentScopeGuard } from '../common/guards/department-scope.guard';
 import { Roles } from '../common/decorators/roles.decorator';
@@ -126,10 +123,7 @@ export class UsersController {
   @ApiResponse({ status: 400, description: 'Requête invalide' })
   @ApiResponse({ status: 401, description: 'Non authentifié' })
   @ApiResponse({ status: 403, description: 'Interdit' })
-  async create(
-    @Body() corps: UserCreate,
-    @Req() req: RequeteAvecUtilisateur,
-  ): Promise<unknown> {
+  async create(@Body() corps: UserCreate, @Req() req: RequeteAvecUtilisateur): Promise<unknown> {
     const resultat = await this.usersService.createUser({
       email: corps.email,
       nom: corps.nom,
@@ -154,10 +148,7 @@ export class UsersController {
   @ApiResponse({ status: 401, description: 'Non authentifié' })
   @ApiResponse({ status: 403, description: 'Interdit' })
   @ApiResponse({ status: 404, description: 'Utilisateur introuvable' })
-  async getOne(
-    @Param() params: UserParams,
-    @Req() req: RequeteAvecUtilisateur,
-  ): Promise<unknown> {
+  async getOne(@Param() params: UserParams, @Req() req: RequeteAvecUtilisateur): Promise<unknown> {
     const utilisateur = await this.usersService.getUser(params.id, {
       utilisateurIdDemandeur: req.user!.sub,
       roleDemandeur: req.user!.role,
@@ -226,10 +217,7 @@ export class UsersController {
   @ApiResponse({ status: 401, description: 'Non authentifié' })
   @ApiResponse({ status: 403, description: 'Interdit' })
   @ApiResponse({ status: 404, description: 'Utilisateur introuvable' })
-  async disable(
-    @Param() params: UserParams,
-    @Req() req: RequeteAvecUtilisateur,
-  ): Promise<unknown> {
+  async disable(@Param() params: UserParams, @Req() req: RequeteAvecUtilisateur): Promise<unknown> {
     const resultat = await this.usersService.disableUser(params.id, req.user!.sub);
     return resultat;
   }

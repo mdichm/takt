@@ -116,7 +116,7 @@ async function creerService(prisma: PrismaMock) {
 }
 
 describe('PlanEtudesService', () => {
-  it('crée un plan d\'études et journalise', async () => {
+  it("crée un plan d'études et journalise", async () => {
     const prisma = creerPrismaMock({
       planEtudes: {
         findUnique: vi.fn(),
@@ -171,7 +171,7 @@ describe('PlanEtudesService', () => {
     });
   });
 
-  it('refuse un plan d\'études déjà existant (conflit)', async () => {
+  it("refuse un plan d'études déjà existant (conflit)", async () => {
     const prisma = creerPrismaMock({
       planEtudes: {
         findUnique: vi.fn(),
@@ -199,7 +199,7 @@ describe('PlanEtudesService', () => {
     ).rejects.toMatchObject({ code: CODES_ERREUR_API.CONFLICT });
   });
 
-  it('retourne le détail d\'un plan avec ses matières', async () => {
+  it("retourne le détail d'un plan avec ses matières", async () => {
     const ligne = {
       id: UUID_LIGNE,
       planEtudesId: UUID_PLAN,
@@ -264,11 +264,11 @@ describe('PlanEtudesService', () => {
     });
     const service = await creerService(prisma);
 
-    await expect(
-      service.getOne(UUID_PLAN, ['autre-departement']),
-    ).rejects.toMatchObject({ code: CODES_ERREUR_API.FORBIDDEN });
+    await expect(service.getOne(UUID_PLAN, ['autre-departement'])).rejects.toMatchObject({
+      code: CODES_ERREUR_API.FORBIDDEN,
+    });
   });
-  it('met à jour un plan d\'études', async () => {
+  it("met à jour un plan d'études", async () => {
     const existant = {
       id: UUID_PLAN,
       parcoursId: UUID_PARCOURS,
@@ -317,11 +317,11 @@ describe('PlanEtudesService', () => {
     });
     const service = await creerService(prisma);
 
-    await expect(service.delete(UUID_PLAN, UTILISATEUR_ID)).rejects.toMatchObject(
-      { code: CODES_ERREUR_API.CONFLICT },
-    );
+    await expect(service.delete(UUID_PLAN, UTILISATEUR_ID)).rejects.toMatchObject({
+      code: CODES_ERREUR_API.CONFLICT,
+    });
   });
-  it('supprime un plan d\'études vide et journalise', async () => {
+  it("supprime un plan d'études vide et journalise", async () => {
     const prisma = creerPrismaMock({
       planEtudes: {
         findUnique: vi.fn().mockResolvedValue({
@@ -347,16 +347,12 @@ describe('PlanEtudesService', () => {
     });
   });
 
-  it('calcule le volume total d\'un plan d\'études', async () => {
+  it("calcule le volume total d'un plan d'études", async () => {
     const prisma = creerPrismaMock({
       planEtudes: {
         findUnique: vi.fn().mockResolvedValue({
           id: UUID_PLAN,
-          planEtudesMatieres: [
-            { volumeHoraire: 30 },
-            { volumeHoraire: 45 },
-            { volumeHoraire: 15 },
-          ],
+          planEtudesMatieres: [{ volumeHoraire: 30 }, { volumeHoraire: 45 }, { volumeHoraire: 15 }],
         }),
         findFirst: vi.fn(),
         findMany: vi.fn().mockResolvedValue([]),
@@ -374,7 +370,7 @@ describe('PlanEtudesService', () => {
     expect(resultat.nombreMatieres).toBe(3);
   });
 
-  it('retourne les groupes héritiers d\'un plan d\'études', async () => {
+  it("retourne les groupes héritiers d'un plan d'études", async () => {
     const groupes = [
       {
         id: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
@@ -403,7 +399,7 @@ describe('PlanEtudesService', () => {
     expect(resultat[0]?.estHéritier).toBe(true);
     expect(resultat[0]?.niveauId).toBe(UUID_NIVEAU);
   });
-  it('ajoute une matière à un plan d\'études et journalise', async () => {
+  it("ajoute une matière à un plan d'études et journalise", async () => {
     const prisma = creerPrismaMock({
       planEtudes: {
         findUnique: vi.fn().mockResolvedValue({ id: UUID_PLAN }),
@@ -490,7 +486,7 @@ describe('PlanEtudesService', () => {
       ),
     ).rejects.toMatchObject({ code: CODES_ERREUR_API.CONFLICT });
   });
-  it('liste les matières d\'un plan avec pagination', async () => {
+  it("liste les matières d'un plan avec pagination", async () => {
     const lignes = [
       {
         id: UUID_LIGNE,
@@ -557,7 +553,7 @@ describe('PlanEtudesService', () => {
     });
   });
 
-  it('met à jour une matière d\'un plan d\'études', async () => {
+  it("met à jour une matière d'un plan d'études", async () => {
     const existant = {
       id: UUID_LIGNE,
       planEtudesId: UUID_PLAN,
@@ -594,7 +590,7 @@ describe('PlanEtudesService', () => {
     expect(resultat.volumeHoraire).toBe(45);
   });
 
-  it('supprime une matière d\'un plan d\'études', async () => {
+  it("supprime une matière d'un plan d'études", async () => {
     const existant = { id: UUID_LIGNE, planEtudesId: UUID_PLAN, matiereId: UUID_MATIERE };
     const prisma = creerPrismaMock({
       planEtudesMatiere: {

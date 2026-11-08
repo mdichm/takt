@@ -1,12 +1,7 @@
 // Copyright (C) 2026 TAKT
 // SPDX-License-Identifier: AGPL-3.0-only
 
-import {
-  ExecutionContext,
-  Injectable,
-  Inject,
-  Optional,
-} from '@nestjs/common';
+import { ExecutionContext, Injectable, Inject, Optional } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { ApiError } from '../http/api-error';
 import { CODES_ERREUR_API } from '../http/api-error';
@@ -44,10 +39,7 @@ export class JwtAuthGuard {
 
   /** Vérifie que la route n'est pas marquée publique avant d'exiger le JWT. */
   canActivate(context: ExecutionContext): boolean {
-    const estPublique = this.reflector.get<boolean>(
-      'estPublique',
-      context.getHandler(),
-    );
+    const estPublique = this.reflector.get<boolean>('estPublique', context.getHandler());
     if (estPublique) {
       return true;
     }
@@ -56,11 +48,7 @@ export class JwtAuthGuard {
     const token = this.extraireToken(request);
 
     if (!token) {
-      throw new ApiError(
-        CODES_ERREUR_API.UNAUTHORIZED,
-        401,
-        'Authentification requise',
-      );
+      throw new ApiError(CODES_ERREUR_API.UNAUTHORIZED, 401, 'Authentification requise');
     }
 
     // En l'absence de vérificateur injecté (ex. tests sans module auth),
@@ -83,18 +71,12 @@ export class JwtAuthGuard {
       };
       return true;
     } catch {
-      throw new ApiError(
-        CODES_ERREUR_API.UNAUTHORIZED,
-        401,
-        'Jeton d’accès invalide ou expiré',
-      );
+      throw new ApiError(CODES_ERREUR_API.UNAUTHORIZED, 401, 'Jeton d’accès invalide ou expiré');
     }
   }
 
   /** Extrait le token Bearer de l'en-tête Authorization. */
-  private extraireToken(request: {
-    headers?: { authorization?: string };
-  }): string | undefined {
+  private extraireToken(request: { headers?: { authorization?: string } }): string | undefined {
     const header = request.headers?.authorization;
     if (!header) {
       return undefined;

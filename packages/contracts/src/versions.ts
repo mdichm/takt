@@ -2,7 +2,14 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import { z } from 'zod';
-import { creerSchemaTri, zDateIso, zEtatVersion, zPaginationQuery, zSearchFilter, zUuid } from './common';
+import {
+  creerSchemaTri,
+  zDateIso,
+  zEtatVersion,
+  zPaginationQuery,
+  zSearchFilter,
+  zUuid,
+} from './common';
 
 /** Données de création d’une version de planning. */
 export const zVersion = z.object({

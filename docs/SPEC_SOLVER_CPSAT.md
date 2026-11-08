@@ -32,6 +32,7 @@ Définir le contrat d'interface entre l'application TAKT (base métier) et le so
 ```
 
 **Flux :**
+
 1. API reçoit demande de génération → crée job `Generation` en `EN_COURS`
 2. Worker pg-boss récupère le job → construit le **fichier dérivé** JSON
 3. Worker écrit le fichier dérivé dans `/data/derived/<generationId>.json`
@@ -39,6 +40,7 @@ Définir le contrat d'interface entre l'application TAKT (base métier) et le so
 5. Solver lit le fichier dérivé, écrit les scénarios dans `/data/scenarios/<generationId>/`
 6. Worker parse les scénarios, met à jour la BDD (table `Scenario`, `Generation`)
 7. API notifie le frontend (SSE) de la fin de génération
+
 ---
 
 ## 3. Format du fichier dérivé (JSON Schema)
@@ -50,11 +52,29 @@ Définir le contrat d'interface entre l'application TAKT (base métier) et le so
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "TAKT CP-SAT Derived File",
   "type": "object",
-  "required": ["metadata", "timeGrid", "rooms", "teachers", "groups", "subjects", "activities", "constraints", "locks"],
+  "required": [
+    "metadata",
+    "timeGrid",
+    "rooms",
+    "teachers",
+    "groups",
+    "subjects",
+    "activities",
+    "constraints",
+    "locks"
+  ],
   "properties": {
     "metadata": {
       "type": "object",
-      "required": ["generationId", "versionId", "semestre", "createdAt", "timeSlotMinutes", "days", "slotsPerDay"],
+      "required": [
+        "generationId",
+        "versionId",
+        "semestre",
+        "createdAt",
+        "timeSlotMinutes",
+        "days",
+        "slotsPerDay"
+      ],
       "properties": {
         "generationId": { "type": "string", "format": "uuid" },
         "versionId": { "type": "string", "format": "uuid" },
@@ -71,7 +91,12 @@ Définir le contrat d'interface entre l'application TAKT (base métier) et le so
       "properties": {
         "totalSlots": { "type": "integer" },
         "slotDurationMinutes": { "type": "integer", "const": 30 },
-        "dayLabels": { "type": "array", "items": { "type": "string" }, "minItems": 6, "maxItems": 6 },
+        "dayLabels": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 6,
+          "maxItems": 6
+        },
         "slotLabels": { "type": "array", "items": { "type": "string" } }
       }
     },
@@ -134,7 +159,16 @@ Définir le contrat d'interface entre l'application TAKT (base métier) et le so
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["id", "subjectId", "teacherIds", "groupIds", "roomType", "durationSlots", "weeklyVolume", "teachingType"],
+        "required": [
+          "id",
+          "subjectId",
+          "teacherIds",
+          "groupIds",
+          "roomType",
+          "durationSlots",
+          "weeklyVolume",
+          "teachingType"
+        ],
         "properties": {
           "id": { "type": "string", "format": "uuid" },
           "subjectId": { "type": "string", "format": "uuid" },
@@ -151,12 +185,47 @@ Définir le contrat d'interface entre l'application TAKT (base métier) et le so
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["id", "type", "category", "scope", "targetId", "value", "weight", "isActive", "source", "createdBy", "createdAt"],
+        "required": [
+          "id",
+          "type",
+          "category",
+          "scope",
+          "targetId",
+          "value",
+          "weight",
+          "isActive",
+          "source",
+          "createdBy",
+          "createdAt"
+        ],
         "properties": {
           "id": { "type": "string", "format": "uuid" },
-          "type": { "type": "string", "enum": ["UNAVAILABILITY", "ROOM_REQUIREMENT", "TEACHER_PREFERENCE", "CONSECUTIVE_SLOTS", "MAX_HOURS_PER_DAY", "WINDOW_CONSTRAINT", "NO_GAPS", "COMPACT_DAYS", "LOAD_BALANCE", "SUBJECT_GROUPING", "CM_BEFORE_TD", "SPREAD", "AVOID_LAST_SLOT", "SAME_ROOM", "ROOM_PROXIMITY", "PREFERRED_BUILDING"] },
+          "type": {
+            "type": "string",
+            "enum": [
+              "UNAVAILABILITY",
+              "ROOM_REQUIREMENT",
+              "TEACHER_PREFERENCE",
+              "CONSECUTIVE_SLOTS",
+              "MAX_HOURS_PER_DAY",
+              "WINDOW_CONSTRAINT",
+              "NO_GAPS",
+              "COMPACT_DAYS",
+              "LOAD_BALANCE",
+              "SUBJECT_GROUPING",
+              "CM_BEFORE_TD",
+              "SPREAD",
+              "AVOID_LAST_SLOT",
+              "SAME_ROOM",
+              "ROOM_PROXIMITY",
+              "PREFERRED_BUILDING"
+            ]
+          },
           "category": { "type": "string", "enum": ["HARD", "SOFT"] },
-          "scope": { "type": "string", "enum": ["GLOBAL", "TEACHER", "GROUP", "ROOM", "ACTIVITY", "DEPARTMENT"] },
+          "scope": {
+            "type": "string",
+            "enum": ["GLOBAL", "TEACHER", "GROUP", "ROOM", "ACTIVITY", "DEPARTMENT"]
+          },
           "targetId": { "type": ["string", "null"], "format": "uuid" },
           "value": { "type": "string" },
           "weight": { "type": "integer", "minimum": 1, "maximum": 100 },
@@ -183,6 +252,7 @@ Définir le contrat d'interface entre l'application TAKT (base métier) et le so
   }
 }
 ```
+
 ### 3.2 Exemple concret (extrait)
 
 ```json
@@ -207,13 +277,23 @@ Définir le contrat d'interface entre l'application TAKT (base métier) et le so
     { "id": "r2", "code": "AMPHI", "capacity": 200, "type": "AMPHI", "building": "A" }
   ],
   "teachers": [
-    { "id": "t1", "code": "MARTIN", "name": "Martin Jean", "departmentId": "d1", "maxHoursPerWeek": 19 }
+    {
+      "id": "t1",
+      "code": "MARTIN",
+      "name": "Martin Jean",
+      "departmentId": "d1",
+      "maxHoursPerWeek": 19
+    }
   ],
-  "groups": [
-    { "id": "g1", "code": "G1", "size": 28, "departmentId": "d1" }
-  ],
+  "groups": [{ "id": "g1", "code": "G1", "size": 28, "departmentId": "d1" }],
   "subjects": [
-    { "id": "s1", "code": "ALGO", "name": "Algorithmique", "teachingType": "CM", "chargeCoefficient": 1.0 }
+    {
+      "id": "s1",
+      "code": "ALGO",
+      "name": "Algorithmique",
+      "teachingType": "CM",
+      "chargeCoefficient": 1.0
+    }
   ],
   "activities": [
     {
@@ -232,7 +312,7 @@ Définir le contrat d'interface entre l'application TAKT (base métier) et le so
       "id": "c1",
       "type": "UNAVAILABILITY",
       "targetId": "t1",
-      "value": '{"day": 2, "slots": [0,1,2,3]}',
+      "value": "{\"day\": 2, \"slots\": [0,1,2,3]}",
       "weight": 100
     }
   ],
@@ -327,7 +407,23 @@ export interface Activity {
 
 export interface Constraint {
   id: string;
-  type: 'UNAVAILABILITY' | 'ROOM_REQUIREMENT' | 'TEACHER_PREFERENCE' | 'CONSECUTIVE_SLOTS' | 'MAX_HOURS_PER_DAY' | 'WINDOW_CONSTRAINT' | 'NO_GAPS' | 'COMPACT_DAYS' | 'LOAD_BALANCE' | 'SUBJECT_GROUPING' | 'CM_BEFORE_TD' | 'SPREAD' | 'AVOID_LAST_SLOT' | 'SAME_ROOM' | 'ROOM_PROXIMITY' | 'PREFERRED_BUILDING';
+  type:
+    | 'UNAVAILABILITY'
+    | 'ROOM_REQUIREMENT'
+    | 'TEACHER_PREFERENCE'
+    | 'CONSECUTIVE_SLOTS'
+    | 'MAX_HOURS_PER_DAY'
+    | 'WINDOW_CONSTRAINT'
+    | 'NO_GAPS'
+    | 'COMPACT_DAYS'
+    | 'LOAD_BALANCE'
+    | 'SUBJECT_GROUPING'
+    | 'CM_BEFORE_TD'
+    | 'SPREAD'
+    | 'AVOID_LAST_SLOT'
+    | 'SAME_ROOM'
+    | 'ROOM_PROXIMITY'
+    | 'PREFERRED_BUILDING';
   category: 'HARD' | 'SOFT';
   scope: 'GLOBAL' | 'TEACHER' | 'GROUP' | 'ROOM' | 'ACTIVITY' | 'DEPARTMENT';
   targetId: string | null;
@@ -346,6 +442,7 @@ export interface Lock {
   value: string;
 }
 ```
+
 ---
 
 ## 5. Client Solver (packages/solver-client)
@@ -363,11 +460,7 @@ export class SolverClient {
   private readonly scenariosDir: string;
   private readonly solverCommand: string;
 
-  constructor(options: {
-    derivedDir: string;
-    scenariosDir: string;
-    solverCommand?: string;
-  }) {
+  constructor(options: { derivedDir: string; scenariosDir: string; solverCommand?: string }) {
     this.derivedDir = options.derivedDir;
     this.scenariosDir = options.scenariosDir;
     this.solverCommand = options.solverCommand || 'python3 -m takt.solver';
@@ -397,31 +490,43 @@ export class SolverClient {
   private async runSolver(
     generationId: string,
     derivedPath: string,
-    scenarioDir: string
+    scenarioDir: string,
   ): Promise<{ success: boolean; error?: string; durationMs: number }> {
     const start = Date.now();
 
     return new Promise((resolve) => {
-      const child = spawn(this.solverCommand, [
-        '--input', derivedPath,
-        '--output', scenarioDir,
-        '--max-scenarios', '3',
-        '--time-limit', '300'
-      ], {
-        shell: true,
-        stdio: ['ignore', 'pipe', 'pipe'],
-        env: {
-          ...process.env,
-          PYTHONPATH: '/opt/takt/solver',
-          ORTOOLS_LOGGING: 'INFO'
-        }
-      });
+      const child = spawn(
+        this.solverCommand,
+        [
+          '--input',
+          derivedPath,
+          '--output',
+          scenarioDir,
+          '--max-scenarios',
+          '3',
+          '--time-limit',
+          '300',
+        ],
+        {
+          shell: true,
+          stdio: ['ignore', 'pipe', 'pipe'],
+          env: {
+            ...process.env,
+            PYTHONPATH: '/opt/takt/solver',
+            ORTOOLS_LOGGING: 'INFO',
+          },
+        },
+      );
 
       let stdout = '';
       let stderr = '';
 
-      child.stdout?.on('data', (data) => { stdout += data.toString(); });
-      child.stderr?.on('data', (data) => { stderr += data.toString(); });
+      child.stdout?.on('data', (data) => {
+        stdout += data.toString();
+      });
+      child.stderr?.on('data', (data) => {
+        stderr += data.toString();
+      });
 
       child.on('close', (code) => {
         const durationMs = Date.now() - start;
@@ -445,11 +550,13 @@ export class SolverClient {
 
   private async parseScenarios(scenarioDir: string): Promise<ScenarioResult[]> {
     const files = await fs.readdir(scenarioDir);
-    const scenarioFiles = files.filter(f => f.endsWith('.json'));
-    return Promise.all(scenarioFiles.map(async (file) => {
-      const content = await fs.readFile(path.join(scenarioDir, file), 'utf-8');
-      return JSON.parse(content) as ScenarioResult;
-    }));
+    const scenarioFiles = files.filter((f) => f.endsWith('.json'));
+    return Promise.all(
+      scenarioFiles.map(async (file) => {
+        const content = await fs.readFile(path.join(scenarioDir, file), 'utf-8');
+        return JSON.parse(content) as ScenarioResult;
+      }),
+    );
   }
 }
 
@@ -486,6 +593,7 @@ export interface Placement {
   groupIds: string[];
 }
 ```
+
 ---
 
 ## 6. Worker pg-boss (NestJS)
@@ -565,15 +673,24 @@ export class GenerationProcessor {
   }
 
   private async buildDerivedFile(version: Version): Promise<DerivedFile> {
-    const [seances, contraintes, verrous, salles, enseignants, groupes, matieres] = await Promise.all([
-      this.seanceRepo.find({ where: { versionId: version.id }, relations: ['affectation', 'affectation.matiere', 'affectation.enseignant', 'affectation.groupe'] }),
-      this.contrainteRepo.find({ where: { versionId: version.id } }),
-      this.verrouRepo.find({ where: { versionId: version.id }, relations: ['seance'] }),
-      this.salleRepo.find(),
-      this.enseignantRepo.find(),
-      this.groupeRepo.find(),
-      this.matiereRepo.find(),
-    ]);
+    const [seances, contraintes, verrous, salles, enseignants, groupes, matieres] =
+      await Promise.all([
+        this.seanceRepo.find({
+          where: { versionId: version.id },
+          relations: [
+            'affectation',
+            'affectation.matiere',
+            'affectation.enseignant',
+            'affectation.groupe',
+          ],
+        }),
+        this.contrainteRepo.find({ where: { versionId: version.id } }),
+        this.verrouRepo.find({ where: { versionId: version.id }, relations: ['seance'] }),
+        this.salleRepo.find(),
+        this.enseignantRepo.find(),
+        this.groupeRepo.find(),
+        this.matiereRepo.find(),
+      ]);
 
     return {
       metadata: {
@@ -597,6 +714,7 @@ export class GenerationProcessor {
   }
 }
 ```
+
 ---
 
 ## 7. Configuration du solver (OR-Tools CP-SAT — Python)
@@ -659,24 +777,24 @@ if __name__ == '__main__':
 
 ## 8. Critères de performance (Spike SPK-01)
 
-| Métrique | Cible | Seuil d'alerte |
-|----------|-------|----------------|
-| Temps de génération (200 séances) | < 5 min | > 10 min |
-| Temps de génération (4000 séances) | < 30 min | > 60 min |
-| Scénarios générés | 3 par défaut | < 1 = échec |
-| Taux de couverture moyen | ≥ 95% | < 80% |
-| Mémoire solver | < 4 GB | > 6 GB |
+| Métrique                           | Cible        | Seuil d'alerte |
+| ---------------------------------- | ------------ | -------------- |
+| Temps de génération (200 séances)  | < 5 min      | > 10 min       |
+| Temps de génération (4000 séances) | < 30 min     | > 60 min       |
+| Scénarios générés                  | 3 par défaut | < 1 = échec    |
+| Taux de couverture moyen           | ≥ 95%        | < 80%          |
+| Mémoire solver                     | < 4 GB       | > 6 GB         |
 
 ---
 
 ## 9. Gestion des erreurs
 
-| Code | Situation | Comportement |
-|------|-----------|--------------|
-| SOLVER_TIMEOUT | Dépassement 300s | Statut `ECHEC`, scénario partiel si disponible |
-| SOLVER_INFEASIBLE | Contraintes incompatibles | Statut `ECHEC`, liste des conflits détectés |
-| DERIVED_FILE_INVALID | Schéma JSON invalide | Erreur avant lancement, job marqué `ECHEC` |
-| STORAGE_FULL | Espace disque insuffisant | Alerte monitoring, retry différé |
+| Code                 | Situation                 | Comportement                                   |
+| -------------------- | ------------------------- | ---------------------------------------------- |
+| SOLVER_TIMEOUT       | Dépassement 300s          | Statut `ECHEC`, scénario partiel si disponible |
+| SOLVER_INFEASIBLE    | Contraintes incompatibles | Statut `ECHEC`, liste des conflits détectés    |
+| DERIVED_FILE_INVALID | Schéma JSON invalide      | Erreur avant lancement, job marqué `ECHEC`     |
+| STORAGE_FULL         | Espace disque insuffisant | Alerte monitoring, retry différé               |
 
 ---
 
@@ -690,4 +808,4 @@ if __name__ == '__main__':
 
 ---
 
-*Fin du SPEC_SOLVER_CPSAT.md — TAKT v1.0*
+_Fin du SPEC_SOLVER_CPSAT.md — TAKT v1.0_

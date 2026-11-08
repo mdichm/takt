@@ -10,7 +10,10 @@ interface EtatChargementProps extends PropsBase {
 }
 
 /** État de chargement avec indicateur animé. */
-export function EtatChargement({ libelle = 'Chargement en cours…', className }: EtatChargementProps): JSX.Element {
+export function EtatChargement({
+  libelle = 'Chargement en cours…',
+  className,
+}: EtatChargementProps): JSX.Element {
   return (
     <div
       aria-label={libelle}

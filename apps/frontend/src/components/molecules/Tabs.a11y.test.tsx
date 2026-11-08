@@ -10,7 +10,10 @@ describe('Tabs — accessibilité', () => {
   it('ne produit aucune violation axe', async () => {
     const { container } = render(
       <Tabs
-        onglets={[{ id: 'a', libelle: 'A' }, { id: 'b', libelle: 'B' }]}
+        onglets={[
+          { id: 'a', libelle: 'A' },
+          { id: 'b', libelle: 'B' },
+        ]}
         valeur="a"
         onChange={() => {}}
       />,

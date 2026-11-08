@@ -34,7 +34,15 @@ describe('Modal', () => {
 
   it('appelle onValider quand le bouton valider est clique', () => {
     const onValider = vi.fn();
-    render(<Modal ouvert={true} titre="Titre" onFermer={() => {}} libelleValider="Enregistrer" onValider={onValider} />);
+    render(
+      <Modal
+        ouvert={true}
+        titre="Titre"
+        onFermer={() => {}}
+        libelleValider="Enregistrer"
+        onValider={onValider}
+      />,
+    );
     fireEvent.click(screen.getByRole('button', { name: 'Enregistrer' }));
     expect(onValider).toHaveBeenCalledTimes(1);
   });

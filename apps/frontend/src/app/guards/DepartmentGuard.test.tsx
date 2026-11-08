@@ -3,11 +3,7 @@
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import {
-  MemoryRouter,
-  Routes,
-  Route,
-} from 'react-router-dom';
+import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { DepartmentGuard } from './DepartmentGuard';
 import { userStore } from '@/stores/userStore';
 import type { SessionUtilisateur } from '@/stores/types';
@@ -36,9 +32,16 @@ function monter({ session }: { session: SessionUtilisateur | null }) {
     <MemoryRouter initialEntries={['/cible']}>
       <Routes>
         <Route path="/login" element={<Connexion />} />
-        <Route path="/cible" element={<DepartmentGuard><Cible /></DepartmentGuard>} />
+        <Route
+          path="/cible"
+          element={
+            <DepartmentGuard>
+              <Cible />
+            </DepartmentGuard>
+          }
+        />
       </Routes>
-    </MemoryRouter>
+    </MemoryRouter>,
   );
 }
 

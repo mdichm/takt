@@ -1,10 +1,7 @@
 // Copyright (C) 2026 TAKT
 // SPDX-License-Identifier: AGPL-3.0-only
 
-import {
-  ExecutionContext,
-  Injectable,
-} from '@nestjs/common';
+import { ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { EtatVersion } from '@takt/contracts';
 import { ApiError } from '../http/api-error';
@@ -28,10 +25,7 @@ export class VersionStateGuard {
 
   canActivate(context: ExecutionContext): boolean {
     const etatsAutorises =
-      this.reflector.get<EtatVersion[]>(
-        VERSION_STATES_KEY,
-        context.getHandler(),
-      ) ??
+      this.reflector.get<EtatVersion[]>(VERSION_STATES_KEY, context.getHandler()) ??
       this.reflector.get<EtatVersion[]>(VERSION_STATES_KEY, context.getClass());
 
     if (!etatsAutorises || etatsAutorises.length === 0) {
@@ -44,11 +38,7 @@ export class VersionStateGuard {
 
     const etatCourant = request.etatVersionCourant;
     if (!etatCourant) {
-      throw new ApiError(
-        CODES_ERREUR_API.FORBIDDEN,
-        403,
-        'État de version non déterminé',
-      );
+      throw new ApiError(CODES_ERREUR_API.FORBIDDEN, 403, 'État de version non déterminé');
     }
 
     const aAutorisation = etatsAutorises.includes(etatCourant);

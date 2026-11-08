@@ -28,10 +28,7 @@ import {
 } from '@takt/contracts';
 import { ZodValidation } from '../../common/pipes/zod-validation.decorator';
 import { GradeService } from './grade.service';
-import {
-  JwtAuthGuard,
-  UtilisateurConnecte,
-} from '../../common/guards/jwt-auth.guard';
+import { JwtAuthGuard, UtilisateurConnecte } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { DepartmentScopeGuard } from '../../common/guards/department-scope.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
@@ -128,10 +125,7 @@ export class GradeController {
   @ApiResponse({ status: 403, description: 'Interdit' })
   @ApiResponse({ status: 404, description: 'Grade introuvable' })
   @ApiResponse({ status: 409, description: 'Conflit (utilisé par un module)' })
-  async delete(
-    @Param() params: GradeParams,
-    @Req() req: RequeteAvecUtilisateur,
-  ): Promise<unknown> {
+  async delete(@Param() params: GradeParams, @Req() req: RequeteAvecUtilisateur): Promise<unknown> {
     return this.gradeService.delete(params.id, req.user!.sub);
   }
 }

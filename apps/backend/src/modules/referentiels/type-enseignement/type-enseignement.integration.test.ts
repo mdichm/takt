@@ -13,15 +13,24 @@ describe('Type d’enseignement (TAKT-L04-02)', () => {
   beforeAll(async () => {
     ctx = await creerContexteTestReferentiels();
     // Nettoyage éventuel d'un type ayant le même code pour éviter les conflits d'unicité
-    const typeExistant = await ctx.prisma.typeEnseignement.findUnique({ where: { code: 'CM-TEST' } });
+    const typeExistant = await ctx.prisma.typeEnseignement.findUnique({
+      where: { code: 'CM-TEST' },
+    });
     if (typeExistant && typeExistant.id !== CODE_TYPE_EXISTANT) {
-      await ctx.prisma.gradeTypeEnseignement.deleteMany({ where: { typeEnseignementId: typeExistant.id } });
+      await ctx.prisma.gradeTypeEnseignement.deleteMany({
+        where: { typeEnseignementId: typeExistant.id },
+      });
       await ctx.prisma.typeEnseignement.delete({ where: { id: typeExistant.id } });
     }
     await ctx.prisma.typeEnseignement.upsert({
       where: { id: CODE_TYPE_EXISTANT },
       update: { code: 'CM-TEST', libelle: 'Cours magistral test', couleur: '#3B82F6' },
-      create: { id: CODE_TYPE_EXISTANT, code: 'CM-TEST', libelle: 'Cours magistral test', couleur: '#3B82F6' },
+      create: {
+        id: CODE_TYPE_EXISTANT,
+        code: 'CM-TEST',
+        libelle: 'Cours magistral test',
+        couleur: '#3B82F6',
+      },
     });
   });
 

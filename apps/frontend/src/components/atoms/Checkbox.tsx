@@ -16,10 +16,27 @@ interface CheckboxProps extends PropsBase {
   readonly onChange?: (checked: boolean) => void;
 }
 
-export function Checkbox({ label, checked, disabled = false, required = false, onChange, id, className }: CheckboxProps): JSX.Element {
+export function Checkbox({
+  label,
+  checked,
+  disabled = false,
+  required = false,
+  onChange,
+  id,
+  className,
+}: CheckboxProps): JSX.Element {
   const boxId = id || `checkbox-${label.toLowerCase().replace(/\s+/g, '-')}`;
   return (
-    <label style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-s)', cursor: disabled ? 'not-allowed' : 'pointer', fontSize: 'var(--font-size-body)', color: 'var(--color-text-primary)' }}>
+    <label
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 'var(--space-s)',
+        cursor: disabled ? 'not-allowed' : 'pointer',
+        fontSize: 'var(--font-size-body)',
+        color: 'var(--color-text-primary)',
+      }}
+    >
       <input
         type="checkbox"
         id={boxId}

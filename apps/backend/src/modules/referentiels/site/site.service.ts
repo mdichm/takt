@@ -28,12 +28,9 @@ export class SiteService {
       where: { code: donnees.code },
     });
     if (existant) {
-      throw new ApiError(
-        CODES_ERREUR_API.BAD_REQUEST,
-        400,
-        'Un site avec ce code existe déjà',
-        { champ: 'code' },
-      );
+      throw new ApiError(CODES_ERREUR_API.BAD_REQUEST, 400, 'Un site avec ce code existe déjà', {
+        champ: 'code',
+      });
     }
 
     const site = await this.prisma.site.create({

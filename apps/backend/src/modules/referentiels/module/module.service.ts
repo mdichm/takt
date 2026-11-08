@@ -6,11 +6,7 @@ import { PRISMA } from '../../common/di/prisma.token';
 import { PrismaClient } from '@takt/db';
 import { CODES_ERREUR_API, ApiError } from '../../common/http/api-error';
 import { AuditService } from '../../audit/audit.service';
-import type {
-  ModuleCreate,
-  ModuleUpdate,
-  ModuleListFilters,
-} from '@takt/contracts';
+import type { ModuleCreate, ModuleUpdate, ModuleListFilters } from '@takt/contracts';
 
 /**
  * Service de gestion des modules pédagogiques.
@@ -51,12 +47,9 @@ export class ModuleService {
       where: { code: donnees.code },
     });
     if (existant) {
-      throw new ApiError(
-        CODES_ERREUR_API.BAD_REQUEST,
-        400,
-        'Un module avec ce code existe déjà',
-        { champ: 'code' },
-      );
+      throw new ApiError(CODES_ERREUR_API.BAD_REQUEST, 400, 'Un module avec ce code existe déjà', {
+        champ: 'code',
+      });
     }
 
     const module = await this.prisma.module.create({
@@ -160,11 +153,7 @@ export class ModuleService {
       },
     });
     if (!module) {
-      throw new ApiError(
-        CODES_ERREUR_API.NOT_FOUND,
-        404,
-        'Module introuvable',
-      );
+      throw new ApiError(CODES_ERREUR_API.NOT_FOUND, 404, 'Module introuvable');
     }
     return {
       id: module.id,
@@ -183,11 +172,7 @@ export class ModuleService {
   async update(id: string, donnees: ModuleUpdate, utilisateurIdModifiePar: string) {
     const existant = await this.prisma.module.findUnique({ where: { id } });
     if (!existant) {
-      throw new ApiError(
-        CODES_ERREUR_API.NOT_FOUND,
-        404,
-        'Module introuvable',
-      );
+      throw new ApiError(CODES_ERREUR_API.NOT_FOUND, 404, 'Module introuvable');
     }
 
     if (donnees.code !== undefined && donnees.code !== existant.code) {
@@ -205,8 +190,7 @@ export class ModuleService {
     }
 
     if (donnees.typeEnseignementId !== undefined || donnees.gradeId !== undefined) {
-      const typeEnseignementId =
-        donnees.typeEnseignementId ?? existant.typeEnseignementId;
+      const typeEnseignementId = donnees.typeEnseignementId ?? existant.typeEnseignementId;
       const gradeId = donnees.gradeId ?? existant.gradeId;
       const coupleExiste = await this.prisma.gradeTypeEnseignement.findUnique({
         where: {
@@ -276,11 +260,7 @@ export class ModuleService {
       include: { matieres: { take: 1 } },
     });
     if (!existant) {
-      throw new ApiError(
-        CODES_ERREUR_API.NOT_FOUND,
-        404,
-        'Module introuvable',
-      );
+      throw new ApiError(CODES_ERREUR_API.NOT_FOUND, 404, 'Module introuvable');
     }
 
     if (existant.matieres.length > 0) {

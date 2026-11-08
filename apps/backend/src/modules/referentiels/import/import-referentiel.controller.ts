@@ -38,7 +38,9 @@ interface RequeteAvecUtilisateur {
 @ApiBearerAuth()
 @Controller('referentiels/import')
 export class ImportReferentielController {
-  constructor(@Inject(ImportReferentielService) private readonly importService: ImportReferentielService) {}
+  constructor(
+    @Inject(ImportReferentielService) private readonly importService: ImportReferentielService,
+  ) {}
 
   /** Liste les types de référentiels importables par CSV. */
   @Get('types')

@@ -37,7 +37,14 @@ export function useVersion(id?: string) {
 
   // Synchronise le store Zustand avec le résultat de la requête.
   if (version) {
-    versionStore.getState().definirVersion(version.id, version.etat, version.semestreId ?? undefined, version.snapshotId ?? undefined);
+    versionStore
+      .getState()
+      .definirVersion(
+        version.id,
+        version.etat,
+        version.semestreId ?? undefined,
+        version.snapshotId ?? undefined,
+      );
   }
 
   return {

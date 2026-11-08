@@ -76,7 +76,9 @@ export class ConfigSystemeService {
     const modifie = await this.prisma.configSysteme.update({
       where: { id: existant.id },
       data: {
-        ...(donnees.pasDeTempsMinutes !== undefined && { pasDeTempsMinutes: donnees.pasDeTempsMinutes }),
+        ...(donnees.pasDeTempsMinutes !== undefined && {
+          pasDeTempsMinutes: donnees.pasDeTempsMinutes,
+        }),
         ...(donnees.joursOuvres !== undefined && { joursOuvres: donnees.joursOuvres }),
         ...(donnees.creneauxParJour !== undefined && { creneauxParJour: donnees.creneauxParJour }),
       },

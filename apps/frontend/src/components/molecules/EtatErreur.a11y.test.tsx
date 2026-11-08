@@ -8,7 +8,9 @@ import { EtatErreur } from './EtatErreur';
 
 describe('EtatErreur — accessibilité', () => {
   it('ne produit aucune violation axe', async () => {
-    const { container } = render(<EtatErreur message="Erreur" titre="Échec" onReessayer={() => {}} />);
+    const { container } = render(
+      <EtatErreur message="Erreur" titre="Échec" onReessayer={() => {}} />,
+    );
     await expectAccessible(container.firstElementChild as HTMLElement | null);
   });
 });

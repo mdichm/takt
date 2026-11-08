@@ -6,11 +6,7 @@ import { PRISMA } from '../../common/di/prisma.token';
 import { PrismaClient } from '@takt/db';
 import { CODES_ERREUR_API, ApiError } from '../../common/http/api-error';
 import { AuditService } from '../../audit/audit.service';
-import type {
-  NiveauCreate,
-  NiveauUpdate,
-  NiveauListFilters,
-} from '@takt/contracts';
+import type { NiveauCreate, NiveauUpdate, NiveauListFilters } from '@takt/contracts';
 
 /**
  * Service de gestion des niveaux.
@@ -33,24 +29,18 @@ export class NiveauService {
       where: { id: donnees.parcoursId },
     });
     if (!parcours) {
-      throw new ApiError(
-        CODES_ERREUR_API.BAD_REQUEST,
-        400,
-        'Le parcours parent est introuvable',
-        { champ: 'parcoursId' },
-      );
+      throw new ApiError(CODES_ERREUR_API.BAD_REQUEST, 400, 'Le parcours parent est introuvable', {
+        champ: 'parcoursId',
+      });
     }
 
     const existant = await this.prisma.niveau.findUnique({
       where: { code: donnees.code },
     });
     if (existant) {
-      throw new ApiError(
-        CODES_ERREUR_API.BAD_REQUEST,
-        400,
-        'Un niveau avec ce code existe déjà',
-        { champ: 'code' },
-      );
+      throw new ApiError(CODES_ERREUR_API.BAD_REQUEST, 400, 'Un niveau avec ce code existe déjà', {
+        champ: 'code',
+      });
     }
 
     const niveau = await this.prisma.niveau.create({

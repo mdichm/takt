@@ -15,7 +15,8 @@ import { describe, it, expect, beforeAll, afterAll, beforeEach, afterEach, vi } 
 import { creerPrismaClient } from '../src/index';
 import { main } from './seed';
 
-const DATABASE_URL = process.env.DATABASE_URL ?? 'postgresql://postgres:postgres@localhost:5432/takt_test';
+const DATABASE_URL =
+  process.env.DATABASE_URL ?? 'postgresql://postgres:postgres@localhost:5432/takt_test';
 const prisma = creerPrismaClient(DATABASE_URL);
 
 const EMAILS_ATTENDUS = [
@@ -115,7 +116,7 @@ describe('Seed de développement (TAKT-L03-07)', () => {
     expect(countSemestreA).toBe(2);
   });
 
-  it('refuse de s\'exécuter si NODE_ENV=production', async () => {
+  it("refuse de s'exécuter si NODE_ENV=production", async () => {
     process.env.NODE_ENV = 'production';
 
     await expect(main()).rejects.toThrow(/production/i);
@@ -128,9 +129,7 @@ describe('Seed de développement (TAKT-L03-07)', () => {
     await main();
 
     // Le mot de passe doit avoir été généré et affiché en console
-    expect(logSpy).toHaveBeenCalledWith(
-      expect.stringContaining('SEED_DEMO_PASSWORD non définie')
-    );
+    expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('SEED_DEMO_PASSWORD non définie'));
 
     const utilisateurs = await prisma.utilisateur.findMany({
       where: { email: { in: EMAILS_ATTENDUS } },

@@ -17,8 +17,14 @@ import { VERIFICATEUR_JWT, VerificateurJwt } from '../common/guards/jwt-verifica
 
 const DOSSIER_CLES = mkdtempSync(join(tmpdir(), 'takt-users-test-jwt-'));
 const premiere = generateKeyPairSync('rsa', { modulusLength: 2048 });
-writeFileSync(join(DOSSIER_CLES, 'active.private.pem'), premiere.privateKey.export({ type: 'pkcs8', format: 'pem' }));
-writeFileSync(join(DOSSIER_CLES, 'active.public.pem'), premiere.publicKey.export({ type: 'spki', format: 'pem' }));
+writeFileSync(
+  join(DOSSIER_CLES, 'active.private.pem'),
+  premiere.privateKey.export({ type: 'pkcs8', format: 'pem' }),
+);
+writeFileSync(
+  join(DOSSIER_CLES, 'active.public.pem'),
+  premiere.publicKey.export({ type: 'spki', format: 'pem' }),
+);
 
 process.env = {
   ...process.env,
@@ -45,29 +51,33 @@ let emailAdmin: string;
 let tokenAdmin: string;
 const idsACleaner: string[] = [];
 
-const emailUnique = () => `takt-test-${Date.now()}-${Math.random().toString(36).slice(2)}@takt.test`;
+const emailUnique = () =>
+  `takt-test-${Date.now()}-${Math.random().toString(36).slice(2)}@takt.test`;
 
 describe('CRUD utilisateurs (TAKT-L03-04)', () => {
   beforeAll(async () => {
-    const { AppModule } = await import('../../app.module');
+    const { AppModule } = await import('../../app.module.js');
     const moduleRef = await Test.createTestingModule({
       imports: [AppModule],
       providers: [
         { provide: Reflector, useValue: new Reflector() },
-        { provide: VERIFICATEUR_JWT, useValue: {
-          verifier: () => ({
-            sub: ADMIN_ID_FOR_TEST,
-            role: 'admin' as const,
-            departementIds: [],
-            typ: 'access',
-            jti: 'mock-jti',
-            iat: 0,
-            nbf: 0,
-            exp: 9999999999,
-            iss: 'takt-test',
-            aud: 'takt-api',
-          }),
-        } },
+        {
+          provide: VERIFICATEUR_JWT,
+          useValue: {
+            verifier: () => ({
+              sub: ADMIN_ID_FOR_TEST,
+              role: 'admin' as const,
+              departementIds: [],
+              typ: 'access',
+              jti: 'mock-jti',
+              iat: 0,
+              nbf: 0,
+              exp: 9999999999,
+              iss: 'takt-test',
+              aud: 'takt-api',
+            }),
+          },
+        },
       ],
     })
       .overrideProvider(PRISMA)
@@ -77,16 +87,16 @@ describe('CRUD utilisateurs (TAKT-L03-04)', () => {
     const verificateur = moduleRef.get(VERIFICATEUR_JWT) as VerificateurJwt;
     verificateur.verifier = () => ({
       sub: ADMIN_ID_FOR_TEST,
-        role: 'admin' as const,
-        departementIds: [],
-        typ: 'access',
-        jti: 'mock-jti',
-        iat: 0,
-        nbf: 0,
-        exp: 9999999999,
-        iss: 'takt-test',
-        aud: 'takt-api',
-      });
+      role: 'admin' as const,
+      departementIds: [],
+      typ: 'access',
+      jti: 'mock-jti',
+      iat: 0,
+      nbf: 0,
+      exp: 9999999999,
+      iss: 'takt-test',
+      aud: 'takt-api',
+    });
     application = moduleRef.createNestApplication();
     application.setGlobalPrefix('api/v1');
     await application.init();
@@ -174,13 +184,25 @@ describe('CRUD utilisateurs (TAKT-L03-04)', () => {
     await agent
       .post('/api/v1/users')
       .set('Authorization', `Bearer ${tokenAdmin}`)
-      .send({ email, nom: 'Dupont', prenom: 'Jean', roleId: roleGest!.id, motDePasse: MOT_DE_PASSE })
+      .send({
+        email,
+        nom: 'Dupont',
+        prenom: 'Jean',
+        roleId: roleGest!.id,
+        motDePasse: MOT_DE_PASSE,
+      })
       .expect(201);
     // Doublon
     const reponse = await agent
       .post('/api/v1/users')
       .set('Authorization', `Bearer ${tokenAdmin}`)
-      .send({ email, nom: 'Dupont', prenom: 'Jean', roleId: roleGest!.id, motDePasse: MOT_DE_PASSE })
+      .send({
+        email,
+        nom: 'Dupont',
+        prenom: 'Jean',
+        roleId: roleGest!.id,
+        motDePasse: MOT_DE_PASSE,
+      })
       .expect(400);
     expect(reponse.body.error.code).toBe('VALIDATION_ERROR');
   });
@@ -203,8 +225,8 @@ describe('CRUD utilisateurs (TAKT-L03-04)', () => {
     const cree = await agent
       .post('/api/v1/users')
       .set('Authorization', `Bearer ${tokenAdmin}`)
-      .send({ email, nom: 'Test', prenom: 'User', roleId: roleGest!.id, motDePasse: MOT_DE_PASSE })
-          const id = cree.body.data.id;
+      .send({ email, nom: 'Test', prenom: 'User', roleId: roleGest!.id, motDePasse: MOT_DE_PASSE });
+    const id = cree.body.data.id;
     idsACleaner.push(id);
 
     const reponse = await agent
@@ -227,8 +249,8 @@ describe('CRUD utilisateurs (TAKT-L03-04)', () => {
     const cree = await agent
       .post('/api/v1/users')
       .set('Authorization', `Bearer ${tokenAdmin}`)
-      .send({ email, nom: 'Test', prenom: 'User', roleId: roleGest!.id, motDePasse: MOT_DE_PASSE })
-          const id = cree.body.data.id;
+      .send({ email, nom: 'Test', prenom: 'User', roleId: roleGest!.id, motDePasse: MOT_DE_PASSE });
+    const id = cree.body.data.id;
     idsACleaner.push(id);
 
     const reponse = await agent
@@ -252,7 +274,13 @@ describe('CRUD utilisateurs (TAKT-L03-04)', () => {
     const cree = await agent
       .post('/api/v1/users')
       .set('Authorization', `Bearer ${tokenAdmin}`)
-      .send({ email, nom: 'ASupprimer', prenom: 'User', roleId: roleGest!.id, motDePasse: MOT_DE_PASSE })
+      .send({
+        email,
+        nom: 'ASupprimer',
+        prenom: 'User',
+        roleId: roleGest!.id,
+        motDePasse: MOT_DE_PASSE,
+      })
       .expect(201);
     const id = cree.body.data.id;
 
@@ -277,7 +305,10 @@ describe('CRUD utilisateurs (TAKT-L03-04)', () => {
 
   it('Journal d’audit : création et désactivation journalisées (GG-07)', async () => {
     const journal = await prisma.journalAudit.findMany({
-      where: { entite: 'Utilisateur', action: { in: ['UTILISATEUR_CREE', 'UTILISATEUR_DESACTIVE'] } },
+      where: {
+        entite: 'Utilisateur',
+        action: { in: ['UTILISATEUR_CREE', 'UTILISATEUR_DESACTIVE'] },
+      },
     });
     expect(journal.length).toBeGreaterThan(0);
     for (const entree of journal) {

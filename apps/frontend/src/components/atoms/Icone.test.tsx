@@ -15,13 +15,13 @@ describe('Icone', () => {
     expect(svgEl).toHaveAttribute('aria-hidden', 'true');
   });
 
-  it('est masquée aux lecteurs d\'écran par défaut', () => {
+  it("est masquée aux lecteurs d'écran par défaut", () => {
     render(<Icone nom="accueil" />);
     const svg = document.querySelector('svg');
     expect(svg).toHaveAttribute('aria-hidden', 'true');
   });
 
-  it('expose un aria-label quand fourni (visible dans l\'arbre d\'accessibilite)', () => {
+  it("expose un aria-label quand fourni (visible dans l'arbre d'accessibilite)", () => {
     render(<Icone nom="fermer" ariaLabel="Fermer la modal" />);
     expect(screen.getByRole('img', { name: 'Fermer la modal' })).toBeInTheDocument();
     expect(document.querySelector('svg')).not.toHaveAttribute('aria-hidden');
