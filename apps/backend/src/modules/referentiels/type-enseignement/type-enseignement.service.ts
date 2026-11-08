@@ -116,11 +116,7 @@ export class TypeEnseignementService {
       where: { id },
     });
     if (!typeEnseignement) {
-      throw new ApiError(
-        CODES_ERREUR_API.NOT_FOUND,
-        404,
-        'Type d’enseignement introuvable',
-      );
+      throw new ApiError(CODES_ERREUR_API.NOT_FOUND, 404, 'Type d’enseignement introuvable');
     }
     return {
       id: typeEnseignement.id,
@@ -136,11 +132,7 @@ export class TypeEnseignementService {
   async update(id: string, donnees: TypeEnseignementUpdate, utilisateurIdModifiePar: string) {
     const existant = await this.prisma.typeEnseignement.findUnique({ where: { id } });
     if (!existant) {
-      throw new ApiError(
-        CODES_ERREUR_API.NOT_FOUND,
-        404,
-        'Type d’enseignement introuvable',
-      );
+      throw new ApiError(CODES_ERREUR_API.NOT_FOUND, 404, 'Type d’enseignement introuvable');
     }
 
     if (donnees.code !== undefined && donnees.code !== existant.code) {
@@ -196,11 +188,7 @@ export class TypeEnseignementService {
       include: { modules: { take: 1 } },
     });
     if (!existant) {
-      throw new ApiError(
-        CODES_ERREUR_API.NOT_FOUND,
-        404,
-        'Type d’enseignement introuvable',
-      );
+      throw new ApiError(CODES_ERREUR_API.NOT_FOUND, 404, 'Type d’enseignement introuvable');
     }
 
     if (existant.modules.length > 0) {

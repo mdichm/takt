@@ -26,7 +26,20 @@ describe('FormulaireEntite', () => {
   });
 
   it('pré-remplit les champs quand une entite est fournie', () => {
-    render(<FormulaireEntite entite={{ id: '1', nom: 'Dupont', email: 'd@ex.fr', role: 'enseignant', departement: 'info', actif: true }} onSubmit={onSubmit} onAnnuler={onAnnuler} />);
+    render(
+      <FormulaireEntite
+        entite={{
+          id: '1',
+          nom: 'Dupont',
+          email: 'd@ex.fr',
+          role: 'enseignant',
+          departement: 'info',
+          actif: true,
+        }}
+        onSubmit={onSubmit}
+        onAnnuler={onAnnuler}
+      />,
+    );
     expect(screen.getByDisplayValue('Dupont')).toBeInTheDocument();
     expect(screen.getByDisplayValue('d@ex.fr')).toBeInTheDocument();
   });

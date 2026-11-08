@@ -15,8 +15,14 @@ import { PASSWORD_ARGON2_OPTIONS } from '../../config/password.config';
 import { VerificateurJwt } from '../common/guards/jwt-verificateur.interface';
 const DOSSIER_CLES = mkdtempSync(join(tmpdir(), 'takt-repartition-test-jwt-'));
 const premiere = generateKeyPairSync('rsa', { modulusLength: 2048 });
-writeFileSync(join(DOSSIER_CLES, 'active.private.pem'), premiere.privateKey.export({ type: 'pkcs8', format: 'pem' }));
-writeFileSync(join(DOSSIER_CLES, 'active.public.pem'), premiere.publicKey.export({ type: 'spki', format: 'pem' }));
+writeFileSync(
+  join(DOSSIER_CLES, 'active.private.pem'),
+  premiere.privateKey.export({ type: 'pkcs8', format: 'pem' }),
+);
+writeFileSync(
+  join(DOSSIER_CLES, 'active.public.pem'),
+  premiere.publicKey.export({ type: 'spki', format: 'pem' }),
+);
 
 process.env = {
   ...process.env,
@@ -60,7 +66,8 @@ const GRADE_ID = '22222222-3333-4444-5555-666666666666';
 
 process.env.TEST_ADMIN_ID = ADMIN_ID;
 
-const emailUnique = () => `takt-test-${Date.now()}-${Math.random().toString(36).slice(2)}@takt.test`;
+const emailUnique = () =>
+  `takt-test-${Date.now()}-${Math.random().toString(36).slice(2)}@takt.test`;
 
 export interface ContexteTestRepartition {
   application: INestApplication;
@@ -94,9 +101,9 @@ export interface ContexteTestRepartition {
 }
 
 export async function creerContexteTestRepartition(): Promise<ContexteTestRepartition> {
-  const { AppModule } = await import('../../app.module');
-  const { TokenService } = await import('../../modules/auth/token.service');
-  const { JwtAuthGuard } = await import('../common/guards/jwt-auth.guard');
+  const { AppModule } = await import('../../app.module.js');
+  const { TokenService } = await import('../../modules/auth/token.service.js');
+  const { JwtAuthGuard } = await import('../common/guards/jwt-auth.guard.js');
   const { Reflector } = await import('@nestjs/core');
   const moduleRef = await Test.createTestingModule({
     imports: [AppModule],
@@ -125,7 +132,7 @@ export async function creerContexteTestRepartition(): Promise<ContexteTestRepart
   }
 
   // Configurer le DepartmentScopeGuard avec le Reflector
-  const { DepartmentScopeGuard } = await import('../common/guards/department-scope.guard');
+  const { DepartmentScopeGuard } = await import('../common/guards/department-scope.guard.js');
   const deptScopeGuard = application.get(DepartmentScopeGuard, { strict: false });
   if (deptScopeGuard) {
     const reflector = application.get(Reflector);
@@ -139,10 +146,26 @@ export async function creerContexteTestRepartition(): Promise<ContexteTestRepart
   const prisma = creerPrismaClient(process.env.DATABASE_URL!);
   const agent = request.agent(application.getHttpServer());
 
-  await prisma.role.upsert({ where: { code: 'admin' }, update: {}, create: { code: 'admin', libelle: 'Administrateur' } });
-  await prisma.role.upsert({ where: { code: 'gest' }, update: {}, create: { code: 'gest', libelle: 'Gestionnaire' } });
-  await prisma.role.upsert({ where: { code: 'rdep' }, update: {}, create: { code: 'rdep', libelle: 'Responsable Département' } });
-  await prisma.role.upsert({ where: { code: 'dir' }, update: {}, create: { code: 'dir', libelle: 'Directeur' } });
+  await prisma.role.upsert({
+    where: { code: 'admin' },
+    update: {},
+    create: { code: 'admin', libelle: 'Administrateur' },
+  });
+  await prisma.role.upsert({
+    where: { code: 'gest' },
+    update: {},
+    create: { code: 'gest', libelle: 'Gestionnaire' },
+  });
+  await prisma.role.upsert({
+    where: { code: 'rdep' },
+    update: {},
+    create: { code: 'rdep', libelle: 'Responsable Département' },
+  });
+  await prisma.role.upsert({
+    where: { code: 'dir' },
+    update: {},
+    create: { code: 'dir', libelle: 'Directeur' },
+  });
 
   const roleAdmin = await prisma.role.findUnique({ where: { code: 'admin' } });
   const roleRdep = await prisma.role.findUnique({ where: { code: 'rdep' } });
@@ -158,12 +181,22 @@ export async function creerContexteTestRepartition(): Promise<ContexteTestRepart
   await prisma.departement.upsert({
     where: { id: DEPARTEMENT_ID },
     update: {},
-    create: { id: DEPARTEMENT_ID, code: 'INFO', libelle: 'Informatique', etablissementId: ETABLISSEMENT_ID },
+    create: {
+      id: DEPARTEMENT_ID,
+      code: 'INFO',
+      libelle: 'Informatique',
+      etablissementId: ETABLISSEMENT_ID,
+    },
   });
   await prisma.departement.upsert({
     where: { id: DEPARTEMENT2_ID },
     update: {},
-    create: { id: DEPARTEMENT2_ID, code: 'MATH', libelle: 'Mathématiques', etablissementId: ETABLISSEMENT_ID },
+    create: {
+      id: DEPARTEMENT2_ID,
+      code: 'MATH',
+      libelle: 'Mathématiques',
+      etablissementId: ETABLISSEMENT_ID,
+    },
   });
 
   const hash = await hacherArgon2(MOT_DE_PASSE, PASSWORD_ARGON2_OPTIONS);
@@ -171,36 +204,80 @@ export async function creerContexteTestRepartition(): Promise<ContexteTestRepart
   const admin = await prisma.utilisateur.upsert({
     where: { id: ADMIN_ID },
     update: {},
-    create: { id: ADMIN_ID, email: emailUnique(), nom: 'Admin', prenom: 'Systeme', roleId: roleAdmin!.id, motDePasseHash: hash, estActif: true },
+    create: {
+      id: ADMIN_ID,
+      email: emailUnique(),
+      nom: 'Admin',
+      prenom: 'Systeme',
+      roleId: roleAdmin!.id,
+      motDePasseHash: hash,
+      estActif: true,
+    },
   });
   const rdep = await prisma.utilisateur.upsert({
     where: { id: RDEP_ID },
     update: {},
-    create: { id: RDEP_ID, email: emailUnique(), nom: 'Rdep', prenom: 'Test', roleId: roleRdep!.id, motDePasseHash: hash, estActif: true, departementId: DEPARTEMENT_ID },
+    create: {
+      id: RDEP_ID,
+      email: emailUnique(),
+      nom: 'Rdep',
+      prenom: 'Test',
+      roleId: roleRdep!.id,
+      motDePasseHash: hash,
+      estActif: true,
+      departementId: DEPARTEMENT_ID,
+    },
   });
   const gest = await prisma.utilisateur.upsert({
     where: { id: GEST_ID },
     update: {},
-    create: { id: GEST_ID, email: emailUnique(), nom: 'Gest', prenom: 'Test', roleId: roleGest!.id, motDePasseHash: hash, estActif: true },
+    create: {
+      id: GEST_ID,
+      email: emailUnique(),
+      nom: 'Gest',
+      prenom: 'Test',
+      roleId: roleGest!.id,
+      motDePasseHash: hash,
+      estActif: true,
+    },
   });
   const dir = await prisma.utilisateur.upsert({
     where: { id: DIR_ID },
     update: {},
-    create: { id: DIR_ID, email: emailUnique(), nom: 'Dir', prenom: 'Test', roleId: roleDir!.id, motDePasseHash: hash, estActif: true },
+    create: {
+      id: DIR_ID,
+      email: emailUnique(),
+      nom: 'Dir',
+      prenom: 'Test',
+      roleId: roleDir!.id,
+      motDePasseHash: hash,
+      estActif: true,
+    },
   });
 
   // AnneeUniversitaire: libelle (unique), dateDebut, dateFin (pas de code)
   await prisma.anneeUniversitaire.upsert({
     where: { id: ANNEE_UNIV_ID },
     update: {},
-    create: { id: ANNEE_UNIV_ID, libelle: '2024-2025', dateDebut: new Date('2024-09-01'), dateFin: new Date('2025-06-30') },
+    create: {
+      id: ANNEE_UNIV_ID,
+      libelle: '2024-2025',
+      dateDebut: new Date('2024-09-01'),
+      dateFin: new Date('2025-06-30'),
+    },
   });
 
   // Semestre: numero, anneeUniversitaireId, dateDebut, dateFin (pas de libelle)
   await prisma.semestre.upsert({
     where: { id: SEMESTRE_ID },
     update: {},
-    create: { id: SEMESTRE_ID, anneeUniversitaireId: ANNEE_UNIV_ID, numero: 1, dateDebut: new Date('2024-09-01'), dateFin: new Date('2025-01-31') },
+    create: {
+      id: SEMESTRE_ID,
+      anneeUniversitaireId: ANNEE_UNIV_ID,
+      numero: 1,
+      dateDebut: new Date('2024-09-01'),
+      dateFin: new Date('2025-01-31'),
+    },
   });
 
   // Version: semestreId, etat (pas de nom)
@@ -239,7 +316,13 @@ export async function creerContexteTestRepartition(): Promise<ContexteTestRepart
   await prisma.module.upsert({
     where: { id: MODULE_ID },
     update: {},
-    create: { id: MODULE_ID, code: 'MOD1', libelle: 'Module Test', typeEnseignementId: TYPE_ENS_ID, gradeId: GRADE_ID },
+    create: {
+      id: MODULE_ID,
+      code: 'MOD1',
+      libelle: 'Module Test',
+      typeEnseignementId: TYPE_ENS_ID,
+      gradeId: GRADE_ID,
+    },
   });
 
   await prisma.niveau.upsert({
@@ -275,21 +358,37 @@ export async function creerContexteTestRepartition(): Promise<ContexteTestRepart
   await prisma.enseignant.upsert({
     where: { id: ENSEIGNANT_ID },
     update: {},
-    create: { id: ENSEIGNANT_ID, matricule: 'ENS001', nom: 'Dupont', prenom: 'Jean', email: 'jean.dupont@test.takt' },
+    create: {
+      id: ENSEIGNANT_ID,
+      matricule: 'ENS001',
+      nom: 'Dupont',
+      prenom: 'Jean',
+      email: 'jean.dupont@test.takt',
+    },
   });
   await prisma.enseignant.upsert({
     where: { id: ENSEIGNANT2_ID },
     update: {},
-    create: { id: ENSEIGNANT2_ID, matricule: 'ENS002', nom: 'Martin', prenom: 'Marie', email: 'marie.martin@test.takt' },
+    create: {
+      id: ENSEIGNANT2_ID,
+      matricule: 'ENS002',
+      nom: 'Martin',
+      prenom: 'Marie',
+      email: 'marie.martin@test.takt',
+    },
   });
 
   await prisma.enseignantDepartement.upsert({
-    where: { enseignantId_departementId: { enseignantId: ENSEIGNANT_ID, departementId: DEPARTEMENT_ID } },
+    where: {
+      enseignantId_departementId: { enseignantId: ENSEIGNANT_ID, departementId: DEPARTEMENT_ID },
+    },
     update: {},
     create: { enseignantId: ENSEIGNANT_ID, departementId: DEPARTEMENT_ID },
   });
   await prisma.enseignantDepartement.upsert({
-    where: { enseignantId_departementId: { enseignantId: ENSEIGNANT2_ID, departementId: DEPARTEMENT_ID } },
+    where: {
+      enseignantId_departementId: { enseignantId: ENSEIGNANT2_ID, departementId: DEPARTEMENT_ID },
+    },
     update: {},
     create: { enseignantId: ENSEIGNANT2_ID, departementId: DEPARTEMENT_ID },
   });
@@ -298,20 +397,43 @@ export async function creerContexteTestRepartition(): Promise<ContexteTestRepart
   await prisma.planEtudes.upsert({
     where: { id: PLAN_ETUDES_ID },
     update: {},
-    create: { id: PLAN_ETUDES_ID, parcoursId: PARCOURS_ID, niveauId: NIVEAU_ID, anneeUniversitaireId: ANNEE_UNIV_ID, semestreId: SEMESTRE_ID, departementId: DEPARTEMENT_ID },
+    create: {
+      id: PLAN_ETUDES_ID,
+      parcoursId: PARCOURS_ID,
+      niveauId: NIVEAU_ID,
+      anneeUniversitaireId: ANNEE_UNIV_ID,
+      semestreId: SEMESTRE_ID,
+      departementId: DEPARTEMENT_ID,
+    },
   });
 
   // PlanEtudesMatiere: planEtudesId, matiereId, typeEnseignementId, volumeHoraire, dureeCreneaux, coefficient
   await prisma.planEtudesMatiere.upsert({
     where: { id: PLAN_ETUDES_MATIERE_ID },
     update: {},
-    create: { id: PLAN_ETUDES_MATIERE_ID, planEtudesId: PLAN_ETUDES_ID, matiereId: MATIERE_ID, typeEnseignementId: TYPE_ENS_ID, volumeHoraire: 4, dureeCreneaux: 90, coefficient: 1 },
+    create: {
+      id: PLAN_ETUDES_MATIERE_ID,
+      planEtudesId: PLAN_ETUDES_ID,
+      matiereId: MATIERE_ID,
+      typeEnseignementId: TYPE_ENS_ID,
+      volumeHoraire: 4,
+      dureeCreneaux: 90,
+      coefficient: 1,
+    },
   });
 
-  const loginAdmin = await agent.post('/api/v1/auth/login').send({ email: admin.email, motDePasse: MOT_DE_PASSE });
-  const loginRdep = await agent.post('/api/v1/auth/login').send({ email: rdep.email, motDePasse: MOT_DE_PASSE });
-  const loginGest = await agent.post('/api/v1/auth/login').send({ email: gest.email, motDePasse: MOT_DE_PASSE });
-  const loginDir = await agent.post('/api/v1/auth/login').send({ email: dir.email, motDePasse: MOT_DE_PASSE });
+  const loginAdmin = await agent
+    .post('/api/v1/auth/login')
+    .send({ email: admin.email, motDePasse: MOT_DE_PASSE });
+  const loginRdep = await agent
+    .post('/api/v1/auth/login')
+    .send({ email: rdep.email, motDePasse: MOT_DE_PASSE });
+  const loginGest = await agent
+    .post('/api/v1/auth/login')
+    .send({ email: gest.email, motDePasse: MOT_DE_PASSE });
+  const loginDir = await agent
+    .post('/api/v1/auth/login')
+    .send({ email: dir.email, motDePasse: MOT_DE_PASSE });
 
   const tokenAdmin = loginAdmin.body.data.accessToken;
   const tokenRdep = loginRdep.body.data.accessToken;

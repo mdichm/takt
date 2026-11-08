@@ -19,12 +19,12 @@ Ce document est l'instrument de pilotage du projet TAKT. Il répond à trois que
 
 ### 1.2 Pourquoi le flux continu plutôt que les sprints
 
-| Critère | Sprint de 2 semaines (`PLAN_MACRO`) | Flux continu retenu | Décision |
-|---------|------------------------------------|---------------------|----------|
-| Granularité de livraison | Binaire : fin de sprint | Continue : journalière | Le `PLAN_MACRO` raisonne en jalons de 2 semaines pour la gouvernance MOA ; l'exécution technique gagne à livrer en continu pour ne pas accumuler un lot d'intégration à J14. |
-| Mesure de la performance | Points par sprint | SP/semaine glissante + débit | Un sprint fige la mesure et masque les pics ; la moyenne glissante sur 4 semaines absorbe le bruit. |
-| Adaptation du périmètre | Gelée en début de sprint | Backlog priorisé en continu | Le `BACKLOG_TAKT.md` compte 89 tickets ; le gel par sprint serait artificiel. |
-| Reporting MOA | Binaire | Continu + jalons | Les jalons J10/J14/J28/J42/J56/J70 du `PLAN_MACRO` restent la contractualisation externe. |
+| Critère                  | Sprint de 2 semaines (`PLAN_MACRO`) | Flux continu retenu          | Décision                                                                                                                                                                     |
+| ------------------------ | ----------------------------------- | ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Granularité de livraison | Binaire : fin de sprint             | Continue : journalière       | Le `PLAN_MACRO` raisonne en jalons de 2 semaines pour la gouvernance MOA ; l'exécution technique gagne à livrer en continu pour ne pas accumuler un lot d'intégration à J14. |
+| Mesure de la performance | Points par sprint                   | SP/semaine glissante + débit | Un sprint fige la mesure et masque les pics ; la moyenne glissante sur 4 semaines absorbe le bruit.                                                                          |
+| Adaptation du périmètre  | Gelée en début de sprint            | Backlog priorisé en continu  | Le `BACKLOG_TAKT.md` compte 89 tickets ; le gel par sprint serait artificiel.                                                                                                |
+| Reporting MOA            | Binaire                             | Continu + jalons             | Les jalons J10/J14/J28/J42/J56/J70 du `PLAN_MACRO` restent la contractualisation externe.                                                                                    |
 
 **Ce qui ne change pas :** les jalons contractuels du `PLAN_MACRO §4` restent opposables à la MOA. Le flux continu est un mode d'exécution interne, pas une renegociation du calendrier contractuel.
 
@@ -53,12 +53,12 @@ Nombre de tickets terminés par semaine. Complément indispensable des SP en flu
 
 ### 2.3 Work In Progress (WIP)
 
-| Lots | WIP max | Justification |
-|------|---------|---------------|
-| L00–L03 (socle) | 2 | Fort couplage ; le parallélisme y est faible |
-| L04–L07 (métier) | 4 | Lot structuré, tâches découpables |
-| L08–L10 (frontend, exports) | 5 | Parallelisme élevé, faible couplage |
-| L11 (recette) | 3 | Phase de stabilisation, WIP réduit |
+| Lots                        | WIP max | Justification                                |
+| --------------------------- | ------- | -------------------------------------------- |
+| L00–L03 (socle)             | 2       | Fort couplage ; le parallélisme y est faible |
+| L04–L07 (métier)            | 4       | Lot structuré, tâches découpables            |
+| L08–L10 (frontend, exports) | 5       | Parallelisme élevé, faible couplage          |
+| L11 (recette)               | 3       | Phase de stabilisation, WIP réduit           |
 
 **Règle** : un agent ne démarre un nouveau ticket que si `WIP en cours < WIP max du lot`. Le dépassement est traité comme un incident de flux (cf. §7.3).
 
@@ -122,132 +122,133 @@ Couverture_forecast  = SP_livrés(S) / (SP_total × (S / S_proj))   //Detection 
 
 Le tableau ci‑dessous donne des bornes de vélocité et de débit pour trois profils d'équipe. Les formules de projection (§3) restent identiques ; seul le couple (V_moy, D_moy) change.
 
-| Paramètre | Scénario **S** — Équipe réduite (1 dev + Cline) | Scénario **M** — Équipe standard (2 devs + Cline) | Scénario **L** — Équipe élargie (4+ devs, 2 lots //) |
-|-----------|-----------------------------------------------|--------------------------------------------------|---------------------------------------------------|
-| Composition | 1 fullstack | 1 fullstack + 1 frontend | 2 fullstack + 1 frontend + 1 DevOps |
-| Vélocité SP/sem (hypothèse départ) | 12 – 15 | 25 – 30 | 55 – 60 |
-| Débit tickets/sem | 4 – 6 | 8 – 11 | 16 – 20 |
-| WIP max global | 2 | 4 | 7 |
-| Charge backlog (504 SP, 89 tickets) | 504 SP / 89 tickets | 504 SP / 89 tickets | 504 SP / 89 tickets |
-| **Date fin P50** (à partir de S0 = sem 1) | **≈ 34 – 42 sem** (≈ fin juin – août 2027) | **≈ 17 – 20 sem** (≈ mars – avril 2027) | **≈ 9 – 10 sem** (≈ janvier 2027) |
-| **Date fin P80** (facteur 0,75) | **≈ 45 – 56 sem** (≈ oct 2027 – jan 2028) | **≈ 23 – 27 sem** (≈ juil – oct 2027) | **≈ 12 – 13 sem** (≈ mars 2027) |
-| **Date retenue (max conservateur)** | **≈ 56 sem** (jan 2028) | **≈ 27 sem** (oct 2027) | **≈ 13 sem** (mars 2027) |
+| Paramètre                                 | Scénario **S** — Équipe réduite (1 dev + Cline) | Scénario **M** — Équipe standard (2 devs + Cline) | Scénario **L** — Équipe élargie (4+ devs, 2 lots //) |
+| ----------------------------------------- | ----------------------------------------------- | ------------------------------------------------- | ---------------------------------------------------- |
+| Composition                               | 1 fullstack                                     | 1 fullstack + 1 frontend                          | 2 fullstack + 1 frontend + 1 DevOps                  |
+| Vélocité SP/sem (hypothèse départ)        | 12 – 15                                         | 25 – 30                                           | 55 – 60                                              |
+| Débit tickets/sem                         | 4 – 6                                           | 8 – 11                                            | 16 – 20                                              |
+| WIP max global                            | 2                                               | 4                                                 | 7                                                    |
+| Charge backlog (504 SP, 89 tickets)       | 504 SP / 89 tickets                             | 504 SP / 89 tickets                               | 504 SP / 89 tickets                                  |
+| **Date fin P50** (à partir de S0 = sem 1) | **≈ 34 – 42 sem** (≈ fin juin – août 2027)      | **≈ 17 – 20 sem** (≈ mars – avril 2027)           | **≈ 9 – 10 sem** (≈ janvier 2027)                    |
+| **Date fin P80** (facteur 0,75)           | **≈ 45 – 56 sem** (≈ oct 2027 – jan 2028)       | **≈ 23 – 27 sem** (≈ juil – oct 2027)             | **≈ 12 – 13 sem** (≈ mars 2027)                      |
+| **Date retenue (max conservateur)**       | **≈ 56 sem** (jan 2028)                         | **≈ 27 sem** (oct 2027)                           | **≈ 13 sem** (mars 2027)                             |
 
-> **Lecture** : les dates sont des *bornes* basées sur les hypothèses de vélocité initiale. Après 4 semaines réelles, `V_moy` et `D_moy` sont mesurés et les projections sont recalculées automatiquement (voir §5).
+> **Lecture** : les dates sont des _bornes_ basées sur les hypothèses de vélocité initiale. Après 4 semaines réelles, `V_moy` et `D_moy` sont mesurés et les projections sont recalculées automatiquement (voir §5).
 
 ## §5. Tableau de suivi hebdomadaire (vierge — à remplir chaque lundi)
 
 | Semaine (S) | Date lundi | SP terminés (Σ) | SP cumulés | Tickets terminés | Tickets cumulés | V_moy (formule §3.1) | D_moy (formule §3.2) | SP restants | Tickets restants | Date fin P50 (SP) | Date fin P50 (Débit) | Date fin P80 (SP) | **Date retenue** | Écarts / Actions |
-|-------------|------------|----------------|-----------|------------------|----------------|----------------------|----------------------|------------|------------------|-------------------|----------------------|-------------------|------------------|------------------|
-| 1 | 2026‑11‑02 |   |   |   |   |   |   | 504 | 89 |   |   |   |   |   |
-| 2 | 2026‑11‑09 |   |   |   |   |   |   |   |   |   |   |   |   |   |
-| 3 | 2026‑11‑16 |   |   |   |   |   |   |   |   |   |   |   |   |   |
-| 4 | 2026‑11‑23 |   |   |   |   |   |   |   |   |   |   |   |   |   |
-| 5 | 2026‑11‑30 |   |   |   |   |   |   |   |   |   |   |   |   |   |
-| … | … |   |   |   |   |   |   |   |   |   |   |   |   |   |
+| ----------- | ---------- | --------------- | ---------- | ---------------- | --------------- | -------------------- | -------------------- | ----------- | ---------------- | ----------------- | -------------------- | ----------------- | ---------------- | ---------------- |
+| 1           | 2026‑11‑02 |                 |            |                  |                 |                      |                      | 504         | 89               |                   |                      |                   |                  |                  |
+| 2           | 2026‑11‑09 |                 |            |                  |                 |                      |                      |             |                  |                   |                      |                   |                  |                  |
+| 3           | 2026‑11‑16 |                 |            |                  |                 |                      |                      |             |                  |                   |                      |                   |                  |                  |
+| 4           | 2026‑11‑23 |                 |            |                  |                 |                      |                      |             |                  |                   |                      |                   |                  |                  |
+| 5           | 2026‑11‑30 |                 |            |                  |                 |                      |                      |             |                  |                   |                      |                   |                  |                  |
+| …           | …          |                 |            |                  |                 |                      |                      |             |                  |                   |                      |                   |                  |                  |
 
 > **Règle de remplissage** : seules les colonnes « SP terminés » et « Tickets terminés » sont saisies manuellement (issues du `BACKLOG_TAKT.md` et du `SUIVI_VELOCITE_TAKT.md §6`). Toutes les autres colonnes sont des formules (copier‑coller la ligne précédente et étendre).
 
 ## §6. Tableau de suivi par ticket (état, SP, dates réelles)
 
-| Ticket | Lot | SP | État | Date début réel | Date fin réel | SP gagnés | Commentaire |
-|--------|-----|----|------|-----------------|--------------|----------|-------------|
-| TAKT-L00-01 | L00 | 3 | À faire |   |   |   |   |
-| TAKT-L00-02 | L00 | 2 | À faire |   |   |   |   |
-| TAKT-L00-03 | L00 | 3 | À faire |   |   |   |   |
-| TAKT-L00-04 | L00 | 3 | À faire |   |   |   |   |
-| TAKT-L00-05 | L00 | 2 | À faire |   |   |   |   |
-| TAKT-L01-01 | L01 | 2 | À faire |   |   |   |   |
-| TAKT-L01-02 | L01 | 5 | À faire |   |   |   |   |
-| TAKT-L01-03 | L01 | 3 | À faire |   |   |   |   |
-| TAKT-L01-04 | L01 | 5 | À faire |   |   |   |   |
-| TAKT-L01-05 | L01 | 3 | À faire |   |   |   |   |
-| TAKT-L01-06 | L01 | 3 | À faire |   |   |   |   |
-| TAKT-L01-07 | L01 | 3 | À faire |   |   |   |   |
-| TAKT-L02-01 | L02 | 5 | À faire |   |   |   |   |
-| TAKT-L02-02 | L02 | 5 | À faire |   |   |   |   |
-| TAKT-L02-03 | L02 | 5 | À faire |   |   |   |   |
-| TAKT-L02-04 | L02 | 4 | À faire |   |   |   |   |
-| TAKT-L02-05 | L02 | 4 | À faire |   |   |   |   |
-| TAKT-L02-06 | L02 | 4 | À faire |   |   |   |   |
-| TAKT-L03-01 | L03 | 5 | À faire |   |   |   |   |
-| TAKT-L03-02 | L03 | 5 | À faire |   |   |   |   |
-| TAKT-L03-03 | L03 | 5 | À faire |   |   |   |   |
-| TAKT-L03-04 | L03 | 5 | À faire |   |   |   |   |
-| TAKT-L03-05 | L03 | 5 | À faire |   |   |   |   |
-| TAKT-L03-06 | L03 | 5 | À faire |   |   |   |   |
-| TAKT-L03-07 | L03 | 4 | À faire |   |   |   |   |
-| TAKT-L04-01 | L04 | 5 | À faire |   |   |   |   |
-| TAKT-L04-02 | L04 | 6 | À faire |   |   |   |   |
-| TAKT-L04-03 | L04 | 5 | À faire |   |   |   |   |
-| TAKT-L04-04 | L04 | 6 | À faire |   |   |   |   |
-| TAKT-L04-05 | L04 | 5 | À faire |   |   |   |   |
-| TAKT-L04-06 | L04 | 8 | À faire |   |   |   |   |
-| TAKT-L04-07 | L04 | 5 | À faire |   |   |   |   |
-| TAKT-L04-08 | L04 | 4 | À faire |   |   |   |   |
-| TAKT-L05-01 | L05 | 5 | À faire |   |   |   |   |
-| TAKT-L05-02 | L05 | 6 | À faire |   |   |   |   |
-| TAKT-L05-03 | L05 | 8 | À faire |   |   |   |   |
-| TAKT-L05-04 | L05 | 5 | À faire |   |   |   |   |
-| TAKT-L05-05 | L05 | 5 | À faire |   |   |   |   |
-| TAKT-L05-06 | L05 | 8 | À faire |   |   |   |   |
-| TAKT-L06-01 | L06 | 8 | À faire |   |   |   |   |
-| TAKT-L06-02 | L06 | 8 | À faire |   |   |   |   |
-| TAKT-L06-03 | L06 | 5 | À faire |   |   |   |   |
-| TAKT-L06-04 | L06 | 5 | À faire |   |   |   |   |
-| TAKT-L06-05 | L06 | 8 | À faire |   |   |   |   |
-| TAKT-L06-06 | L06 | 6 | À faire |   |   |   |   |
-| TAKT-L06-07 | L06 | 6 | À faire |   |   |   |   |
-| TAKT-L06-08 | L06 | 6 | À faire |   |   |   |   |
-| TAKT-L06-09 | L06 | 5 | À faire |   |   |   |   |
-| TAKT-L06-10 | L06 | 6 | À faire |   |   |   |   |
-| TAKT-L07-01 | L07 | 8 | À faire |   |   |   |   |
-| TAKT-L07-02 | L07 | 6 | À faire |   |   |   |   |
-| TAKT-L07-03 | L07 | 8 | À faire |   |   |   |   |
-| TAKT-L07-04 | L07 | 8 | À faire |   |   |   |   |
-| TAKT-L07-05 | L07 | 5 | À faire |   |   |   |   |
-| TAKT-L07-06 | L07 | 5 | À faire |   |   |   |   |
-| TAKT-L07-07 | L07 | 7 | À faire |   |   |   |   |
-| TAKT-L08-01 | L08 | 8 | À faire |   |   |   |   |
-| TAKT-L08-02 | L08 | 5 | À faire |   |   |   |   |
-| TAKT-L08-03 | L08 | 5 | À faire |   |   |   |   |
-| TAKT-L08-04 | L08 | 6 | À faire |   |   |   |   |
-| TAKT-L08-05 | L08 | 8 | À faire |   |   |   |   |
-| TAKT-L08-06 | L08 | 3 | À faire |   |   |   |   |
-| TAKT-L08-07 | L08 | 3 | À faire |   |   |   |   |
-| TAKT-L09-01 | L09 | 5 | À faire |   |   |   |   |
-| TAKT-L09-02 | L09 | 8 | À faire |   |   |   |   |
-| TAKT-L09-03 | L09 | 5 | À faire |   |   |   |   |
-| TAKT-L09-04 | L09 | 13 | À faire |   |   |   |   |
-| TAKT-L09-05 | L09 | 8 | À faire |   |   |   |   |
-| TAKT-L09-06 | L09 | 10 | À faire |   |   |   |   |
-| TAKT-L09-07 | L09 | 8 | À faire |   |   |   |   |
-| TAKT-L09-08 | L09 | 8 | À faire |   |   |   |   |
-| TAKT-L09-09 | L09 | 13 | À faire |   |   |   |   |
-| TAKT-L09-10 | L09 | 6 | À faire |   |   |   |   |
-| TAKT-L09-11 | L09 | 8 | À faire |   |   |   |   |
-| TAKT-L09-12 | L09 | 10 | À faire |   |   |   |   |
-| TAKT-L09-13 | L09 | 10 | À faire |   |   |   |   |
-| TAKT-L10-01 | L10 | 6 | À faire |   |   |   |   |
-| TAKT-L10-02 | L10 | 6 | À faire |   |   |   |   |
-| TAKT-L10-03 | L10 | 8 | À faire |   |   |   |   |
-| TAKT-L10-04 | L10 | 6 | À faire |   |   |   |   |
-| TAKT-L10-05 | L10 | 8 | À faire |   |   |   |   |
-| TAKT-L10-06 | L10 | 5 | À faire |   |   |   |   |
-| TAKT-L10-07 | L10 | 5 | À faire |   |   |   |   |
-| TAKT-L11-01 | L11 | 6 | À faire |   |   |   |   |
-| TAKT-L11-02 | L11 | 8 | À faire |   |   |   |   |
-| TAKT-L11-03 | L11 | 6 | À faire |   |   |   |   |
-| TAKT-L11-04 | L11 | 10 | À faire |   |   |   |   |
-| TAKT-L11-05 | L11 | 8 | À faire |   |   |   |   |
-| TAKT-L11-06 | L11 | 6 | À faire |   |   |   |   |
-| TAKT-L11-07 | L11 | 5 | À faire |   |   |   |   |
+| Ticket      | Lot | SP  | État    | Date début réel | Date fin réel | SP gagnés | Commentaire |
+| ----------- | --- | --- | ------- | --------------- | ------------- | --------- | ----------- |
+| TAKT-L00-01 | L00 | 3   | À faire |                 |               |           |             |
+| TAKT-L00-02 | L00 | 2   | À faire |                 |               |           |             |
+| TAKT-L00-03 | L00 | 3   | À faire |                 |               |           |             |
+| TAKT-L00-04 | L00 | 3   | À faire |                 |               |           |             |
+| TAKT-L00-05 | L00 | 2   | À faire |                 |               |           |             |
+| TAKT-L01-01 | L01 | 2   | À faire |                 |               |           |             |
+| TAKT-L01-02 | L01 | 5   | À faire |                 |               |           |             |
+| TAKT-L01-03 | L01 | 3   | À faire |                 |               |           |             |
+| TAKT-L01-04 | L01 | 5   | À faire |                 |               |           |             |
+| TAKT-L01-05 | L01 | 3   | À faire |                 |               |           |             |
+| TAKT-L01-06 | L01 | 3   | À faire |                 |               |           |             |
+| TAKT-L01-07 | L01 | 3   | À faire |                 |               |           |             |
+| TAKT-L02-01 | L02 | 5   | À faire |                 |               |           |             |
+| TAKT-L02-02 | L02 | 5   | À faire |                 |               |           |             |
+| TAKT-L02-03 | L02 | 5   | À faire |                 |               |           |             |
+| TAKT-L02-04 | L02 | 4   | À faire |                 |               |           |             |
+| TAKT-L02-05 | L02 | 4   | À faire |                 |               |           |             |
+| TAKT-L02-06 | L02 | 4   | À faire |                 |               |           |             |
+| TAKT-L03-01 | L03 | 5   | À faire |                 |               |           |             |
+| TAKT-L03-02 | L03 | 5   | À faire |                 |               |           |             |
+| TAKT-L03-03 | L03 | 5   | À faire |                 |               |           |             |
+| TAKT-L03-04 | L03 | 5   | À faire |                 |               |           |             |
+| TAKT-L03-05 | L03 | 5   | À faire |                 |               |           |             |
+| TAKT-L03-06 | L03 | 5   | À faire |                 |               |           |             |
+| TAKT-L03-07 | L03 | 4   | À faire |                 |               |           |             |
+| TAKT-L04-01 | L04 | 5   | À faire |                 |               |           |             |
+| TAKT-L04-02 | L04 | 6   | À faire |                 |               |           |             |
+| TAKT-L04-03 | L04 | 5   | À faire |                 |               |           |             |
+| TAKT-L04-04 | L04 | 6   | À faire |                 |               |           |             |
+| TAKT-L04-05 | L04 | 5   | À faire |                 |               |           |             |
+| TAKT-L04-06 | L04 | 8   | À faire |                 |               |           |             |
+| TAKT-L04-07 | L04 | 5   | À faire |                 |               |           |             |
+| TAKT-L04-08 | L04 | 4   | À faire |                 |               |           |             |
+| TAKT-L05-01 | L05 | 5   | À faire |                 |               |           |             |
+| TAKT-L05-02 | L05 | 6   | À faire |                 |               |           |             |
+| TAKT-L05-03 | L05 | 8   | À faire |                 |               |           |             |
+| TAKT-L05-04 | L05 | 5   | À faire |                 |               |           |             |
+| TAKT-L05-05 | L05 | 5   | À faire |                 |               |           |             |
+| TAKT-L05-06 | L05 | 8   | À faire |                 |               |           |             |
+| TAKT-L06-01 | L06 | 8   | À faire |                 |               |           |             |
+| TAKT-L06-02 | L06 | 8   | À faire |                 |               |           |             |
+| TAKT-L06-03 | L06 | 5   | À faire |                 |               |           |             |
+| TAKT-L06-04 | L06 | 5   | À faire |                 |               |           |             |
+| TAKT-L06-05 | L06 | 8   | À faire |                 |               |           |             |
+| TAKT-L06-06 | L06 | 6   | À faire |                 |               |           |             |
+| TAKT-L06-07 | L06 | 6   | À faire |                 |               |           |             |
+| TAKT-L06-08 | L06 | 6   | À faire |                 |               |           |             |
+| TAKT-L06-09 | L06 | 5   | À faire |                 |               |           |             |
+| TAKT-L06-10 | L06 | 6   | À faire |                 |               |           |             |
+| TAKT-L07-01 | L07 | 8   | À faire |                 |               |           |             |
+| TAKT-L07-02 | L07 | 6   | À faire |                 |               |           |             |
+| TAKT-L07-03 | L07 | 8   | À faire |                 |               |           |             |
+| TAKT-L07-04 | L07 | 8   | À faire |                 |               |           |             |
+| TAKT-L07-05 | L07 | 5   | À faire |                 |               |           |             |
+| TAKT-L07-06 | L07 | 5   | À faire |                 |               |           |             |
+| TAKT-L07-07 | L07 | 7   | À faire |                 |               |           |             |
+| TAKT-L08-01 | L08 | 8   | À faire |                 |               |           |             |
+| TAKT-L08-02 | L08 | 5   | À faire |                 |               |           |             |
+| TAKT-L08-03 | L08 | 5   | À faire |                 |               |           |             |
+| TAKT-L08-04 | L08 | 6   | À faire |                 |               |           |             |
+| TAKT-L08-05 | L08 | 8   | À faire |                 |               |           |             |
+| TAKT-L08-06 | L08 | 3   | À faire |                 |               |           |             |
+| TAKT-L08-07 | L08 | 3   | À faire |                 |               |           |             |
+| TAKT-L09-01 | L09 | 5   | À faire |                 |               |           |             |
+| TAKT-L09-02 | L09 | 8   | À faire |                 |               |           |             |
+| TAKT-L09-03 | L09 | 5   | À faire |                 |               |           |             |
+| TAKT-L09-04 | L09 | 13  | À faire |                 |               |           |             |
+| TAKT-L09-05 | L09 | 8   | À faire |                 |               |           |             |
+| TAKT-L09-06 | L09 | 10  | À faire |                 |               |           |             |
+| TAKT-L09-07 | L09 | 8   | À faire |                 |               |           |             |
+| TAKT-L09-08 | L09 | 8   | À faire |                 |               |           |             |
+| TAKT-L09-09 | L09 | 13  | À faire |                 |               |           |             |
+| TAKT-L09-10 | L09 | 6   | À faire |                 |               |           |             |
+| TAKT-L09-11 | L09 | 8   | À faire |                 |               |           |             |
+| TAKT-L09-12 | L09 | 10  | À faire |                 |               |           |             |
+| TAKT-L09-13 | L09 | 10  | À faire |                 |               |           |             |
+| TAKT-L10-01 | L10 | 6   | À faire |                 |               |           |             |
+| TAKT-L10-02 | L10 | 6   | À faire |                 |               |           |             |
+| TAKT-L10-03 | L10 | 8   | À faire |                 |               |           |             |
+| TAKT-L10-04 | L10 | 6   | À faire |                 |               |           |             |
+| TAKT-L10-05 | L10 | 8   | À faire |                 |               |           |             |
+| TAKT-L10-06 | L10 | 5   | À faire |                 |               |           |             |
+| TAKT-L10-07 | L10 | 5   | À faire |                 |               |           |             |
+| TAKT-L11-01 | L11 | 6   | À faire |                 |               |           |             |
+| TAKT-L11-02 | L11 | 8   | À faire |                 |               |           |             |
+| TAKT-L11-03 | L11 | 6   | À faire |                 |               |           |             |
+| TAKT-L11-04 | L11 | 10  | À faire |                 |               |           |             |
+| TAKT-L11-05 | L11 | 8   | À faire |                 |               |           |             |
+| TAKT-L11-06 | L11 | 6   | À faire |                 |               |           |             |
+| TAKT-L11-07 | L11 | 5   | À faire |                 |               |           |             |
 
-> **Mise à jour** : à chaque ticket passé en « Terminé », renseigner *Date fin réel* et *SP gagnés* (= SP du ticket). L'état prend les valeurs : `À faire`, `En cours`, `Bloqué`, `Terminé`.
+> **Mise à jour** : à chaque ticket passé en « Terminé », renseigner _Date fin réel_ et _SP gagnés_ (= SP du ticket). L'état prend les valeurs : `À faire`, `En cours`, `Bloqué`, `Terminé`.
 
 ## §7. Burn‑up et projection de date de fin (graphique descriptif)
 
 Le burn‑up se trace avec :
+
 - **Axe X** : semaines (S1, S2, …).
 - **Axe Y** : SP cumulés (0 → 504).
 - **Courbe réalisée** : points `(S, SP_cumulés)` du tableau §5.
@@ -255,23 +256,25 @@ Le burn‑up se trace avec :
 - **Courbe idéale P80** : droite reliant `(S0, 0)` à `(S_fin_P80, 504)`.
 
 **Interprétation** :
+
 - Si la courbe réalisée reste **au‑dessus** de la droite P50 → le projet est en avance.
 - Si elle passe **sous** la droite P80 → alerte : ré‑évaluer la vélocité, réduire WIP, ajouter de la capacité.
 - La **date retenue** affichée dans le tableau §5 est le maximum des trois projections (P50_SP, P50_Débit, P80_SP).
 
 ## §8. Règles de mise à jour et rituel hebdomadaire
 
-| Rituel | Fréquence | Participants | Entrées | Sorties |
-|--------|-----------|--------------|---------|---------|
-| **Mise à jour suivi** | Chaque lundi (30 min) | Chef de projet + Tech Lead | Tableau §5 (SP terminés, tickets terminés), tableau §6 (états) | Tableau §5 complété, projections recalculées, écarts documentés |
-| **Revue de vélocité** | Tous les 4 semaines | Équipe complète | `V_moy`, `D_moy`, burn‑up | Décision d'ajustement (WIP, capacité, découpage tickets) |
-| **Alerte dépassement P80** | Immédiat | Chef de projet + Direction | Courbe burn‑up sous P80 | Plan d'action écrit (répartition, priorisation, renfort) |
+| Rituel                     | Fréquence             | Participants               | Entrées                                                        | Sorties                                                         |
+| -------------------------- | --------------------- | -------------------------- | -------------------------------------------------------------- | --------------------------------------------------------------- |
+| **Mise à jour suivi**      | Chaque lundi (30 min) | Chef de projet + Tech Lead | Tableau §5 (SP terminés, tickets terminés), tableau §6 (états) | Tableau §5 complété, projections recalculées, écarts documentés |
+| **Revue de vélocité**      | Tous les 4 semaines   | Équipe complète            | `V_moy`, `D_moy`, burn‑up                                      | Décision d'ajustement (WIP, capacité, découpage tickets)        |
+| **Alerte dépassement P80** | Immédiat              | Chef de projet + Direction | Courbe burn‑up sous P80                                        | Plan d'action écrit (répartition, priorisation, renfort)        |
 
 **Seuils d'alerte automatiques** (implémentés dans un script `scripts/velocity-check.ts` exécuté en CI hebdo) :
+
 - `Couverture_forecast < 0,9` → warning.
 - `Couverture_forecast < 0,75` → alerte critique (déclenche rituel « Alerte dépassement P80 »).
 - `WIP > WIP_max` pendant 2 semaines consécutives → warning.
 
 ---
 
-*Fin du SUIVI_VELOCITE_TAKT.md — modèle complet pour pilotage en flux continu.*
+_Fin du SUIVI_VELOCITE_TAKT.md — modèle complet pour pilotage en flux continu._

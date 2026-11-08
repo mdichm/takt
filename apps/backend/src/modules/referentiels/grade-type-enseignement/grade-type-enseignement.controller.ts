@@ -15,16 +15,10 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import {
-  zGradeTypeEnseignementCreate,
-  type GradeTypeEnseignementCreate,
-} from '@takt/contracts';
+import { zGradeTypeEnseignementCreate, type GradeTypeEnseignementCreate } from '@takt/contracts';
 import { ZodValidation } from '../../common/pipes/zod-validation.decorator';
 import { GradeTypeEnseignementService } from './grade-type-enseignement.service';
-import {
-  JwtAuthGuard,
-  UtilisateurConnecte,
-} from '../../common/guards/jwt-auth.guard';
+import { JwtAuthGuard, UtilisateurConnecte } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 
@@ -98,10 +92,7 @@ export class GradeTypeEnseignementController {
   @ApiResponse({ status: 403, description: 'Interdit' })
   @ApiResponse({ status: 404, description: 'Couple introuvable' })
   @ApiResponse({ status: 409, description: 'Conflit (utilisé par un module)' })
-  async delete(
-    @Param('id') id: string,
-    @Req() req: RequeteAvecUtilisateur,
-  ): Promise<unknown> {
+  async delete(@Param('id') id: string, @Req() req: RequeteAvecUtilisateur): Promise<unknown> {
     return this.gradeTypeEnseignementService.delete(id, req.user!.sub);
   }
 }

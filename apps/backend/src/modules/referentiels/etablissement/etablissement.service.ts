@@ -7,7 +7,11 @@ import { PrismaClient } from '@takt/db';
 import { CODES_ERREUR_API, ApiError } from '../../common/http/api-error';
 import { appliquerFiltreDepartement } from '../../common/rbac/filtre-departement.util';
 import { AuditService } from '../../audit/audit.service';
-import type { EtablissementCreate, EtablissementUpdate, EtablissementListFilters } from '@takt/contracts';
+import type {
+  EtablissementCreate,
+  EtablissementUpdate,
+  EtablissementListFilters,
+} from '@takt/contracts';
 
 /**
  * Service de gestion des établissements.

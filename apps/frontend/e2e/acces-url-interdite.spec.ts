@@ -3,7 +3,9 @@
 
 import { expect, test } from '@playwright/test';
 
-test('un utilisateur non authentifié ne peut pas accéder à une URL protégée (admin)', async ({ page }) => {
+test('un utilisateur non authentifié ne peut pas accéder à une URL protégée (admin)', async ({
+  page,
+}) => {
   const reponse = await page.goto('/admin/users', { waitUntil: 'networkidle' });
   expect(reponse?.status()).toBe(200);
   // L écran admin est protégé : redirection vers /login (pas de session).

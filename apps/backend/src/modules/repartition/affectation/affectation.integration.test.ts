@@ -2,7 +2,11 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { creerContexteTestRepartition, nettoyerContexteTestRepartition, ContexteTestRepartition } from '../test-helper.integration';
+import {
+  creerContexteTestRepartition,
+  nettoyerContexteTestRepartition,
+  ContexteTestRepartition,
+} from '../test-helper.integration';
 
 // Constantes du test helper (définies là-bas, mais on les recopie ici pour les tests qui en ont besoin)
 const PARCOURS_ID = '22222222-2222-2222-2222-222222222222';
@@ -58,7 +62,7 @@ describe('Affectations pédagogiques (TAKT-L05-02)', () => {
     expect(audit).not.toBeNull();
     expect(audit!.metadonnees).toMatchObject({
       versionId: ctx.version2Id,
-        semestreId: ctx.semestreId,
+      semestreId: ctx.semestreId,
       enseignantId: ctx.enseignantId,
       matiereId: ctx.matiereId,
       groupeId: ctx.groupe1Id,
@@ -144,7 +148,11 @@ describe('Affectations pédagogiques (TAKT-L05-02)', () => {
 
     expect(reponse.body.data.avertissements).toBeDefined();
     expect(Array.isArray(reponse.body.data.avertissements)).toBe(true);
-    expect(reponse.body.data.avertissements.some((a: { code: string }) => a.code === 'DIVERGENCE_VOLUME')).toBe(true);
+    expect(
+      reponse.body.data.avertissements.some(
+        (a: { code: string }) => a.code === 'DIVERGENCE_VOLUME',
+      ),
+    ).toBe(true);
 
     const affectationId = reponse.body.data.affectation.id;
     ctx.idsACleaner.push(affectationId);
@@ -233,7 +241,9 @@ describe('Affectations pédagogiques (TAKT-L05-02)', () => {
     expect(reponse.body.data.id).toBe(idASupprimer);
 
     // Vérifier suppression en DB
-    const enBase = await ctx.prisma.affectationPedagogique.findUnique({ where: { id: idASupprimer } });
+    const enBase = await ctx.prisma.affectationPedagogique.findUnique({
+      where: { id: idASupprimer },
+    });
     expect(enBase).toBeNull();
 
     // Vérifier l'audit
@@ -243,7 +253,7 @@ describe('Affectations pédagogiques (TAKT-L05-02)', () => {
     expect(audit).not.toBeNull();
   });
 
-  it('POST /affectations/cascade : crée N affectations depuis plan d\'études', async () => {
+  it("POST /affectations/cascade : crée N affectations depuis plan d'études", async () => {
     // Créer une version dédiée pour ce test pour éviter les conflits résiduels
     const versionCascade = await ctx.prisma.version.create({
       data: { semestreId: ctx.semestreId, etat: 'initial' },
@@ -271,7 +281,7 @@ describe('Affectations pédagogiques (TAKT-L05-02)', () => {
     expect(reponse.body.data.affectations).toHaveLength(2);
     expect(reponse.body.data.affectations[0]).toMatchObject({
       versionId: versionCascade.id,
-        semestreId: ctx.semestreId,
+      semestreId: ctx.semestreId,
       enseignantId: ctx.enseignantId,
       matiereId: ctx.matiereId,
       typeEnseignementId: ctx.typeEnseignementId,
@@ -280,7 +290,9 @@ describe('Affectations pédagogiques (TAKT-L05-02)', () => {
     });
 
     // Vérifier que les 2 groupes sont couverts
-    const groupeIds = reponse.body.data.affectations.map((a: { groupeId: string }) => a.groupeId).sort();
+    const groupeIds = reponse.body.data.affectations
+      .map((a: { groupeId: string }) => a.groupeId)
+      .sort();
     expect(groupeIds).toEqual([ctx.groupe1Id, ctx.groupe2Id].sort());
 
     // Nettoyage
@@ -295,10 +307,23 @@ describe('Affectations pédagogiques (TAKT-L05-02)', () => {
       data: { code: 'L1', libelle: 'Licence 1', parcoursId: PARCOURS_ID },
     });
     const planVide = await ctx.prisma.planEtudes.create({
-      data: { parcoursId: PARCOURS_ID, niveauId: niveauVide.id, anneeUniversitaireId: ANNEE_UNIV_ID, semestreId: SEMESTRE_ID, departementId: DEPARTEMENT_ID },
+      data: {
+        parcoursId: PARCOURS_ID,
+        niveauId: niveauVide.id,
+        anneeUniversitaireId: ANNEE_UNIV_ID,
+        semestreId: SEMESTRE_ID,
+        departementId: DEPARTEMENT_ID,
+      },
     });
     const planMatVide = await ctx.prisma.planEtudesMatiere.create({
-      data: { planEtudesId: planVide.id, matiereId: MATIERE_ID, typeEnseignementId: TYPE_ENS_ID, volumeHoraire: 2, dureeCreneaux: 90, coefficient: 1 },
+      data: {
+        planEtudesId: planVide.id,
+        matiereId: MATIERE_ID,
+        typeEnseignementId: TYPE_ENS_ID,
+        volumeHoraire: 2,
+        dureeCreneaux: 90,
+        coefficient: 1,
+      },
     });
 
     const reponse = await ctx.agent

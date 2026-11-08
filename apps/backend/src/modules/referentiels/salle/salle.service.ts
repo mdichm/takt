@@ -29,12 +29,9 @@ export class SalleService {
       where: { code: donnees.code },
     });
     if (existant) {
-      throw new ApiError(
-        CODES_ERREUR_API.BAD_REQUEST,
-        400,
-        'Une salle avec ce code existe déjà',
-        { champ: 'code' },
-      );
+      throw new ApiError(CODES_ERREUR_API.BAD_REQUEST, 400, 'Une salle avec ce code existe déjà', {
+        champ: 'code',
+      });
     }
 
     // Valider le type de salle
@@ -55,12 +52,9 @@ export class SalleService {
       where: { id: donnees.siteId },
     });
     if (!site) {
-      throw new ApiError(
-        CODES_ERREUR_API.BAD_REQUEST,
-        400,
-        'Le site spécifié est introuvable',
-        { champ: 'siteId' },
-      );
+      throw new ApiError(CODES_ERREUR_API.BAD_REQUEST, 400, 'Le site spécifié est introuvable', {
+        champ: 'siteId',
+      });
     }
 
     // Valider les équipements si fournis
@@ -291,12 +285,9 @@ export class SalleService {
         where: { id: donnees.siteId },
       });
       if (!site) {
-        throw new ApiError(
-          CODES_ERREUR_API.BAD_REQUEST,
-          400,
-          'Le site spécifié est introuvable',
-          { champ: 'siteId' },
-        );
+        throw new ApiError(CODES_ERREUR_API.BAD_REQUEST, 400, 'Le site spécifié est introuvable', {
+          champ: 'siteId',
+        });
       }
     }
 

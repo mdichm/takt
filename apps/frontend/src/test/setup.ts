@@ -26,7 +26,9 @@ expect.extend({
     const pass = results.violations.length === 0 && results.incomplete.length === 0;
     const messages = [
       ...results.violations.map((v) => `• ${v.help} (${v.id}) — ${v.nodes.length} node(s)`),
-      ...results.incomplete.map((i) => `• [incomplet] ${i.help} (${i.id}) — ${i.nodes.length} node(s)`),
+      ...results.incomplete.map(
+        (i) => `• [incomplet] ${i.help} (${i.id}) — ${i.nodes.length} node(s)`,
+      ),
     ];
     return {
       pass,

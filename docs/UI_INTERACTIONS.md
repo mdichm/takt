@@ -11,6 +11,7 @@
 ---
 
 **Convention d'identification.**
+
 - Chaque interaction porte un code stable `IX-<DOMAINE>-<NN>` (ex: `IX-GES-01`, `IX-RDEP-02`).
 - Le code est cité dans les spécifications d'interaction (E0.3d) et référencé par les écrans `EC-*` et les parcours `UF-*`, jamais le numéro de section.
 
@@ -18,45 +19,45 @@
 
 ## §1. Catalogue des interactions
 
-| Code | Interaction | Écran | Acteur | État avant | État après | Parcours UF |
-|------|-------------|-------|--------|------------|------------|-------------|
-| `IX-COM-01` | Connexion | `EC-COM-01` | Tous | — | Authentifié | `UF-COM-01` |
-| `IX-COM-02` | Déconnexion | `EC-COM-02` / `EC-COM-03` | Tous | Authentifié | — | `UF-COM-01` |
-| `IX-COM-03` | Mise à jour profil | `EC-COM-03` | Tous | Authentifié | Authentifié | `UF-COM-01` |
-| `IX-ADM-01` | Créer utilisateur | `EC-ADM-01` | `admin` | Tous | Tous | — |
-| `IX-ADM-02` | Modifier utilisateur | `EC-ADM-01` | `admin` | Tous | Tous | — |
-| `IX-ADM-03` | Activer/désactiver utilisateur | `EC-ADM-01` | `admin` | Tous | Tous | — |
-| `IX-ADM-04` | Ajouter élément référentiel | `EC-ADM-02` | `admin` | Tous | Tous | — |
-| `IX-ADM-05` | Modifier élément référentiel | `EC-ADM-02` | `admin` | Tous | Tous | — |
-| `IX-ADM-06` | Modifier paramètres système | `EC-ADM-03` | `admin` | Tous | Tous | — |
-| `IX-ADM-07` | Filtrer journal d'audit | `EC-ADM-04` | `admin` | Tous | Tous | `UF-ADM-01` |
-| `IX-ADM-08` | Exporter logs d'audit | `EC-ADM-04` | `admin` | Tous | Tous | `UF-ADM-01` |
-| `IX-GES-01` | Initialiser année/semestre | `EC-GES-01` | `gest` | — | `initial` | `UF-GES-01` |
-| `IX-GES-02` | Importer données année précédente | `EC-GES-01` | `gest` | `initial` | `initial` | `UF-GES-01` |
-| `IX-GES-03` | Ajouter matière plan d'études | `EC-GES-02` | `gest` | `brouillon` | `brouillon` | `UF-GES-02` |
-| `IX-GES-04` | Ajouter contrainte | `EC-GES-03` | `gest` | `brouillon` | `brouillon` | `UF-GES-02` |
-| `IX-GES-05` | Lancer génération CP-SAT | `EC-GES-04` | `gest` | `brouillon` | `generation` | `UF-GES-03` |
-| `IX-GES-06` | Sélectionner scénario | `EC-GES-05` | `gest` | `generation` | `edition` | `UF-GES-04` |
-| `IX-GES-07` | Déplacer séance (drag&drop) | `EC-GES-06` | `gest` | `edition` | `edition` | `UF-GES-04`, `UF-GES-05` |
-| `IX-GES-08` | Poser verrou de séance | `EC-GES-06` / `EC-GES-12` | `gest` | `edition` | `edition` | `UF-GES-05` |
-| `IX-GES-09` | Lever verrou de séance | `EC-GES-06` / `EC-GES-12` | `gest` | `edition` | `edition` | `UF-GES-05` |
-| `IX-GES-10` | Appliquer alternative conflit | `EC-GES-07` | `gest` | `edition` | `edition` | `UF-GES-05` |
-| `IX-GES-11` | Soumettre validation Département | `EC-GES-08` | `gest` | `edition` | `valid_pedag` | `UF-GES-06` |
-| `IX-GES-12` | Publier version | `EC-GES-09` | `gest` | `valide` | `publie` | `UF-GES-07` |
-| `IX-GES-13` | Archiver version | `EC-GES-10` | `gest`, `admin` | `publie` / `valide` | `archive` | `UF-ADM-01` |
-| `IX-GES-14` | Nouvelle version depuis archive | `EC-GES-10` | `gest` | `archive` | `initial` | `UF-GES-08` |
-| `IX-GES-15` | Générer export | `EC-GES-11` | `gest` | `publie` | `publie` | `UF-GES-07` |
-| `IX-GES-16` | Renouveler bail d'édition | `EC-GES-06` | `gest` | `edition` | `edition` | `UF-GES-05` |
-| `IX-RDEP-01` | Saisir affectation pédagogique | `EC-RDEP-01` | `rdep` | `initial` | `rep_pedag` | `UF-RDEP-01` |
-| `IX-RDEP-02` | Valider répartition périmètre | `EC-RDEP-01` | `rdep` | `rep_pedag` | `brouillon` | `UF-RDEP-01` |
-| `IX-RDEP-03` | Rejeter version (motif) | `EC-RDEP-03` | `rdep` | `valid_pedag` | `edition` | `UF-RDEP-02` |
-| `IX-RDEP-04` | Revalidation ciblée | `EC-RDEP-04` | `rdep` | `valid_dir` | `valid_dir` | `UF-DIR-01` |
-| `IX-RDEP-05` | Filtrer consultation transversale | `EC-RDEP-05` | `rdep` | Tous | Tous | — |
-| `IX-DIR-01` | Valider définitivement | `EC-DIR-01` / `EC-DIR-02` | `dir` | `valid_dir` | `valide` | `UF-DIR-01` |
-| `IX-DIR-02` | Rejeter avec motif pédagogique | `EC-DIR-03` | `dir` | `valid_dir` | `rep_pedag` | `UF-DIR-01` |
-| `IX-DIR-03` | Rejeter avec motif planning | `EC-DIR-03` | `dir` | `valid_dir` | `edition` | `UF-DIR-01` |
-| `IX-DIR-04` | Archiver sans publication | `EC-DIR-04` | `dir` | `valide` | `archive` | `UF-ADM-01` |
-| `IX-DIR-05` | Générer export officiel | `EC-DIR-05` | `dir` | `publie` | `publie` | — |
+| Code         | Interaction                       | Écran                     | Acteur          | État avant          | État après    | Parcours UF              |
+| ------------ | --------------------------------- | ------------------------- | --------------- | ------------------- | ------------- | ------------------------ |
+| `IX-COM-01`  | Connexion                         | `EC-COM-01`               | Tous            | —                   | Authentifié   | `UF-COM-01`              |
+| `IX-COM-02`  | Déconnexion                       | `EC-COM-02` / `EC-COM-03` | Tous            | Authentifié         | —             | `UF-COM-01`              |
+| `IX-COM-03`  | Mise à jour profil                | `EC-COM-03`               | Tous            | Authentifié         | Authentifié   | `UF-COM-01`              |
+| `IX-ADM-01`  | Créer utilisateur                 | `EC-ADM-01`               | `admin`         | Tous                | Tous          | —                        |
+| `IX-ADM-02`  | Modifier utilisateur              | `EC-ADM-01`               | `admin`         | Tous                | Tous          | —                        |
+| `IX-ADM-03`  | Activer/désactiver utilisateur    | `EC-ADM-01`               | `admin`         | Tous                | Tous          | —                        |
+| `IX-ADM-04`  | Ajouter élément référentiel       | `EC-ADM-02`               | `admin`         | Tous                | Tous          | —                        |
+| `IX-ADM-05`  | Modifier élément référentiel      | `EC-ADM-02`               | `admin`         | Tous                | Tous          | —                        |
+| `IX-ADM-06`  | Modifier paramètres système       | `EC-ADM-03`               | `admin`         | Tous                | Tous          | —                        |
+| `IX-ADM-07`  | Filtrer journal d'audit           | `EC-ADM-04`               | `admin`         | Tous                | Tous          | `UF-ADM-01`              |
+| `IX-ADM-08`  | Exporter logs d'audit             | `EC-ADM-04`               | `admin`         | Tous                | Tous          | `UF-ADM-01`              |
+| `IX-GES-01`  | Initialiser année/semestre        | `EC-GES-01`               | `gest`          | —                   | `initial`     | `UF-GES-01`              |
+| `IX-GES-02`  | Importer données année précédente | `EC-GES-01`               | `gest`          | `initial`           | `initial`     | `UF-GES-01`              |
+| `IX-GES-03`  | Ajouter matière plan d'études     | `EC-GES-02`               | `gest`          | `brouillon`         | `brouillon`   | `UF-GES-02`              |
+| `IX-GES-04`  | Ajouter contrainte                | `EC-GES-03`               | `gest`          | `brouillon`         | `brouillon`   | `UF-GES-02`              |
+| `IX-GES-05`  | Lancer génération CP-SAT          | `EC-GES-04`               | `gest`          | `brouillon`         | `generation`  | `UF-GES-03`              |
+| `IX-GES-06`  | Sélectionner scénario             | `EC-GES-05`               | `gest`          | `generation`        | `edition`     | `UF-GES-04`              |
+| `IX-GES-07`  | Déplacer séance (drag&drop)       | `EC-GES-06`               | `gest`          | `edition`           | `edition`     | `UF-GES-04`, `UF-GES-05` |
+| `IX-GES-08`  | Poser verrou de séance            | `EC-GES-06` / `EC-GES-12` | `gest`          | `edition`           | `edition`     | `UF-GES-05`              |
+| `IX-GES-09`  | Lever verrou de séance            | `EC-GES-06` / `EC-GES-12` | `gest`          | `edition`           | `edition`     | `UF-GES-05`              |
+| `IX-GES-10`  | Appliquer alternative conflit     | `EC-GES-07`               | `gest`          | `edition`           | `edition`     | `UF-GES-05`              |
+| `IX-GES-11`  | Soumettre validation Département  | `EC-GES-08`               | `gest`          | `edition`           | `valid_pedag` | `UF-GES-06`              |
+| `IX-GES-12`  | Publier version                   | `EC-GES-09`               | `gest`          | `valide`            | `publie`      | `UF-GES-07`              |
+| `IX-GES-13`  | Archiver version                  | `EC-GES-10`               | `gest`, `admin` | `publie` / `valide` | `archive`     | `UF-ADM-01`              |
+| `IX-GES-14`  | Nouvelle version depuis archive   | `EC-GES-10`               | `gest`          | `archive`           | `initial`     | `UF-GES-08`              |
+| `IX-GES-15`  | Générer export                    | `EC-GES-11`               | `gest`          | `publie`            | `publie`      | `UF-GES-07`              |
+| `IX-GES-16`  | Renouveler bail d'édition         | `EC-GES-06`               | `gest`          | `edition`           | `edition`     | `UF-GES-05`              |
+| `IX-RDEP-01` | Saisir affectation pédagogique    | `EC-RDEP-01`              | `rdep`          | `initial`           | `rep_pedag`   | `UF-RDEP-01`             |
+| `IX-RDEP-02` | Valider répartition périmètre     | `EC-RDEP-01`              | `rdep`          | `rep_pedag`         | `brouillon`   | `UF-RDEP-01`             |
+| `IX-RDEP-03` | Rejeter version (motif)           | `EC-RDEP-03`              | `rdep`          | `valid_pedag`       | `edition`     | `UF-RDEP-02`             |
+| `IX-RDEP-04` | Revalidation ciblée               | `EC-RDEP-04`              | `rdep`          | `valid_dir`         | `valid_dir`   | `UF-DIR-01`              |
+| `IX-RDEP-05` | Filtrer consultation transversale | `EC-RDEP-05`              | `rdep`          | Tous                | Tous          | —                        |
+| `IX-DIR-01`  | Valider définitivement            | `EC-DIR-01` / `EC-DIR-02` | `dir`           | `valid_dir`         | `valide`      | `UF-DIR-01`              |
+| `IX-DIR-02`  | Rejeter avec motif pédagogique    | `EC-DIR-03`               | `dir`           | `valid_dir`         | `rep_pedag`   | `UF-DIR-01`              |
+| `IX-DIR-03`  | Rejeter avec motif planning       | `EC-DIR-03`               | `dir`           | `valid_dir`         | `edition`     | `UF-DIR-01`              |
+| `IX-DIR-04`  | Archiver sans publication         | `EC-DIR-04`               | `dir`           | `valide`            | `archive`     | `UF-ADM-01`              |
+| `IX-DIR-05`  | Générer export officiel           | `EC-DIR-05`               | `dir`           | `publie`            | `publie`      | —                        |
 
 **Total :** 37 interactions spécifiées.
 
@@ -389,7 +390,7 @@
 **Réaction système :** Confirmation de l'immutabilité, passage de la version à `publie`, notification aux utilisateurs concernés, activation des exports  
 **État de workflow :** `valide` → `publie`  
 **Conditions de garde :** État `valide`, version validée par la Direction  
-**Notifications :** `valide` → `publie` : Tous les utilisateurs concernés (In-app + Email + .ics : "Version publiée, exports disponibles")  
+**Notifications :** `valide` → `publie` : Tous les utilisateurs concernés (In-app + Email + .ics : "Version publiée, exports disponibles")
 
 ---
 
@@ -446,7 +447,7 @@
 **Réaction système :** Extension du bail d'édition de 30 minutes, réinitialisation du compte à rebours  
 **État de workflow :** `edition` → `edition` (inchangé)  
 **Conditions de garde :** État `edition`, bail d'édition détenu par l'utilisateur actuel  
-**Notifications :** Aucune  
+**Notifications :** Aucune
 
 ---
 
@@ -599,29 +600,29 @@
 
 ## §3. Gestion des erreurs et cas limites
 
-| Cas limite | Comportement UI | Écran concerné | Règle applicable |
-|------------|-----------------|----------------|------------------|
-| Conflit dur sur drag&drop | Déplacement refusé, message d'erreur | `EC-GES-06` | `RB-UI-05` |
-| Couverture < 100 % | Bouton "Soumettre" désactivé | `EC-GES-08` | `RB-UI-06` |
-| Verrou incompatible | Bouton "Lancer génération" désactivé | `EC-GES-04` | `RB-UI-07` |
-| Bail d'édition expiré | Passage en lecture seule, invitation à renouveler | `EC-GES-06`, `EC-GES-07`, `EC-GES-12` | `RB-UI-03` |
-| Rejet Direction pédagogique | Retour à `rep_pedag`, notification `rdep` | `EC-DIR-03` | `RB-UI-06` |
-| Rejet Direction planning | Retour à `edition`, notification `gest` | `EC-DIR-03` | `RB-UI-06` |
-| Import avec lignes invalides | Rapport d'erreurs par ligne, lignes valides importées | `EC-GES-01` | — |
-| Échec génération CP-SAT | Conservation du job, pas d'altération de version | `EC-GES-04` | — |
-| Motif de rejet vide | Blocage de la confirmation du rejet | `EC-DIR-03`, `EC-RDEP-03` | — |
+| Cas limite                   | Comportement UI                                       | Écran concerné                        | Règle applicable |
+| ---------------------------- | ----------------------------------------------------- | ------------------------------------- | ---------------- |
+| Conflit dur sur drag&drop    | Déplacement refusé, message d'erreur                  | `EC-GES-06`                           | `RB-UI-05`       |
+| Couverture < 100 %           | Bouton "Soumettre" désactivé                          | `EC-GES-08`                           | `RB-UI-06`       |
+| Verrou incompatible          | Bouton "Lancer génération" désactivé                  | `EC-GES-04`                           | `RB-UI-07`       |
+| Bail d'édition expiré        | Passage en lecture seule, invitation à renouveler     | `EC-GES-06`, `EC-GES-07`, `EC-GES-12` | `RB-UI-03`       |
+| Rejet Direction pédagogique  | Retour à `rep_pedag`, notification `rdep`             | `EC-DIR-03`                           | `RB-UI-06`       |
+| Rejet Direction planning     | Retour à `edition`, notification `gest`               | `EC-DIR-03`                           | `RB-UI-06`       |
+| Import avec lignes invalides | Rapport d'erreurs par ligne, lignes valides importées | `EC-GES-01`                           | —                |
+| Échec génération CP-SAT      | Conservation du job, pas d'altération de version      | `EC-GES-04`                           | —                |
+| Motif de rejet vide          | Blocage de la confirmation du rejet                   | `EC-DIR-03`, `EC-RDEP-03`             | —                |
 
 ---
 
 ## §4. Decision Log Interactions
 
-| # | Décision | Conséquence |
-|---|----------|-------------|
-| DL-IX-01 | Drag&drop avec `@dnd-kit` | Dépendance frontend, gestion des états de drop (valid/invalid) |
+| #        | Décision                            | Conséquence                                                                            |
+| -------- | ----------------------------------- | -------------------------------------------------------------------------------------- |
+| DL-IX-01 | Drag&drop avec `@dnd-kit`           | Dépendance frontend, gestion des états de drop (valid/invalid)                         |
 | DL-IX-02 | Contrôle optimiste en seconde ligne | Vérification de version avant écriture, message de conflit si modification concurrente |
-| DL-IX-03 | Bail d'édition 30 min | Compte à rebours affiché, bouton renouveler, forçage par `admin` |
-| DL-IX-04 | Pas d'écran enseignant | Pas d'interaction enseignant ; diffusion .ics/PDF par email |
+| DL-IX-03 | Bail d'édition 30 min               | Compte à rebours affiché, bouton renouveler, forçage par `admin`                       |
+| DL-IX-04 | Pas d'écran enseignant              | Pas d'interaction enseignant ; diffusion .ics/PDF par email                            |
 
 ---
 
-*Fin du UI_INTERACTIONS.md — TAKT v0.1 (E0.3d — validé)*
+_Fin du UI_INTERACTIONS.md — TAKT v0.1 (E0.3d — validé)_

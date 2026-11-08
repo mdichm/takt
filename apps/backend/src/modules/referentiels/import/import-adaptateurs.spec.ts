@@ -41,10 +41,14 @@ function creerFauxTx(): FauxTx {
   return {
     site: { create: async (_args: unknown) => creer('site', (_args as CreateArgs).data) },
     typeSalle: { create: async (_args: unknown) => creer('typeSalle', (_args as CreateArgs).data) },
-    equipement: { create: async (_args: unknown) => creer('equipement', (_args as CreateArgs).data) },
+    equipement: {
+      create: async (_args: unknown) => creer('equipement', (_args as CreateArgs).data),
+    },
     salle: { create: async (_args: unknown) => creer('salle', (_args as CreateArgs).data) },
     groupe: { create: async (_args: unknown) => creer('groupe', (_args as CreateArgs).data) },
-    enseignant: { create: async (_args: unknown) => creer('enseignant', (_args as CreateArgs).data) },
+    enseignant: {
+      create: async (_args: unknown) => creer('enseignant', (_args as CreateArgs).data),
+    },
     findMany: async () => [],
   } as FauxTx;
 }
@@ -76,18 +80,14 @@ const LIGNE = (ligne = 2, donnees: Record<string, string> = {}) => ({
 });
 
 describe('import-adaptateurs — contrats (L04-07)', () => {
-  test.each([
-    'site',
-    'type-salle',
-    'equipement',
-    'salle',
-    'groupe',
-    'enseignant',
-  ] as const)('adaptateur disponible pour %s', (type) => {
-    const a = adaptateurPour(type);
-    expect(a.type).toBe(type);
-    expect(a.entetesAttendus.length).toBeGreaterThan(0);
-  });
+  test.each(['site', 'type-salle', 'equipement', 'salle', 'groupe', 'enseignant'] as const)(
+    'adaptateur disponible pour %s',
+    (type) => {
+      const a = adaptateurPour(type);
+      expect(a.type).toBe(type);
+      expect(a.entetesAttendus.length).toBeGreaterThan(0);
+    },
+  );
 
   test('chargerCaches indexe par code', async () => {
     const tx = {
@@ -156,20 +156,14 @@ describe('import-adaptateurs — site / type-salle / equipement (L04-07)', () =>
   test('type-salle : crée', async () => {
     const a = adaptateurPour('type-salle');
     const ctx = creerContexte();
-    const resultat = await a.creer(
-      LIGNE(2, { code: 'AMPHI', libelle: 'Amphithéâtre' }),
-      ctx,
-    );
+    const resultat = await a.creer(LIGNE(2, { code: 'AMPHI', libelle: 'Amphithéâtre' }), ctx);
     expect('id' in resultat).toBe(true);
   });
 
   test('equipement : crée', async () => {
     const a = adaptateurPour('equipement');
     const ctx = creerContexte();
-    const resultat = await a.creer(
-      LIGNE(2, { code: 'VID', libelle: 'Vidéo-projecteur' }),
-      ctx,
-    );
+    const resultat = await a.creer(LIGNE(2, { code: 'VID', libelle: 'Vidéo-projecteur' }), ctx);
     expect('id' in resultat).toBe(true);
   });
 });
@@ -334,4 +328,3 @@ describe('import-adaptateurs — groupe / enseignant (L04-07)', () => {
     if ('erreur' in resultat) expect(resultat.erreur.champ).toBe('grade');
   });
 });
-

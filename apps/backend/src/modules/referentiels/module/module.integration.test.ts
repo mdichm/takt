@@ -50,8 +50,12 @@ describe('Module (TAKT-L04-02)', () => {
 
   afterAll(async () => {
     await nettoyerContexteTest(ctx);
-    await ctx.prisma.module.deleteMany({ where: { OR: [{ typeEnseignementId: ID_TYPE }, { gradeId: ID_GRADE }] } });
-    await ctx.prisma.gradeTypeEnseignement.deleteMany({ where: { gradeId: ID_GRADE, typeEnseignementId: ID_TYPE } });
+    await ctx.prisma.module.deleteMany({
+      where: { OR: [{ typeEnseignementId: ID_TYPE }, { gradeId: ID_GRADE }] },
+    });
+    await ctx.prisma.gradeTypeEnseignement.deleteMany({
+      where: { gradeId: ID_GRADE, typeEnseignementId: ID_TYPE },
+    });
     await ctx.prisma.grade.deleteMany({ where: { id: ID_GRADE } });
     await ctx.prisma.typeEnseignement.deleteMany({ where: { id: ID_TYPE } });
   });
@@ -69,7 +73,12 @@ describe('Module (TAKT-L04-02)', () => {
     const reponse = await ctx.agent
       .post('/api/v1/referentiels/modules')
       .set('Authorization', `Bearer ${ctx.tokenAdmin}`)
-      .send({ code: 'MOD2-TEST', libelle: 'Module test 2', typeEnseignementId: ID_TYPE, gradeId: ID_GRADE })
+      .send({
+        code: 'MOD2-TEST',
+        libelle: 'Module test 2',
+        typeEnseignementId: ID_TYPE,
+        gradeId: ID_GRADE,
+      })
       .expect(201);
     expect(reponse.body.data.id).toBeDefined();
     expect(reponse.body.data.code).toBe('MOD2-TEST');
@@ -81,7 +90,12 @@ describe('Module (TAKT-L04-02)', () => {
     const reponse = await ctx.agent
       .post('/api/v1/referentiels/modules')
       .set('Authorization', `Bearer ${ctx.tokenAdmin}`)
-      .send({ code: 'MOD-INVALIDE', libelle: 'Invalide', typeEnseignementId: idTypeInvalide, gradeId: ID_GRADE })
+      .send({
+        code: 'MOD-INVALIDE',
+        libelle: 'Invalide',
+        typeEnseignementId: idTypeInvalide,
+        gradeId: ID_GRADE,
+      })
       .expect(400);
     expect(reponse.body.error.code).toBe('VALIDATION_ERROR');
   });
@@ -120,7 +134,12 @@ describe('Module (TAKT-L04-02)', () => {
     const cree = await ctx.agent
       .post('/api/v1/referentiels/modules')
       .set('Authorization', `Bearer ${ctx.tokenAdmin}`)
-      .send({ code: 'MOD3-TEST', libelle: 'Module test 3', typeEnseignementId: ID_TYPE, gradeId: ID_GRADE })
+      .send({
+        code: 'MOD3-TEST',
+        libelle: 'Module test 3',
+        typeEnseignementId: ID_TYPE,
+        gradeId: ID_GRADE,
+      })
       .expect(201);
     const id = cree.body.data.id;
     ctx.idsACleaner.push(id);

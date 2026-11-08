@@ -47,7 +47,9 @@ describe('contrats des versions et du workflow', () => {
     };
     expect(zScenario.parse(scenario)).toEqual(scenario);
     expect(zScenario.safeParse({ ...scenario, scoreGlobal: 101 }).success).toBe(false);
-    expect(zScenario.safeParse({ ...scenario, sousScores: { couverture: 'haute' } }).success).toBe(false);
+    expect(zScenario.safeParse({ ...scenario, sousScores: { couverture: 'haute' } }).success).toBe(
+      false,
+    );
   });
 
   it('valide la sélection d’un scénario', () => {

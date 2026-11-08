@@ -6,10 +6,7 @@ import { ErreurFiltreListe, buildPrismaQuery } from './build-prisma-query';
 
 interface WhereTest {
   actif?: boolean;
-  OR?: Array<
-    | { nom: { contains: string } }
-    | { prenom: { contains: string } }
-  >;
+  OR?: Array<{ nom: { contains: string } } | { prenom: { contains: string } }>;
 }
 
 type OrderByTest = { nom: 'asc' | 'desc' };
@@ -27,9 +24,10 @@ const configuration = {
 
 describe('construction des requêtes Prisma paginées', () => {
   it('calcule skip et take à partir de la page demandée', () => {
-    expect(
-      buildPrismaQuery({ page: 2, pageSize: 50 }, configuration),
-    ).toMatchObject({ skip: 50, take: 50 });
+    expect(buildPrismaQuery({ page: 2, pageSize: 50 }, configuration)).toMatchObject({
+      skip: 50,
+      take: 50,
+    });
   });
 
   it('applique le tri ascendant par défaut', () => {
@@ -49,10 +47,7 @@ describe('construction des requêtes Prisma paginées', () => {
 
   it('refuse un champ de tri non déclaré', () => {
     expect(() =>
-      buildPrismaQuery(
-        { page: 1, pageSize: 20, sortBy: 'email' },
-        configuration,
-      ),
+      buildPrismaQuery({ page: 1, pageSize: 20, sortBy: 'email' }, configuration),
     ).toThrow(ErreurFiltreListe);
   });
 

@@ -20,7 +20,7 @@ describe('Document OpenAPI de l’application', () => {
 
   beforeAll(async () => {
     process.env = { ...process.env, ...ENV_TEST };
-    const { AppModule } = await import('../../../app.module');
+    const { AppModule } = await import('../../../app.module.js');
     const moduleRef = await Test.createTestingModule({ imports: [AppModule] }).compile();
     application = moduleRef.createNestApplication();
     application.setGlobalPrefix('api/v1', { exclude: ['health'] });

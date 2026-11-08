@@ -20,10 +20,6 @@ import { VersionStateGuard } from '../guards/version-state.guard';
     DepartmentScopeGuard,
     VersionStateGuard,
   ],
-  exports: [
-    RolesGuard,
-    DepartmentScopeGuard,
-    VersionStateGuard,
-  ],
+  exports: [RolesGuard, DepartmentScopeGuard, VersionStateGuard],
 })
 export class RbacModule {}

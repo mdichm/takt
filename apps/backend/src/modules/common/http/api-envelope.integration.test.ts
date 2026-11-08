@@ -81,7 +81,7 @@ describe("Enveloppe et catalogue d'erreurs API", () => {
 
   beforeAll(async () => {
     process.env = { ...process.env, ...ENV_TEST };
-    const { AppModule } = await import('../../../app.module');
+    const { AppModule } = await import('../../../app.module.js');
     const moduleRef = await Test.createTestingModule({
       imports: [AppModule],
       controllers: [ControleurDemonstration],

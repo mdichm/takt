@@ -33,10 +33,7 @@ describe('AuditService', () => {
   it('appelle prisma.journalAudit.create avec les bons champs', async () => {
     const prisma = creerPrismaMock();
     const moduleRef = await Test.createTestingModule({
-      providers: [
-        AuditService,
-        { provide: PRISMA, useValue: prisma },
-      ],
+      providers: [AuditService, { provide: PRISMA, useValue: prisma }],
     }).compile();
 
     const service = moduleRef.get(AuditService);
@@ -62,10 +59,7 @@ describe('AuditService', () => {
   it('utilise des valeurs par défaut quand utilisateurId, entiteId et metadonnees sont omis', async () => {
     const prisma = creerPrismaMock();
     const moduleRef = await Test.createTestingModule({
-      providers: [
-        AuditService,
-        { provide: PRISMA, useValue: prisma },
-      ],
+      providers: [AuditService, { provide: PRISMA, useValue: prisma }],
     }).compile();
 
     const service = moduleRef.get(AuditService);
@@ -108,10 +102,7 @@ describe('AuditService', () => {
     for (const action of actions) {
       const prisma = creerPrismaMock();
       const moduleRef = await Test.createTestingModule({
-        providers: [
-          AuditService,
-          { provide: PRISMA, useValue: prisma },
-        ],
+        providers: [AuditService, { provide: PRISMA, useValue: prisma }],
       }).compile();
 
       const service = moduleRef.get(AuditService);

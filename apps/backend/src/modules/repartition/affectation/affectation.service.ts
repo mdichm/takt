@@ -6,7 +6,10 @@ import { PRISMA } from '../../common/di/prisma.token';
 import { PrismaClient, Prisma } from '@takt/db';
 import { CODES_ERREUR_API, ApiError } from '../../common/http/api-error';
 import { AuditService } from '../../audit/audit.service';
-import { buildPrismaQuery, ConfigurationRequeteListe } from '../../common/pagination/build-prisma-query';
+import {
+  buildPrismaQuery,
+  ConfigurationRequeteListe,
+} from '../../common/pagination/build-prisma-query';
 import { construireDonneesPaginees } from '../../common/pagination/pagination-normalizer';
 import type {
   AffectationPedagogiqueCreate,
@@ -37,12 +40,8 @@ export class AffectationPedagogiqueService {
   ) {}
 
   /** Liste paginée des affectations, filtrée par département(s). */
-  async lister(
-    filtres: AffectationPedagogiqueListFilters,
-    departementIds: string[],
-  ) {
-    const { page, pageSize, search, sortBy, sortDirection, ...filtresMetier } =
-      filtres;
+  async lister(filtres: AffectationPedagogiqueListFilters, departementIds: string[]) {
+    const { page, pageSize, search, sortBy, sortDirection, ...filtresMetier } = filtres;
 
     // Défauts pour la pagination si non fournis par le pipe Zod
     const pageDefaut = page ?? 1;
@@ -116,7 +115,11 @@ export class AffectationPedagogiqueService {
       this.prisma.affectationPedagogique.count({ where }),
     ]);
 
-    return construireDonneesPaginees(lignes, total, { ...filtres, page: pageDefaut, pageSize: pageSizeDefaut });
+    return construireDonneesPaginees(lignes, total, {
+      ...filtres,
+      page: pageDefaut,
+      pageSize: pageSizeDefaut,
+    });
   }
 
   /** Détail d'une affectation pédagogique par son identifiant. */
@@ -146,18 +149,11 @@ export class AffectationPedagogiqueService {
     });
 
     if (!existant) {
-      throw new ApiError(
-        CODES_ERREUR_API.NOT_FOUND,
-        404,
-        'Affectation pédagogique introuvable',
-      );
+      throw new ApiError(CODES_ERREUR_API.NOT_FOUND, 404, 'Affectation pédagogique introuvable');
     }
 
     // Vérification de la portée départementale
-    if (
-      departementIds.length > 0 &&
-      !departementIds.includes(existant.departementId)
-    ) {
+    if (departementIds.length > 0 && !departementIds.includes(existant.departementId)) {
       throw new ApiError(
         CODES_ERREUR_API.FORBIDDEN,
         403,
@@ -169,11 +165,7 @@ export class AffectationPedagogiqueService {
     return { affectation: existant };
   }
   /** Crée une affectation pédagogique. */
-  async creer(
-    donnees: AffectationPedagogiqueCreate,
-    departementId: string,
-    utilisateurId: string,
-  ) {
+  async creer(donnees: AffectationPedagogiqueCreate, departementId: string, utilisateurId: string) {
     // Vérifier le groupe et son département (pour déduire departementId si admin/dir)
     const groupe = await this.prisma.groupe.findUnique({
       where: { id: donnees.groupeId },
@@ -186,12 +178,9 @@ export class AffectationPedagogiqueService {
       },
     });
     if (!groupe) {
-      throw new ApiError(
-        CODES_ERREUR_API.BAD_REQUEST,
-        400,
-        'Groupe introuvable',
-        { champ: 'groupeId' },
-      );
+      throw new ApiError(CODES_ERREUR_API.BAD_REQUEST, 400, 'Groupe introuvable', {
+        champ: 'groupeId',
+      });
     }
 
     // Si departementId non fourni (admin/dir), le déduire du groupe
@@ -213,20 +202,16 @@ export class AffectationPedagogiqueService {
       select: { id: true },
     });
     if (!enseignant) {
-      throw new ApiError(
-        CODES_ERREUR_API.BAD_REQUEST,
-        400,
-        'Enseignant introuvable',
-        { champ: 'enseignantId' },
-      );
-    }
-    const enseignantDansDepartement =
-      await this.prisma.enseignantDepartement.findFirst({
-        where: {
-          enseignantId: donnees.enseignantId,
-          departementId: departementEffectif,
-        },
+      throw new ApiError(CODES_ERREUR_API.BAD_REQUEST, 400, 'Enseignant introuvable', {
+        champ: 'enseignantId',
       });
+    }
+    const enseignantDansDepartement = await this.prisma.enseignantDepartement.findFirst({
+      where: {
+        enseignantId: donnees.enseignantId,
+        departementId: departementEffectif,
+      },
+    });
     if (!enseignantDansDepartement) {
       throw new ApiError(
         CODES_ERREUR_API.BAD_REQUEST,
@@ -242,12 +227,9 @@ export class AffectationPedagogiqueService {
       select: { id: true },
     });
     if (!matiere) {
-      throw new ApiError(
-        CODES_ERREUR_API.BAD_REQUEST,
-        400,
-        'Matière introuvable',
-        { champ: 'matiereId' },
-      );
+      throw new ApiError(CODES_ERREUR_API.BAD_REQUEST, 400, 'Matière introuvable', {
+        champ: 'matiereId',
+      });
     }
 
     // Vérifier le type d'enseignement si fourni
@@ -257,12 +239,9 @@ export class AffectationPedagogiqueService {
         select: { id: true },
       });
       if (!typeEnseignement) {
-        throw new ApiError(
-          CODES_ERREUR_API.BAD_REQUEST,
-          400,
-          "Type d'enseignement introuvable",
-          { champ: 'typeEnseignementId' },
-        );
+        throw new ApiError(CODES_ERREUR_API.BAD_REQUEST, 400, "Type d'enseignement introuvable", {
+          champ: 'typeEnseignementId',
+        });
       }
     }
 
@@ -280,7 +259,12 @@ export class AffectationPedagogiqueService {
         CODES_ERREUR_API.CONFLICT,
         409,
         'Ce triplet (enseignant, matière, groupe) est déjà affecté dans cette version',
-        { versionId: donnees.versionId, enseignantId: donnees.enseignantId, matiereId: donnees.matiereId, groupeId: donnees.groupeId },
+        {
+          versionId: donnees.versionId,
+          enseignantId: donnees.enseignantId,
+          matiereId: donnees.matiereId,
+          groupeId: donnees.groupeId,
+        },
       );
     }
 
@@ -349,11 +333,7 @@ export class AffectationPedagogiqueService {
     return { affectation: cree, avertissements };
   }
   /** Met à jour une affectation pédagogique. */
-  async mettreAJour(
-    id: string,
-    donnees: AffectationPedagogiqueUpdate,
-    utilisateurId: string,
-  ) {
+  async mettreAJour(id: string, donnees: AffectationPedagogiqueUpdate, utilisateurId: string) {
     const existant = await this.prisma.affectationPedagogique.findUnique({
       where: { id },
       include: {
@@ -370,11 +350,7 @@ export class AffectationPedagogiqueService {
     });
 
     if (!existant) {
-      throw new ApiError(
-        CODES_ERREUR_API.NOT_FOUND,
-        404,
-        'Affectation pédagogique introuvable',
-      );
+      throw new ApiError(CODES_ERREUR_API.NOT_FOUND, 404, 'Affectation pédagogique introuvable');
     }
 
     const departementId = existant.groupe!.niveau.parcours.departement.id;
@@ -387,20 +363,16 @@ export class AffectationPedagogiqueService {
         select: { id: true },
       });
       if (!enseignant) {
-        throw new ApiError(
-          CODES_ERREUR_API.BAD_REQUEST,
-          400,
-          'Enseignant introuvable',
-          { champ: 'enseignantId' },
-        );
-      }
-      const enseignantDansDepartement =
-        await this.prisma.enseignantDepartement.findFirst({
-          where: {
-            enseignantId: donnees.enseignantId,
-            departementId,
-          },
+        throw new ApiError(CODES_ERREUR_API.BAD_REQUEST, 400, 'Enseignant introuvable', {
+          champ: 'enseignantId',
         });
+      }
+      const enseignantDansDepartement = await this.prisma.enseignantDepartement.findFirst({
+        where: {
+          enseignantId: donnees.enseignantId,
+          departementId,
+        },
+      });
       if (!enseignantDansDepartement) {
         throw new ApiError(
           CODES_ERREUR_API.BAD_REQUEST,
@@ -424,12 +396,9 @@ export class AffectationPedagogiqueService {
         },
       });
       if (!nouveauGroupe) {
-        throw new ApiError(
-          CODES_ERREUR_API.BAD_REQUEST,
-          400,
-          'Groupe introuvable',
-          { champ: 'groupeId' },
-        );
+        throw new ApiError(CODES_ERREUR_API.BAD_REQUEST, 400, 'Groupe introuvable', {
+          champ: 'groupeId',
+        });
       }
       if (nouveauGroupe.niveau.parcours.departement.id !== departementId) {
         throw new ApiError(
@@ -448,12 +417,9 @@ export class AffectationPedagogiqueService {
         select: { id: true },
       });
       if (!matiere) {
-        throw new ApiError(
-          CODES_ERREUR_API.BAD_REQUEST,
-          400,
-          'Matière introuvable',
-          { champ: 'matiereId' },
-        );
+        throw new ApiError(CODES_ERREUR_API.BAD_REQUEST, 400, 'Matière introuvable', {
+          champ: 'matiereId',
+        });
       }
     }
 
@@ -464,12 +430,9 @@ export class AffectationPedagogiqueService {
           select: { id: true },
         });
         if (!typeEnseignement) {
-          throw new ApiError(
-            CODES_ERREUR_API.BAD_REQUEST,
-            400,
-            "Type d'enseignement introuvable",
-            { champ: 'typeEnseignementId' },
-          );
+          throw new ApiError(CODES_ERREUR_API.BAD_REQUEST, 400, "Type d'enseignement introuvable", {
+            champ: 'typeEnseignementId',
+          });
         }
       }
     }
@@ -491,7 +454,12 @@ export class AffectationPedagogiqueService {
         CODES_ERREUR_API.CONFLICT,
         409,
         'Ce triplet (enseignant, matière, groupe) est déjà affecté dans cette version',
-        { versionId, enseignantId: nouveauEnseignant, matiereId: nouvelleMatiere, groupeId: nouveauGroupe },
+        {
+          versionId,
+          enseignantId: nouveauEnseignant,
+          matiereId: nouvelleMatiere,
+          groupeId: nouveauGroupe,
+        },
       );
     }
 
@@ -524,7 +492,9 @@ export class AffectationPedagogiqueService {
         ...(donnees.enseignantId !== undefined && { enseignantId: donnees.enseignantId }),
         ...(donnees.matiereId !== undefined && { matiereId: donnees.matiereId }),
         ...(donnees.groupeId !== undefined && { groupeId: donnees.groupeId }),
-        ...(donnees.typeEnseignementId !== undefined && { typeEnseignementId: donnees.typeEnseignementId }),
+        ...(donnees.typeEnseignementId !== undefined && {
+          typeEnseignementId: donnees.typeEnseignementId,
+        }),
         ...(donnees.volumeHebdo !== undefined && { volumeHebdo: donnees.volumeHebdo }),
         ...(donnees.dureeCreneaux !== undefined && { dureeCreneaux: donnees.dureeCreneaux }),
       },
@@ -577,11 +547,7 @@ export class AffectationPedagogiqueService {
     });
 
     if (!existant) {
-      throw new ApiError(
-        CODES_ERREUR_API.NOT_FOUND,
-        404,
-        'Affectation pédagogique introuvable',
-      );
+      throw new ApiError(CODES_ERREUR_API.NOT_FOUND, 404, 'Affectation pédagogique introuvable');
     }
 
     await this.prisma.affectationPedagogique.delete({ where: { id } });
@@ -622,12 +588,9 @@ export class AffectationPedagogiqueService {
       select: { id: true, niveauId: true, departementId: true },
     });
     if (!planEtudes) {
-      throw new ApiError(
-        CODES_ERREUR_API.NOT_FOUND,
-        404,
-        "Plan d'études introuvable",
-        { champ: 'planEtudesId' },
-      );
+      throw new ApiError(CODES_ERREUR_API.NOT_FOUND, 404, "Plan d'études introuvable", {
+        champ: 'planEtudesId',
+      });
     }
     if (planEtudes.departementId !== departementId) {
       throw new ApiError(
@@ -640,15 +603,19 @@ export class AffectationPedagogiqueService {
 
     const planMatiere = await this.prisma.planEtudesMatiere.findUnique({
       where: { id: donnees.planEtudesMatiereId },
-      select: { id: true, matiereId: true, typeEnseignementId: true, volumeHoraire: true, dureeCreneaux: true, planEtudesId: true },
+      select: {
+        id: true,
+        matiereId: true,
+        typeEnseignementId: true,
+        volumeHoraire: true,
+        dureeCreneaux: true,
+        planEtudesId: true,
+      },
     });
     if (!planMatiere || planMatiere.planEtudesId !== donnees.planEtudesId) {
-      throw new ApiError(
-        CODES_ERREUR_API.NOT_FOUND,
-        404,
-        "Matière du plan d'études introuvable",
-        { champ: 'planEtudesMatiereId' },
-      );
+      throw new ApiError(CODES_ERREUR_API.NOT_FOUND, 404, "Matière du plan d'études introuvable", {
+        champ: 'planEtudesMatiereId',
+      });
     }
 
     const groupes = await this.prisma.groupe.findMany({
@@ -668,12 +635,9 @@ export class AffectationPedagogiqueService {
       select: { id: true, semestreId: true },
     });
     if (!version) {
-      throw new ApiError(
-        CODES_ERREUR_API.NOT_FOUND,
-        404,
-        'Version introuvable',
-        { champ: 'versionId' },
-      );
+      throw new ApiError(CODES_ERREUR_API.NOT_FOUND, 404, 'Version introuvable', {
+        champ: 'versionId',
+      });
     }
 
     const enseignant = await this.prisma.enseignant.findUnique({
@@ -681,20 +645,16 @@ export class AffectationPedagogiqueService {
       select: { id: true },
     });
     if (!enseignant) {
-      throw new ApiError(
-        CODES_ERREUR_API.BAD_REQUEST,
-        400,
-        'Enseignant introuvable',
-        { champ: 'enseignantId' },
-      );
-    }
-    const enseignantDansDepartement =
-      await this.prisma.enseignantDepartement.findFirst({
-        where: {
-          enseignantId: donnees.enseignantId,
-          departementId,
-        },
+      throw new ApiError(CODES_ERREUR_API.BAD_REQUEST, 400, 'Enseignant introuvable', {
+        champ: 'enseignantId',
       });
+    }
+    const enseignantDansDepartement = await this.prisma.enseignantDepartement.findFirst({
+      where: {
+        enseignantId: donnees.enseignantId,
+        departementId,
+      },
+    });
     if (!enseignantDansDepartement) {
       throw new ApiError(
         CODES_ERREUR_API.BAD_REQUEST,

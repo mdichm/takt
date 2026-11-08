@@ -17,7 +17,13 @@ interface EtatErreurProps extends PropsBase {
 }
 
 /** État d'erreur avec message et bouton de nouvelle tentative. */
-export function EtatErreur({ message, titre, onReessayer, libelleReessayer = 'Réessayer', className }: EtatErreurProps): JSX.Element {
+export function EtatErreur({
+  message,
+  titre,
+  onReessayer,
+  libelleReessayer = 'Réessayer',
+  className,
+}: EtatErreurProps): JSX.Element {
   return (
     <div
       role="alert"
@@ -36,14 +42,19 @@ export function EtatErreur({ message, titre, onReessayer, libelleReessayer = 'R�
     >
       <Icone nom="alerte" taille={48} aria-label="Icône d'erreur" />
       {titre && (
-        <h3 style={{ fontSize: 'var(--font-size-h3)', fontWeight: 600, marginBottom: 'var(--space-xs)', color: 'var(--color-error)' }}>
+        <h3
+          style={{
+            fontSize: 'var(--font-size-h3)',
+            fontWeight: 600,
+            marginBottom: 'var(--space-xs)',
+            color: 'var(--color-error)',
+          }}
+        >
           {titre}
         </h3>
       )}
       <p style={{ fontSize: 'var(--font-size-body)', margin: 0, maxWidth: '400px' }}>{message}</p>
-      {onReessayer && (
-        <Bouton variante="danger" libelle={libelleReessayer} onClick={onReessayer} />
-      )}
+      {onReessayer && <Bouton variante="danger" libelle={libelleReessayer} onClick={onReessayer} />}
     </div>
   );
 }

@@ -24,7 +24,9 @@ export const VERIFICATEUR_JWT = 'VERIFICATEUR_JWT';
  * Extrait le token Bearer depuis l'en-tête Authorization de la requête HTTP.
  * Retourne undefined si absent ou mal formé.
  */
-export function extraireBearerToken(req: { headers?: { authorization?: string } }): string | undefined {
+export function extraireBearerToken(req: {
+  headers?: { authorization?: string };
+}): string | undefined {
   const header = req.headers?.authorization;
   if (!header) {
     return undefined;

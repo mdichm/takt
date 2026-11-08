@@ -32,7 +32,7 @@ describe('Sidebar (filtrage par rôle, UI_ARBORESCENCE §1)', () => {
     return render(
       <MemoryRouter initialEntries={['/']}>
         <Sidebar />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
   }
 

@@ -14,13 +14,21 @@ interface TooltipProps extends PropsBase {
 }
 
 /** Bulle d'aide accessible (role="tooltip", aria-describedby sur le declencheur). */
-export function Tooltip({ contenu, children, ouvert = false, className }: TooltipProps): JSX.Element {
+export function Tooltip({
+  contenu,
+  children,
+  ouvert = false,
+  className,
+}: TooltipProps): JSX.Element {
   const [estSurvole, setEstSurvole] = useState(false);
   const affiche = ouvert || estSurvole;
   const tooltipId = `tooltip-${Math.random().toString(36).slice(2)}`;
 
   return (
-    <span style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center' }} className={className}>
+    <span
+      style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center' }}
+      className={className}
+    >
       <span
         id={tooltipId}
         role="tooltip"

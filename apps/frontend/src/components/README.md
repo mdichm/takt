@@ -32,8 +32,8 @@ pnpm exec eslint src/components/
 
 ## Structure des tests
 
-| Composant | Test unitaire | Test a11y |
-|-----------|--------------|-----------|
-| Atomes (10) | ✅ | ✅ |
-| Molécules (10) | ✅ | ✅ |
-| Organismes (6) | ✅ | ✅ (Showcase uniquement) |
+| Composant      | Test unitaire | Test a11y                |
+| -------------- | ------------- | ------------------------ |
+| Atomes (10)    | ✅            | ✅                       |
+| Molécules (10) | ✅            | ✅                       |
+| Organismes (6) | ✅            | ✅ (Showcase uniquement) |

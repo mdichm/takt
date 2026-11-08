@@ -290,7 +290,7 @@ export function construireDocumentOpenApi(app: INestApplication): OpenAPIObject 
    * est toujours un tableau afin d'éviter le crash dans ParameterMetadataAccessor.
    */
   const originalGetMetadata = Reflect.getMetadata.bind(Reflect);
-  Reflect.getMetadata = ((metadataKey: string, target: object, propertyKey?: string | symbol) => {
+  Reflect.getMetadata = (metadataKey: string, target: object, propertyKey?: string | symbol) => {
     if (propertyKey === undefined) {
       return originalGetMetadata(metadataKey, target);
     }
@@ -299,7 +299,7 @@ export function construireDocumentOpenApi(app: INestApplication): OpenAPIObject 
       return [];
     }
     return valeur;
-  });
+  };
 
   let genere: OpenAPIObject;
   try {

@@ -32,17 +32,13 @@ export default function RapportImport({
     <section className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
       <h2 className="text-lg font-semibold text-gray-900">{t('succes') as string}</h2>
       <p className="mt-1 text-sm text-gray-600">
-        {t('importes')} :
-        <span className="font-medium text-green-700">{rapport.importes}</span>{' '}
-        {t('rejets')} :
-        <span className="font-medium text-red-700">{rapport.rejets}</span>
+        {t('importes')} :<span className="font-medium text-green-700">{rapport.importes}</span>{' '}
+        {t('rejets')} :<span className="font-medium text-red-700">{rapport.rejets}</span>
       </p>
 
       {rapport.erreurs.length > 0 ? (
         <>
-          <h3 className="mt-6 mb-2 text-sm font-semibold text-gray-900">
-            {t('lignesRejetees')}
-          </h3>
+          <h3 className="mt-6 mb-2 text-sm font-semibold text-gray-900">{t('lignesRejetees')}</h3>
           <div className="overflow-x-auto rounded-md border border-gray-200">
             <table className="w-full text-sm">
               <thead>

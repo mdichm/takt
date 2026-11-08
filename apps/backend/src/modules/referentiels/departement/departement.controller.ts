@@ -28,10 +28,7 @@ import {
 } from '@takt/contracts';
 import { ZodValidation } from '../../common/pipes/zod-validation.decorator';
 import { DepartementService } from './departement.service';
-import {
-  JwtAuthGuard,
-  UtilisateurConnecte,
-} from '../../common/guards/jwt-auth.guard';
+import { JwtAuthGuard, UtilisateurConnecte } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { DepartmentScopeGuard } from '../../common/guards/department-scope.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
@@ -48,7 +45,9 @@ interface RequeteAvecUtilisateur {
 @ApiBearerAuth()
 @Controller('referentiels/departements')
 export class DepartementController {
-  constructor(@Inject(DepartementService) private readonly departementService: DepartementService) {}
+  constructor(
+    @Inject(DepartementService) private readonly departementService: DepartementService,
+  ) {}
 
   /** Liste paginée des départements (GET /api/v1/referentiels/departements). */
   @Get()

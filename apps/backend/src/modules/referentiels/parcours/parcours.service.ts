@@ -6,11 +6,7 @@ import { PRISMA } from '../../common/di/prisma.token';
 import { PrismaClient } from '@takt/db';
 import { CODES_ERREUR_API, ApiError } from '../../common/http/api-error';
 import { AuditService } from '../../audit/audit.service';
-import type {
-  ParcoursCreate,
-  ParcoursUpdate,
-  ParcoursListFilters,
-} from '@takt/contracts';
+import type { ParcoursCreate, ParcoursUpdate, ParcoursListFilters } from '@takt/contracts';
 
 /**
  * Service de gestion des parcours.

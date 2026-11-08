@@ -2,12 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import { z } from 'zod';
-import {
-  creerSchemaTri,
-  zPaginationQuery,
-  zSearchFilter,
-  zUuid,
-} from './common';
+import { creerSchemaTri, zPaginationQuery, zSearchFilter, zUuid } from './common';
 
 /** Affectation pédagogique — lecture (enregistrée en base). */
 export const zAffectationPedagogique = z.object({
@@ -20,7 +15,11 @@ export const zAffectationPedagogique = z.object({
   groupeId: zUuid,
   typeEnseignementId: zUuid.nullable(),
   volumeHebdo: z.number().int().positive('Le volume hebdomadaire doit être strictement positif'),
-  dureeCreneaux: z.number().int().positive('La durée de créneau doit être strictement positive').nullable(),
+  dureeCreneaux: z
+    .number()
+    .int()
+    .positive('La durée de créneau doit être strictement positive')
+    .nullable(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
 });

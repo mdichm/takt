@@ -3,7 +3,15 @@
 
 /** Point d'entrée des jetons de design. */
 // Source de vérité des jetons de design (Normal + Ramadan).
-export { THEMES, THEME_DEFAUT, SEUIL_CONTRASTE, type Theme, type JetonCouleur, obtenirTheme, obtenirValeur } from './tokens';
+export {
+  THEMES,
+  THEME_DEFAUT,
+  SEUIL_CONTRASTE,
+  type Theme,
+  type JetonCouleur,
+  obtenirTheme,
+  obtenirValeur,
+} from './tokens';
 
 // Utilitaires de contraste WCAG 2.x.
 export { calculerRatioContrastes, estConformeWCAG, luminanceRelative } from './contraste';
@@ -28,4 +36,3 @@ export {
   Z_INDEX,
   BREAKPOINT,
 } from './tokens';
-

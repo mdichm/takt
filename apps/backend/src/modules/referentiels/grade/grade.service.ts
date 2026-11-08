@@ -6,11 +6,7 @@ import { PRISMA } from '../../common/di/prisma.token';
 import { PrismaClient } from '@takt/db';
 import { CODES_ERREUR_API, ApiError } from '../../common/http/api-error';
 import { AuditService } from '../../audit/audit.service';
-import type {
-  GradeCreate,
-  GradeUpdate,
-  GradeListFilters,
-} from '@takt/contracts';
+import type { GradeCreate, GradeUpdate, GradeListFilters } from '@takt/contracts';
 
 /**
  * Service de gestion des grades académiques (L1, L2, L3, M1, M2).
@@ -32,12 +28,9 @@ export class GradeService {
       where: { code: donnees.code },
     });
     if (existant) {
-      throw new ApiError(
-        CODES_ERREUR_API.BAD_REQUEST,
-        400,
-        'Un grade avec ce code existe déjà',
-        { champ: 'code' },
-      );
+      throw new ApiError(CODES_ERREUR_API.BAD_REQUEST, 400, 'Un grade avec ce code existe déjà', {
+        champ: 'code',
+      });
     }
 
     const grade = await this.prisma.grade.create({
@@ -111,11 +104,7 @@ export class GradeService {
       where: { id },
     });
     if (!grade) {
-      throw new ApiError(
-        CODES_ERREUR_API.NOT_FOUND,
-        404,
-        'Grade introuvable',
-      );
+      throw new ApiError(CODES_ERREUR_API.NOT_FOUND, 404, 'Grade introuvable');
     }
     return {
       id: grade.id,
@@ -130,11 +119,7 @@ export class GradeService {
   async update(id: string, donnees: GradeUpdate, utilisateurIdModifiePar: string) {
     const existant = await this.prisma.grade.findUnique({ where: { id } });
     if (!existant) {
-      throw new ApiError(
-        CODES_ERREUR_API.NOT_FOUND,
-        404,
-        'Grade introuvable',
-      );
+      throw new ApiError(CODES_ERREUR_API.NOT_FOUND, 404, 'Grade introuvable');
     }
 
     if (donnees.code !== undefined && donnees.code !== existant.code) {
@@ -187,11 +172,7 @@ export class GradeService {
       include: { modules: { take: 1 } },
     });
     if (!existant) {
-      throw new ApiError(
-        CODES_ERREUR_API.NOT_FOUND,
-        404,
-        'Grade introuvable',
-      );
+      throw new ApiError(CODES_ERREUR_API.NOT_FOUND, 404, 'Grade introuvable');
     }
 
     if (existant.modules.length > 0) {

@@ -17,8 +17,14 @@ import { VERIFICATEUR_JWT, VerificateurJwt } from '../common/guards/jwt-verifica
 
 const DOSSIER_CLES = mkdtempSync(join(tmpdir(), 'takt-referentiels-test-jwt-'));
 const premiere = generateKeyPairSync('rsa', { modulusLength: 2048 });
-writeFileSync(join(DOSSIER_CLES, 'active.private.pem'), premiere.privateKey.export({ type: 'pkcs8', format: 'pem' }));
-writeFileSync(join(DOSSIER_CLES, 'active.public.pem'), premiere.publicKey.export({ type: 'spki', format: 'pem' }));
+writeFileSync(
+  join(DOSSIER_CLES, 'active.private.pem'),
+  premiere.privateKey.export({ type: 'pkcs8', format: 'pem' }),
+);
+writeFileSync(
+  join(DOSSIER_CLES, 'active.public.pem'),
+  premiere.publicKey.export({ type: 'spki', format: 'pem' }),
+);
 
 process.env = {
   ...process.env,
@@ -46,15 +52,32 @@ export interface ContexteTestReferentiels {
   idsACleaner: string[];
 }
 
-const emailUnique = () => `takt-test-${Date.now()}-${Math.random().toString(36).slice(2)}@takt.test`;
+const emailUnique = () =>
+  `takt-test-${Date.now()}-${Math.random().toString(36).slice(2)}@takt.test`;
 
 export async function creerContexteTestReferentiels(): Promise<ContexteTestReferentiels> {
-  const { AppModule } = await import('../../app.module');
+  const { AppModule } = await import('../../app.module.js');
   const moduleRef = await Test.createTestingModule({
     imports: [AppModule],
     providers: [
       { provide: Reflector, useValue: new Reflector() },
-      { provide: VERIFICATEUR_JWT, useValue: { verifier: () => ({ sub: ADMIN_ID_FOR_TEST, role: 'admin' as const, departementIds: [], typ: 'access', jti: 'mock-jti', iat: 0, nbf: 0, exp: 9999999999, iss: 'takt-test', aud: 'takt-api' }) } },
+      {
+        provide: VERIFICATEUR_JWT,
+        useValue: {
+          verifier: () => ({
+            sub: ADMIN_ID_FOR_TEST,
+            role: 'admin' as const,
+            departementIds: [],
+            typ: 'access',
+            jti: 'mock-jti',
+            iat: 0,
+            nbf: 0,
+            exp: 9999999999,
+            iss: 'takt-test',
+            aud: 'takt-api',
+          }),
+        },
+      },
     ],
   })
     .overrideProvider(PRISMA)
@@ -62,7 +85,18 @@ export async function creerContexteTestReferentiels(): Promise<ContexteTestRefer
     .compile();
 
   const verificateur = moduleRef.get(VERIFICATEUR_JWT) as VerificateurJwt;
-  verificateur.verifier = () => ({ sub: ADMIN_ID_FOR_TEST, role: 'admin' as const, departementIds: [], typ: 'access', jti: 'mock-jti', iat: 0, nbf: 0, exp: 9999999999, iss: 'takt-test', aud: 'takt-api' });
+  verificateur.verifier = () => ({
+    sub: ADMIN_ID_FOR_TEST,
+    role: 'admin' as const,
+    departementIds: [],
+    typ: 'access',
+    jti: 'mock-jti',
+    iat: 0,
+    nbf: 0,
+    exp: 9999999999,
+    iss: 'takt-test',
+    aud: 'takt-api',
+  });
 
   const application = moduleRef.createNestApplication();
   application.setGlobalPrefix('api/v1');
@@ -71,8 +105,16 @@ export async function creerContexteTestReferentiels(): Promise<ContexteTestRefer
   const prisma = creerPrismaClient(process.env.DATABASE_URL!);
   const agent = request.agent(application.getHttpServer());
 
-  await prisma.role.upsert({ where: { code: 'admin' }, update: {}, create: { code: 'admin', libelle: 'Administrateur' } });
-  await prisma.role.upsert({ where: { code: 'gest' }, update: {}, create: { code: 'gest', libelle: 'Gestionnaire' } });
+  await prisma.role.upsert({
+    where: { code: 'admin' },
+    update: {},
+    create: { code: 'admin', libelle: 'Administrateur' },
+  });
+  await prisma.role.upsert({
+    where: { code: 'gest' },
+    update: {},
+    create: { code: 'gest', libelle: 'Gestionnaire' },
+  });
 
   const roleAdmin = await prisma.role.findUnique({ where: { code: 'admin' } });
   const hash = await hacherArgon2(MOT_DE_PASSE, PASSWORD_ARGON2_OPTIONS);
@@ -89,7 +131,9 @@ export async function creerContexteTestReferentiels(): Promise<ContexteTestRefer
     },
   });
 
-  const loginResp = await agent.post('/api/v1/auth/login').send({ email: emailAdmin, motDePasse: MOT_DE_PASSE });
+  const loginResp = await agent
+    .post('/api/v1/auth/login')
+    .send({ email: emailAdmin, motDePasse: MOT_DE_PASSE });
   const tokenAdmin = loginResp.status === 200 ? loginResp.body.data.accessToken : '';
 
   return { application, prisma, agent, tokenAdmin, idAdmin: admin.id, idsACleaner: [admin.id] };

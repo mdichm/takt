@@ -26,7 +26,7 @@ describe('Alerte', () => {
   it('ferme l alerte quand on clique sur le bouton fermer', () => {
     const onFermer = vi.fn();
     render(<Alerte variante="erreur" message="Erreur" fermable onFermer={onFermer} />);
-    fireEvent.click(screen.getByLabelText('Fermer l\'alerte'));
+    fireEvent.click(screen.getByLabelText("Fermer l'alerte"));
     expect(onFermer).toHaveBeenCalledTimes(1);
   });
 });

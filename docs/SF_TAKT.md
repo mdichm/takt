@@ -32,15 +32,15 @@ TAKT gère la répartition pédagogique, les contraintes de planification, la g�
 
 ## §2. Périmètre et capacités
 
-| Élément | Volumétrie cible |
-|---------|-----------------|
-| Enseignants | 400 |
-| Départements | 10 |
-| Salles | 150 |
-| Séances par semestre | 4 000 |
-| Semestres par année / semaines par semestre | 2 / 14 |
-| Jours | lundi à samedi |
-| Pas de temps | 30 minutes, fixe pour toute l'institution |
+| Élément                                     | Volumétrie cible                          |
+| ------------------------------------------- | ----------------------------------------- |
+| Enseignants                                 | 400                                       |
+| Départements                                | 10                                        |
+| Salles                                      | 150                                       |
+| Séances par semestre                        | 4 000                                     |
+| Semestres par année / semaines par semestre | 2 / 14                                    |
+| Jours                                       | lundi à samedi                            |
+| Pas de temps                                | 30 minutes, fixe pour toute l'institution |
 
 - **EX-PER-01** — Le planning est une grille hebdomadaire répétée pendant les 14 semaines d'un semestre. Il n'y a ni semaines A/B ni variation hebdomadaire individuelle.
 - **EX-PER-02** — Pas de gestion de calendrier académique (jours fériés, vacances). La grille est dupliquée mécaniquement sur le semestre.
@@ -49,12 +49,12 @@ TAKT gère la répartition pédagogique, les contraintes de planification, la g�
 
 ## §3. Rôles et droits
 
-| Rôle | Raccourci | Résumé |
-|------|-----------|--------|
-| Administrateur | `admin` | Administration de l'application, gestion des référentiels durables, tous droits |
-| Gestionnaire des emplois du temps | `gest` | Pilotage opérationnel, génération, publication, exports |
-| Responsable de département | `rdep` | Affectation pédagogique, validation de son périmètre, revalidation ciblée |
-| Direction | `dir` | Validation finale, rejet avec motif, consultation stratégique |
+| Rôle                              | Raccourci | Résumé                                                                          |
+| --------------------------------- | --------- | ------------------------------------------------------------------------------- |
+| Administrateur                    | `admin`   | Administration de l'application, gestion des référentiels durables, tous droits |
+| Gestionnaire des emplois du temps | `gest`    | Pilotage opérationnel, génération, publication, exports                         |
+| Responsable de département        | `rdep`    | Affectation pédagogique, validation de son périmètre, revalidation ciblée       |
+| Direction                         | `dir`     | Validation finale, rejet avec motif, consultation stratégique                   |
 
 - **EX-ROL-01** — Si un nouveau rôle est ajouté, il sera rattaché à l'un de ces quatre acteurs existants.
 - **EX-ROL-02** — Matrice des droits par rôle et par état de version (reprise de WORKFLOW_METIER §6).
@@ -177,43 +177,43 @@ Simple référence vers les livrables UI séparés (E0.3a à E0.3e).
 
 ## §14. Ouvertes et hypothèses
 
-| # | Question ouverte | Décision attendue | Responsable |
-|---|------------------|-------------------|-------------|
-| EX-OUV-01 | Le seuil de verrouillage maximal avant qu'une génération CP-SAT soit déclarée risquée | 75 % des séances verrouillées | Architecte |
-| EX-OUV-02 | Une version `archive` peut-elle être dupliquée pour créer un nouveau semestre directement vers `initial` | Oui | MOA |
-| EX-OUV-03 | Les notifications en cas de rejet doivent-elles inclure le motif détaillé | Oui, texte libre obligatoire | MOA |
-| EX-OUV-04 | Le rôle `initial` peut-il être créé par le `gest` ou seulement par l'`admin` | `admin` et `gest` | MOA |
+| #         | Question ouverte                                                                                         | Décision attendue             | Responsable |
+| --------- | -------------------------------------------------------------------------------------------------------- | ----------------------------- | ----------- |
+| EX-OUV-01 | Le seuil de verrouillage maximal avant qu'une génération CP-SAT soit déclarée risquée                    | 75 % des séances verrouillées | Architecte  |
+| EX-OUV-02 | Une version `archive` peut-elle être dupliquée pour créer un nouveau semestre directement vers `initial` | Oui                           | MOA         |
+| EX-OUV-03 | Les notifications en cas de rejet doivent-elles inclure le motif détaillé                                | Oui, texte libre obligatoire  | MOA         |
+| EX-OUV-04 | Le rôle `initial` peut-il être créé par le `gest` ou seulement par l'`admin`                             | `admin` et `gest`             | MOA         |
 
 ---
 
 ## §15. Glossaire
 
-| Terme | Définition |
-|-------|------------|
-| Version | État versionné d'un planning pour un semestre, identifié par un des 10 états du workflow. |
-| Scénario | Proposition de placement des séances produite par le solver CP-SAT, avec score global et sous-scores. |
-| Snapshot | Copie immuable des données utilisées pour une génération. |
-| Verrou | Contrainte imposée sur une séance (créneau, salle, enseignant, activité) respectée par le solver. |
-| Couverture | Rapport entre le volume placé et le volume attendu pour une affectation (doit être 100 % pour soumission). |
-| Bail d'édition | Verrou exclusif sur une version pendant l'édition manuelle (30 min). |
+| Terme          | Définition                                                                                                 |
+| -------------- | ---------------------------------------------------------------------------------------------------------- |
+| Version        | État versionné d'un planning pour un semestre, identifié par un des 10 états du workflow.                  |
+| Scénario       | Proposition de placement des séances produite par le solver CP-SAT, avec score global et sous-scores.      |
+| Snapshot       | Copie immuable des données utilisées pour une génération.                                                  |
+| Verrou         | Contrainte imposée sur une séance (créneau, salle, enseignant, activité) respectée par le solver.          |
+| Couverture     | Rapport entre le volume placé et le volume attendu pour une affectation (doit être 100 % pour soumission). |
+| Bail d'édition | Verrou exclusif sur une version pendant l'édition manuelle (30 min).                                       |
 
 ---
 
 ## §16. Decision Log
 
-| # | Décision | Conséquence |
-|---|----------|-------------|
-| DL-01 | Solver CP-SAT (pas FET) | Le solver reçoit des fichiers dérivés, pas d'accès direct à la base métier |
-| DL-02 | 10 états de workflow | `initial`, `rep_pedag`, `brouillon`, `generation`, `edition`, `valid_pedag`, `valid_dir`, `valide`, `publie`, `archive` |
-| DL-03 | Raccourcis rôles | `admin`, `gest`, `rdep`, `dir` |
-| DL-04 | Pas de portail public | Consultation interne uniquement, diffusion par exports |
-| DL-05 | Immutabilité publiée | `publie` → seule transition possible : `archive` |
-| DL-06 | Pas de calendrier académique | Grille hebdomadaire dupliquée, sans jours fériés ni vacances |
-| DL-07 | Charge figée | Verrouillée une fois l'affectation pédagogique validée (`rep_pedag` → `brouillon`) |
-| DL-08 | Génération conditionnée | Tous les départements doivent avoir validé avant lancement |
+| #     | Décision                     | Conséquence                                                                                                             |
+| ----- | ---------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| DL-01 | Solver CP-SAT (pas FET)      | Le solver reçoit des fichiers dérivés, pas d'accès direct à la base métier                                              |
+| DL-02 | 10 états de workflow         | `initial`, `rep_pedag`, `brouillon`, `generation`, `edition`, `valid_pedag`, `valid_dir`, `valide`, `publie`, `archive` |
+| DL-03 | Raccourcis rôles             | `admin`, `gest`, `rdep`, `dir`                                                                                          |
+| DL-04 | Pas de portail public        | Consultation interne uniquement, diffusion par exports                                                                  |
+| DL-05 | Immutabilité publiée         | `publie` → seule transition possible : `archive`                                                                        |
+| DL-06 | Pas de calendrier académique | Grille hebdomadaire dupliquée, sans jours fériés ni vacances                                                            |
+| DL-07 | Charge figée                 | Verrouillée une fois l'affectation pédagogique validée (`rep_pedag` → `brouillon`)                                      |
+| DL-08 | Génération conditionnée      | Tous les départements doivent avoir validé avant lancement                                                              |
 
 ---
 
-*Fin du SF_TAKT.md — TAKT v0.1 (E0.3 — validé)*
+_Fin du SF_TAKT.md — TAKT v0.1 (E0.3 — validé)_
 
 ---

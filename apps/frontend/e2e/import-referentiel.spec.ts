@@ -5,10 +5,8 @@ import { expect, test } from '@playwright/test';
 
 const API = 'http://localhost:3000/api/v1';
 
-test.describe("Import CSV des referentiels (L04-07)", () => {
-  test("ecran d'import protege : redirection vers /login sans session", async ({
-    page,
-  }) => {
+test.describe('Import CSV des referentiels (L04-07)', () => {
+  test("ecran d'import protege : redirection vers /login sans session", async ({ page }) => {
     const reponse = await page.goto('/ges/init', { waitUntil: 'networkidle' });
     // L'ecran d'import (EC-GES-01) est protege : sans session on redirige vers le login.
     await expect(page).toHaveURL(/\/login/);
@@ -16,8 +14,8 @@ test.describe("Import CSV des referentiels (L04-07)", () => {
   });
 });
 
-test.describe("Import depuis une annee cloturee (L04-08)", () => {
-  test("les endpoints archive existent et sont proteges (401 sans session)", async ({
+test.describe('Import depuis une annee cloturee (L04-08)', () => {
+  test('les endpoints archive existent et sont proteges (401 sans session)', async ({
     request,
   }) => {
     const anneesSource = await request.get(`${API}/referentiels/import/archive/annees-source`);

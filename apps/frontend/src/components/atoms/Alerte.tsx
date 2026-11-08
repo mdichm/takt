@@ -24,7 +24,14 @@ interface AlerteProps extends PropsBase {
 }
 
 /** Alerte accessible (role="alert", couleur via jeton design-tokens). */
-export function Alerte({ variante, message, titre, fermable = false, onFermer, className }: AlerteProps): JSX.Element {
+export function Alerte({
+  variante,
+  message,
+  titre,
+  fermable = false,
+  onFermer,
+  className,
+}: AlerteProps): JSX.Element {
   return (
     <div
       role="alert"
@@ -49,7 +56,14 @@ export function Alerte({ variante, message, titre, fermable = false, onFermer, c
       </div>
       <div style={{ flex: 1 }}>
         {titre && (
-          <strong style={{ fontSize: 'var(--font-size-body)', fontWeight: 600, marginBottom: 'var(--space-xxs)', display: 'block' }}>
+          <strong
+            style={{
+              fontSize: 'var(--font-size-body)',
+              fontWeight: 600,
+              marginBottom: 'var(--space-xxs)',
+              display: 'block',
+            }}
+          >
             {titre}
           </strong>
         )}

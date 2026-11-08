@@ -7,10 +7,7 @@ import { PrismaClient } from '@takt/db';
 import { PasswordService } from './password.service';
 import { TokenService, IdentiteAccessToken } from './token.service';
 import { SessionRefreshStore } from './session-refresh.store';
-import {
-  ApiError,
-  CODES_ERREUR_API,
-} from '../common/http/api-error';
+import { ApiError, CODES_ERREUR_API } from '../common/http/api-error';
 import { AuditService } from '../audit/audit.service';
 
 /** Message unique renvoyé pour tout échec d'authentification (pas d'énumération). */
@@ -63,10 +60,9 @@ export class AuthService {
     const maintenant = Date.now();
 
     // Rate limiting : rejet préventif si trop d'échecs récents sur cette clé.
-    const horodatages =
-      (this.echecsParCle.get(cle) ?? []).filter(
-        (t) => maintenant - t < this.FENETRE_MS,
-      );
+    const horodatages = (this.echecsParCle.get(cle) ?? []).filter(
+      (t) => maintenant - t < this.FENETRE_MS,
+    );
     if (horodatages.length >= this.MAX_ECHECS) {
       throw new ApiError(
         CODES_ERREUR_API.TOO_MANY_REQUESTS,
@@ -90,9 +86,7 @@ export class AuthService {
     if (!motDePasseValide || !compteActif) {
       // Un même message quelle que soit la cause : pas d'énumération de comptes.
       this.echecsParCle.set(cle, [...horodatages, maintenant]);
-      this.logger.warn(
-        `Tentative de connexion échouée pour ${email} depuis ${ip}`,
-      );
+      this.logger.warn(`Tentative de connexion échouée pour ${email} depuis ${ip}`);
       throw new ApiError(CODES_ERREUR_API.UNAUTHORIZED, 401, MESSAGE_ECHEC_AUTH);
     }
 
@@ -102,18 +96,13 @@ export class AuthService {
     const maintenantSec = Math.floor(Date.now() / 1000);
     const identite: IdentiteAccessToken = {
       sub: utilisateur.id,
-      role: (utilisateur.role?.code ??
-        'gest') as IdentiteAccessToken['role'],
-      departementIds: utilisateur.departementId
-        ? [utilisateur.departementId]
-        : [],
+      role: (utilisateur.role?.code ?? 'gest') as IdentiteAccessToken['role'],
+      departementIds: utilisateur.departementId ? [utilisateur.departementId] : [],
     };
 
     const access = this.tokenService.signAccessToken(identite);
     const refresh = this.tokenService.signRefreshToken(utilisateur.id);
-    const expiresAt = new Date(
-      maintenantSec + this.tokenService.refreshTtlSeconds * 1000,
-    );
+    const expiresAt = new Date(maintenantSec + this.tokenService.refreshTtlSeconds * 1000);
 
     // Persistance de la famille de rafraîchissement (nouveau jti).
     await this.sessionStore.creerSession(
@@ -156,9 +145,7 @@ export class AuthService {
     const rotation = await this.tokenService.rotateRefreshToken(refreshToken);
 
     const maintenantSec = Math.floor(Date.now() / 1000);
-    const expiresAt = new Date(
-      maintenantSec + this.tokenService.refreshTtlSeconds * 1000,
-    );
+    const expiresAt = new Date(maintenantSec + this.tokenService.refreshTtlSeconds * 1000);
 
     // Remplace l'ancien jti par le nouveau dans la même famille.
     await this.sessionStore.creerSession(
@@ -176,9 +163,7 @@ export class AuthService {
     const identite: IdentiteAccessToken = {
       sub: claims.sub,
       role: (utilisateur?.role?.code ?? 'gest') as IdentiteAccessToken['role'],
-      departementIds: utilisateur?.departementId
-        ? [utilisateur.departementId]
-        : [],
+      departementIds: utilisateur?.departementId ? [utilisateur.departementId] : [],
     };
     const access = this.tokenService.signAccessToken(identite);
 

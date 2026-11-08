@@ -6,7 +6,11 @@ import { PRISMA } from '../../common/di/prisma.token';
 import { PrismaClient } from '@takt/db';
 import { CODES_ERREUR_API, ApiError } from '../../common/http/api-error';
 import { AuditService } from '../../audit/audit.service';
-import type { CreneauAffichageCreate, CreneauAffichageUpdate, CreneauAffichageListFilters } from '@takt/contracts';
+import type {
+  CreneauAffichageCreate,
+  CreneauAffichageUpdate,
+  CreneauAffichageListFilters,
+} from '@takt/contracts';
 
 /**
  * Service de gestion des variantes d'affichage des créneaux (NORMAL / RAMADAN) (L04-05).
@@ -78,14 +82,25 @@ export class CreneauAffichageService {
   async getByVariante(variante: string) {
     const affichage = await this.prisma.creneauAffichage.findUnique({ where: { variante } });
     if (!affichage) {
-      throw new ApiError(CODES_ERREUR_API.NOT_FOUND, 404, `Variante d'affichage ${variante} introuvable`);
+      throw new ApiError(
+        CODES_ERREUR_API.NOT_FOUND,
+        404,
+        `Variante d'affichage ${variante} introuvable`,
+      );
     }
     return affichage;
   }
 
   /** Liste paginée des variantes d'affichage avec filtres. */
   async list(filtres: CreneauAffichageListFilters) {
-    const { page = 1, pageSize = 20, sortBy = 'variante', sortDirection = 'asc', variante, search } = filtres;
+    const {
+      page = 1,
+      pageSize = 20,
+      sortBy = 'variante',
+      sortDirection = 'asc',
+      variante,
+      search,
+    } = filtres;
 
     const where: Record<string, unknown> = {};
     if (variante) {
@@ -122,7 +137,9 @@ export class CreneauAffichageService {
       where: { id },
       data: {
         ...(donnees.decalageMinutes !== undefined && { decalageMinutes: donnees.decalageMinutes }),
-        ...(donnees.plageReduiteMinutes !== undefined && { plageReduiteMinutes: donnees.plageReduiteMinutes }),
+        ...(donnees.plageReduiteMinutes !== undefined && {
+          plageReduiteMinutes: donnees.plageReduiteMinutes,
+        }),
         ...(donnees.libelle !== undefined && { libelle: donnees.libelle }),
       },
     });

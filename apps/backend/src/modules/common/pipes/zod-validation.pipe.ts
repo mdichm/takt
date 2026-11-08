@@ -11,12 +11,7 @@
 // inchangées.
 // ============================================================================
 
-import {
-  ArgumentMetadata,
-  BadRequestException,
-  Injectable,
-  PipeTransform,
-} from '@nestjs/common';
+import { ArgumentMetadata, BadRequestException, Injectable, PipeTransform } from '@nestjs/common';
 import { ZodType } from 'zod';
 import { SchemasRoute, schemasDeRoute } from './zod-validation.decorator';
 import { formaterErreursZod } from './zod-error';

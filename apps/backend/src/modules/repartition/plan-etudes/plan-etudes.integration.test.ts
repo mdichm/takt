@@ -2,7 +2,10 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { creerContexteTestReferentiels, nettoyerContexteTest } from '../../referentiels/test-helper.integration';
+import {
+  creerContexteTestReferentiels,
+  nettoyerContexteTest,
+} from '../../referentiels/test-helper.integration';
 
 const DEPARTEMENT_ID = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
 const ETABLISSEMENT_ID = '11111111-1111-4111-8111-111111111111';
@@ -15,7 +18,7 @@ const MODULE_ID = 'aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee';
 const GRADE_ID = '11111111-2222-4333-8444-555555555555';
 const TYPE_ID = '11111111-1111-4111-4111-111111111111';
 
-describe('Plans d\'études (TAKT-L05-01)', () => {
+describe("Plans d'études (TAKT-L05-01)", () => {
   let ctx: Awaited<ReturnType<typeof creerContexteTestReferentiels>>;
   let planId: string;
 
@@ -29,12 +32,22 @@ describe('Plans d\'études (TAKT-L05-01)', () => {
     await ctx.prisma.departement.upsert({
       where: { id: DEPARTEMENT_ID },
       update: { code: 'INFO', libelle: 'Informatique' },
-      create: { id: DEPARTEMENT_ID, code: 'INFO', libelle: 'Informatique', etablissementId: ETABLISSEMENT_ID },
+      create: {
+        id: DEPARTEMENT_ID,
+        code: 'INFO',
+        libelle: 'Informatique',
+        etablissementId: ETABLISSEMENT_ID,
+      },
     });
     await ctx.prisma.parcours.upsert({
       where: { id: PARCOURS_ID },
       update: { code: 'LIC-INFO', libelle: 'Licence Informatique', departementId: DEPARTEMENT_ID },
-      create: { id: PARCOURS_ID, code: 'LIC-INFO', libelle: 'Licence Informatique', departementId: DEPARTEMENT_ID },
+      create: {
+        id: PARCOURS_ID,
+        code: 'LIC-INFO',
+        libelle: 'Licence Informatique',
+        departementId: DEPARTEMENT_ID,
+      },
     });
     await ctx.prisma.niveau.upsert({
       where: { id: NIVEAU_ID },
@@ -44,12 +57,23 @@ describe('Plans d\'études (TAKT-L05-01)', () => {
     await ctx.prisma.anneeUniversitaire.upsert({
       where: { id: ANNEE_ID },
       update: { libelle: '2026-2027' },
-      create: { id: ANNEE_ID, libelle: '2026-2027', dateDebut: new Date('2026-09-01'), dateFin: new Date('2027-06-30') },
+      create: {
+        id: ANNEE_ID,
+        libelle: '2026-2027',
+        dateDebut: new Date('2026-09-01'),
+        dateFin: new Date('2027-06-30'),
+      },
     });
     await ctx.prisma.semestre.upsert({
       where: { id: SEMESTRE_ID },
       update: { numero: 1, anneeUniversitaireId: ANNEE_ID },
-      create: { id: SEMESTRE_ID, numero: 1, anneeUniversitaireId: ANNEE_ID, dateDebut: new Date('2026-09-01'), dateFin: new Date('2027-01-31') },
+      create: {
+        id: SEMESTRE_ID,
+        numero: 1,
+        anneeUniversitaireId: ANNEE_ID,
+        dateDebut: new Date('2026-09-01'),
+        dateFin: new Date('2027-01-31'),
+      },
     });
     await ctx.prisma.grade.upsert({
       where: { id: GRADE_ID },
@@ -63,8 +87,19 @@ describe('Plans d\'études (TAKT-L05-01)', () => {
     });
     await ctx.prisma.module.upsert({
       where: { id: MODULE_ID },
-      update: { code: 'MOD-MATH', libelle: 'Module Maths', typeEnseignementId: TYPE_ID, gradeId: GRADE_ID },
-      create: { id: MODULE_ID, code: 'MOD-MATH', libelle: 'Module Maths', typeEnseignementId: TYPE_ID, gradeId: GRADE_ID },
+      update: {
+        code: 'MOD-MATH',
+        libelle: 'Module Maths',
+        typeEnseignementId: TYPE_ID,
+        gradeId: GRADE_ID,
+      },
+      create: {
+        id: MODULE_ID,
+        code: 'MOD-MATH',
+        libelle: 'Module Maths',
+        typeEnseignementId: TYPE_ID,
+        gradeId: GRADE_ID,
+      },
     });
     await ctx.prisma.matiere.upsert({
       where: { id: MATIERE_ID },

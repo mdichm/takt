@@ -32,13 +32,21 @@ describe('DataTable — accessibilité', () => {
   });
 
   it('ne produit aucune violation axe en etat vide', async () => {
-    const { container } = render(<DataTable<Utilisateur> colonnes={colonnes} donnees={[]} etat="succès" />);
+    const { container } = render(
+      <DataTable<Utilisateur> colonnes={colonnes} donnees={[]} etat="succès" />,
+    );
     await expectAccessible(container.firstElementChild as HTMLElement | null);
   });
 
   it('ne produit aucune violation axe en etat erreur', async () => {
     const { container } = render(
-      <DataTable<Utilisateur> colonnes={colonnes} donnees={[]} etat="erreur" messageErreur="Indisponible" surReessayer={() => {}} />,
+      <DataTable<Utilisateur>
+        colonnes={colonnes}
+        donnees={[]}
+        etat="erreur"
+        messageErreur="Indisponible"
+        surReessayer={() => {}}
+      />,
     );
     await expectAccessible(container.firstElementChild as HTMLElement | null);
   });

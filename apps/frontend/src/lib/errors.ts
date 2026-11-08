@@ -39,22 +39,17 @@ export class ErreurHttp extends Error {
 
 /** Messages utilisateur en français, par code d’erreur du catalogue (ST_TAKT §3.4). */
 export const MESSAGES_ERREUR_FR: Record<CodeErreurApi, string> = {
-  VALIDATION_ERROR:
-    'Les informations saisies sont invalides. Vérifiez les champs indiqués.',
-  UNAUTHORIZED:
-    'Votre session a expiré. Reconnectez-vous pour continuer.',
+  VALIDATION_ERROR: 'Les informations saisies sont invalides. Vérifiez les champs indiqués.',
+  UNAUTHORIZED: 'Votre session a expiré. Reconnectez-vous pour continuer.',
   FORBIDDEN:
-    'Vous n\'avez pas les droits nécessaires pour cette action. Contactez un administrateur.',
-  NOT_FOUND:
-    'La ressource demandée est introuvable ou a été supprimée.',
+    "Vous n'avez pas les droits nécessaires pour cette action. Contactez un administrateur.",
+  NOT_FOUND: 'La ressource demandée est introuvable ou a été supprimée.',
   WORKFLOW_INVALID_TRANSITION:
     'Cette action n’est pas autorisée dans l’état actuel de la ressource.',
   SEANCE_LOCKED:
     'Cette séance est verrouillée par un autre utilisateur. Déverrouillez-la ou contactez-la.',
-  RATE_LIMITED:
-    'Trop de tentatives. Patientez quelques instants avant de réessayer.',
-  INTERNAL_ERROR:
-    'Une erreur interne est survenue. Réessayez plus tard ou contactez le support.',
+  RATE_LIMITED: 'Trop de tentatives. Patientez quelques instants avant de réessayer.',
+  INTERNAL_ERROR: 'Une erreur interne est survenue. Réessayez plus tard ou contactez le support.',
 };
 
 /** Vérifie si une erreur normale relate d’une perte d’authentification. */
@@ -122,6 +117,6 @@ export function mapHttpError(
     code = codeDepuisStatut(reponse.status);
   }
   const statut = reponse.status;
-  const message = corps?.message ?? (MESSAGES_ERREUR_FR[code] ?? MESSAGES_ERREUR_FR.INTERNAL_ERROR);
+  const message = corps?.message ?? MESSAGES_ERREUR_FR[code] ?? MESSAGES_ERREUR_FR.INTERNAL_ERROR;
   return new ErreurHttp(code, statut, message, corps?.details, corps?.requestId);
 }

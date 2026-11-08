@@ -80,7 +80,23 @@ export interface Activity {
 
 export interface Constraint {
   id: string;
-  type: 'UNAVAILABILITY' | 'ROOM_REQUIREMENT' | 'TEACHER_PREFERENCE' | 'CONSECUTIVE_SLOTS' | 'MAX_HOURS_PER_DAY' | 'WINDOW_CONSTRAINT' | 'NO_GAPS' | 'COMPACT_DAYS' | 'LOAD_BALANCE' | 'SUBJECT_GROUPING' | 'CM_BEFORE_TD' | 'SPREAD' | 'AVOID_LAST_SLOT' | 'SAME_ROOM' | 'ROOM_PROXIMITY' | 'PREFERRED_BUILDING';
+  type:
+    | 'UNAVAILABILITY'
+    | 'ROOM_REQUIREMENT'
+    | 'TEACHER_PREFERENCE'
+    | 'CONSECUTIVE_SLOTS'
+    | 'MAX_HOURS_PER_DAY'
+    | 'WINDOW_CONSTRAINT'
+    | 'NO_GAPS'
+    | 'COMPACT_DAYS'
+    | 'LOAD_BALANCE'
+    | 'SUBJECT_GROUPING'
+    | 'CM_BEFORE_TD'
+    | 'SPREAD'
+    | 'AVOID_LAST_SLOT'
+    | 'SAME_ROOM'
+    | 'ROOM_PROXIMITY'
+    | 'PREFERRED_BUILDING';
   category: 'HARD' | 'SOFT';
   scope: 'GLOBAL' | 'TEACHER' | 'GROUP' | 'ROOM' | 'ACTIVITY' | 'DEPARTMENT';
   targetId: string | null;

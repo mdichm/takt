@@ -2,11 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import { Inject, Injectable } from '@nestjs/common';
-import {
-  SeanceListFilters,
-  UserListFilters,
-  VersionListFilters,
-} from '@takt/contracts';
+import { SeanceListFilters, UserListFilters, VersionListFilters } from '@takt/contracts';
 import { Prisma } from '@takt/db';
 import { DonneesPaginees } from '../../http/api-envelope';
 import { PrismaService } from '../../prisma/prisma.service';
@@ -23,9 +19,7 @@ type OrderSeance = Prisma.SeanceOrderByWithRelationInput;
 /** Service des trois listes techniques pilotes du ticket TAKT-L02-03. */
 @Injectable()
 export class PilotListsService {
-  constructor(
-    @Inject(PrismaService) private readonly prisma: PrismaService,
-  ) {}
+  constructor(@Inject(PrismaService) private readonly prisma: PrismaService) {}
 
   async utilisateurs(query: UserListFilters): Promise<DonneesPaginees<unknown>> {
     const where: WhereUtilisateur = {
@@ -36,9 +30,15 @@ export class PilotListsService {
     const requete = buildPrismaQuery<WhereUtilisateur, OrderUtilisateur>(query, {
       where: () => where,
       searchFields: {
-        nom: (valeur) => ({ OR: [{ nom: { contains: valeur, mode: Prisma.QueryMode.insensitive } }] }),
-        prenom: (valeur) => ({ OR: [{ prenom: { contains: valeur, mode: Prisma.QueryMode.insensitive } }] }),
-        email: (valeur) => ({ OR: [{ email: { contains: valeur, mode: Prisma.QueryMode.insensitive } }] }),
+        nom: (valeur) => ({
+          OR: [{ nom: { contains: valeur, mode: Prisma.QueryMode.insensitive } }],
+        }),
+        prenom: (valeur) => ({
+          OR: [{ prenom: { contains: valeur, mode: Prisma.QueryMode.insensitive } }],
+        }),
+        email: (valeur) => ({
+          OR: [{ email: { contains: valeur, mode: Prisma.QueryMode.insensitive } }],
+        }),
       },
       sortFields: {
         nom: (direction) => ({ nom: direction as Prisma.SortOrder }),
@@ -100,15 +100,15 @@ export class PilotListsService {
       ...(query.salleId ? { salleId: query.salleId } : {}),
       ...(query.enseignantId ? { enseignantId: query.enseignantId } : {}),
       ...(query.groupeId ? { groupeId: query.groupeId } : {}),
-      ...(query.estVerrouillee === undefined
-        ? {}
-        : { estVerrouillee: query.estVerrouillee }),
+      ...(query.estVerrouillee === undefined ? {} : { estVerrouillee: query.estVerrouillee }),
     };
     const requete = buildPrismaQuery<WhereSeance, OrderSeance>(query, {
       where: () => where,
       searchFields: {
         id: (valeur) => ({ id: { contains: valeur, mode: Prisma.QueryMode.insensitive } }),
-        versionId: (valeur) => ({ versionId: { contains: valeur, mode: Prisma.QueryMode.insensitive } }),
+        versionId: (valeur) => ({
+          versionId: { contains: valeur, mode: Prisma.QueryMode.insensitive },
+        }),
       },
       sortFields: {
         jour: (direction) => ({ jour: direction as Prisma.SortOrder }),

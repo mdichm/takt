@@ -32,7 +32,14 @@ export function Router(): JSX.Element {
         <Routes>
           <Route element={<Layout />}>
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
-            <Route path="/login" element={<GuestGuard><PageLogin /></GuestGuard>} />
+            <Route
+              path="/login"
+              element={
+                <GuestGuard>
+                  <PageLogin />
+                </GuestGuard>
+              }
+            />
             {ROUTES.filter((r) => r.chemin !== '/login').map((route) => (
               <Route
                 key={route.code}

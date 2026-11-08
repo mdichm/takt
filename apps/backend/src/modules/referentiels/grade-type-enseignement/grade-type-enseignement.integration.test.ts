@@ -38,7 +38,9 @@ describe('GradeTypeEnseignement — Matrice (TAKT-L04-02)', () => {
 
   afterAll(async () => {
     await nettoyerContexteTest(ctx);
-    await ctx.prisma.gradeTypeEnseignement.deleteMany({ where: { id: { in: [ID_COUPLE_EXISTANT] } } });
+    await ctx.prisma.gradeTypeEnseignement.deleteMany({
+      where: { id: { in: [ID_COUPLE_EXISTANT] } },
+    });
     await ctx.prisma.grade.deleteMany({ where: { id: ID_GRADE } });
     await ctx.prisma.typeEnseignement.deleteMany({ where: { id: ID_TYPE } });
   });

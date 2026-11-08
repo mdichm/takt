@@ -22,15 +22,18 @@ interface TabsProps extends PropsBase {
 export function Tabs({ onglets, valeur, onChange, className }: TabsProps): JSX.Element {
   const [indexActive, setIndexActive] = useState(onglets.findIndex((o) => o.id === valeur));
 
-  const activerOnglet = useCallback((index: number) => {
-    if (index >= 0 && index < onglets.length) {
-      const cible = onglets[index];
-      if (cible) {
-        setIndexActive(index);
-        onChange(cible.id);
+  const activerOnglet = useCallback(
+    (index: number) => {
+      if (index >= 0 && index < onglets.length) {
+        const cible = onglets[index];
+        if (cible) {
+          setIndexActive(index);
+          onChange(cible.id);
+        }
       }
-    }
-  }, [onglets, onChange]);
+    },
+    [onglets, onChange],
+  );
 
   const handleKeydown = useCallback(
     (e: React.KeyboardEvent, index: number) => {
@@ -56,7 +59,12 @@ export function Tabs({ onglets, valeur, onChange, className }: TabsProps): JSX.E
       <div
         role="tablist"
         aria-label="Onglets"
-        style={{ display: 'flex', gap: 'var(--space-xxs)', borderBottom: 'var(--border-width) solid var(--color-divider)', marginBottom: 'var(--space-m)' }}
+        style={{
+          display: 'flex',
+          gap: 'var(--space-xxs)',
+          borderBottom: 'var(--border-width) solid var(--color-divider)',
+          marginBottom: 'var(--space-m)',
+        }}
       >
         {onglets.map((onglet, index) => {
           const estActif = index === indexActive;
@@ -74,7 +82,9 @@ export function Tabs({ onglets, valeur, onChange, className }: TabsProps): JSX.E
               onKeyDown={(e) => handleKeydown(e, index)}
               style={{
                 padding: 'var(--space-s) var(--space-m)',
-                borderBottom: estActif ? 'var(--border-width) solid var(--color-primary)' : 'transparent',
+                borderBottom: estActif
+                  ? 'var(--border-width) solid var(--color-primary)'
+                  : 'transparent',
                 borderTop: 'none',
                 borderLeft: 'none',
                 borderRight: 'none',

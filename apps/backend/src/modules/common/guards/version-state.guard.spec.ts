@@ -17,9 +17,7 @@ class ReflectorMock {
   }
 }
 
-function creerContexte(
-  etatCourant: EtatVersion | undefined,
-): ExecutionContext {
+function creerContexte(etatCourant: EtatVersion | undefined): ExecutionContext {
   const getHandler = () => ({});
   const getClass = () => ({});
   const switchToHttp = () => ({

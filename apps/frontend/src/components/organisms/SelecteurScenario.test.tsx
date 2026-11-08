@@ -7,7 +7,14 @@ import { SelecteurScenario } from './SelecteurScenario';
 
 describe('SelecteurScenario', () => {
   const scenarios = [
-    { id: 's1', nom: 'Scénario A', description: 'Optimisé salles', score: 85, conflits: 2, selected: true },
+    {
+      id: 's1',
+      nom: 'Scénario A',
+      description: 'Optimisé salles',
+      score: 85,
+      conflits: 2,
+      selected: true,
+    },
     { id: 's2', nom: 'Scénario B', description: 'Optimisé enseignants', score: 70, conflits: 5 },
     { id: 's3', nom: 'Scénario C', description: 'Baseline', score: 45, conflits: 12 },
   ];
@@ -36,7 +43,10 @@ describe('SelecteurScenario', () => {
 
   it('marque le scénario sélectionné avec aria-checked', () => {
     render(<SelecteurScenario scenarios={scenarios} onSelect={vi.fn()} />);
-    expect(screen.getByRole('radio', { name: /Scénario A/ })).toHaveAttribute('aria-checked', 'true');
+    expect(screen.getByRole('radio', { name: /Scénario A/ })).toHaveAttribute(
+      'aria-checked',
+      'true',
+    );
   });
 
   it('desactive les cartes en chargement', () => {

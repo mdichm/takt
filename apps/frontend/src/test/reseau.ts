@@ -12,12 +12,13 @@ export interface ReponseMocke {
 
 /** Crée un mock de fetch réutilisable et le stub globalement. */
 export function creerMockFetch(reponse: ReponseMocke) {
-  const fetchMock = vi.fn(async () =>
-    new Response(JSON.stringify(reponse.json), {
-      status: reponse.status,
-      statusText: reponse.ok ? 'OK' : 'Error',
-      headers: { 'Content-Type': 'application/json', ...reponse.headers },
-    }),
+  const fetchMock = vi.fn(
+    async () =>
+      new Response(JSON.stringify(reponse.json), {
+        status: reponse.status,
+        statusText: reponse.ok ? 'OK' : 'Error',
+        headers: { 'Content-Type': 'application/json', ...reponse.headers },
+      }),
   );
   vi.stubGlobal('fetch', fetchMock);
   return fetchMock;

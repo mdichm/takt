@@ -10,9 +10,8 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"],
+      "@/*": ["./src/*"],
       "@takt/contracts": ["../../packages/contracts/src/index.ts"],
       "@takt/design-tokens": ["../../packages/design-tokens/src/index.ts"]
     },

@@ -35,7 +35,12 @@ function entetesCorrespondent(recues: readonly string[], attendus: readonly stri
   return recues.every((e) => ensemble.has(e));
 }
 
-function erreurLigne(ligne: number, champ: string, valeur: string, motif: string): ErreurLigneImport {
+function erreurLigne(
+  ligne: number,
+  champ: string,
+  valeur: string,
+  motif: string,
+): ErreurLigneImport {
   return { ligne, champ, valeur, motif };
 }
 
@@ -104,9 +109,7 @@ export class ImportReferentielService {
         string,
         string
       > & { __ligne: string };
-      const validation = adaptateur.schemaLigne.safeParse(
-        donneesPourSchema(donnees, dto.type),
-      );
+      const validation = adaptateur.schemaLigne.safeParse(donneesPourSchema(donnees, dto.type));
       if (!validation.success) {
         const issue = validation.error.issues[0] ?? { path: [], message: 'Erreur de validation' };
         const donneesMappees = donneesPourSchema(donnees, dto.type);
@@ -122,8 +125,7 @@ export class ImportReferentielService {
       }
 
       const donneesValidees = validation.data as Record<string, unknown>;
-      const cleCle =
-        donneesValidees.matricule !== undefined ? 'matricule' : 'code';
+      const cleCle = donneesValidees.matricule !== undefined ? 'matricule' : 'code';
       const valeurCle = String(donneesValidees[cleCle]);
 
       if (cleCle === 'matricule') {
@@ -142,7 +144,12 @@ export class ImportReferentielService {
       } else {
         if (vus.codes.has(valeurCle)) {
           erreurs.push(
-            erreurLigne(ligne.numero, 'code', valeurCle, 'Ce code est déjà utilisé dans le fichier'),
+            erreurLigne(
+              ligne.numero,
+              'code',
+              valeurCle,
+              'Ce code est déjà utilisé dans le fichier',
+            ),
           );
           continue;
         }
@@ -153,7 +160,12 @@ export class ImportReferentielService {
         const email = String(donneesValidees.email);
         if (vus.emails.has(email)) {
           erreurs.push(
-            erreurLigne(ligne.numero, 'email', email, 'Cet e-mail est déjà utilisé dans le fichier'),
+            erreurLigne(
+              ligne.numero,
+              'email',
+              email,
+              'Cet e-mail est déjà utilisé dans le fichier',
+            ),
           );
           continue;
         }
@@ -166,9 +178,7 @@ export class ImportReferentielService {
           ligne: ligne.numero,
           code: String(donneesValidees.code ?? donneesValidees.matricule ?? ''),
           libelle:
-            typeof donneesValidees.libelle === 'string'
-              ? donneesValidees.libelle
-              : undefined,
+            typeof donneesValidees.libelle === 'string' ? donneesValidees.libelle : undefined,
         });
       }
     }
@@ -192,10 +202,7 @@ export class ImportReferentielService {
    *   échec sur une ligne est rollbacké au savepoint sans annuler les autres.
    * - Journalise la mutation (GG-07).
    */
-  async executer(
-    dto: ImportReferentielCsvConfirme,
-    utilisateurId: string,
-  ): Promise<RapportImport> {
+  async executer(dto: ImportReferentielCsvConfirme, utilisateurId: string): Promise<RapportImport> {
     // 1. L'empreinte doit correspondre à celle de l'aperçu.
     if (empreinteSha256(dto.contenu) !== dto.empreinte) {
       throw new ApiError(
@@ -244,10 +251,7 @@ export class ImportReferentielService {
 
         await tx.$queryRawUnsafe(`SAVEPOINT "${savepoint}"`);
         try {
-          const resultat = await adaptateur.creer(
-            donnees,
-            { tx, caches, vus } as ContexteImport,
-          );
+          const resultat = await adaptateur.creer(donnees, { tx, caches, vus } as ContexteImport);
           await tx.$queryRawUnsafe(`RELEASE SAVEPOINT "${savepoint}"`);
           if ('id' in resultat) {
             importes += 1;
@@ -258,9 +262,7 @@ export class ImportReferentielService {
         } catch (err) {
           await tx.$queryRawUnsafe(`ROLLBACK TO SAVEPOINT "${savepoint}"`);
           const message = err instanceof Error ? err.message : String(err);
-          erreurs.push(
-            erreurLigne(ligne.numero, 'corps', '', `Échec de création : ${message}`),
-          );
+          erreurs.push(erreurLigne(ligne.numero, 'corps', '', `Échec de création : ${message}`));
           rejets += 1;
         }
       }

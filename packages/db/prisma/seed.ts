@@ -25,7 +25,9 @@ function getPrisma(): PrismaClient {
   if (instancePrisma) {
     return instancePrisma;
   }
-  instancePrisma = new PrismaClient({ adapter: new PrismaPg({ connectionString: resoudreConnexion() }) });
+  instancePrisma = new PrismaClient({
+    adapter: new PrismaPg({ connectionString: resoudreConnexion() }),
+  });
   return instancePrisma;
 }
 
@@ -129,10 +131,34 @@ async function main(): Promise<void> {
   const deptByCode = new Map(departements.map((d) => [d.code, d]));
 
   const utilisateurs = [
-    { email: 'admin@takt.internal', nom: 'Admin', prenom: 'Système', role: 'admin', departement: 'INFO' },
-    { email: 'gest@takt.internal', nom: 'Gestion', prenom: 'Temps', role: 'gest', departement: null },
-    { email: 'rdep@takt.internal', nom: 'Resp', prenom: 'Département', role: 'rdep', departement: 'INFO' },
-    { email: 'dir@takt.internal', nom: 'Direction', prenom: 'Établissement', role: 'dir', departement: null },
+    {
+      email: 'admin@takt.internal',
+      nom: 'Admin',
+      prenom: 'Système',
+      role: 'admin',
+      departement: 'INFO',
+    },
+    {
+      email: 'gest@takt.internal',
+      nom: 'Gestion',
+      prenom: 'Temps',
+      role: 'gest',
+      departement: null,
+    },
+    {
+      email: 'rdep@takt.internal',
+      nom: 'Resp',
+      prenom: 'Département',
+      role: 'rdep',
+      departement: 'INFO',
+    },
+    {
+      email: 'dir@takt.internal',
+      nom: 'Direction',
+      prenom: 'Établissement',
+      role: 'dir',
+      departement: null,
+    },
   ];
 
   for (const u of utilisateurs) {
@@ -169,12 +195,20 @@ async function main(): Promise<void> {
     getPrisma().parcours.upsert({
       where: { code: 'L-INFO' },
       update: { libelle: 'Licence Informatique' },
-      create: { code: 'L-INFO', libelle: 'Licence Informatique', departementId: deptByCode.get('INFO')!.id },
+      create: {
+        code: 'L-INFO',
+        libelle: 'Licence Informatique',
+        departementId: deptByCode.get('INFO')!.id,
+      },
     }),
     getPrisma().parcours.upsert({
       where: { code: 'L-MATH' },
       update: { libelle: 'Licence Mathématiques' },
-      create: { code: 'L-MATH', libelle: 'Licence Mathématiques', departementId: deptByCode.get('MATH')!.id },
+      create: {
+        code: 'L-MATH',
+        libelle: 'Licence Mathématiques',
+        departementId: deptByCode.get('MATH')!.id,
+      },
     }),
   ]);
 
@@ -193,7 +227,11 @@ async function main(): Promise<void> {
     getPrisma().niveau.upsert({
       where: { code: 'L3-MATH' },
       update: { libelle: 'Licence 3ème année Mathématiques' },
-      create: { code: 'L3-MATH', libelle: 'Licence 3ème année Mathématiques', parcoursId: parcours[1].id },
+      create: {
+        code: 'L3-MATH',
+        libelle: 'Licence 3ème année Mathématiques',
+        parcoursId: parcours[1].id,
+      },
     }),
   ]);
 
@@ -299,7 +337,13 @@ async function main(): Promise<void> {
     const site = sites[(i - 1) % 3];
     const typeSalle = typesSalle[(i - 1) % 4];
     const capacite =
-      typeSalle.code === 'CM' ? 120 : typeSalle.code === 'TD' ? 30 : typeSalle.code === 'TP' ? 24 : 20;
+      typeSalle.code === 'CM'
+        ? 120
+        : typeSalle.code === 'TD'
+          ? 30
+          : typeSalle.code === 'TP'
+            ? 24
+            : 20;
 
     // Préparer les liens équipements selon le type de salle
     const liensEquipements = [];

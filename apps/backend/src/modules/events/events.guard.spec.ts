@@ -12,9 +12,16 @@ const CLAIMS = {
   departementIds: [],
 } as const;
 
-function creerContexte(authorization?: string, accessToken?: string): {
+function creerContexte(
+  authorization?: string,
+  accessToken?: string,
+): {
   contexte: ExecutionContext;
-  requete: { headers: { authorization?: string }; query: { access_token?: string }; utilisateur?: unknown };
+  requete: {
+    headers: { authorization?: string };
+    query: { access_token?: string };
+    utilisateur?: unknown;
+  };
 } {
   const requete = {
     headers: authorization === undefined ? {} : { authorization },

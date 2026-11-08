@@ -18,7 +18,7 @@ describe('ErrorBoundary (GG-06 : pas de stack trace)', () => {
     render(
       <ErrorBoundary>
         <EnfantQuiRend />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
     expect(screen.getByTestId('error-boundary')).toBeInTheDocument();
   });

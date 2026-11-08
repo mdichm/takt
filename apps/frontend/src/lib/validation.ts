@@ -50,22 +50,14 @@ export type ReponseListe = z.infer<ReturnType<typeof zReponseListe>>;
  * données typées. Lève une ErreurApi VALIDATION_ERROR si le corps ne
  * correspond pas à l’enveloppe attendue (GG-05).
  */
-export function validerReponseApi<T extends ZodTypeAny>(
-  schema: T,
-  donnees: unknown,
-): z.infer<T> {
+export function validerReponseApi<T extends ZodTypeAny>(schema: T, donnees: unknown): z.infer<T> {
   const resultat = schema.safeParse(donnees);
   if (!resultat.success) {
     const details = resultat.error.issues.map((issue) => ({
       chemin: issue.path.join('.'),
       message: issue.message,
     }));
-    throw new ErreurHttp(
-      'VALIDATION_ERROR',
-      400,
-      'La réponse du serveur est invalide.',
-      details,
-    );
+    throw new ErreurHttp('VALIDATION_ERROR', 400, 'La réponse du serveur est invalide.', details);
   }
   return resultat.data;
 }

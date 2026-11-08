@@ -17,13 +17,13 @@ Définir une stratégie de migration de base de données robuste, reproductible 
 
 ## 2. Principes directeurs
 
-| Principe | Description |
-|----------|-------------|
-| **Versionnage explicite** | Chaque changement de schéma est une migration nommée, horodatée, stockée en SQL dans `packages/db/prisma/migrations/` |
-| **Séparation des responsabilités** | `prisma migrate dev` en développement ; `prisma migrate deploy` en recette/production |
-| **Traçabilité complète** | Historique Git des migrations = audit trail du schéma |
-| **Rollback maîtrisé** | Chaque migration critique maintient un fichier `down.sql` testé |
-| **Seed déterministe** | Données de référence injectées via `prisma db seed` (idempotent) |
+| Principe                           | Description                                                                                                           |
+| ---------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| **Versionnage explicite**          | Chaque changement de schéma est une migration nommée, horodatée, stockée en SQL dans `packages/db/prisma/migrations/` |
+| **Séparation des responsabilités** | `prisma migrate dev` en développement ; `prisma migrate deploy` en recette/production                                 |
+| **Traçabilité complète**           | Historique Git des migrations = audit trail du schéma                                                                 |
+| **Rollback maîtrisé**              | Chaque migration critique maintient un fichier `down.sql` testé                                                       |
+| **Seed déterministe**              | Données de référence injectées via `prisma db seed` (idempotent)                                                      |
 
 ---
 
@@ -45,6 +45,7 @@ packages/db/prisma/
 ```
 
 > **Note :** `contract.prisma` est le fichier source. `schema.prisma` est généré par le script de build pour compatibilité Prisma Client.
+
 ---
 
 ## 4. Commandes par environnement
@@ -93,12 +94,13 @@ pnpm --filter @takt/db prisma db seed -- --env=recette
 
 ## 5. Convention de nommage des migrations
 
-| Format | Exemple | Description |
-|--------|---------|-------------|
-| `YYYYMMDDHHMMSS_<action>_<entité>` | `20261101120000_add_index_seance_version` | Action + entité concernée |
-| Actions : `create`, `add`, `remove`, `rename`, `alter`, `drop` | | Verbe à l'infinitif, entité au singulier |
+| Format                                                         | Exemple                                   | Description                              |
+| -------------------------------------------------------------- | ----------------------------------------- | ---------------------------------------- |
+| `YYYYMMDDHHMMSS_<action>_<entité>`                             | `20261101120000_add_index_seance_version` | Action + entité concernée                |
+| Actions : `create`, `add`, `remove`, `rename`, `alter`, `drop` |                                           | Verbe à l'infinitif, entité au singulier |
 
 **Exemples :**
+
 - `20261030000000_init` — Schéma initial complet
 - `20261101100000_add_column_seance_verrou_type` — Ajout colonne
 - `20261101150000_create_table_export` — Création table
@@ -182,11 +184,11 @@ SEED_ENV=recette pnpm --filter @takt/db prisma db seed
 
 ## 8. Matrice de compatibilité Application ↔ Schéma
 
-| Version App | Version Schéma (migration) | Compatibilité | Notes |
-|-------------|----------------------------|---------------|-------|
-| 1.0.0 | `20261030000000_init` | ✅ Baseline | Première release |
-| 1.1.0 | `20261101120000_add_...` | ✅ Forward | Ajout index performance |
-| 1.2.0 | `20261115090000_create_...` | ⚠️ Breaking | Nouvelle table `Export` — migration requise avant déploiement |
+| Version App | Version Schéma (migration)  | Compatibilité | Notes                                                         |
+| ----------- | --------------------------- | ------------- | ------------------------------------------------------------- |
+| 1.0.0       | `20261030000000_init`       | ✅ Baseline   | Première release                                              |
+| 1.1.0       | `20261101120000_add_...`    | ✅ Forward    | Ajout index performance                                       |
+| 1.2.0       | `20261115090000_create_...` | ⚠️ Breaking   | Nouvelle table `Export` — migration requise avant déploiement |
 
 **Règle :** Toute version d'application qui introduit un changement de schéma **doit** inclure la migration correspondante dans le même commit/PR.
 
@@ -194,13 +196,13 @@ SEED_ENV=recette pnpm --filter @takt/db prisma db seed
 
 ## 9. Intégration dans le pipeline CI/CD
 
-| Étape | Commande | Environnement | Condition de succès |
-|-------|----------|---------------|---------------------|
-| Generate | `prisma generate` | Tous | Client Prisma généré sans erreur |
-| Validate | `prisma validate` | Tous | Schéma syntaxiquement valide |
-| Migrate Dev | `prisma migrate dev` | Dev (local) | Migration créée, DB à jour |
-| Migrate Deploy | `prisma migrate deploy` | Recette/Prod | Migrations appliquées, 0 erreur |
-| Seed | `prisma db seed` | Dev/Recette | Données injectées, idempotent |
+| Étape          | Commande                | Environnement | Condition de succès              |
+| -------------- | ----------------------- | ------------- | -------------------------------- |
+| Generate       | `prisma generate`       | Tous          | Client Prisma généré sans erreur |
+| Validate       | `prisma validate`       | Tous          | Schéma syntaxiquement valide     |
+| Migrate Dev    | `prisma migrate dev`    | Dev (local)   | Migration créée, DB à jour       |
+| Migrate Deploy | `prisma migrate deploy` | Recette/Prod  | Migrations appliquées, 0 erreur  |
+| Seed           | `prisma db seed`        | Dev/Recette   | Données injectées, idempotent    |
 
 ---
 
@@ -225,4 +227,4 @@ SEED_ENV=recette pnpm --filter @takt/db prisma db seed
 
 ---
 
-*Fin du DOC_MIGRATION_DB.md — TAKT v1.0*
+_Fin du DOC_MIGRATION_DB.md — TAKT v1.0_

@@ -47,9 +47,12 @@ describe('contrats des référentiels', () => {
   });
 
   it('valide les filtres de liste des utilisateurs', () => {
-    expect(
-      zUserList.parse({ page: '2', role: 'rdep', departementId: UUID_DEPARTEMENT }),
-    ).toEqual({ page: 2, pageSize: 20, role: 'rdep', departementId: UUID_DEPARTEMENT });
+    expect(zUserList.parse({ page: '2', role: 'rdep', departementId: UUID_DEPARTEMENT })).toEqual({
+      page: 2,
+      pageSize: 20,
+      role: 'rdep',
+      departementId: UUID_DEPARTEMENT,
+    });
   });
 
   it('refuse un rôle inconnu', () => {
@@ -57,7 +60,9 @@ describe('contrats des référentiels', () => {
   });
 
   it('valide les ressources de référentiel', () => {
-    expect(zRole.parse({ id: UUID_ROLE, code: 'admin', libelle: 'Administrateur' }).code).toBe('admin');
+    expect(zRole.parse({ id: UUID_ROLE, code: 'admin', libelle: 'Administrateur' }).code).toBe(
+      'admin',
+    );
     expect(
       zDepartement.parse({
         id: UUID_DEPARTEMENT,
