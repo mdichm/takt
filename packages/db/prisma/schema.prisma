@@ -34,7 +34,6 @@ model Utilisateur {
   departement      Departement?        @relation(fields: [departementId], references: [id])
   sessionsRefresh  SessionRefresh[]    // familles de jetons de rafraîchissement (rotation)
   verrous          VerrouSeance[]
-  affectations     AffectationPedagogique[]
   journalAudit     JournalAudit[]
 
   @@index([email])
@@ -145,6 +144,7 @@ model Groupe {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   niveau    Niveau @relation(fields: [niveauId], references: [id])
+  affectations AffectationPedagogique[]
 
   @@index([code])
   @@index([niveauId])
@@ -247,12 +247,13 @@ model Version {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  semestre    Semestre    @relation(fields: [semestreId], references: [id])
+  semestre    Semestre          @relation(fields: [semestreId], references: [id])
   seances     Seance[]
   snapshots   Snapshot[]
   generations Generation[]
   exports     Export[]
   contraintes Contrainte[]
+  affectations AffectationPedagogique[]
 
   @@index([semestreId])
   @@index([etat])
@@ -278,24 +279,35 @@ model Snapshot {
 // 8. AffectationPedagogique — Enseignant ↔ Matière ↔ Groupe, volume horaire
 // ----------------------------------------------------------------------------
 model AffectationPedagogique {
-  id                String   @id @default(uuid()) @db.Uuid
-  semestreId        String   @db.Uuid
-  departementId     String   @db.Uuid
-  enseignantId      String   @db.Uuid
-  matiereId         String   @db.Uuid
-  groupeId          String   @db.Uuid
-  volumeHoraire     Int      // volume horaire annuel ou semestriel
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id                 String   @id @default(uuid()) @db.Uuid
+  versionId          String   @db.Uuid
+  semestreId         String   @db.Uuid
+  departementId      String   @db.Uuid
+  enseignantId       String   @db.Uuid
+  matiereId          String   @db.Uuid
+  groupeId           String   @db.Uuid
+  typeEnseignementId String?  @db.Uuid
+  volumeHebdo        Int      // volume horaire hebdomadaire
+  dureeCreneaux      Int?     // durée d'un créneau (minutes)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
 
-  semestre    Semestre        @relation(fields: [semestreId], references: [id])
-  departement Departement     @relation(fields: [departementId], references: [id])
-  enseignant  Utilisateur     @relation(fields: [enseignantId], references: [id])
-  // matiereId et groupeId sont des références logiques (pas de table dédiée dans le périmètre E0.5)
+  version            Version              @relation(fields: [versionId], references: [id])
+  semestre           Semestre             @relation(fields: [semestreId], references: [id])
+  departement        Departement          @relation(fields: [departementId], references: [id])
+  enseignant         Enseignant           @relation(fields: [enseignantId], references: [id])
+  matiere            Matiere              @relation(fields: [matiereId], references: [id])
+  groupe             Groupe               @relation(fields: [groupeId], references: [id])
+  typeEnseignement   TypeEnseignement?    @relation(fields: [typeEnseignementId], references: [id])
 
+  @@unique([versionId, enseignantId, matiereId, groupeId])
+  @@index([versionId])
   @@index([semestreId])
   @@index([departementId])
   @@index([enseignantId])
+  @@index([matiereId])
+  @@index([groupeId])
+  @@index([typeEnseignementId])
 }
 
 // ----------------------------------------------------------------------------
@@ -462,6 +474,7 @@ model TypeEnseignement {
   modules     Module[]
   gradeType   GradeTypeEnseignement[]
   planEtudesMatieres PlanEtudesMatiere[]
+  affectations AffectationPedagogique[]
 
   @@index([code])
 }
@@ -534,6 +547,7 @@ model Matiere {
   updatedAt   DateTime @updatedAt
   module      Module   @relation(fields: [moduleId], references: [id])
   planEtudesMatieres PlanEtudesMatiere[]
+  affectations  AffectationPedagogique[]
 
   @@index([code])
   @@index([moduleId])
@@ -556,6 +570,7 @@ model Enseignant {
 
   grade         Grade?                 @relation(fields: [gradeId], references: [id])
   departements  EnseignantDepartement[]
+  affectations  AffectationPedagogique[]
 
   @@index([matricule])
   @@index([email])
