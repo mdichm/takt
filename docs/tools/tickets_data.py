@@ -330,7 +330,7 @@ TICKETS: List[Ticket] = [
         lot="L05",
         titre="Implémenter les affectations pédagogiques (enseignant ↔ matière ↔ groupe)",
         sp=6,
-        status="À faire",
+        status="En cours",
         deps=['TAKT-L05-01', 'TAKT-L04-03'],
         exigences=['EX-REP-01', 'EX-REP-02', 'EX-DAT-01', 'TE-MET-03', 'IX-RDEP-01.'],
     ),
