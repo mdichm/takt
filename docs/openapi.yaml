@@ -3070,6 +3070,28 @@ paths:
       summary: Modifie un type de salle
       tags:
         - Référentiels
+  /api/v1/repartition/valider:
+    post:
+      operationId: RepartitionController_valider
+      parameters: []
+      responses:
+        '200':
+          description: Répartition validée, snapshot créé
+        '400':
+          description: Répartition incomplète ou dépassement de charge
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit ou hors périmètre
+        '404':
+          description: Version ou plan d'études introuvable
+        '409':
+          description: État de version invalide pour validation
+      security:
+        - bearerAuth: []
+      summary: Valide la répartition pédagogique du département
+      tags:
+        - Répartition
   /api/v1/users:
     get:
       operationId: UsersController_list

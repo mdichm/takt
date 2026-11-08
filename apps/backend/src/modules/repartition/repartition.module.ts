@@ -10,12 +10,14 @@ import { PlanEtudesController } from './plan-etudes/plan-etudes.controller';
 import { PlanEtudesService } from './plan-etudes/plan-etudes.service';
 import { AffectationPedagogiqueController } from './affectation/affectation.controller';
 import { AffectationPedagogiqueService } from './affectation/affectation.service';
+import { RepartitionController } from './repartition/repartition.controller';
+import { RepartitionService } from './repartition/repartition.service';
 
 /** Module de la répartition pédagogique et de la charge horaire. */
 @Module({
   imports: [CommonModule, ReferentielsModule, VersionsModule, AuditModule],
-  providers: [PlanEtudesService, AffectationPedagogiqueService],
-  controllers: [PlanEtudesController, AffectationPedagogiqueController],
-  exports: [PlanEtudesService, AffectationPedagogiqueService],
+  providers: [PlanEtudesService, AffectationPedagogiqueService, RepartitionService],
+  controllers: [PlanEtudesController, AffectationPedagogiqueController, RepartitionController],
+  exports: [PlanEtudesService, AffectationPedagogiqueService, RepartitionService],
 })
 export class RepartitionModule {}

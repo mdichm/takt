@@ -83,6 +83,7 @@ model Departement {
   parcours        Parcours[]
   planEtudes      PlanEtudes[]
   enseignants     EnseignantDepartement[]
+  snapshots       Snapshot[]
 
   @@index([code])
   @@index([etablissementId])
@@ -263,16 +264,18 @@ model Version {
 // 7. Snapshot — Snapshot immuable des données d'une version
 // ----------------------------------------------------------------------------
 model Snapshot {
-  id        String   @id @default(uuid()) @db.Uuid
-  versionId String   @db.Uuid
-  donnees   Json     // données JSONB du snapshot
-  hash      String   // hash d'intégrité du snapshot
-  createdAt DateTime @default(now())
+  id            String      @id @default(uuid()) @db.Uuid
+  versionId     String      @db.Uuid
+  departementId String?     @db.Uuid // snapshot de répartition : un par (versionId, departementId) ; snapshot de publication : NULL
+  donnees       Json        // données JSONB du snapshot
+  hash          String      // hash d'intégrité du snapshot
+  createdAt     DateTime    @default(now())
 
-  version   Version  @relation(fields: [versionId], references: [id])
+  version       Version       @relation(fields: [versionId], references: [id])
+  departement   Departement?  @relation(fields: [departementId], references: [id])
 
   @@index([versionId])
-  @@unique([versionId])
+  @@index([versionId, departementId])
 }
 
 // ----------------------------------------------------------------------------
