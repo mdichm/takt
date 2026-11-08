@@ -596,16 +596,28 @@ model EnseignantDepartement {
 }
 
 // ----------------------------------------------------------------------------
-// 22 (bis). ChargeRuleSet — Règles de charge horaire (amorcée, complétée en L05-03)
+// 22 (bis). ChargeRuleSet — Règles de charge horaire (complétée en L05-03)
 // ----------------------------------------------------------------------------
 model ChargeRuleSet {
-  id          String   @id @default(uuid()) @db.Uuid
-  code        String   @unique
-  libelle     String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id                       String   @id @default(uuid()) @db.Uuid
+  code                     String
+  libelle                  String
+  version                  Int      @default(1)
+  estActive                Boolean  @default(false)
+  seuilAlerte              Int      @default(90)
+  plafondHebdomadaire      Int      @default(20)
+  arrondi                  String   @default("UNITAIRE") // UNITAIRE | DEMI_JOURNEE | JOURNEE
+  dureeJournee             Float    @default(7)
+  dureeDemiJournee         Float    @default(3.5)
+  coefficientsParType      Json     // { [typeCode: string]: number }
+  cibleHebdomadaireParGrade Json    // { [gradeCode: string]: number }
+  toleranceEquilibrage     Float    @default(5)
+  createdAt                DateTime @default(now())
+  updatedAt                DateTime @updatedAt
 
+  @@unique([code, version])
   @@index([code])
+  @@index([estActive])
 }
 
 // ----------------------------------------------------------------------------

@@ -339,7 +339,7 @@ TICKETS: List[Ticket] = [
         lot="L05",
         titre="Implémenter le moteur de charge horaire (ChargeRuleSet)",
         sp=8,
-        status="En cours",
+        status="Terminé",
         deps=['TAKT-L05-02', 'TAKT-L04-02'],
         exigences=['EX-PRI-05', 'DL-07', 'ST_TAKT §0.2 B6', 'SC-LOAD-01 à SC-LOAD-03', 'TE-TEST-02.'],
     ),
