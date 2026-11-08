@@ -6,6 +6,7 @@
  * Ticket : TAKT-L02-02 — ST_TAKT §3.1, §3.2 et TE-API-02.
  */
 
+export * from './affectations';
 export * from './auth';
 export * from './common';
 export * from './events';

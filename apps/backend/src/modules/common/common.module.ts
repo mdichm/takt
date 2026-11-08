@@ -9,6 +9,8 @@ import { PRISMA } from './di/prisma.token';
 import { PrismaService } from './prisma/prisma.service';
 import { RbacModule } from './rbac/rbac.module';
 
+import { Reflector } from '@nestjs/core';
+
 /** Module transverse exposant les endpoints opérationnels de l'API. */
 @Module({
   imports: [PrismaModule, RbacModule],
@@ -16,8 +18,9 @@ import { RbacModule } from './rbac/rbac.module';
   providers: [
     HealthService,
     PrismaService,
+    Reflector,
     { provide: PRISMA, useExisting: PrismaService },
   ],
-  exports: [PrismaModule, PRISMA, RbacModule],
+  exports: [PrismaModule, PRISMA, RbacModule, Reflector],
 })
 export class CommonModule {}

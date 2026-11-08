@@ -1023,6 +1023,121 @@ info:
   version: 1.0.0
 openapi: 3.0.0
 paths:
+  /api/v1/affectations:
+    get:
+      operationId: AffectationPedagogiqueController_list
+      parameters: []
+      responses:
+        '200':
+          description: Liste des affectations pédagogiques
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Liste paginée des affectations pédagogiques
+      tags:
+        - Répartition
+    post:
+      operationId: AffectationPedagogiqueController_creer
+      parameters: []
+      responses:
+        '201':
+          description: Affectation pédagogique créée
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Version ou ressource introuvable
+        '409':
+          description: Conflit (triplet déjà affecté)
+      security:
+        - bearerAuth: []
+      summary: Crée une affectation pédagogique
+      tags:
+        - Répartition
+  /api/v1/affectations/cascade:
+    post:
+      operationId: AffectationPedagogiqueController_creerCascade
+      parameters: []
+      responses:
+        '201':
+          description: Affectations créées en cascade
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Ressource introuvable
+        '409':
+          description: Conflit (triplet déjà affecté)
+      security:
+        - bearerAuth: []
+      summary: Crée des affectations en cascade depuis un plan d’études
+      tags:
+        - Répartition
+  /api/v1/affectations/{id}:
+    delete:
+      operationId: AffectationPedagogiqueController_supprimer
+      parameters: []
+      responses:
+        '200':
+          description: Affectation pédagogique supprimée
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Affectation pédagogique introuvable
+      security:
+        - bearerAuth: []
+      summary: Supprime une affectation pédagogique
+      tags:
+        - Répartition
+    get:
+      operationId: AffectationPedagogiqueController_getOne
+      parameters: []
+      responses:
+        '200':
+          description: Affectation pédagogique trouvée
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit ou hors périmètre
+        '404':
+          description: Affectation pédagogique introuvable
+      security:
+        - bearerAuth: []
+      summary: Détail d’une affectation pédagogique
+      tags:
+        - Répartition
+    patch:
+      operationId: AffectationPedagogiqueController_mettreAJour
+      parameters: []
+      responses:
+        '200':
+          description: Affectation pédagogique modifiée
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Affectation pédagogique introuvable
+        '409':
+          description: Conflit (triplet déjà affecté)
+      security:
+        - bearerAuth: []
+      summary: Modifie une affectation pédagogique
+      tags:
+        - Répartition
   /api/v1/auth/login:
     post:
       operationId: AuthController_login
