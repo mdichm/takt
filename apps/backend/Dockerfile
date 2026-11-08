@@ -17,6 +17,7 @@ COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc turbo.json tsconfig.
 COPY packages/contracts/package.json ./packages/contracts/
 COPY packages/db/package.json ./packages/db/
 COPY packages/solver-client/package.json ./packages/solver-client/
+COPY packages/charge-engine/package.json ./packages/charge-engine/
 COPY apps/backend/package.json ./apps/backend/
 
 # Install dependencies
@@ -31,6 +32,8 @@ COPY packages/db/prisma.config.ts ./packages/db/
 COPY packages/db/tsconfig*.json ./packages/db/
 COPY packages/solver-client ./packages/solver-client
 COPY packages/solver-client/tsconfig*.json ./packages/solver-client/
+COPY packages/charge-engine ./packages/charge-engine
+COPY packages/charge-engine/tsconfig*.json ./packages/charge-engine/
 COPY apps/backend/src ./apps/backend/src
 COPY apps/backend/tsconfig*.json ./apps/backend/
 COPY apps/backend/nest-cli.json ./apps/backend/
