@@ -348,7 +348,7 @@ TICKETS: List[Ticket] = [
         lot="L05",
         titre="Implémenter la validation de la répartition pédagogique et son snapshot immuable",
         sp=5,
-        status="À faire",
+        status="Terminé",
         deps=['TAKT-L05-02', 'TAKT-L05-03'],
         exigences=['EX-REP-02', 'EX-REP-03', 'EX-REP-05', 'EX-DAT-01', 'EX-PRI-02', 'DL-07', 'IX-RDEP-02.'],
     ),
