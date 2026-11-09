@@ -32,6 +32,9 @@ COPY apps/frontend/index.html ./apps/frontend/
 COPY apps/frontend/tsconfig*.json ./apps/frontend/
 COPY apps/frontend/vite.config.ts ./apps/frontend/
 
+# Build charge-engine (dépendance workspace du frontend)
+RUN pnpm --filter @takt/charge-engine build
+
 # Build frontend
 RUN pnpm --filter @takt/frontend build
 
