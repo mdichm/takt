@@ -6,7 +6,7 @@
 **Responsables :** Architecte + QA  
 **Statut :** Phase 0 (E0.7) — Validé  
 **Critère de sortie :** ≥ 80 % couverture sur les services critiques, 100 % des parcours critiques en E2E  
-**Documents liés :** ST_TAKT.md, openapi.yaml, contract.prisma, UI_FRONTEND_SPECS.md, UI_USER_FLOWS.md, UI_INTERACTIONS.md, WORKFLOW_METIER.md, PLAN_MACRO.md
+**Documents liés :** ST_TAKT.md, openapi.yaml, schema.prisma (DL-09), UI_FRONTEND_SPECS.md, UI_USER_FLOWS.md, UI_INTERACTIONS.md, WORKFLOW_METIER.md, PLAN_MACRO.md
 
 ---
 

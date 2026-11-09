@@ -5,7 +5,7 @@
 **Date :** 30 octobre 2026
 **Responsable :** Architecte + Backend Lead
 **Statut :** Validé — G3 résolu
-**Documents liés :** ST_TAKT.md (§0.1, §3.4), SF_TAKT.md (§11), WORKFLOW_METIER.md (§8), openapi.yaml, contract.prisma
+**Documents liés :** ST_TAKT.md (§0.1, §3.4), SF_TAKT.md (§11), WORKFLOW_METIER.md (§8), openapi.yaml, schema.prisma (DL-09)
 
 ---
 

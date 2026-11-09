@@ -1,6 +1,6 @@
 // ============================================================================
 // TAKT — Modèle de données (MLD/MDP)
-// Fichier : packages/db/prisma/contract.prisma
+// Fichier : packages/db/prisma/schema.prisma (source de vérité, DL-09)
 // Étape E0.5 — Conforme à docs/ST_TAKT.md §2
 // Générateur : Prisma Client (@takt/db)
 // ============================================================================

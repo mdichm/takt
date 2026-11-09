@@ -40,7 +40,7 @@
 | Backend              | Node.js                         | 24 LTS       | Runtime unifié avec le frontend                         |
 | Backend framework    | NestJS                          | 10+          | Monolithe modulaire, OpenAPI (@nestjs/swagger)          |
 | Base de données      | PostgreSQL                      | 16           | Robuste, JSONB pour audit, pg-boss                      |
-| ORM                  | Prisma                          | 8            | Contrat `prisma/contract.prisma`, client `@takt/db`     |
+| ORM                  | Prisma                          | 8            | Schéma `prisma/schema.prisma` (DL-09), client `@takt/db`|
 | Moteur planification | CP-SAT                          | —            | Solver externe, fichiers dérivés uniquement (EX-PRI-01) |
 | Asynchrone           | pg-boss                         | —            | File de jobs dans PostgreSQL                            |
 | Temps réel           | SSE                             | —            | Suivi des générations, exports, notifications           |

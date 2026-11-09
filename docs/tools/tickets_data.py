@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Source de vérité unique du backlog TAKT.
-Contient la liste complète des 89 tickets avec leurs métadonnées.
+Contient la liste complète des 91 tickets avec leurs métadonnées.
 Ne pas éditer les fichiers générés dans dist/ – modifier uniquement ce fichier.
 """
 from dataclasses import dataclass, asdict
@@ -63,6 +63,15 @@ TICKETS: List[Ticket] = [
         status="Terminé",
         deps=['TAKT-L00-01`…`TAKT-L00-04'],
         exigences=['DL-01 à DL-08', 'DL-TE-01 à DL-TE-08', 'DL-UI-01 à DL-UI-04', 'DL-FS-*.'],
+    ),
+    Ticket(
+        id="TAKT-L00-06",
+        lot="L00",
+        titre="Trancher la source de vérité du modèle de données Prisma",
+        sp=2,
+        status="Terminé",
+        deps=[],
+        exigences=['DL-09'],
     ),
     Ticket(
         id="TAKT-L01-01",

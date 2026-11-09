@@ -42,7 +42,7 @@ TAKT est une application de planification pédagogique conçue pour un établiss
 | E0.3e    | Design tokens & charte             | `docs/UI_DESIGN_TOKENS.md` + doc     | UX Designer + Frontend Lead | Tokens, WCAG AA, thème Ramadan défini                                  |
 | E0.3f    | Spécifications frontend détaillées | `docs/UI_FRONTEND_SPECS.md`          | Frontend Lead + UX Designer | Stack, composants, état, intégration API figés                         |
 | E0.4     | Spécification Technique (ST)       | `docs/ST_TAKT.md`                    | Architecte                  | Stack, architecture, contrats API, algorithmes                         |
-| E0.5     | Modèle de données (MLD/MDP)        | `packages/db/prisma/contract.prisma` | Architecte                  | Contraintes UNIQUE, index, cardinalités validées                       |
+| E0.5     | Modèle de données (MLD/MDP)        | `packages/db/prisma/schema.prisma`   | Architecte                  | Contraintes UNIQUE, index, cardinalités validées                       |
 | E0.6     | Contrats API OpenAPI               | `docs/openapi.yaml`                  | Architecte                  | Endpoints, payloads, erreurs RFC 9457 figés                            |
 | E0.7     | Plan de tests                      | `docs/TESTS.md`                      | Architecte + QA             | ≥ 80 % couverture visée sur les services critiques                     |
 | E0.8     | Plan de déploiement                | `docs/DEPLOIEMENT.md`                | DSI + Architecte            | Environnements dev/recette/prod, sauvegardes, rollback                 |
@@ -57,7 +57,7 @@ TAKT est une application de planification pédagogique conçue pour un établiss
 | Étape | Contenu                                                | Livrable                             | Responsable  | DoD                                                                   |
 | ----- | ------------------------------------------------------ | ------------------------------------ | ------------ | --------------------------------------------------------------------- |
 | E1.1  | Initialisation du monorepo Turbo + pnpm                | Repo Git initial                     | Tech Lead    | `pnpm install` fonctionne, Turbo reconnu                              |
-| E1.2  | Schéma Prisma 8 initial (UUID, tables de base)         | `packages/db/prisma/contract.prisma` | Backend Lead | `prisma db verify` passe, migrations initiales créées                 |
+| E1.2  | Schéma Prisma 8 initial (UUID, tables de base)         | `packages/db/prisma/schema.prisma`   | Backend Lead | `prisma db verify` passe, migrations initiales créées                 |
 | E1.3  | Authentification basique (JWT RS256, refresh argon2id) | `apps/api/src/auth/`                 | Backend Lead | Login/refresh fonctionnel, routes protégées retournent 401 sans token |
 | E1.4  | File de jobs pg-boss                                   | `apps/api/src/jobs/`                 | Backend Lead | Un job de test s'exécute et est tracé en base                         |
 | E1.5  | Docker Compose dev + healthcheck                       | `docker-compose.yml`                 | DevOps       | `curl /health` retourne 200, tous les services montent                |

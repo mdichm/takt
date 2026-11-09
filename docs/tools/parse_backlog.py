@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Parse BACKLOG_TAKT.md and generate tickets_data.py with the full list of 89 tickets.
+Parse BACKLOG_TAKT.md and generate tickets_data.py with the full list of 91 tickets.
 Run from repo root: python3 docs/tools/parse_backlog.py
 """
 import re
@@ -69,7 +69,7 @@ def generate_tickets_py(tickets: List[Ticket], out_path: Path):
     lines.append('#!/usr/bin/env python3')
     lines.append('"""')
     lines.append('Source de vérité unique du backlog TAKT.')
-    lines.append('Contient la liste complète des 89 tickets avec leurs métadonnées.')
+    lines.append('Contient la liste complète des 91 tickets avec leurs métadonnées.')
     lines.append('Ne pas éditer les fichiers générés dans dist/ – modifier uniquement ce fichier.')
     lines.append('"""')
     lines.append('from dataclasses import dataclass, asdict')
