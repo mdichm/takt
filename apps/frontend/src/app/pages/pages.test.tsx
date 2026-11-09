@@ -2,15 +2,18 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { render, screen, cleanup, waitFor } from '@testing-library/react';
+import { render, screen, cleanup, waitFor, fireEvent } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { versionStore } from '@/stores/versionStore';
+import { repartitionApi } from '@/lib/repartition.api';
 
 vi.mock('@/lib/repartition.api', () => ({
   repartitionApi: {
     listerAffectations: vi.fn().mockResolvedValue({ items: [], meta: { page: 1, pageSize: 20, total: 0 } }),
     listerMatieresPlanEtudes: vi.fn().mockResolvedValue({ items: [], meta: { page: 1, pageSize: 20, total: 0 } }),
     listerStatutsValidation: vi.fn().mockResolvedValue([]),
+    validerRepartition: vi.fn().mockResolvedValue({}),
+    annulerRepartition: vi.fn().mockResolvedValue({}),
   },
 }));
 
@@ -133,6 +136,7 @@ describe('pages EC-RDEP-01 / EC-RDEP-02 (réelles, lot L05-06)', () => {
 
   afterEach(() => {
     cleanup();
+    queryClient.clear();
     versionStore.setState({ contexteRepartition: null });
   });
 
@@ -148,6 +152,79 @@ describe('pages EC-RDEP-01 / EC-RDEP-02 (réelles, lot L05-06)', () => {
     renderWithQuery(<EC_RDEP_02 />);
     await waitFor(() =>
       expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument(),
+    );
+    cleanup();
+  });
+
+  it('EC-RDEP-02 : bouton Annuler désactivé quand le département n’est pas validé', async () => {
+    versionStore.setState({
+      contexteRepartition: {
+        versionId: 'v-test',
+        semestreId: 's-test',
+        departementId: 'd-test',
+        etatVersion: 'rep_pedag',
+      },
+    });
+    vi.mocked(repartitionApi.listerStatutsValidation).mockResolvedValue([
+      { departementId: 'd-test', etat: 'EN_COURS', revision: 1 },
+    ]);
+    renderWithQuery(<EC_RDEP_02 />);
+    await waitFor(() =>
+      expect(
+        screen.getByRole('button', { name: 'Annuler la répartition' }),
+      ).toBeDisabled(),
+    );
+    cleanup();
+  });
+
+  it('EC-RDEP-02 : bouton Annuler activé quand le département est validé', async () => {
+    versionStore.setState({
+      contexteRepartition: {
+        versionId: 'v-test',
+        semestreId: 's-test',
+        departementId: 'd-test',
+        etatVersion: 'rep_pedag',
+      },
+    });
+    vi.mocked(repartitionApi.listerStatutsValidation).mockResolvedValue([
+      { departementId: 'd-test', etat: 'VALIDE', revision: 1 },
+    ]);
+    renderWithQuery(<EC_RDEP_02 />);
+    await waitFor(() =>
+      expect(
+        screen.getByRole('button', { name: 'Annuler la répartition' }),
+      ).toBeEnabled(),
+    );
+    cleanup();
+  });
+
+  it('EC-RDEP-02 : cliquer sur Annuler appelle l’API et affiche le succès', async () => {
+    versionStore.setState({
+      contexteRepartition: {
+        versionId: 'v-test',
+        semestreId: 's-test',
+        departementId: 'd-test',
+        etatVersion: 'rep_pedag',
+      },
+    });
+    vi.mocked(repartitionApi.listerStatutsValidation).mockResolvedValue([
+      { departementId: 'd-test', etat: 'VALIDE', revision: 1 },
+    ]);
+    renderWithQuery(<EC_RDEP_02 />);
+    await waitFor(() =>
+      expect(
+        screen.getByRole('button', { name: 'Annuler la répartition' }),
+      ).toBeEnabled(),
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Annuler la répartition' }));
+    await waitFor(() =>
+      expect(repartitionApi.annulerRepartition).toHaveBeenCalledWith({
+        versionId: 'v-test',
+        departementId: 'd-test',
+      }),
+    );
+    await waitFor(() =>
+      expect(screen.getByText(/Répartition annulée/)).toBeInTheDocument(),
     );
     cleanup();
   });

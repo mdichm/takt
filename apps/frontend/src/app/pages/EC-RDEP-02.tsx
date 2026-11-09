@@ -29,7 +29,6 @@ function EC_RDEP_02(): JSX.Element {
 
   const [messageSucces, setMessageSucces] = useState<string | undefined>();
   const [messageErreur, setMessageErreur] = useState<string | undefined>();
-  const [annulerDemande, setAnnulerDemande] = useState(false);
 
   if (!contexteRepartition) {
     return (
@@ -107,12 +106,10 @@ function EC_RDEP_02(): JSX.Element {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['rdep', 'charges', versionId, departementId] });
       setMessageSucces('Répartition annulée (retour à initial).');
-      setAnnulerDemande(false);
       setMessageErreur(undefined);
     },
     onError: (erreur: Error) => {
       setMessageErreur(erreur.message || 'Échec de l’annulation.');
-      setAnnulerDemande(false);
       setMessageSucces(undefined);
     },
   });
@@ -122,7 +119,6 @@ function EC_RDEP_02(): JSX.Element {
   }, [peutValider, validerRepartition]);
 
   const gererAnnuler = useCallback(async () => {
-    setAnnulerDemande(true);
     await annulerRepartition();
   }, [annulerRepartition]);
 
@@ -303,16 +299,11 @@ function EC_RDEP_02(): JSX.Element {
           <Bouton
             variante="danger"
             taille="moyenne"
-            disabled={true}
+            disabled={!estValide}
             chargement={chargementAnnulation}
             onClick={gererAnnuler}
             libelle="Annuler la répartition"
           />
-          {annulerDemande && (
-            <span style={{ fontSize: 'var(--font-size-caption)', color: 'var(--color-text-secondary)' }}>
-              Annulation indisponible : endpoint backend en cours de livraison (TAKT-L05-04).
-            </span>
-          )}
         </div>
       </section>
 
