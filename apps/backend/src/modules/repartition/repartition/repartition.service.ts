@@ -106,6 +106,146 @@ export class RepartitionService {
     @Inject(AuditService) private readonly auditService: AuditService,
   ) {}
 
+  /**
+   * Contrôles du périmètre de validation d’un département : plan d’études
+   * complet par rapport aux matières du département, et charge sans alerte
+   * bloquante.
+   *
+   * Réutilisé par la validation initiale (TAKT-L05-04) et la revalidation
+   * ciblée (TAKT-L05-05). Ne vérifie ni l’état de version, ni l’immuabilité
+   * (ces règles relèvent de l’appelant).
+   *
+   * @throws 404 si la version est introuvable
+   * @throws 400 si aucune affectation, plan d’études manquant, matières du
+   *         plan manquantes ou charge bloquante
+   */
+  async validerPerimetre(
+    versionId: string,
+    departementId: string,
+  ): Promise<{
+    affectationsPourSnapshot: Array<{
+      id: string;
+      enseignantId: string;
+      matiereId: string;
+      groupeId: string;
+      typeEnseignementId: string | null;
+      volumeHebdo: number;
+      dureeCreneaux: number | null;
+    }>;
+    resultatCharge: ChargeEngineResultat;
+    reglesCharge: {
+      id: string;
+      code: string;
+      version: number;
+      source: 'CHARGE_RULE_SET' | 'DEFAUT';
+    };
+    hashAffectations: string;
+  }> {
+    const version = await this.prisma.version.findUnique({
+      where: { id: versionId },
+      select: { id: true, semestreId: true },
+    });
+
+    if (!version) {
+      throw new ApiError(CODES_ERREUR_API.NOT_FOUND, 404, 'Version introuvable', {
+        champ: 'versionId',
+      });
+    }
+
+    const affectations = await this.prisma.affectationPedagogique.findMany({
+      where: { versionId, departementId },
+      include: {
+        enseignant: { select: { id: true, grade: { select: { code: true } } } },
+        matiere: { select: { id: true, code: true } },
+        typeEnseignement: { select: { id: true, code: true } },
+        groupe: {
+          select: {
+            id: true,
+            niveau: { select: { parcours: { select: { departementId: true } } } },
+          },
+        },
+      },
+    });
+
+    if (affectations.length === 0) {
+      throw new ApiError(CODES_ERREUR_API.BAD_REQUEST, 400, 'Aucune affectation trouvee', {
+        departementId,
+      });
+    }
+
+    const planEtudes = await this.prisma.planEtudes.findFirst({
+      where: { semestreId: version.semestreId, departementId },
+      include: { planEtudesMatieres: { select: { matiereId: true } } },
+    });
+
+    if (!planEtudes) {
+      throw new ApiError(CODES_ERREUR_API.BAD_REQUEST, 400, 'Aucun plan d etudes trouve', {
+        departementId,
+      });
+    }
+
+    const matieresPlan = new Set(planEtudes.planEtudesMatieres.map((m) => m.matiereId));
+    const matieresAffectees = new Set(affectations.map((a) => a.matiereId));
+    const matieresManquantes = [...matieresPlan].filter((m) => !matieresAffectees.has(m));
+
+    if (matieresManquantes.length > 0) {
+      throw new ApiError(CODES_ERREUR_API.BAD_REQUEST, 400, 'Repartition incomplete', {
+        matieresManquantes,
+      });
+    }
+
+    const { ruleSet, source } = await this.obtenirChargeRuleSetActifOuDefaut();
+
+    const affectationsCharge: ChargeEngineAffectation[] = affectations.map((a) => ({
+      id: a.id,
+      enseignantId: a.enseignantId,
+      departementId: a.departementId,
+      gradeCode: a.enseignant.grade?.code,
+      typeEnseignementCode: a.typeEnseignement?.code,
+      volumeHebdo: a.volumeHebdo,
+    }));
+
+    // Import dynamique du moteur de charge (package ESM, backend CommonJS).
+    const chargeEngine = await import('@takt/charge-engine');
+    const resultatCharge: ChargeEngineResultat = chargeEngine.computeCharge(
+      affectationsCharge,
+      ruleSet,
+    );
+
+    const alertesBloquantes = resultatCharge.alertes.filter(
+      (a: { severite: string }) => a.severite === 'BLOQUANT',
+    );
+    if (alertesBloquantes.length > 0) {
+      throw new ApiError(CODES_ERREUR_API.BAD_REQUEST, 400, 'Depassement plafond de charge', {
+        alertes: alertesBloquantes,
+      });
+    }
+
+    const affectationsPourSnapshot = affectations.map((a) => ({
+      id: a.id,
+      enseignantId: a.enseignantId,
+      matiereId: a.matiereId,
+      groupeId: a.groupeId,
+      typeEnseignementId: a.typeEnseignementId,
+      volumeHebdo: a.volumeHebdo,
+      dureeCreneaux: a.dureeCreneaux,
+    }));
+
+    // Hash stable des seules affectations : permet de détecter un impact sur un département.
+    const hashAffectations = creerHashSHA256({
+      versionId,
+      departementId,
+      affectations: [...affectationsPourSnapshot].sort((a, b) => a.id.localeCompare(b.id)),
+    });
+
+    return {
+      affectationsPourSnapshot,
+      resultatCharge,
+      reglesCharge: { id: ruleSet.id, code: ruleSet.code, version: ruleSet.version, source },
+      hashAffectations,
+    };
+  }
+
   async validerRepartition(
     versionId: string,
     departementId: string,
@@ -122,21 +262,25 @@ export class RepartitionService {
     });
 
     if (!version) {
-      throw new ApiError(CODES_ERREUR_API.NOT_FOUND, 404, 'Version introuvable', { champ: 'versionId' });
+      throw new ApiError(CODES_ERREUR_API.NOT_FOUND, 404, 'Version introuvable', {
+        champ: 'versionId',
+      });
     }
 
     if (version.etat !== 'rep_pedag') {
       throw new ApiError(
         CODES_ERREUR_API.CONFLICT,
         409,
-        'Validation impossible : la version doit etre en etat rep_pedag (etat actuel: ' + version.etat + ')',
+        'Validation impossible : la version doit etre en etat rep_pedag (etat actuel: ' +
+          version.etat +
+          ')',
         { etatActuel: version.etat },
       );
     }
 
-    // Immuabilité : un snapshot de répartition existe déjà pour ce département sur cette version.
+    // Immuabilité : un snapshot de répartition courant existe déjà pour ce département sur cette version.
     const snapshotExistant = await this.prisma.snapshot.findFirst({
-      where: { versionId, departementId },
+      where: { versionId, departementId, estCourant: true },
     });
     if (snapshotExistant) {
       throw new ApiError(
@@ -147,72 +291,17 @@ export class RepartitionService {
       );
     }
 
-    const affectations = await this.prisma.affectationPedagogique.findMany({
-      where: { versionId, departementId },
-      include: {
-        enseignant: { select: { id: true, grade: { select: { code: true } } } },
-        matiere: { select: { id: true, code: true } },
-        typeEnseignement: { select: { id: true, code: true } },
-        groupe: { select: { id: true, niveau: { select: { parcours: { select: { departementId: true } } } } } },
-      },
-    });
-
-    if (affectations.length === 0) {
-      throw new ApiError(CODES_ERREUR_API.BAD_REQUEST, 400, 'Aucune affectation trouvee', { departementId });
-    }
-
-    const planEtudes = await this.prisma.planEtudes.findFirst({
-      where: { semestreId: version.semestreId, departementId },
-      include: { planEtudesMatieres: { select: { matiereId: true } } },
-    });
-
-    if (!planEtudes) {
-      throw new ApiError(CODES_ERREUR_API.BAD_REQUEST, 400, 'Aucun plan d etudes trouve', { departementId });
-    }
-
-    const matieresPlan = new Set(planEtudes.planEtudesMatieres.map((m) => m.matiereId));
-    const matieresAffectees = new Set(affectations.map((a) => a.matiereId));
-    const matieresManquantes = [...matieresPlan].filter((m) => !matieresAffectees.has(m));
-
-    if (matieresManquantes.length > 0) {
-      throw new ApiError(CODES_ERREUR_API.BAD_REQUEST, 400, 'Repartition incomplete', { matieresManquantes });
-    }
-
-    const { ruleSet, source } = await this.obtenirChargeRuleSetActifOuDefaut();
-
-    const affectationsCharge: ChargeEngineAffectation[] = affectations.map((a) => ({
-      id: a.id,
-      enseignantId: a.enseignantId,
-      departementId: a.departementId,
-      gradeCode: a.enseignant.grade?.code,
-      typeEnseignementCode: a.typeEnseignement?.code,
-      volumeHebdo: a.volumeHebdo,
-    }));
-
-    // Import dynamique du moteur de charge (package ESM, backend CommonJS).
-    const chargeEngine = await import('@takt/charge-engine');
-    const resultatCharge: ChargeEngineResultat = chargeEngine.computeCharge(affectationsCharge, ruleSet);
-
-    const alertesBloquantes = resultatCharge.alertes.filter((a: { severite: string }) => a.severite === 'BLOQUANT');
-    if (alertesBloquantes.length > 0) {
-      throw new ApiError(CODES_ERREUR_API.BAD_REQUEST, 400, 'Depassement plafond de charge', { alertes: alertesBloquantes });
-    }
+    // Contrôles du périmètre (plan d’études complet + charge sans alerte bloquante).
+    const perimetre = await this.validerPerimetre(versionId, departementId);
+    const { affectationsPourSnapshot, resultatCharge, reglesCharge, hashAffectations } = perimetre;
 
     const donneesSnapshot = {
       versionId,
       departementId,
       type: 'REPARTITION' as const,
-      affectations: affectations.map((a) => ({
-        id: a.id,
-        enseignantId: a.enseignantId,
-        matiereId: a.matiereId,
-        groupeId: a.groupeId,
-        typeEnseignementId: a.typeEnseignementId,
-        volumeHebdo: a.volumeHebdo,
-        dureeCreneaux: a.dureeCreneaux,
-      })),
+      affectations: affectationsPourSnapshot,
       charge: resultatCharge,
-      reglesCharge: { id: ruleSet.id, code: ruleSet.code, version: ruleSet.version, source },
+      reglesCharge,
       validePar: utilisateurId,
       valideLe: new Date().toISOString(),
     };
@@ -223,8 +312,24 @@ export class RepartitionService {
       data: {
         versionId,
         departementId,
-        donnees: (donneesSnapshot as unknown) as Prisma.InputJsonValue,
+        revision: 1,
+        estCourant: true,
+        donnees: donneesSnapshot as unknown as Prisma.InputJsonValue,
         hash,
+      },
+    });
+
+    // État de validation par département (TAKT-L05-05).
+    await this.prisma.validationRepartition.create({
+      data: {
+        versionId,
+        departementId,
+        etat: 'VALIDE',
+        revision: 1,
+        hashAffectations,
+        snapshotCourantId: snapshot.id,
+        valideLe: new Date(),
+        validePar: utilisateurId,
       },
     });
 
@@ -234,14 +339,37 @@ export class RepartitionService {
       utilisateurId,
       entite: 'Snapshot',
       entiteId: snapshot.id,
-      metadonnees: { versionId, departementId, type: 'REPARTITION', action: 'VALIDATION_REPARTITION' },
+      metadonnees: {
+        versionId,
+        departementId,
+        type: 'REPARTITION',
+        action: 'VALIDATION_REPARTITION',
+      },
     });
 
-    const transitionVersBrouillon = await this.verifierEtTransitionnerVersBrouillon(versionId, version.semestreId, utilisateurId);
+    const transitionVersBrouillon = await this.verifierEtTransitionnerVersBrouillon(
+      versionId,
+      version.semestreId,
+      utilisateurId,
+    );
 
-    this.logger.log('Répartition validée: dep ' + departementId + ', ver ' + versionId + ', snap ' + snapshot.id + ', brouillon: ' + transitionVersBrouillon);
+    this.logger.log(
+      'Répartition validée: dep ' +
+        departementId +
+        ', ver ' +
+        versionId +
+        ', snap ' +
+        snapshot.id +
+        ', brouillon: ' +
+        transitionVersBrouillon,
+    );
 
-    return { snapshotId: snapshot.id, charge: resultatCharge, reglesChargeSource: source, transitionVersBrouillon };
+    return {
+      snapshotId: snapshot.id,
+      charge: resultatCharge,
+      reglesChargeSource: reglesCharge.source,
+      transitionVersBrouillon,
+    };
   }
 
   private async obtenirChargeRuleSetActifOuDefaut(): Promise<{
@@ -251,7 +379,10 @@ export class RepartitionService {
     const ruleSetActif = await this.prisma.chargeRuleSet.findFirst({ where: { estActive: true } });
 
     if (ruleSetActif) {
-      return { ruleSet: this.mapPrismaToChargeEngineRuleSet(ruleSetActif), source: 'CHARGE_RULE_SET' };
+      return {
+        ruleSet: this.mapPrismaToChargeEngineRuleSet(ruleSetActif),
+        source: 'CHARGE_RULE_SET',
+      };
     }
 
     const ruleSetDefaut: ChargeEngineRuleSet = {
@@ -272,7 +403,9 @@ export class RepartitionService {
       updatedAt: new Date(),
     };
 
-    this.logger.warn('Aucun ChargeRuleSet actif trouve - utilisation des valeurs par defaut du modele Prisma');
+    this.logger.warn(
+      'Aucun ChargeRuleSet actif trouve - utilisation des valeurs par defaut du modele Prisma',
+    );
     return { ruleSet: ruleSetDefaut, source: 'DEFAUT' };
   }
 
@@ -315,7 +448,7 @@ export class RepartitionService {
     if (departementIds.length === 0) return false;
 
     const snapshotsCount = await this.prisma.snapshot.count({
-      where: { versionId, departementId: { in: departementIds } },
+      where: { versionId, departementId: { in: departementIds }, estCourant: true },
     });
 
     if (snapshotsCount === departementIds.length) {
@@ -326,10 +459,20 @@ export class RepartitionService {
           utilisateurId,
           entite: 'Version',
           entiteId: versionId,
-          metadonnees: { transition: 'rep_pedag -> brouillon', declencheur: 'DERNIER_DEPARTEMENT_VALIDE', departementsValides: departementIds },
+          metadonnees: {
+            transition: 'rep_pedag -> brouillon',
+            declencheur: 'DERNIER_DEPARTEMENT_VALIDE',
+            departementsValides: departementIds,
+          },
         });
       });
-      this.logger.log('Version ' + versionId + ' transitionnee vers brouillon : tous les ' + departementIds.length + ' departements ont valide');
+      this.logger.log(
+        'Version ' +
+          versionId +
+          ' transitionnee vers brouillon : tous les ' +
+          departementIds.length +
+          ' departements ont valide',
+      );
       return true;
     }
     return false;

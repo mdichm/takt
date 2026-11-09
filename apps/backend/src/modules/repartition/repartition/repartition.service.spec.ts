@@ -49,6 +49,7 @@ function creerPrismaMock(overrides: Record<string, unknown> = {}) {
     affectationPedagogique: { findMany: vi.fn<any>() }, // eslint-disable-line @typescript-eslint/no-explicit-any
     planEtudes: { findFirst: vi.fn<any>() }, // eslint-disable-line @typescript-eslint/no-explicit-any
     chargeRuleSet: { findFirst: vi.fn<any>() }, // eslint-disable-line @typescript-eslint/no-explicit-any
+    validationRepartition: { create: vi.fn<any>() }, // eslint-disable-line @typescript-eslint/no-explicit-any
     ...overrides,
   } as any; // eslint-disable-line @typescript-eslint/no-explicit-any
 }
@@ -69,21 +70,27 @@ describe('RepartitionService.validerRepartition (TAKT-L05-04)', () => {
     const prisma = creerPrismaMock({ version: { findUnique: vi.fn().mockResolvedValue(null) } });
     const service = creerService(prisma);
 
-    await expect(service.validerRepartition(VERSION_ID, DEPARTEMENT_ID, UTILISATEUR_ID)).rejects.toMatchObject({
+    await expect(
+      service.validerRepartition(VERSION_ID, DEPARTEMENT_ID, UTILISATEUR_ID),
+    ).rejects.toMatchObject({
       code: CODES_ERREUR_API.NOT_FOUND,
     });
   });
 
-  it('retourne 409 quand la version n\'est pas en état rep_pedag', async () => {
-    const prisma = creerPrismaMock({ version: { findUnique: vi.fn().mockResolvedValue(VERSION_BROUILLON) } });
+  it("retourne 409 quand la version n'est pas en état rep_pedag", async () => {
+    const prisma = creerPrismaMock({
+      version: { findUnique: vi.fn().mockResolvedValue(VERSION_BROUILLON) },
+    });
     const service = creerService(prisma);
 
-    await expect(service.validerRepartition(VERSION_ID, DEPARTEMENT_ID, UTILISATEUR_ID)).rejects.toMatchObject({
+    await expect(
+      service.validerRepartition(VERSION_ID, DEPARTEMENT_ID, UTILISATEUR_ID),
+    ).rejects.toMatchObject({
       code: CODES_ERREUR_API.CONFLICT,
     });
   });
 
-  it('retourne 400 quand aucune affectation n\'est trouvée', async () => {
+  it("retourne 400 quand aucune affectation n'est trouvée", async () => {
     const prisma = creerPrismaMock({
       version: { findUnique: vi.fn().mockResolvedValue(VERSION_REP_PEDAG) },
       snapshot: { findFirst: vi.fn().mockResolvedValue(null) },
@@ -91,12 +98,14 @@ describe('RepartitionService.validerRepartition (TAKT-L05-04)', () => {
     });
     const service = creerService(prisma);
 
-    await expect(service.validerRepartition(VERSION_ID, DEPARTEMENT_ID, UTILISATEUR_ID)).rejects.toMatchObject({
+    await expect(
+      service.validerRepartition(VERSION_ID, DEPARTEMENT_ID, UTILISATEUR_ID),
+    ).rejects.toMatchObject({
       code: CODES_ERREUR_API.BAD_REQUEST,
     });
   });
 
-  it('retourne 400 quand le plan d\'études est manquant', async () => {
+  it("retourne 400 quand le plan d'études est manquant", async () => {
     const prisma = creerPrismaMock({
       version: { findUnique: vi.fn().mockResolvedValue(VERSION_REP_PEDAG) },
       snapshot: { findFirst: vi.fn().mockResolvedValue(null) },
@@ -105,7 +114,9 @@ describe('RepartitionService.validerRepartition (TAKT-L05-04)', () => {
     });
     const service = creerService(prisma);
 
-    await expect(service.validerRepartition(VERSION_ID, DEPARTEMENT_ID, UTILISATEUR_ID)).rejects.toMatchObject({
+    await expect(
+      service.validerRepartition(VERSION_ID, DEPARTEMENT_ID, UTILISATEUR_ID),
+    ).rejects.toMatchObject({
       code: CODES_ERREUR_API.BAD_REQUEST,
     });
   });
@@ -115,16 +126,23 @@ describe('RepartitionService.validerRepartition (TAKT-L05-04)', () => {
       version: { findUnique: vi.fn().mockResolvedValue(VERSION_REP_PEDAG) },
       snapshot: { findFirst: vi.fn().mockResolvedValue(null) },
       affectationPedagogique: { findMany: vi.fn().mockResolvedValue(AFFECTATIONS) },
-      planEtudes: { findFirst: vi.fn().mockResolvedValue({ ...PLAN_ETUDES, planEtudesMatieres: [{ matiereId: 'mat-1' }, { matiereId: 'mat-2' }] }) },
+      planEtudes: {
+        findFirst: vi.fn().mockResolvedValue({
+          ...PLAN_ETUDES,
+          planEtudesMatieres: [{ matiereId: 'mat-1' }, { matiereId: 'mat-2' }],
+        }),
+      },
     });
     const service = creerService(prisma);
 
-    await expect(service.validerRepartition(VERSION_ID, DEPARTEMENT_ID, UTILISATEUR_ID)).rejects.toMatchObject({
+    await expect(
+      service.validerRepartition(VERSION_ID, DEPARTEMENT_ID, UTILISATEUR_ID),
+    ).rejects.toMatchObject({
       code: CODES_ERREUR_API.BAD_REQUEST,
     });
   });
 
-  it('crée le snapshot, écrit l\'audit et retourne les données quand tout est valide', async () => {
+  it("crée le snapshot, écrit l'audit et retourne les données quand tout est valide", async () => {
     const snapshotCree = { id: 'snap-new', versionId: VERSION_ID, departementId: DEPARTEMENT_ID };
     const prisma = creerPrismaMock({
       version: { findUnique: vi.fn().mockResolvedValue(VERSION_REP_PEDAG) },
@@ -157,6 +175,14 @@ describe('RepartitionService.validerRepartition (TAKT-L05-04)', () => {
     expect(auditCall.action).toBe('TRANSITION_ETAT');
     expect(auditCall.entite).toBe('Snapshot');
     expect(auditCall.entiteId).toBe('snap-new');
+
+    // Un état de validation par département est créé (TAKT-L05-05).
+    expect(prisma.validationRepartition.create).toHaveBeenCalledTimes(1);
+    const vrCall = prisma.validationRepartition.create.mock.calls[0]![0]!;
+    expect(vrCall.data!.versionId).toBe(VERSION_ID);
+    expect(vrCall.data!.departementId).toBe(DEPARTEMENT_ID);
+    expect(vrCall.data!.etat).toBe('VALIDE');
+    expect(vrCall.data!.revision).toBe(1);
   });
 
   it('passe en DEFAUT quand aucun ChargeRuleSet actif', async () => {

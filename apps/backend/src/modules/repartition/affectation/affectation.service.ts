@@ -6,6 +6,7 @@ import { PRISMA } from '../../common/di/prisma.token';
 import { PrismaClient, Prisma } from '@takt/db';
 import { CODES_ERREUR_API, ApiError } from '../../common/http/api-error';
 import { AuditService } from '../../audit/audit.service';
+import { RevalidationService } from '../revalidation/revalidation.service';
 import {
   buildPrismaQuery,
   ConfigurationRequeteListe,
@@ -37,6 +38,8 @@ export class AffectationPedagogiqueService {
   constructor(
     @Inject(PRISMA) private readonly prisma: PrismaClient,
     @Inject(AuditService) private readonly auditService: AuditService,
+    @Inject(RevalidationService)
+    private readonly revalidationService: RevalidationService,
   ) {}
 
   /** Liste paginée des affectations, filtrée par département(s). */
@@ -328,6 +331,9 @@ export class AffectationPedagogiqueService {
       },
     });
 
+    // Détection automatique des départements impactés (TAKT-L05-05).
+    await this.revalidationService.detecterImpacts(cree.versionId, utilisateurId);
+
     this.logger.log(`Affectation pédagogique créée : ${cree.id}`);
 
     return { affectation: cree, avertissements };
@@ -526,6 +532,9 @@ export class AffectationPedagogiqueService {
       },
     });
 
+    // Détection automatique des départements impactés (TAKT-L05-05).
+    await this.revalidationService.detecterImpacts(versionId, utilisateurId);
+
     this.logger.log(`Affectation pédagogique modifiée : ${id}`);
 
     return { affectation: modifie, avertissements };
@@ -567,6 +576,9 @@ export class AffectationPedagogiqueService {
         volumeHebdo: existant.volumeHebdo,
       },
     });
+
+    // Détection automatique des départements impactés (TAKT-L05-05).
+    await this.revalidationService.detecterImpacts(existant.versionId, utilisateurId);
 
     this.logger.log(`Affectation pédagogique supprimée : ${id}`);
 
@@ -716,6 +728,9 @@ export class AffectationPedagogiqueService {
 
       affectationsCrees.push(cree);
     }
+
+    // Détection automatique des départements impactés (TAKT-L05-05).
+    await this.revalidationService.detecterImpacts(donnees.versionId, utilisateurId);
 
     this.logger.log(`${affectationsCrees.length} affectations créées en cascade`);
 

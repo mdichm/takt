@@ -45,6 +45,7 @@ const GEST_ID = 'cccccccc-cccc-cccc-cccc-cccccccccccc';
 const DIR_ID = 'dddddddd-dddd-dddd-dddd-dddddddddddd';
 const DEPARTEMENT_ID = 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee';
 const DEPARTEMENT2_ID = 'ffffffff-ffff-ffff-ffff-ffffffffffff';
+const DEPARTEMENT3_ID = 'e2e2e2e2-e2e2-e2e2-e2e2-e2e2e2e2e2e2';
 const ETABLISSEMENT_ID = '11111111-1111-1111-1111-111111111111';
 const PARCOURS_ID = '22222222-2222-2222-2222-222222222222';
 const NIVEAU_ID = '33333333-3333-3333-3333-333333333333';
@@ -83,6 +84,7 @@ export interface ContexteTestRepartition {
   idDir: string;
   departementId: string;
   departement2Id: string;
+  departement3Id: string;
   semestreId: string;
   versionId: string;
   version2Id: string;
@@ -195,6 +197,16 @@ export async function creerContexteTestRepartition(): Promise<ContexteTestRepart
       id: DEPARTEMENT2_ID,
       code: 'MATH',
       libelle: 'Mathématiques',
+      etablissementId: ETABLISSEMENT_ID,
+    },
+  });
+  await prisma.departement.upsert({
+    where: { id: DEPARTEMENT3_ID },
+    update: {},
+    create: {
+      id: DEPARTEMENT3_ID,
+      code: 'PHYS',
+      libelle: 'Physique',
       etablissementId: ETABLISSEMENT_ID,
     },
   });
@@ -454,6 +466,7 @@ export async function creerContexteTestRepartition(): Promise<ContexteTestRepart
     idDir: dir.id,
     departementId: DEPARTEMENT_ID,
     departement2Id: DEPARTEMENT2_ID,
+    departement3Id: DEPARTEMENT3_ID,
     semestreId: SEMESTRE_ID,
     versionId: VERSION_ID,
     version2Id: VERSION2_ID,

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import { z } from 'zod';
-import { creerSchemaTri, zPaginationQuery, zSearchFilter, zUuid } from './common';
+import { creerSchemaTri, zDateIso, zPaginationQuery, zSearchFilter, zUuid } from './common';
 
 /** Plan d'études d'un niveau pour une année universitaire et un semestre. */
 export const zPlanEtudes = z.object({
@@ -164,3 +164,86 @@ export const zRepartitionSnapshot = z.object({
 });
 
 export type RepartitionSnapshot = z.infer<typeof zRepartitionSnapshot>;
+
+/** États possibles de la validation de répartition d’un département (TAKT-L05-05). */
+export const zEtatValidationRepartition = z.enum([
+  'EN_COURS',
+  'VALIDE',
+  'REVALIDATION_REQUISE',
+  'REJETE',
+]);
+
+export type EtatValidationRepartition = z.infer<typeof zEtatValidationRepartition>;
+
+/** Détection des départements impactés d’une version (POST /repartition/revalidation/detecter). */
+export const zRevalidationDetecter = z.object({
+  versionId: zUuid,
+});
+
+export type RevalidationDetecterInput = z.infer<typeof zRevalidationDetecter>;
+
+/** Filtres de lecture des états de validation (GET /repartition/revalidation/statuts). */
+export const zRevalidationStatutsQuery = z.object({
+  versionId: zUuid,
+});
+
+export type RevalidationStatutsQuery = z.infer<typeof zRevalidationStatutsQuery>;
+
+/** Revalidation d’un département (POST /repartition/revalidation/valider). */
+export const zRevalidationValider = z.object({
+  versionId: zUuid,
+  departementId: zUuid.optional(),
+});
+
+export type RevalidationValiderInput = z.infer<typeof zRevalidationValider>;
+
+/** État de validation d’un département pour une version. */
+export const zStatutValidationRepartition = z.object({
+  departementId: zUuid,
+  etat: zEtatValidationRepartition,
+  revision: z.number().int().positive(),
+  hashAffectations: z.string().nullable().optional(),
+  motif: z.string().nullable().optional(),
+  revalidationDemandeeLe: zDateIso.nullable().optional(),
+  revalidationDemandeePar: zUuid.nullable().optional(),
+  valideLe: zDateIso.nullable().optional(),
+  validePar: zUuid.nullable().optional(),
+  snapshotCourantId: zUuid.nullable().optional(),
+  snapshotPrecedentId: zUuid.nullable().optional(),
+});
+
+export type StatutValidationRepartition = z.infer<typeof zStatutValidationRepartition>;
+
+/** Réponse de détection des impacts (POST /repartition/revalidation/detecter). */
+export const zRevalidationDetecterReponse = z.object({
+  versionId: zUuid,
+  departementsImpactes: z.array(zStatutValidationRepartition),
+  notificationsCrees: z.number().int().nonnegative(),
+});
+
+export type RevalidationDetecterReponse = z.infer<typeof zRevalidationDetecterReponse>;
+
+/** Réponse de revalidation d’un département (POST /repartition/revalidation/valider). */
+export const zRevalidationValiderReponse = z.object({
+  departementId: zUuid,
+  etat: zEtatValidationRepartition,
+  revision: z.number().int().positive(),
+  snapshotId: zUuid,
+  snapshotPrecedentId: zUuid.nullable(),
+  tousDepartementsValides: z.boolean(),
+});
+
+export type RevalidationValiderReponse = z.infer<typeof zRevalidationValiderReponse>;
+
+/** Notification in-app émise à un utilisateur (TAKT-L05-05). */
+export const zNotification = z.object({
+  id: zUuid,
+  utilisateurId: zUuid,
+  type: z.string().min(1),
+  titre: z.string().min(1),
+  message: z.string().min(1),
+  lue: z.boolean(),
+  createdAt: zDateIso,
+});
+
+export type Notification = z.infer<typeof zNotification>;
