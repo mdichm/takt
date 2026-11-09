@@ -3070,6 +3070,62 @@ paths:
       summary: Modifie un type de salle
       tags:
         - Référentiels
+  /api/v1/repartition/revalidation/detecter:
+    post:
+      operationId: RevalidationController_detecter
+      parameters: []
+      responses:
+        '200':
+          description: Départements impactés et notifications envoyées
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit ou hors périmètre
+        '404':
+          description: Version introuvable
+      security:
+        - bearerAuth: []
+      summary: Détecte les départements impactés d’une version
+      tags:
+        - Revalidation
+  /api/v1/repartition/revalidation/statuts:
+    get:
+      operationId: RevalidationController_statuts
+      parameters: []
+      responses:
+        '200':
+          description: États de validation des départements
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit ou hors périmètre
+      security:
+        - bearerAuth: []
+      summary: Liste les états de validation par département
+      tags:
+        - Revalidation
+  /api/v1/repartition/revalidation/valider:
+    post:
+      operationId: RevalidationController_revalider
+      parameters: []
+      responses:
+        '200':
+          description: Département revalidé, nouveau snapshot créé
+        '400':
+          description: Répartition incomplète ou charge bloquante
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit ou hors périmètre
+        '404':
+          description: Aucune validation de répartition trouvée
+        '409':
+          description: Aucune demande de revalidation en cours
+      security:
+        - bearerAuth: []
+      summary: Revalide la répartition d’un département impacté
+      tags:
+        - Revalidation
   /api/v1/repartition/valider:
     post:
       operationId: RepartitionController_valider

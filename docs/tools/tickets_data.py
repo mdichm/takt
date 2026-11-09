@@ -357,7 +357,7 @@ TICKETS: List[Ticket] = [
         lot="L05",
         titre="Implémenter la revalidation ciblée d'un département impacté",
         sp=5,
-        status="À faire",
+        status="Terminé",
         deps=['TAKT-L05-04', 'TAKT-L06-02'],
         exigences=['EX-REP-04', 'EX-WKF-09', 'IX-RDEP-04', 'EC-RDEP-04', 'ST_TAKT §1.4.'],
     ),

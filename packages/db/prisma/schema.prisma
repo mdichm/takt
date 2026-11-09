@@ -35,6 +35,7 @@ model Utilisateur {
   sessionsRefresh  SessionRefresh[]    // familles de jetons de rafraîchissement (rotation)
   verrous          VerrouSeance[]
   journalAudit     JournalAudit[]
+  notifications    Notification[]      // notifications in-app (TAKT-L05-05)
 
   @@index([email])
   @@index([roleId])
@@ -84,6 +85,7 @@ model Departement {
   planEtudes      PlanEtudes[]
   enseignants     EnseignantDepartement[]
   snapshots       Snapshot[]
+  validationRepartitions ValidationRepartition[] // état de validation par département (TAKT-L05-05)
 
   @@index([code])
   @@index([etablissementId])
@@ -255,6 +257,7 @@ model Version {
   exports     Export[]
   contraintes Contrainte[]
   affectations AffectationPedagogique[]
+  validationRepartitions ValidationRepartition[] // état de validation par département (TAKT-L05-05)
 
   @@index([semestreId])
   @@index([etat])
@@ -267,6 +270,8 @@ model Snapshot {
   id            String      @id @default(uuid()) @db.Uuid
   versionId     String      @db.Uuid
   departementId String?     @db.Uuid // snapshot de répartition : un par (versionId, departementId) ; snapshot de publication : NULL
+  revision      Int         @default(1) // numéro de révision du snapshot (historique des revalidations)
+  estCourant    Boolean     @default(true) // true = snapshot actuellement en vigueur pour le département
   donnees       Json        // données JSONB du snapshot
   hash          String      // hash d'intégrité du snapshot
   createdAt     DateTime    @default(now())
@@ -274,7 +279,42 @@ model Snapshot {
   version       Version       @relation(fields: [versionId], references: [id])
   departement   Departement?  @relation(fields: [departementId], references: [id])
 
+  // Historique des revalidations ciblées par département.
+  validationRepartitionsCourant  ValidationRepartition[] @relation("SnapshotCourant")
+  validationRepartitionsPrecedent ValidationRepartition[] @relation("SnapshotPrecedent")
+
   @@index([versionId])
+  @@index([versionId, departementId])
+  @@index([departementId])
+}
+
+// ----------------------------------------------------------------------------
+// 7b. ValidationRepartition — État de validation d’un département pour une version
+// ----------------------------------------------------------------------------
+model ValidationRepartition {
+  id                        String   @id @default(uuid()) @db.Uuid
+  versionId                 String   @db.Uuid
+  departementId             String   @db.Uuid
+  etat                      String   // EN_COURS | VALIDE | REVALIDATION_REQUISE | REJETE
+  revision                  Int      @default(1)
+  hashAffectations          String?  // hash des affectations validées (détection d’impact par département)
+  snapshotCourantId         String?  @db.Uuid
+  snapshotPrecedentId       String?  @db.Uuid
+  motif                     String?
+  revalidationDemandeeLe    DateTime?
+  revalidationDemandeePar   String?  @db.Uuid
+  valideLe                  DateTime?
+  validePar                 String?  @db.Uuid
+  createdAt                 DateTime @default(now())
+  updatedAt                 DateTime @updatedAt
+
+  version        Version              @relation(fields: [versionId], references: [id])
+  departement    Departement          @relation(fields: [departementId], references: [id])
+  snapshotCourant    Snapshot?        @relation("SnapshotCourant", fields: [snapshotCourantId], references: [id])
+  snapshotPrecedent  Snapshot?        @relation("SnapshotPrecedent", fields: [snapshotPrecedentId], references: [id])
+
+  @@index([versionId])
+  @@index([departementId])
   @@index([versionId, departementId])
 }
 
@@ -747,4 +787,22 @@ model ConfigSysteme {
   creneauxParJour   Int      @default(24)
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
+}
+
+// ----------------------------------------------------------------------------
+// 31. Notification — Notification in-app émise à un utilisateur (TAKT-L05-05)
+// ----------------------------------------------------------------------------
+model Notification {
+  id            String   @id @default(uuid()) @db.Uuid
+  utilisateurId String   @db.Uuid
+  type          String   // REVALIDATION_DEMANDEE | REVALIDATION_VALIDEE | ...
+  titre         String
+  message       String
+  lue           Boolean  @default(false)
+  createdAt     DateTime @default(now())
+
+  utilisateur Utilisateur @relation(fields: [utilisateurId], references: [id])
+
+  @@index([utilisateurId])
+  @@index([utilisateurId, lue])
 }
