@@ -5,6 +5,11 @@ import { expect, test } from '@playwright/test';
 
 const API = 'http://localhost:3000/api/v1';
 
+// Les tests E2E nécessitent un environnement de démo (frontend + backend démarrés).
+// En CI sans BASE_URL explicite, on saute ces tests.
+test.skip(!process.env.BASE_URL || process.env.BASE_URL === 'http://localhost:5173',
+  'Tests E2E ignorés : aucun environnement de démo disponible (BASE_URL non défini)');
+
 test.describe('UF-RDEP-01 — Saisie et validation de la répartition pédagogique', () => {
   test('écran de saisie protégé sans session redirige vers /login', async ({ page }) => {
     const reponse = await page.goto('/rdep/allocation', { waitUntil: 'networkidle' });
