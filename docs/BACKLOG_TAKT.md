@@ -177,10 +177,10 @@ L00 → L01 → L02 → L03 → L04 → L05 → L06 → L07 → L09 → L10 → 
 
 - **Objectif :** Supprimer la contradiction 75 % vs 80 % et faire du seuil un paramètre système administrable.
 - **Exigences :** `EX-OUV-01`, `WF-01`, `RB-UI-07`, `EC-ADM-03`.
-- **Périmètre :** `docs/SF_TAKT.md`, `docs/WORKFLOW_METIER.md`, `docs/ST_TAKT.md`, `docs/SPEC_CONTRAINTES_GENERATION.md`, `packages/db/prisma/contract.prisma` (champ paramètre uniquement). **Hors périmètre :** implémentation du moteur de génération.
+- **Périmètre :** `docs/SF_TAKT.md`, `docs/WORKFLOW_METIER.md`, `docs/ST_TAKT.md`, `docs/SPEC_CONTRAINTES_GENERATION.md`, `packages/db/prisma/schema.prisma` (champ paramètre uniquement, DL-09). **Hors périmètre :** implémentation du moteur de génération.
 - **Livrables :** Valeur canonique retenue et documentée (recommandation : **75 %**, avec mention de l'écart de 5 points absorbé par la marge P80), paramètre `seuilVerrouillageGeneration` documenté comme configurable par l'`admin` (`EC-ADM-03`).
 - **Critères :** _Given_ un paramètre système, _When_ il est modifié par l'`admin`, _Then_ la garde de génération utilise la nouvelle valeur. _Given_ 76 % de séances verrouillées, _When_ le `gest` lance une génération, _Then_ un avertissement bloquant est présenté.
-- **DoD :** Une seule valeur par défaut dans tout le corpus ; le caractère configurable est acté ; le `contract.prisma` expose le champ ; l'impact est documenté dans `ST_TAKT §5.6`.
+- **DoD :** Une seule valeur par défaut dans tout le corpus ; le caractère configurable est acté ; le `schema.prisma` expose le champ (DL-09) ; l'impact est documenté dans `ST_TAKT §5.6`.
 - **Tests exigés :** revue documentaire + validation `prisma db verify` si schéma modifié.
 - **SP :** 2 · **Dépend de :** `TAKT-L00-01` · **Bloque :** `TAKT-L07-07`.
 
@@ -208,7 +208,7 @@ L00 → L01 → L02 → L03 → L04 → L05 → L06 → L07 → L09 → L10 → 
 
 #### TAKT-L00-05 — Constituer le registre de décision unifié
 
-- **Objectif :** Créer un registre unique des décisions structurantes couvrant les 3 Decision Logs existants, condition de la gouvernance des 89 tickets.
+- **Objectif :** Créer un registre unique des décisions structurantes couvrant les 3 Decision Logs existants, condition de la gouvernance des 91 tickets.
 - **Exigences :** `DL-01` à `DL-08`, `DL-TE-01` à `DL-TE-08`, `DL-UI-01` à `DL-UI-04`, `DL-FS-*`.
 - **Périmètre :** `docs/DECISIONS.md` (nouveau), `docs/SF_TAKT.md`, `docs/ST_TAKT.md`, `docs/UI_ARBORESCENCE.md`, `docs/UI_FRONTEND_SPECS.md`. **Hors périmètre :** aucun code.
 - **Livrables :** `docs/DECISIONS.md` : tableau `ID | Date | Statut | Décision | Conséquence technique | Documents impactés | Ticket backlog`, consolidant les ~25 décisions et les 7 arbitrages L00.
@@ -265,9 +265,9 @@ L00 → L01 → L02 → L03 → L04 → L05 → L06 → L07 → L09 → L10 → 
 
 #### TAKT-L01-04 — Matérialiser le modèle de données Prisma et la migration initiale
 
-- **Objectif :** Transformer le contrat Prisma (`contract.prisma`, 15 modèles) en schéma exécutable avec migration initiale réversible.
+- **Objectif :** Matérialiser le schéma exécutable Prisma (15 modèles) avec migration initiale réversible, à partir du contrat E0.5.
 - **Exigences :** `PLAN_MACRO E1.2`, `ST_TAKT §2`, `TE-DB-*`, `GG-08`, `docs/DOC_MIGRATION_DB.md`.
-- **Périmètre :** `packages/db/prisma/schema.prisma` (nouveau, dérivé de `contract.prisma`), `packages/db/prisma/migrations/**`, `packages/db/src/**` (client généré + export), `packages/db/package.json`. **Hors périmètre :** `contract.prisma` (reste le contrat de référence, non modifié sans décision).
+- **Périmètre :** `packages/db/prisma/schema.prisma` (schéma exécutable unique, DL-09), `packages/db/prisma/migrations/**`, `packages/db/src/**` (client généré + export), `packages/db/package.json`. **Hors périmètre :** `docs/archives/contract.prisma` (contrat E0.5 archivé, non modifié).
 - **Livrables :** `schema.prisma` complet (15 modèles, `Uuid` en PK, `DateTime` UTC, index et contraintes UNIQUE de `ST_TAKT §2.3`/`§2.4`), provider `postgresql`, `DATABASE_URL` par environnement ; migration initiale `2026_init/` avec `migration.sql` **et** `down.sql` de rollback ; `@takt/db` exportant le client Prisma typé.
 - **Critères :** _Given_ un PostgreSQL vierge, _When_ `prisma migrate deploy` est exécuté, _Then_ toutes les tables, index et contraintes sont créés sans erreur. _Given_ la migration appliquée, _When_ le `down.sql` est exécuté, _Then_ le schéma revient à l'état initial. _Given_ un import de `@takt/db`, _Then_ les types des 15 modèles sont autocomplétés.
 - **DoD :** `prisma db verify` passe ; `prisma migrate dev` puis `prisma migrate reset` réussissent en local ; `down.sql` testé ; `pnpm --filter @takt/db build` produit un client importable ; seed idempotent branché sur `packages/db/prisma/seed.ts` existant.
@@ -1230,4 +1230,4 @@ L00 → L01 → L02 → L03 → L04 → L05 → L06 → L07 → L09 → L10 → 
 
 ---
 
-_Fin du BACKLOG_TAKT.md — 89 tickets, 504 SP, prêt pour exécution en flux continu._
+_Fin du BACKLOG_TAKT.md — 91 tickets, 534 SP, prêt pour exécution en flux continu._

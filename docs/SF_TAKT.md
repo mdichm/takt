@@ -211,6 +211,7 @@ Simple référence vers les livrables UI séparés (E0.3a à E0.3e).
 | DL-06 | Pas de calendrier académique | Grille hebdomadaire dupliquée, sans jours fériés ni vacances                                                            |
 | DL-07 | Charge figée                 | Verrouillée une fois l'affectation pédagogique validée (`rep_pedag` → `brouillon`)                                      |
 | DL-08 | Génération conditionnée      | Tous les départements doivent avoir validé avant lancement                                                              |
+| DL-09 | Source de vérité Prisma      | `packages/db/prisma/schema.prisma` est le schéma exécutable unique ; l'ancien contrat `contract.prisma` (E0.5) est archivé sous `docs/archives/contract.prisma` et n'est plus maintenu. |
 
 ---
 

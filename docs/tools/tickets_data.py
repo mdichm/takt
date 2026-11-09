@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Source de vérité unique du backlog TAKT.
-Contient la liste complète des 89 tickets avec leurs métadonnées.
+Contient la liste complète des 91 tickets avec leurs métadonnées.
 Ne pas éditer les fichiers générés dans dist/ – modifier uniquement ce fichier.
 """
 from dataclasses import dataclass, asdict

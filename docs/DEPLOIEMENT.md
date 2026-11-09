@@ -6,7 +6,7 @@
 **Responsables :** DSI + Architecte
 **Statut :** Phase 0 (E0.8) — Validé
 **Critère de sortie :** Environnements dev/recette/prod, sauvegardes, rollback
-**Documents liés :** ST_TAKT.md, PLAN_MACRO.md, openapi.yaml, contract.prisma
+**Documents liés :** ST_TAKT.md, PLAN_MACRO.md, openapi.yaml, schema.prisma (DL-09)
 
 ---
 

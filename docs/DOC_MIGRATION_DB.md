@@ -5,7 +5,7 @@
 **Date :** 30 octobre 2026
 **Responsable :** Backend Lead + Architecte
 **Statut :** Validé — G1 résolu
-**Documents liés :** ST_TAKT.md (§2), PLAN_MACRO.md, DEPLOIEMENT.md, contract.prisma
+**Documents liés :** ST_TAKT.md (§2), PLAN_MACRO.md, DEPLOIEMENT.md, schema.prisma (DL-09)
 
 ---
 
@@ -31,7 +31,7 @@ Définir une stratégie de migration de base de données robuste, reproductible 
 
 ```
 packages/db/prisma/
-├── contract.prisma          # Schéma source de vérité (déjà existant)
+├── schema.prisma            # Schéma source de vérité exécutable (DL-09)
 ├── migrations/              # Dossier versionné (créé par Prisma Migrate)
 │   ├── 20261030000000_init/ # Migration initiale
 │   │   ├── migration.sql    # SQL up
@@ -41,10 +41,10 @@ packages/db/prisma/
 │       └── down.sql
 ├── seed.ts                  # Script de seed (données de référence)
 ├── seed.recette.ts          # Données de recette (anonymisées)
-└── schema.prisma            # Généré à partir de contract.prisma (ne pas éditer)
+└── schema.prisma            # Schéma exécutable unique (DL-09) — ne pas éditer manuellement en dehors des migrations
 ```
 
-> **Note :** `contract.prisma` est le fichier source. `schema.prisma` est généré par le script de build pour compatibilité Prisma Client.
+> **Note (DL-09) :** `schema.prisma` est le fichier source de vérité exécutable. L'ancien contrat `contract.prisma` (E0.5) a été archivé sous `docs/archives/contract.prisma` et n'est plus utilisé pour générer le client Prisma ni pour créer des migrations.
 
 ---
 
@@ -53,7 +53,7 @@ packages/db/prisma/
 ### 4.1 Développement (local)
 
 ```bash
-# Créer une nouvelle migration après modification de contract.prisma
+# Créer une nouvelle migration après modification de schema.prisma
 pnpm --filter @takt/db prisma migrate dev --name <description_courte>
 
 # Appliquer les migrations existantes (nouveau clone)
@@ -208,7 +208,7 @@ SEED_ENV=recette pnpm --filter @takt/db prisma db seed
 
 ## 10. Checklist de validation avant merge (Definition of Done)
 
-- [ ] `contract.prisma` modifié avec la convention de nommage
+- [ ] `schema.prisma` modifié avec la convention de nommage (DL-09)
 - [ ] Migration générée via `prisma migrate dev --name ...`
 - [ ] Fichiers `migration.sql` et `down.sql` présents dans `migrations/`
 - [ ] `down.sql` testé localement (rollback fonctionnel)

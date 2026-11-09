@@ -1,9 +1,21 @@
 // ============================================================================
 // TAKT — Modèle de données (MLD/MDP)
-// Fichier : packages/db/prisma/contract.prisma
+// Fichier : packages/db/prisma/contract.prisma (ARCHIVÉ — voir ci-dessous)
 // Étape E0.5 — Conforme à docs/ST_TAKT.md §2
 // Générateur : Prisma Client (@takt/db)
 // ============================================================================
+//
+// ARCHIVÉ (DL-09) — CE FICHIER N'EST PLUS LA SOURCE DE VÉRITÉ EXÉCUTABLE.
+//
+// `packages/db/prisma/schema.prisma` est le schéma exécutable unique (DL-09).
+// Ce contrat E0.5 est conservé à titre d'archive uniquement. Il est figé depuis
+// le lot L04 (commit 1d11bb2) et diverge de `schema.prisma` (19 modèles ici
+// contre 40 dans schema.prisma, dont ValidationRepartition et Notification
+// issus de TAKT-L05-05).
+//
+// Ne pas utiliser ce fichier pour générer le client Prisma ni pour créer des
+// migrations. Toute évolution du modèle de données doit être apportée dans
+// `packages/db/prisma/schema.prisma`.
 
 generator client {
   provider = "prisma-client-js"
