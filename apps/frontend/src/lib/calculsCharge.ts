@@ -3,6 +3,7 @@
 
 import {
   computeCharge,
+  type AlerteCharge,
   type ChargeRuleSet,
   type AffectationCharge,
   type ResultatCalculCharge,
@@ -153,7 +154,7 @@ export function calculerTauxCouverture(
 export function hasAlertesBloquantes(
   resultat: ResultatCalculCharge,
 ): boolean {
-  return resultat.alertes.some((a) => a.severite === 'BLOQUANT');
+  return resultat.alertes.some((a: AlerteCharge) => a.severite === 'BLOQUANT');
 }
 
 export type { ChargeRuleSet, AffectationCharge, ResultatCalculCharge, StatutCharge };

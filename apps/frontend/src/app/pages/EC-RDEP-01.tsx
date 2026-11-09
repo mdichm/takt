@@ -6,6 +6,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { versionStore } from '@/stores/versionStore';
 import { repartitionApi } from '@/lib/repartition.api';
 import { calculerCharge, detecterMatieresManquantes, construireAffectationsCharge, CHARGE_RULE_SET_DEFAUT } from '@/lib/calculsCharge';
+import type { ChargeEnseignant, AlerteCharge } from '@takt/charge-engine';
 import { AffectationEditor } from '@/components/organisms/AffectationEditor/AffectationEditor';
 import { Bouton } from '@/components/atoms/Bouton';
 import { Badge } from '@/components/atoms/Badge';
@@ -93,12 +94,12 @@ function EC_RDEP_01(): JSX.Element {
   const chargeEnseignant = useMemo(() => {
     if (!enseignantCourantId) return null;
     return resultatCharge.parEnseignant.find(
-      (c) => c.enseignantId === enseignantCourantId,
+      (c: ChargeEnseignant) => c.enseignantId === enseignantCourantId,
     ) ?? null;
   }, [enseignantCourantId, resultatCharge]);
 
   const hasBloquant = resultatCharge.alertes.some(
-    (a) => a.severite === 'BLOQUANT',
+    (a: AlerteCharge) => a.severite === 'BLOQUANT',
   );
 
   const { mutateAsync: creerAffectation, isPending: chargementCreation } = useMutation({
@@ -389,7 +390,7 @@ function EC_RDEP_01(): JSX.Element {
               hasBloquant
                 ? 'erreur'
                 : resultatCharge.alertes.some(
-                    (a) => a.severite === 'AVERTISSEMENT',
+                    (a: AlerteCharge) => a.severite === 'AVERTISSEMENT',
                   )
                   ? 'attention'
                   : 'succès'
@@ -398,7 +399,7 @@ function EC_RDEP_01(): JSX.Element {
               hasBloquant
                 ? 'Bloquant'
                 : resultatCharge.alertes.some(
-                    (a) => a.severite === 'AVERTISSEMENT',
+                    (a: AlerteCharge) => a.severite === 'AVERTISSEMENT',
                   )
                   ? 'Attention'
                   : 'Conforme'

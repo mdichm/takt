@@ -6,6 +6,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { versionStore } from '@/stores/versionStore';
 import { repartitionApi } from '@/lib/repartition.api';
 import { calculerCharge, construireAffectationsCharge, calculerTauxCouverture, CHARGE_RULE_SET_DEFAUT } from '@/lib/calculsCharge';
+import type { ChargeEnseignant, AlerteCharge } from '@takt/charge-engine';
 import { Bouton } from '@/components/atoms/Bouton';
 import { Badge } from '@/components/atoms/Badge';
 import { Alerte } from '@/components/atoms/Alerte';
@@ -126,7 +127,7 @@ function EC_RDEP_02(): JSX.Element {
   }, [annulerRepartition]);
 
   const hasBloquant = resultatCharge.alertes.some(
-    (a) => a.severite === 'BLOQUANT',
+    (a: AlerteCharge) => a.severite === 'BLOQUANT',
   );
   const blocageValidation = !peutValider || hasBloquant;
   if (chargementDonnees) {
@@ -245,7 +246,7 @@ function EC_RDEP_02(): JSX.Element {
           <Alerte variante="info" titre="Aucune donnée" message="Aucune affectation saisie pour ce département." />
         )}
         {resultatCharge.parEnseignant.map(
-          (charge) => (
+          (charge: ChargeEnseignant) => (
           <div
             key={charge.enseignantId}
             style={{
