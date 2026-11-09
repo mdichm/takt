@@ -182,8 +182,6 @@ export const DICTIONNAIRE_FR = {
     ajouter: 'Ajouter',
     annuler: 'Annuler',
     annulerRepartition: 'Annuler la répartition',
-    annulerIndisponible:
-      'Annulation indisponible : endpoint backend en cours de livraison (TAKT-L05-04).',
     actualiser: 'Actualiser',
     valider: 'Valider',
     chargeEnseignant: 'Charge enseignant :',

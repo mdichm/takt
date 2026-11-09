@@ -171,17 +171,6 @@ export const repartitionApi = {
   },
 
   /*───── Annulation de répartition (EX-REP-05) — D5-bis ─────*/
-  /**
-   * Le endpoint POST /repartition/annuler existe au niveau du contrat
-   * (zRepartitionAnnuler) mais aucune route ni service backend ne l'implémente
-   * (défaut sur TAKT-L05-04, ticket marqué Terminé sans livraison effective).
-   *
-   * Le client est écrit et testé unitairement contre le schéma Zod, mais le
-   * bouton UI associé est rendu désactivé avec un motif explicite (voir
-   * SuiviChargesPage). Dès que le ticket backend correctif est mergé, il
-   * suffira d'activer le bouton.
-   */
-
   /** Annule la répartition d'un département (retour à initial). */
   async annulerRepartition(
     donnees: RepartitionAnnulerInput,
