@@ -170,3 +170,108 @@ describe('Répartition pédagogique - validation + snapshot (TAKT-L05-04)', () =
     expect([200, 403]).toContain(reponse.status);
   });
 });
+
+describe('Répartition pédagogique - annulation (TAKT-L05-04)', () => {
+  let ctx: ContexteTestRepartition;
+
+  beforeAll(async () => {
+    ctx = await creerContexteTestRepartition();
+  });
+
+  afterAll(async () => {
+    await nettoyerContexteTestRepartition(ctx);
+  });
+
+  it('POST /repartition/annuler : 200 retire le snapshot courant et repasse le département en EN_COURS', async () => {
+    // Nettoyer l'état laissé par le precedent describe (mêmes IDs constants)
+    await ctx.prisma.snapshot.deleteMany({ where: { versionId: VERSION_ID, departementId: DEPARTEMENT_ID } });
+    await ctx.prisma.validationRepartition.deleteMany({
+      where: { versionId: VERSION_ID, departementId: DEPARTEMENT_ID },
+    });
+    await ctx.prisma.affectationPedagogique.deleteMany({
+      where: { versionId: VERSION_ID, departementId: DEPARTEMENT_ID },
+    });
+    await ctx.prisma.version.update({
+      where: { id: VERSION_ID },
+      data: { etat: 'rep_pedag' },
+    });
+
+    await ctx.prisma.affectationPedagogique.create({
+      data: {
+        id: '77777777-7777-7777-7777-777777777777',
+        versionId: VERSION_ID,
+        semestreId: ctx.semestreId,
+        enseignantId: ctx.enseignantId,
+        matiereId: ctx.matiereId,
+        groupeId: ctx.groupe1Id,
+        typeEnseignementId: ctx.typeEnseignementId,
+        volumeHebdo: 4,
+        dureeCreneaux: 90,
+        departementId: DEPARTEMENT_ID,
+      },
+    });
+
+    // Validation préalable pour créer un snapshot courant
+    await ctx.agent
+      .post('/api/v1/repartition/valider')
+      .set('Authorization', `Bearer ${ctx.tokenRdep}`)
+      .send({ versionId: VERSION_ID, departementId: DEPARTEMENT_ID })
+      .expect(200);
+
+    const reponse = await ctx.agent
+      .post('/api/v1/repartition/annuler')
+      .set('Authorization', `Bearer ${ctx.tokenRdep}`)
+      .send({ versionId: VERSION_ID, departementId: DEPARTEMENT_ID })
+      .expect(200);
+
+    expect(reponse.body.data.annulee).toBe(true);
+
+    // Le snapshot n'est plus courant
+    const snapshot = await ctx.prisma.snapshot.findFirst({
+      where: { versionId: VERSION_ID, departementId: DEPARTEMENT_ID },
+    });
+    expect(snapshot!.estCourant).toBe(false);
+
+    // L'état de validation est repasse en EN_COURS
+    const validation = await ctx.prisma.validationRepartition.findFirst({
+      where: { versionId: VERSION_ID, departementId: DEPARTEMENT_ID },
+    });
+    expect(validation!.etat).toBe('EN_COURS');
+    expect(validation!.snapshotCourantId).toBeNull();
+
+    // La version repasse en rep_pedag (aucun departement ne reste valide)
+    const version = await ctx.prisma.version.findUnique({
+      where: { id: VERSION_ID },
+      select: { etat: true },
+    });
+    expect(version!.etat).toBe('rep_pedag');
+
+    // Audit ecrit : l'entree la plus recente pour ce snapshot doit etre l'annulation
+    const audits = await ctx.prisma.journalAudit.findMany({
+      where: {
+        entite: 'Snapshot',
+        entiteId: snapshot!.id,
+        action: 'TRANSITION_ETAT',
+      },
+      orderBy: { horodatage: 'desc' },
+      take: 1,
+    });
+    expect(audits[0]).toBeDefined();
+    expect((audits[0]!.metadonnees as { action: string }).action).toBe('ANNULATION_REPARTITION');
+  });
+
+  it('POST /repartition/annuler : 404 quand aucun snapshot courant pour le departement', async () => {
+    await ctx.prisma.version.update({
+      where: { id: VERSION_ID },
+      data: { etat: 'rep_pedag' },
+    });
+
+    const reponse = await ctx.agent
+      .post('/api/v1/repartition/annuler')
+      .set('Authorization', `Bearer ${ctx.tokenRdep}`)
+      .send({ versionId: VERSION_ID, departementId: ctx.departement2Id })
+      .expect(404);
+
+    expect(reponse.body.error.code).toBe(CODES_ERREUR_API.NOT_FOUND);
+  });
+});

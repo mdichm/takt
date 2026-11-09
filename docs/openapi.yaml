@@ -3070,6 +3070,28 @@ paths:
       summary: Modifie un type de salle
       tags:
         - Référentiels
+  /api/v1/repartition/annuler:
+    post:
+      operationId: RepartitionController_annuler
+      parameters: []
+      responses:
+        '200':
+          description: Répartition annulée, retour à l'état initial
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit ou hors périmètre
+        '404':
+          description: Aucun snapshot de répartition courant à annuler
+        '409':
+          description: État de version invalide pour annulation
+      security:
+        - bearerAuth: []
+      summary: Annule la répartition pédagogique du département
+      tags:
+        - Répartition
   /api/v1/repartition/revalidation/detecter:
     post:
       operationId: RevalidationController_detecter
