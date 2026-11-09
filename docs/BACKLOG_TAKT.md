@@ -217,6 +217,17 @@ L00 → L01 → L02 → L03 → L04 → L05 → L06 → L07 → L09 → L10 → 
 - **Tests exigés :** revue documentaire (complétude : chaque `DL-*` du corpus figure au registre).
 - **SP :** 2 · **Dépend de :** `TAKT-L00-01`…`TAKT-L00-04` · **Bloque :** aucun (amélioration continue).
 
+#### TAKT-L00-06 — Trancher la source de vérité du modèle de données Prisma
+
+- **Objectif :** Acter `packages/db/prisma/schema.prisma` comme le schéma exécutable unique et archiver `contract.prisma` (E0.5), mettant fin à une double source de vérité qui diverge depuis L04.
+- **Exigences :** `DL-09`.
+- **Périmètre :** `packages/db/prisma/schema.prisma`, `packages/db/prisma/contract.prisma` (archivé), `docs/DOC_MIGRATION_DB.md`, `docs/ST_TAKT.md`, `docs/PLAN_MACRO.md`, `docs/TESTS.md`, `docs/SPEC_SOLVER_CPSAT.md`, `docs/DEPLOIEMENT.md`, `docs/BACKLOG_TAKT.md`, `docs/SF_TAKT.md`. **Hors périmètre :** aucun code applicatif.
+- **Livrables :** `contract.prisma` déplacé en archive avec bandeau ARCHIVÉ ; en-tête de `schema.prisma` corrigé (source : schema.prisma, ref DL-09) ; `schema.integration.test.ts` refactoré (contrôle des 15 modèles historiques + `ValidationRepartition`/`Notification`, contrat inexistant) ; 7 documents mis à jour ; décision `DL-09` ajoutée au Decision Log de `SF_TAKT.md`.
+- **Critères :** _Given_ le dépôt, _When_ on liste `packages/db/prisma/`, _Then_ `schema.prisma` est le seul schéma exécutable et `contract.prisma` n'y figure plus. _Given_ `prisma generate` et `prisma validate`, _Then_ ils passent sur `schema.prisma`. _Given_ la CI, _Then_ aucune tâche ne référence plus `contract.prisma` comme source.
+- **DoD :** Aucune référence à `contract.prisma` comme source de vérité exécutoire dans le corpus documentaire ; `schema.prisma` cité partout comme source unique ; `DL-09` au Decision Log ; tests de schéma verts ; backlog cohérent (91 tickets, 534 SP).
+- **Tests exigés :** `pnpm --filter @takt/db db:validate`, `pnpm --filter @takt/db test`, revue documentaire croisée des 7 fichiers.
+- **SP :** 2 · **Dépend de :** — · **Bloque :** aucun (amélioration continue).
+
 ### Lot L01 — Fondation : monorepo, outillage, Git, CI/CD de base (7 tickets · 24 SP)
 
 #### TAKT-L01-01 — Initialiser le dépôt Git et la gouvernance de branches

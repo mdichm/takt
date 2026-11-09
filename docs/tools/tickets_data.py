@@ -65,6 +65,15 @@ TICKETS: List[Ticket] = [
         exigences=['DL-01 à DL-08', 'DL-TE-01 à DL-TE-08', 'DL-UI-01 à DL-UI-04', 'DL-FS-*.'],
     ),
     Ticket(
+        id="TAKT-L00-06",
+        lot="L00",
+        titre="Trancher la source de vérité du modèle de données Prisma",
+        sp=2,
+        status="En cours",
+        deps=[],
+        exigences=['DL-09'],
+    ),
+    Ticket(
         id="TAKT-L01-01",
         lot="L01",
         titre="Initialiser le dépôt Git et la gouvernance de branches",
