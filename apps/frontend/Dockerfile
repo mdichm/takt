@@ -16,6 +16,7 @@ RUN corepack enable && corepack prepare pnpm@9 --activate
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc turbo.json tsconfig.base.json ./
 COPY packages/contracts/package.json ./packages/contracts/
 COPY packages/design-tokens/package.json ./packages/design-tokens/
+COPY packages/charge-engine/package.json ./packages/charge-engine/
 COPY apps/frontend/package.json ./apps/frontend/
 
 # Install dependencies
@@ -24,6 +25,7 @@ RUN pnpm install --frozen-lockfile --filter @takt/frontend...
 # Copy source code
 COPY packages/contracts ./packages/contracts
 COPY packages/design-tokens ./packages/design-tokens
+COPY packages/charge-engine ./packages/charge-engine
 COPY apps/frontend/src ./apps/frontend/src
 COPY apps/frontend/public ./apps/frontend/public
 COPY apps/frontend/index.html ./apps/frontend/
