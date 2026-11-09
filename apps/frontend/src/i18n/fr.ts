@@ -140,6 +140,64 @@ export const DICTIONNAIRE_FR = {
     confirmationSuppression:
       'Voulez-vous vraiment supprimer cet élément ? Cette action est irréversible.',
   },
+  // Répartition pédagogique (L05-06)
+  rdep: {
+    titreSaisie: 'Répartition pédagogique',
+    titreSuivi: 'Suivi des charges',
+    affectationsDepartement: 'Affectations du département',
+    chargeDepartement: 'Charge du département',
+    chargeParEnseignant: 'Charge par enseignant',
+    actionsWorkflow: 'Actions de workflow',
+    tauxCouverture: 'Taux de couverture',
+    couverture: 'Couverture',
+    enseignants: 'Enseignants',
+    validationDepartement: 'Validation du département',
+    validee: 'Validée',
+    encours: 'En cours',
+    aucunStatut: 'Aucun statut',
+    aucuneDonnee: 'Aucune donnée',
+    aucuneAffectation: 'Aucune affectation',
+    aucuneAffectationDetaille:
+      'Aucune affectation pédagogique n’est encore saisie pour ce département.',
+    matièresSansAffectation: 'Matières sans affectation',
+    matieresManquantes:
+      'matière(s) du plan d’études n’ont pas d’affectation. La validation sera bloquée.',
+    contexteManquant: 'Contexte manquant',
+    contexteManquantDetaille:
+      'Aucun contexte de répartition n’est défini. Veuillez sélectionner une version et un département.',
+    charger: 'Chargement de la répartition…',
+    chargerSuivi: 'Chargement du suivi…',
+    erreur: 'Erreur',
+    succes: 'Succès',
+    affectationCree: 'Affectation créée avec succès.',
+    affectationModifiee: 'Affectation modifiée avec succès.',
+    affectationSupprimee: 'Affectation supprimée avec succès.',
+    repartitionValidee: 'Répartition validée avec succès.',
+    repartitionAnnulee: 'Répartition annulée (retour à initial).',
+    echecValidation: 'Échec de la validation.',
+    echecAnnulation: 'Échec de l’annulation.',
+    confirmerSuppression: 'Supprimer cette affectation ?',
+    modifier: 'Modifier',
+    supprimer: 'Supprimer',
+    ajouter: 'Ajouter',
+    annuler: 'Annuler',
+    annulerRepartition: 'Annuler la répartition',
+    annulerIndisponible:
+      'Annulation indisponible : endpoint backend en cours de livraison (TAKT-L05-04).',
+    actualiser: 'Actualiser',
+    valider: 'Valider',
+    chargeEnseignant: 'Charge enseignant :',
+    conform: 'Conforme',
+    attention: 'Attention',
+    bloquant: 'Bloquant',
+    bloque: 'Bloquant (dépassement de plafond)',
+    seuilAtteint: 'Seuil atteint',
+    validationNonDisponibleEtat:
+      'La validation n’est disponible qu’en état rep_pedag.',
+    toutesMatieresDoiventAvoirAffectation:
+      'Toutes les matières du plan doivent avoir une affectation.',
+    alerteBloquante: 'Alerte bloquante : validation interdite.',
+  },
 } as const;
 
 export type CleDictionnaire = keyof typeof DICTIONNAIRE_FR;
