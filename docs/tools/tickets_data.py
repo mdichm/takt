@@ -69,7 +69,7 @@ TICKETS: List[Ticket] = [
         lot="L00",
         titre="Trancher la source de vérité du modèle de données Prisma",
         sp=2,
-        status="En cours",
+        status="Terminé",
         deps=[],
         exigences=['DL-09'],
     ),
