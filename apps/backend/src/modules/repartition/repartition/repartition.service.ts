@@ -372,6 +372,114 @@ export class RepartitionService {
     };
   }
 
+  /**
+   * Annule la répartition d'un département (TAKT-L05-04).
+   * - Retire le statut "courant" du snapshot de répartition (conservé en historique).
+   * - Repasse l'état de validation du département en EN_COURS.
+   * - Si la version était en brouillon et qu'aucun département ne reste valide, repasse en rep_pedag.
+   * - Toute mutation est journalisée (GG-07).
+   */
+  async annulerRepartition(
+    versionId: string,
+    departementId: string,
+    utilisateurId: string,
+  ): Promise<{ annulee: boolean; versionId: string; departementId: string }> {
+    const version = await this.prisma.version.findUnique({
+      where: { id: versionId },
+      select: { id: true, etat: true },
+    });
+
+    if (!version) {
+      throw new ApiError(CODES_ERREUR_API.NOT_FOUND, 404, 'Version introuvable', {
+        champ: 'versionId',
+      });
+    }
+
+    // Un snapshot de répartition courant est identifie par (versionId, departementId, estCourant=true).
+    // Le snapshot de publication a departementId = null, donc il ne correspond pas.
+    const snapshotCourant = await this.prisma.snapshot.findFirst({
+      where: { versionId, departementId, estCourant: true },
+      select: { id: true },
+    });
+    if (!snapshotCourant) {
+      throw new ApiError(
+        CODES_ERREUR_API.NOT_FOUND,
+        404,
+        'Aucun snapshot de répartition courant pour ce département',
+        { versionId, departementId },
+      );
+    }
+
+    const validation = await this.prisma.validationRepartition.findFirst({
+      where: { versionId, departementId },
+      select: { id: true, etat: true, revision: true },
+    });
+    if (!validation) {
+      throw new ApiError(
+        CODES_ERREUR_API.NOT_FOUND,
+        404,
+        'État de validation introuvable pour ce département',
+        { versionId, departementId },
+      );
+    }
+
+    await this.prisma.$transaction(async (tx) => {
+      // Retirer le statut "courant" du snapshot (conservé en historique).
+      await tx.snapshot.update({
+        where: { id: snapshotCourant.id },
+        data: { estCourant: false },
+      });
+
+      // Repasser l'état de validation du département en EN_COURS.
+      await tx.validationRepartition.update({
+        where: { id: validation.id },
+        data: {
+          etat: 'EN_COURS',
+          revision: validation.revision + 1,
+          snapshotCourantId: null,
+          valideLe: null,
+          validePar: null,
+        },
+      });
+
+      // Si la version était en brouillon et qu'aucun département ne reste valide, repasser en rep_pedag.
+      if (version.etat === 'brouillon') {
+        const nbRestant = await tx.validationRepartition.count({
+          where: { versionId, etat: 'VALIDE' },
+        });
+        if (nbRestant === 0) {
+          await tx.version.update({
+            where: { id: versionId },
+            data: { etat: 'rep_pedag' },
+          });
+        }
+      }
+    });
+
+    // Audit écrit après la transaction (AuditService utilise sa propre instance PrismaClient).
+    await this.auditService.record({
+      action: 'TRANSITION_ETAT',
+      utilisateurId,
+      entite: 'Snapshot',
+      entiteId: snapshotCourant.id,
+      metadonnees: {
+        versionId,
+        departementId,
+        type: 'REPARTITION',
+        action: 'ANNULATION_REPARTITION',
+      },
+    });
+
+    this.logger.log(
+      'Répartition annulée: dep ' +
+        departementId +
+        ', ver ' +
+        versionId,
+    );
+
+    return { annulee: true, versionId, departementId };
+  }
+
   private async obtenirChargeRuleSetActifOuDefaut(): Promise<{
     ruleSet: ChargeEngineRuleSet;
     source: 'CHARGE_RULE_SET' | 'DEFAUT';
