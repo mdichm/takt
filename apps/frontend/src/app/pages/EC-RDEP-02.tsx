@@ -296,6 +296,7 @@ function EC_RDEP_02(): JSX.Element {
               {hasBloquant ? 'Alerte bloquante : validation interdite.' : ''}
             </span>
           )}
+          {/* Annulation autorisée uniquement quand le département possède une répartition validée (snapshot courant existant). */}
           <Bouton
             variante="danger"
             taille="moyenne"
