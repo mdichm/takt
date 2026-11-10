@@ -52,12 +52,14 @@ export class JwtAuthGuard {
     }
 
     // En l'absence de vérificateur injecté (ex. tests sans module auth),
-    // on autorise l'accès pour ne pas bloquer les routes protégées.
+    // on décode le jeton sans vérification de signature pour extraire les claims.
+    // En production, VERIFICATEUR_JWT est toujours fourni par AuthModule.
     if (!this.verificateur) {
+      const claims = this.decoderClaimsSansVerification(token);
       request.user = {
-        sub: process.env.TEST_ADMIN_ID ?? 'test',
-        role: 'admin',
-        departementIds: [],
+        sub: claims.sub,
+        role: claims.role as 'admin' | 'gest' | 'rdep' | 'dir',
+        departementIds: claims.departementIds ?? [],
       };
       return true;
     }
@@ -83,5 +85,23 @@ export class JwtAuthGuard {
     }
     const correspondance = header.match(/^Bearer\s+(.+)$/i);
     return correspondance?.[1];
+  }
+
+  /**
+   * Décode le payload d'un JWT sans vérifier la signature.
+   * Uniquement utilisé en fallback quand VERIFICATEUR_JWT n'est pas injecté
+   * (contexte de test). En production, le vrai vérificateur est toujours fourni.
+   */
+  private decoderClaimsSansVerification(token: string): {
+    sub: string;
+    role: string;
+    departementIds?: string[];
+  } {
+    const partie = token.split('.')[1];
+    if (!partie) {
+      throw new ApiError(CODES_ERREUR_API.UNAUTHORIZED, 401, 'Jeton d’accès invalide');
+    }
+    const decoded = Buffer.from(partie, 'base64url').toString('utf8');
+    return JSON.parse(decoded);
   }
 }

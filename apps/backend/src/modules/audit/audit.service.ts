@@ -16,6 +16,7 @@ export type ActionAudit =
   | 'MODIFICATION'
   | 'SUPPRESSION'
   | 'TRANSITION_ETAT'
+  | 'DUPLICATION'
   | 'POSE_VERROU'
   | 'LEVEE_VERROU'
   | 'EXPORT'

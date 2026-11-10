@@ -32,10 +32,11 @@ model Utilisateur {
 
   role             Role                @relation(fields: [roleId], references: [id])
   departement      Departement?        @relation(fields: [departementId], references: [id])
-  sessionsRefresh  SessionRefresh[]    // familles de jetons de rafraîchissement (rotation)
-  verrous          VerrouSeance[]
-  journalAudit     JournalAudit[]
-  notifications    Notification[]      // notifications in-app (TAKT-L05-05)
+  sessionsRefresh       SessionRefresh[]    // familles de jetons de rafraîchissement (rotation)
+  verrous               VerrouSeance[]
+  journalAudit          JournalAudit[]
+  notifications         Notification[]      // notifications in-app (TAKT-L05-05)
+  versionsPubliees      Version[]           // versions dont cet utilisateur est l'auteur de publication
 
   @@index([email])
   @@index([roleId])
@@ -216,6 +217,7 @@ model AnneeUniversitaire {
   dateFin   DateTime
   semestres Semestre[]
   planEtudes PlanEtudes[]
+  versions   Version[]
 
   @@index([libelle])
 }
@@ -242,25 +244,42 @@ model Semestre {
 // ----------------------------------------------------------------------------
 // 6. Version — Version de planning pour un semestre (10 états)
 // ----------------------------------------------------------------------------
-model Version {
-  id          String   @id @default(uuid()) @db.Uuid
-  semestreId  String   @db.Uuid
-  etat        String   // initial, rep_pedag, brouillon, generation, edition, valid_pedag, valid_dir, valide, publie, archive
-  snapshotId  String?  @db.Uuid
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+enum EtatVersion {
+  initial
+  rep_pedag
+  brouillon
+  generation
+  edition
+  valid_pedag
+  valid_dir
+  valide
+  publie
+  archive
+}
 
-  semestre    Semestre          @relation(fields: [semestreId], references: [id])
-  seances     Seance[]
-  snapshots   Snapshot[]
-  generations Generation[]
-  exports     Export[]
-  contraintes Contrainte[]
-  affectations AffectationPedagogique[]
+model Version {
+  id              String       @id @default(uuid()) @db.Uuid
+  anneeId         String       @db.Uuid
+  semestreId      String       @db.Uuid
+  etat            EtatVersion  @default(initial)
+  snapshotId      String?      @db.Uuid
+  datePublication DateTime?
+  publiePar       String?      @db.Uuid
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  annee             AnneeUniversitaire  @relation(fields: [anneeId], references: [id])
+  semestre          Semestre            @relation(fields: [semestreId], references: [id])
+  publieParUtilisateur Utilisateur?    @relation(fields: [publiePar], references: [id])
+  seances           Seance[]
+  snapshots         Snapshot[]
+  generations       Generation[]
+  exports           Export[]
+  contraintes       Contrainte[]
+  affectations      AffectationPedagogique[]
   validationRepartitions ValidationRepartition[] // état de validation par département (TAKT-L05-05)
 
-  @@index([semestreId])
-  @@index([etat])
+  @@index([semestreId, etat], name: "Version_semestreId_etat_idx")
 }
 
 // ----------------------------------------------------------------------------

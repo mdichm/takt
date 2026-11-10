@@ -256,7 +256,7 @@ describe('Affectations pédagogiques (TAKT-L05-02)', () => {
   it("POST /affectations/cascade : crée N affectations depuis plan d'études", async () => {
     // Créer une version dédiée pour ce test pour éviter les conflits résiduels
     const versionCascade = await ctx.prisma.version.create({
-      data: { semestreId: ctx.semestreId, etat: 'initial' },
+      data: { semestreId: ctx.semestreId, anneeId: ANNEE_UNIV_ID, etat: 'initial' },
     });
     ctx.idsACleaner.push(versionCascade.id);
 

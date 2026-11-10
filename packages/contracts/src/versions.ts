@@ -14,8 +14,15 @@ import {
 /** Données de création d’une version de planning. */
 export const zVersion = z.object({
   semestreId: zUuid,
+  anneeId: zUuid.optional(),
   etat: zEtatVersion.default('initial'),
   snapshotId: zUuid.nullish(),
+  sourceVersionId: zUuid.optional(),
+});
+
+/** Identifiant de version dans l’URL. */
+export const zVersionParams = z.object({
+  id: zUuid,
 });
 
 /** Filtres de la liste des versions. */
@@ -24,6 +31,7 @@ export const zVersionList = zPaginationQuery
   .extend(creerSchemaTri(['etat', 'createdAt', 'updatedAt']).shape)
   .extend({
     etat: zEtatVersion.optional(),
+    semestreId: zUuid.optional(),
   });
 
 /** Transition d’état demandée. */
@@ -85,6 +93,7 @@ export const zAudit = z
   );
 
 export type VersionInput = z.infer<typeof zVersion>;
+export type VersionParams = z.infer<typeof zVersionParams>;
 export type VersionListFilters = z.infer<typeof zVersionList>;
 export type TransitionInput = z.infer<typeof zTransition>;
 export type GenerationInput = z.infer<typeof zGeneration>;

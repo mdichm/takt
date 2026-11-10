@@ -69,7 +69,6 @@ export class PilotListsService {
       where: () => where,
       searchFields: {
         id: (valeur) => ({ id: { contains: valeur, mode: Prisma.QueryMode.insensitive } }),
-        etat: (valeur) => ({ etat: { contains: valeur, mode: Prisma.QueryMode.insensitive } }),
       },
       sortFields: {
         etat: (direction) => ({ etat: direction as Prisma.SortOrder }),
