@@ -30,7 +30,7 @@ test.describe('Répartition pédagogique (TAKT-L05-06)', () => {
     expect(statuts.status()).toBe(401);
 
     const affectations = await request.get(
-      `${API}/repartition/affectations?versionId=v1&departementId=d1`,
+      `${API}/affectations?versionId=v1&departementId=d1`,
     );
     expect(affectations.status()).toBe(401);
   });
