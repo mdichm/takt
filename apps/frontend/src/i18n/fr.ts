@@ -15,6 +15,10 @@ export const DICTIONNAIRE_FR = {
     charger: 'Charger en cours…',
     ajouter: 'Ajouter',
     modifier: 'Modifier',
+    enseignant: 'Enseignant',
+    matiere: 'Matière',
+    groupe: 'Groupe',
+    typeEnseignement: 'Type d’enseignement',
   },
   // Input / FormField
   champ: {
@@ -195,6 +199,10 @@ export const DICTIONNAIRE_FR = {
     toutesMatieresDoiventAvoirAffectation:
       'Toutes les matières du plan doivent avoir une affectation.',
     alerteBloquante: 'Alerte bloquante : validation interdite.',
+    recherche: 'Rechercher enseignant ou matière…',
+    selectionner: 'Sélectionnez…',
+    enseignantsCharge: 'Enseignants en charge',
+    tauxDepassement: 'Taux de dépassement',
   },
 } as const;
 

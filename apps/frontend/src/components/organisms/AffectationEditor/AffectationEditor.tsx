@@ -5,6 +5,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { z } from 'zod';
 import { Bouton } from '../../atoms/Bouton';
 import { Input } from '../../atoms/Input';
+import { Select } from '../../atoms/Select';
 import { Badge } from '../../atoms/Badge';
 import { Alerte } from '../../atoms/Alerte';
 import { IndicateurCharge } from '../IndicateurCharge';
@@ -63,6 +64,10 @@ interface AffectationEditorProps {
 /** Formulaire de saisie / modification d'une affectation pédagogique. */
 export function AffectationEditor({
   affectation,
+  enseignants,
+  matieres,
+  groupes,
+  typesEnseignement,
   chargeEnseignant,
   lectureSeule = false,
   chargement = false,
@@ -71,6 +76,7 @@ export function AffectationEditor({
   surAnnuler,
 }: AffectationEditorProps): JSX.Element {
   const dictBouton = traduction('bouton') as (typeof DICTIONNAIRE_FR)['bouton'];
+  const dictRdep = traduction('rdep') as (typeof DICTIONNAIRE_FR)['rdep'];
   const [donnees, setDonnees] = useState<DonneesFormulaire>({
     enseignantId: affectation?.enseignantId ?? '',
     matiereId: affectation?.matiereId ?? '',
@@ -207,36 +213,44 @@ export function AffectationEditor({
             gap: 'var(--space-m)',
           }}
         >
-          <Input
-            label="Enseignant"
+          <Select
+            label={dictBouton.enseignant ?? 'Enseignant'}
+            options={enseignants.map((e) => ({ valeur: e.id, libelle: e.libelle }))}
             value={donnees.enseignantId}
             onChange={gererChangement('enseignantId')}
             disabled={lectureSeule || chargement}
             required
             messageErreur={erreurs.enseignantId}
+            placeholder={dictRdep.selectionner ?? 'Sélectionnez…'}
           />
-          <Input
-            label="Matière"
+          <Select
+            label={dictBouton.matiere ?? 'Matière'}
+            options={matieres.map((m) => ({ valeur: m.id, libelle: m.libelle }))}
             value={donnees.matiereId}
             onChange={gererChangement('matiereId')}
             disabled={lectureSeule || chargement}
             required
             messageErreur={erreurs.matiereId}
+            placeholder={dictRdep.selectionner ?? 'Sélectionnez…'}
           />
-          <Input
-            label="Groupe"
+          <Select
+            label={dictBouton.groupe ?? 'Groupe'}
+            options={groupes.map((g) => ({ valeur: g.id, libelle: g.libelle }))}
             value={donnees.groupeId}
             onChange={gererChangement('groupeId')}
             disabled={lectureSeule || chargement}
             required
             messageErreur={erreurs.groupeId}
+            placeholder={dictRdep.selectionner ?? 'Sélectionnez…'}
           />
-          <Input
-            label="Type d'enseignement"
+          <Select
+            label={dictBouton.typeEnseignement ?? 'Type d’enseignement'}
+            options={typesEnseignement.map((t) => ({ valeur: t.id, libelle: t.libelle }))}
             value={donnees.typeEnseignementId ?? ''}
             onChange={gererChangement('typeEnseignementId')}
             disabled={lectureSeule || chargement}
             messageErreur={erreurs.typeEnseignementId}
+            placeholder={dictRdep.selectionner ?? 'Sélectionnez…'}
           />
         </div>
 

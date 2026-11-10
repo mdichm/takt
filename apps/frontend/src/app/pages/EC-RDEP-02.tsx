@@ -12,7 +12,11 @@ import { Badge } from '@/components/atoms/Badge';
 import { Alerte } from '@/components/atoms/Alerte';
 import { Icone } from '@/components/atoms/Icone';
 import { traduction, DICTIONNAIRE_FR } from '@/i18n/fr';
-import type { AffectationPedagogique, PlanEtudesMatiere, StatutValidationRepartition } from '@takt/contracts';
+import type {
+  AffectationPedagogique,
+  PlanEtudesMatiere,
+  StatutValidationRepartition,
+} from '@takt/contracts';
 
 interface DonneesPage {
   affectations: AffectationPedagogique[];
@@ -22,6 +26,7 @@ interface DonneesPage {
 
 function EC_RDEP_02(): JSX.Element {
   const dictBouton = traduction('bouton') as (typeof DICTIONNAIRE_FR)['bouton'];
+  const dictRdep = traduction('rdep') as (typeof DICTIONNAIRE_FR)['rdep'];
   const { contexteRepartition } = versionStore((state) => ({
     contexteRepartition: state.contexteRepartition,
   }));
@@ -30,15 +35,12 @@ function EC_RDEP_02(): JSX.Element {
   const [messageSucces, setMessageSucces] = useState<string | undefined>();
   const [messageErreur, setMessageErreur] = useState<string | undefined>();
 
-  if (!contexteRepartition) {
-    return (
-      <section style={{ padding: 'var(--space-l)', display: 'flex', flexDirection: 'column', gap: 'var(--space-m)' }}>
-        <Alerte variante="erreur" titre="Contexte manquant" message="Aucun contexte de répartition n'est défini. Veuillez sélectionner une version et un département." />
-      </section>
-    );
-  }
-
-  const { versionId, semestreId, departementId, etatVersion } = contexteRepartition;
+  const {
+    versionId = '',
+    semestreId = '',
+    departementId = '',
+    etatVersion = '',
+  } = contexteRepartition ?? {};
   const peutValider = etatVersion === 'rep_pedag';
 
   const {
@@ -68,6 +70,10 @@ function EC_RDEP_02(): JSX.Element {
   const matieresPlan = donneesPage?.matieresPlan ?? [];
   const statuts = donneesPage?.statuts ?? [];
 
+  const statutDepartement = statuts.find((s) => s.departementId === departementId);
+  const estValide = statutDepartement?.etat === 'VALIDE';
+  const valideLe = statutDepartement?.valideLe;
+
   const affectationsCharge = useMemo(
     () => construireAffectationsCharge(affectations),
     [affectations],
@@ -83,15 +89,12 @@ function EC_RDEP_02(): JSX.Element {
     [departementId, matieresPlan, affectations],
   );
 
-  const statutDepartement = statuts.find((s) => s.departementId === departementId);
-  const estValide = statutDepartement?.etat === 'VALIDE';
-
   const { mutateAsync: validerRepartition, isPending: chargementValidation } = useMutation({
     mutationFn: () =>
       repartitionApi.validerRepartition({ versionId, departementId }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['rdep', 'charges', versionId, departementId] });
-      setMessageSucces('Répartition validée avec succès.');
+      setMessageSucces(dictRdep.repartitionValidee);
       setMessageErreur(undefined);
     },
     onError: (erreur: Error) => {
@@ -105,7 +108,7 @@ function EC_RDEP_02(): JSX.Element {
       repartitionApi.annulerRepartition({ versionId, departementId }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['rdep', 'charges', versionId, departementId] });
-      setMessageSucces('Répartition annulée (retour à initial).');
+      setMessageSucces(dictRdep.repartitionAnnulee);
       setMessageErreur(undefined);
     },
     onError: (erreur: Error) => {
@@ -143,6 +146,14 @@ function EC_RDEP_02(): JSX.Element {
       </section>
     );
   }
+  if (!contexteRepartition) {
+    return (
+      <section style={{ padding: 'var(--space-l)', display: 'flex', flexDirection: 'column', gap: 'var(--space-m)' }}>
+        <Alerte variante="erreur" titre={dictRdep.contexteManquant} message={dictRdep.contexteManquantDetaille} />
+      </section>
+    );
+  }
+
   return (
     <section
       data-testid="ec-rdep-02"
@@ -165,7 +176,7 @@ function EC_RDEP_02(): JSX.Element {
               color: 'var(--color-text-primary)',
             }}
           >
-            Suivi des charges — {departementId}
+            {dictRdep.titreSuivi} — {departementId}
           </h1>
           <p
             style={{
@@ -186,6 +197,15 @@ function EC_RDEP_02(): JSX.Element {
           <span style={{ fontSize: 'var(--font-size-caption)', fontWeight: 500, color: 'var(--color-text-primary)' }}>Suivi des charges</span>
         </nav>
       </header>
+
+      {estValide && valideLe && (
+        <Alerte
+          variante="succès"
+          titre={dictRdep.repartitionValidee}
+          message={`Répartition validée le ${new Date(valideLe).toLocaleDateString('fr-FR')}. Les champs sont en lecture seule.`}
+          fermable={false}
+        />
+      )}
 
       {messageSucces && (
         <Alerte variante="succès" titre="Succès" message={messageSucces} fermable={true} onFermer={() => setMessageSucces(undefined)} />
@@ -220,10 +240,10 @@ function EC_RDEP_02(): JSX.Element {
         <div style={{ padding: 'var(--space-m)', border: `var(--border-width) solid var(--color-border)`, borderRadius: 'var(--radius-md)', background: 'var(--color-surface)' }}>
           <span style={{ fontSize: 'var(--font-size-caption)', color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Validation département</span>
           <span style={{ fontSize: 'var(--font-size-h2)', fontWeight: 600, color: 'var(--color-text-primary)', display: 'block', marginTop: 'var(--space-xs)' }}>
-            {estValide ? 'Validée' : 'En cours'}
+            {estValide ? dictRdep.validee : dictRdep.encours}
           </span>
           <span style={{ fontSize: 'var(--font-size-caption)', color: 'var(--color-text-secondary)' }}>
-            {statutDepartement?.etat ?? 'Aucun statut'}
+            {statutDepartement?.etat ?? dictRdep.aucunStatut}
           </span>
         </div>
       </div>
@@ -303,7 +323,7 @@ function EC_RDEP_02(): JSX.Element {
             disabled={!estValide}
             chargement={chargementAnnulation}
             onClick={gererAnnuler}
-            libelle="Annuler la répartition"
+            libelle={dictRdep.annulerRepartition}
           />
         </div>
       </section>

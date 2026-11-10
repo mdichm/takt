@@ -375,7 +375,7 @@ TICKETS: List[Ticket] = [
         lot="L05",
         titre="Fournir l'UI de saisie et de validation de la répartition pédagogique",
         sp=8,
-        status="À faire",
+        status="Terminé",
         deps=['TAKT-L05-04', 'TAKT-L08-04'],
         exigences=['EX-REP-01', 'EX-REP-02', 'EC-RDEP-01', 'EC-RDEP-02', 'IX-RDEP-01', 'IX-RDEP-02', 'UF-RDEP-01.'],
     ),

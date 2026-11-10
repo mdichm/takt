@@ -14,6 +14,11 @@ vi.mock('@/lib/repartition.api', () => ({
     listerStatutsValidation: vi.fn().mockResolvedValue([]),
     validerRepartition: vi.fn().mockResolvedValue({}),
     annulerRepartition: vi.fn().mockResolvedValue({}),
+    listerPlansEtudes: vi.fn().mockResolvedValue({ items: [], meta: { page: 1, pageSize: 50, total: 0 } }),
+    listerEnseignants: vi.fn().mockResolvedValue({ items: [], meta: { page: 1, pageSize: 50, total: 0 } }),
+    listerGroupes: vi.fn().mockResolvedValue({ items: [], meta: { page: 1, pageSize: 50, total: 0 } }),
+    listerTypesEnseignement: vi.fn().mockResolvedValue({ items: [], meta: { page: 1, pageSize: 50, total: 0 } }),
+    listerMatieres: vi.fn().mockResolvedValue({ items: [], meta: { page: 1, pageSize: 50, total: 0 } }),
   },
 }));
 

@@ -9,6 +9,14 @@ import {
   type AffectationPedagogique,
   type AffectationPedagogiqueCreate,
   type AffectationPedagogiqueUpdate,
+  zEnseignant,
+  type Enseignant,
+  zGroupe,
+  type Groupe,
+  zMatiere,
+  type Matiere,
+  zPlanEtudes,
+  type PlanEtudes,
   zPlanEtudesMatiere,
   type PlanEtudesMatiere,
   zRepartitionValider,
@@ -23,6 +31,8 @@ import {
   type RevalidationValiderInput,
   zRevalidationValiderReponse,
   type RevalidationValiderReponse,
+  zTypeEnseignement,
+  type TypeEnseignement,
   zEnvelope,
   type MetaApi,
 } from '@takt/contracts';
@@ -83,6 +93,11 @@ const zEnveloppeAnnuler = zEnvelope(zRepartitionAnnuler);
 const zEnveloppeStatutValidation = zEnvelope(zStatutValidationRepartition);
 const zEnveloppeRevalidationDetecter = zEnvelope(zRevalidationDetecterReponse);
 const zEnveloppeRevalidationValider = zEnvelope(zRevalidationValiderReponse);
+const zEnveloppePlanEtudes = zEnvelope(zPlanEtudes);
+const zEnveloppeEnseignants = zEnvelope(zEnseignant);
+const zEnveloppeGroupes = zEnvelope(zGroupe);
+const zEnveloppeTypesEnseignement = zEnvelope(zTypeEnseignement);
+const zEnveloppeMatieres = zEnvelope(zMatiere);
 
 /*──────────────────────────────────────────────────────────────────────────────
   Client API typé — Répartition (TAKT-L05-06)
@@ -160,6 +175,64 @@ export const repartitionApi = {
     return normaliserListe(reponse, zPlanEtudesMatiere);
   },
 
+  /*───── Plans d'études ─────*/
+  /** Liste les plans d'études d'un département/semestre (GET /plans-etudes). */
+  async listerPlansEtudes(
+    filtres: { departementId: string; semestreId: string },
+  ): Promise<ListeNormalisee<PlanEtudes>> {
+    const params = new URLSearchParams({
+      departementId: filtres.departementId,
+      semestreId: filtres.semestreId,
+      page: '1',
+      pageSize: '50',
+    });
+    const reponse = await api.get<unknown>(
+      `/plans-etudes?${params.toString()}`,
+      { schema: zEnveloppePlanEtudes },
+    );
+    return normaliserListe(reponse, zPlanEtudes);
+  },
+
+  /*───── Référentiels — enseignants ─────*/
+  /** Liste les enseignants du périmètre du département connecté. */
+  async listerEnseignants(): Promise<ListeNormalisee<Enseignant>> {
+    const reponse = await api.get<unknown>(
+      '/referentiels/enseignants',
+      { schema: zEnveloppeEnseignants },
+    );
+    return normaliserListe(reponse, zEnseignant);
+  },
+
+  /*───── Référentiels — groupes ─────*/
+  /** Liste les groupes. */
+  async listerGroupes(): Promise<ListeNormalisee<Groupe>> {
+    const reponse = await api.get<unknown>(
+      '/referentiels/groupes',
+      { schema: zEnveloppeGroupes },
+    );
+    return normaliserListe(reponse, zGroupe);
+  },
+
+  /*───── Référentiels — types d'enseignement ─────*/
+  /** Liste les types d'enseignement (CM, TD, TP, …). */
+  async listerTypesEnseignement(): Promise<ListeNormalisee<TypeEnseignement>> {
+    const reponse = await api.get<unknown>(
+      '/referentiels/type-enseignements',
+      { schema: zEnveloppeTypesEnseignement },
+    );
+    return normaliserListe(reponse, zTypeEnseignement);
+  },
+
+  /*───── Référentiels — matières ─────*/
+  /** Liste les matières. */
+  async listerMatieres(): Promise<ListeNormalisee<Matiere>> {
+    const reponse = await api.get<unknown>(
+      '/referentiels/matieres',
+      { schema: zEnveloppeMatieres },
+    );
+    return normaliserListe(reponse, zMatiere);
+  },
+
   /*───── Validation de répartition ─────*/
   /** Valide la répartition pédagogique d'un département (POST /repartition/valider). */
   async validerRepartition(
@@ -232,8 +305,13 @@ export type {
   AffectationPedagogique,
   AffectationPedagogiqueCreate,
   AffectationPedagogiqueUpdate,
+  Enseignant,
+  Groupe,
+  Matiere,
+  PlanEtudes,
   PlanEtudesMatiere,
   RepartitionValiderInput,
   RepartitionAnnulerInput,
   StatutValidationRepartition,
+  TypeEnseignement,
 };

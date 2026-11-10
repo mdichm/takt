@@ -4,7 +4,14 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { versionStore } from '@/stores/versionStore';
-import { repartitionApi } from '@/lib/repartition.api';
+import {
+  repartitionApi,
+  type PlanEtudes,
+  type Enseignant,
+  type Groupe,
+  type Matiere,
+  type TypeEnseignement,
+} from '@/lib/repartition.api';
 import { calculerCharge, detecterMatieresManquantes, construireAffectationsCharge, CHARGE_RULE_SET_DEFAUT } from '@/lib/calculsCharge';
 import type { ChargeEnseignant, AlerteCharge } from '@takt/charge-engine';
 import { AffectationEditor } from '@/components/organisms/AffectationEditor/AffectationEditor';
@@ -12,20 +19,28 @@ import { Bouton } from '@/components/atoms/Bouton';
 import { Badge } from '@/components/atoms/Badge';
 import { Alerte } from '@/components/atoms/Alerte';
 import { Icone } from '@/components/atoms/Icone';
+import { Input } from '@/components/atoms/Input';
 import { traduction, DICTIONNAIRE_FR } from '@/i18n/fr';
-import type { AffectationPedagogique, PlanEtudesMatiere } from '@takt/contracts';
+import type {
+  AffectationPedagogique,
+  PlanEtudesMatiere,
+  StatutValidationRepartition,
+} from '@takt/contracts';
 
 interface DonneesPage {
   affectations: AffectationPedagogique[];
   matieresPlan: PlanEtudesMatiere[];
-  enseignants: { id: string; code: string; libelle: string }[];
-  matieres: { id: string; code: string; libelle: string }[];
-  groupes: { id: string; code: string; libelle: string }[];
-  typesEnseignement: { id: string; code: string; libelle: string }[];
+  planEtudes: PlanEtudes | null;
+  enseignants: Enseignant[];
+  matieres: Matiere[];
+  groupes: Groupe[];
+  typesEnseignement: TypeEnseignement[];
+  statuts: StatutValidationRepartition[];
 }
 
 function EC_RDEP_01(): JSX.Element {
   const dictBouton = traduction('bouton') as (typeof DICTIONNAIRE_FR)['bouton'];
+  const dictRdep = traduction('rdep') as (typeof DICTIONNAIRE_FR)['rdep'];
   const { contexteRepartition } = versionStore((state) => ({
     contexteRepartition: state.contexteRepartition,
   }));
@@ -35,17 +50,14 @@ function EC_RDEP_01(): JSX.Element {
     AffectationPedagogique | null
   >(null);
   const [messageSucces, setMessageSucces] = useState<string | undefined>();
+  const [recherche, setRecherche] = useState('');
 
-  if (!contexteRepartition) {
-    return (
-      <section style={{ padding: 'var(--space-l)', display: 'flex', flexDirection: 'column', gap: 'var(--space-m)' }}>
-        <Alerte variante="erreur" titre="Contexte manquant" message="Aucun contexte de répartition n'est défini. Veuillez sélectionner une version et un département." />
-      </section>
-    );
-  }
-
-  const { versionId, semestreId, departementId, etatVersion } = contexteRepartition;
-  const estLectureSeule = etatVersion !== 'initial' && etatVersion !== 'rep_pedag';
+  const {
+    versionId = '',
+    semestreId = '',
+    departementId = '',
+    etatVersion = '',
+  } = contexteRepartition ?? {};
   const peutValider = etatVersion === 'rep_pedag';
 
   const {
@@ -56,17 +68,31 @@ function EC_RDEP_01(): JSX.Element {
   } = useQuery<DonneesPage, Error>({
     queryKey: ['rdep', 'allocation', versionId, departementId],
     queryFn: async () => {
-      const [affectations, matieresPlan] = await Promise.all([
+      const [plans, affectations, statuts] = await Promise.all([
+        repartitionApi.listerPlansEtudes({ departementId, semestreId }),
         repartitionApi.listerAffectations(versionId, departementId),
-        repartitionApi.listerMatieresPlanEtudes(''),
+        repartitionApi.listerStatutsValidation(versionId),
       ]);
+      const planEtudes = plans.items.length > 0 ? plans.items[0] : null;
+      const matieresPlan = planEtudes
+        ? (await repartitionApi.listerMatieresPlanEtudes(planEtudes.id)).items
+        : [];
+      const [enseignants, groupes, typesEnseignement, matieresRef] =
+        await Promise.all([
+          repartitionApi.listerEnseignants(),
+          repartitionApi.listerGroupes(),
+          repartitionApi.listerTypesEnseignement(),
+          repartitionApi.listerMatieres(),
+        ]);
       return {
         affectations: affectations.items,
-        matieresPlan: matieresPlan.items,
-        enseignants: [],
-        matieres: [],
-        groupes: [],
-        typesEnseignement: [],
+        matieresPlan,
+        planEtudes,
+        enseignants: enseignants.items,
+        matieres: matieresRef.items,
+        groupes: groupes.items,
+        typesEnseignement: typesEnseignement.items,
+        statuts,
       } as DonneesPage;
     },
     enabled: !!versionId && !!departementId,
@@ -74,6 +100,35 @@ function EC_RDEP_01(): JSX.Element {
   });
   const affectations = donneesPage?.affectations ?? [];
   const matieresPlan = donneesPage?.matieresPlan ?? [];
+  const enseignants = donneesPage?.enseignants ?? [];
+  const matieresRef = donneesPage?.matieres ?? [];
+  const groupes = donneesPage?.groupes ?? [];
+  const statuts = donneesPage?.statuts ?? [];
+
+  const statutDepartement = statuts.find((s) => s.departementId === departementId);
+  const estValide = statutDepartement?.etat === 'VALIDE';
+  const valideLe = statutDepartement?.valideLe;
+  const estLectureSeule =
+    estValide || (etatVersion !== 'initial' && etatVersion !== 'rep_pedag');
+
+  const enseignantNomParId = new Map(
+    enseignants.map((e) => [e.id, `${e.prenom} ${e.nom}`]),
+  );
+  const matiereParId = new Map(matieresRef.map((m) => [m.id, m]));
+  const groupeParId = new Map(groupes.map((g) => [g.id, g]));
+
+  const affectationsFiltrees = affectations.filter((aff) => {
+    const terme = recherche.toLowerCase();
+    const ens = enseignantNomParId.get(aff.enseignantId)?.toLowerCase() ?? '';
+    const mat = matiereParId.get(aff.matiereId)?.libelle?.toLowerCase() ?? '';
+    return ens.includes(terme) || mat.includes(terme);
+  });
+
+  const enseignantsPourEditeur = enseignants.map((e) => ({
+    id: e.id,
+    code: e.matricule,
+    libelle: `${e.prenom} ${e.nom}`,
+  }));
 
   const affectationsCharge = useMemo(
     () => construireAffectationsCharge(affectations),
@@ -108,7 +163,7 @@ function EC_RDEP_01(): JSX.Element {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['rdep', 'allocation', versionId, departementId] });
       setAffectationSelectionnee(null);
-      setMessageSucces('Affectation créée avec succès.');
+      setMessageSucces(dictRdep.affectationCree);
     },
   });
 
@@ -121,7 +176,7 @@ function EC_RDEP_01(): JSX.Element {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['rdep', 'allocation', versionId, departementId] });
       setAffectationSelectionnee(null);
-      setMessageSucces('Affectation modifiée avec succès.');
+      setMessageSucces(dictRdep.affectationModifiee);
     },
   });
 
@@ -130,7 +185,7 @@ function EC_RDEP_01(): JSX.Element {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['rdep', 'allocation', versionId, departementId] });
       setAffectationSelectionnee(null);
-      setMessageSucces('Affectation supprimée avec succès.');
+      setMessageSucces(dictRdep.affectationSupprimee);
     },
   });
 
@@ -139,7 +194,7 @@ function EC_RDEP_01(): JSX.Element {
       repartitionApi.validerRepartition({ versionId, departementId }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['rdep', 'allocation', versionId, departementId] });
-      setMessageSucces('Répartition validée avec succès.');
+      setMessageSucces(dictRdep.repartitionValidee);
     },
   });
   const gererNouvelleAffectation = useCallback(() => {
@@ -157,7 +212,7 @@ function EC_RDEP_01(): JSX.Element {
 
   const gererSupprimerAffectation = useCallback(
     async (id: string) => {
-      if (!window.confirm('Supprimer cette affectation ?')) return;
+      if (!window.confirm(dictRdep.confirmerSuppression)) return;
       await supprimerAffectation(id);
     },
     [supprimerAffectation],
@@ -205,7 +260,7 @@ function EC_RDEP_01(): JSX.Element {
       return;
     }
     if (hasBloquant) {
-      if (!window.confirm('Des alertes bloquantes de charge sont détectées. Valider quand même ?')) return;
+      if (!window.confirm(dictRdep.alerteBloquante)) return;
     }
     await validerRepartition();
   }, [peutValider, matieresManquantes, hasBloquant, validerRepartition]);
@@ -213,17 +268,21 @@ function EC_RDEP_01(): JSX.Element {
     matieresManquantes.length > 0 && (
       <Alerte
         variante="attention"
-        titre="Matières sans affectation"
-        message={`${matieresManquantes.length} matière(s) du plan d’études n’ont pas d’affectation. La validation sera bloquée.`}
+        titre={dictRdep.matièresSansAffectation}
+        message={
+          matieresManquantes.length > 1
+            ? `${matieresManquantes.length} ${dictRdep.matieresManquantes}`
+            : `${matieresManquantes.length} ${dictRdep.matieresManquantes}`
+        }
         fermable={false}
       />
     );
 
   const blocageValidation = !peutValider || matieresManquantes.length > 0 || hasBloquant;
   const motifBlocage = useMemo(() => {
-    if (!peutValider) return 'La validation n’est disponible qu’en état rep_pedag.';
-    if (matieresManquantes.length > 0) return 'Toutes les matières du plan doivent avoir une affectation.';
-    if (hasBloquant) return 'Une alerte de charge bloquante empêche la validation.';
+    if (!peutValider) return dictRdep.validationNonDisponibleEtat;
+    if (matieresManquantes.length > 0) return dictRdep.toutesMatieresDoiventAvoirAffectation;
+    if (hasBloquant) return dictRdep.alerteBloquante;
     return '';
   }, [peutValider, matieresManquantes.length, hasBloquant]);
   if (chargementDonnees) {
@@ -243,6 +302,14 @@ function EC_RDEP_01(): JSX.Element {
       </section>
     );
   }
+  if (!contexteRepartition) {
+    return (
+      <section style={{ padding: 'var(--space-l)', display: 'flex', flexDirection: 'column', gap: 'var(--space-m)' }}>
+        <Alerte variante="erreur" titre={dictRdep.contexteManquant} message={dictRdep.contexteManquantDetaille} />
+      </section>
+    );
+  }
+
   return (
     <section
       data-testid="ec-rdep-01"
@@ -265,7 +332,7 @@ function EC_RDEP_01(): JSX.Element {
               color: 'var(--color-text-primary)',
             }}
           >
-            Répartition pédagogique — {departementId}
+            {dictRdep.titreSaisie} — {departementId}
           </h1>
           <p
             style={{
@@ -287,6 +354,15 @@ function EC_RDEP_01(): JSX.Element {
         </nav>
       </header>
 
+      {estValide && valideLe && (
+        <Alerte
+          variante="succès"
+          titre={dictRdep.repartitionValidee}
+          message={`Répartition validée le ${new Date(valideLe).toLocaleDateString('fr-FR')}. Les champs sont en lecture seule.`}
+          fermable={false}
+        />
+      )}
+
       {messageSucces && (
         <Alerte variante="succès" titre="Succès" message={messageSucces} fermable={true} onFermer={() => setMessageSucces(undefined)} />
       )}
@@ -303,9 +379,15 @@ function EC_RDEP_01(): JSX.Element {
               color: 'var(--color-text-primary)',
             }}
           >
-            Affectations du département
+            {dictRdep.affectationsDepartement}
           </h2>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 'var(--space-s)' }}>
+            <Input
+              label={dictRdep.recherche ?? 'Rechercher…'}
+              placeholder={dictRdep.recherche ?? 'Rechercher enseignant ou matière…'}
+              value={recherche}
+              onChange={(valeur) => setRecherche(valeur)}
+            />
             <Bouton
               variante="primaire"
               taille="moyenne"
@@ -316,10 +398,10 @@ function EC_RDEP_01(): JSX.Element {
           </div>
 
           {affectations.length === 0 && (
-            <Alerte variante="info" titre="Aucune affectation" message="Aucune affectation pédagogique n’est encore saisie pour ce département." />
+            <Alerte variante="info" titre={dictRdep.aucuneAffectation} message={dictRdep.aucuneAffectationDetaille} />
           )}
 
-          {affectations.map((aff) => (
+          {affectationsFiltrees.map((aff) => (
             <div
               key={aff.id}
               style={{
@@ -334,7 +416,9 @@ function EC_RDEP_01(): JSX.Element {
               }}
             >
               <span style={{ fontSize: 'var(--font-size-body)', color: 'var(--color-text-primary)', flex: 1, minWidth: 0 }}>
-                {aff.enseignantId} → {aff.matiereId} / {aff.groupeId} ({aff.volumeHebdo} h)
+                {enseignantNomParId.get(aff.enseignantId) ?? aff.enseignantId} →
+                {matiereParId.get(aff.matiereId)?.libelle ?? aff.matiereId} /
+                {groupeParId.get(aff.groupeId)?.libelle ?? aff.groupeId} ({aff.volumeHebdo} h)
               </span>
               <div style={{ display: 'flex', gap: 'var(--space-xs)' }}>
                 {!estLectureSeule && (
@@ -343,7 +427,7 @@ function EC_RDEP_01(): JSX.Element {
                     taille="petite"
                     disabled={chargementModification || chargementSuppression}
                     onClick={() => gererModifierAffectation(aff)}
-                    libelle="Modifier"
+                    libelle={dictRdep.modifier}
                   />
                 )}
                 {!estLectureSeule && (
@@ -352,7 +436,7 @@ function EC_RDEP_01(): JSX.Element {
                     taille="petite"
                     disabled={chargementModification || chargementSuppression}
                     onClick={() => gererSupprimerAffectation(aff.id)}
-                    libelle="Supprimer"
+                    libelle={dictRdep.supprimer}
                   />
                 )}
               </div>
@@ -363,7 +447,7 @@ function EC_RDEP_01(): JSX.Element {
         {affectationSelectionnee || !estLectureSeule ? (
           <AffectationEditor
             affectation={affectationSelectionnee}
-            enseignants={donneesPage?.enseignants ?? []}
+            enseignants={enseignantsPourEditeur}
             matieres={donneesPage?.matieres ?? []}
             groupes={donneesPage?.groupes ?? []}
             typesEnseignement={donneesPage?.typesEnseignement ?? []}
@@ -377,13 +461,13 @@ function EC_RDEP_01(): JSX.Element {
         ) : null}
       </div>
       <aside style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-m)' }}>
-        <h3 style={{ fontSize: 'var(--font-size-h3)', fontWeight: 600, margin: 0, color: 'var(--color-text-primary)' }}>Charge du département</h3>
+        <h3 style={{ fontSize: 'var(--font-size-h3)', fontWeight: 600, margin: 0, color: 'var(--color-text-primary)' }}>{dictRdep.chargeDepartement}</h3>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-xs)' }}>
           <span style={{ fontSize: 'var(--font-size-body)', color: 'var(--color-text-primary)' }}>
-            Enseignants en charge : {resultatCharge.parEnseignant.length}
+            {dictRdep.enseignantsCharge} : {resultatCharge.parEnseignant.length}
           </span>
           <span style={{ fontSize: 'var(--font-size-body)', color: 'var(--color-text-primary)' }}>
-            Taux de dépassement : {resultatCharge.tauxDepassement.toFixed(1)}%
+            {dictRdep.tauxDepassement} : {resultatCharge.tauxDepassement.toFixed(1)}%
           </span>
           <Badge
             variante={
@@ -397,19 +481,19 @@ function EC_RDEP_01(): JSX.Element {
             }
             libelle={
               hasBloquant
-                ? 'Bloquant'
+                ? dictRdep.bloquant
                 : resultatCharge.alertes.some(
                     (a: AlerteCharge) => a.severite === 'AVERTISSEMENT',
                   )
-                  ? 'Attention'
-                  : 'Conforme'
+                  ? dictRdep.attention
+                  : dictRdep.conform
             }
           />
         </div>
 
         <div style={{ marginTop: 'var(--space-m)', padding: 'var(--space-m)', border: `var(--border-width) solid var(--color-border)`, borderRadius: 'var(--radius-md)', background: 'var(--color-surface-variant)' }}>
           <h4 style={{ fontSize: 'var(--font-size-caption)', fontWeight: 600, margin: '0 0 var(--space-s) 0', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--color-text-secondary)' }}>
-            Actions de workflow
+            {dictRdep.actionsWorkflow}
           </h4>
           <Bouton
             variante="primaire"
