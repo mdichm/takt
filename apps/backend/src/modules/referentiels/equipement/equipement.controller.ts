@@ -42,9 +42,7 @@ interface RequeteAvecUtilisateur {
 @ApiBearerAuth()
 @Controller('referentiels/equipements')
 export class EquipementController {
-  constructor(
-    @Inject(EquipementService) private readonly equipementService: EquipementService,
-  ) {}
+  constructor(@Inject(EquipementService) private readonly equipementService: EquipementService) {}
 
   /** Liste paginée des équipements (GET /api/v1/referentiels/equipements). */
   @Get()

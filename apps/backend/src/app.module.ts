@@ -3,7 +3,7 @@
 
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
+import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE, Reflector } from '@nestjs/core';
 import { validateEnv } from './config/env.schema';
 import { AllExceptionsFilter } from './modules/common/http/all-exceptions.filter';
 import { ResponseEnvelopeInterceptor } from './modules/common/http/response-envelope.interceptor';
@@ -43,6 +43,7 @@ import { VersionsModule } from './modules/versions/versions.module';
     EventsModule,
   ],
   providers: [
+    Reflector,
     { provide: APP_FILTER, useClass: AllExceptionsFilter },
     { provide: APP_INTERCEPTOR, useClass: ResponseEnvelopeInterceptor },
     { provide: APP_PIPE, useClass: ZodValidationPipe },

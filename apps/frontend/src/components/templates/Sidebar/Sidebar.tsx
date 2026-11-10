@@ -21,17 +21,13 @@ export function Sidebar(): JSX.Element | null {
   }
 
   const entrees = ROUTES.filter(
-    (route) => route.sidebar !== false && route.roles.includes(session.role)
+    (route) => route.sidebar !== false && route.roles.includes(session.role),
   );
 
   return (
     <nav data-testid="sidebar" aria-label="Navigation principale">
       {entrees.map((route) => (
-        <NavLink
-          key={route.code}
-          to={route.chemin}
-          data-testid={`sidebar-entry-${route.code}`}
-        >
+        <NavLink key={route.code} to={route.chemin} data-testid={`sidebar-entry-${route.code}`}>
           {route.code}
         </NavLink>
       ))}

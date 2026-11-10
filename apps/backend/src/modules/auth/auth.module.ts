@@ -26,10 +26,7 @@ import { Reflector } from '@nestjs/core';
     {
       provide: TokenService,
       inject: [ConfigService, SessionRefreshStore],
-      useFactory: (
-        config: ConfigService,
-        revokedStore: SessionRefreshStore,
-      ): TokenService => {
+      useFactory: (config: ConfigService, revokedStore: SessionRefreshStore): TokenService => {
         const authConfig: AuthConfig = chargerConfigAuth({
           JWT_KEYS_DIRECTORY: config.get<string>('JWT_KEYS_DIRECTORY', '/run/secrets/jwt'),
           JWT_ACTIVE_KEY_ID: config.get<string>('JWT_ACTIVE_KEY_ID', 'active'),

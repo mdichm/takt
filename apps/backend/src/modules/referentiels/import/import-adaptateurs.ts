@@ -43,7 +43,10 @@ export interface ImportAdaptateur {
   readonly entetesAttendus: readonly string[];
   readonly schemaLigne: ZodTypeAny;
   /** Crée l'entité dans la transaction fournie. Retourne son id ou une erreur de ligne. */
-  readonly creer: (donnees: Record<string, string>, ctx: ContexteImport) => Promise<ResultatCreation>;
+  readonly creer: (
+    donnees: Record<string, string>,
+    ctx: ContexteImport,
+  ) => Promise<ResultatCreation>;
 }
 
 // ---------------------------------------------------------------------------
@@ -69,8 +72,7 @@ const zLigneSalle = z.object({
   code: z.string().trim().min(1, 'Le code est requis').max(50, 'Le code est trop long'),
   libelle: z.string().trim().min(1, 'Le libellé est requis').max(100, 'Le libellé est trop long'),
   typeSalle: z.string().trim().min(1, 'Le type de salle est requis'),
-  capacite: z
-    .coerce
+  capacite: z.coerce
     .number({ invalid_type_error: 'La capacité doit être un nombre' })
     .int('La capacité doit être un nombre entier')
     .positive('La capacité doit être supérieure à 0'),
@@ -84,28 +86,29 @@ const zLigneGroupe = z.object({
 });
 
 const zLigneEnseignant = z.object({
-  matricule: z.string().trim().min(1, 'Le matricule est requis').max(50, 'Le matricule est trop long'),
+  matricule: z
+    .string()
+    .trim()
+    .min(1, 'Le matricule est requis')
+    .max(50, 'Le matricule est trop long'),
   nom: z.string().trim().min(1, 'Le nom est requis').max(100, 'Le nom est trop long'),
   prenom: z.string().trim().min(1, 'Le prénom est requis').max(100, 'Le prénom est trop long'),
   email: z.string().email('Adresse e-mail invalide'),
   grade: z.string().trim().min(1).max(50, 'Le grade est trop long').optional(),
   actif: z
-    .preprocess(
-      (valeur) => {
-        if (valeur === undefined || valeur === '') {
-          return undefined;
-        }
-        const s = String(valeur).trim().toLowerCase();
-        if (s === 'true' || s === 'oui' || s === '1') {
-          return true;
-        }
-        if (s === 'false' || s === 'non' || s === '0') {
-          return false;
-        }
-        return s;
-      },
-      z.boolean().optional(),
-    )
+    .preprocess((valeur) => {
+      if (valeur === undefined || valeur === '') {
+        return undefined;
+      }
+      const s = String(valeur).trim().toLowerCase();
+      if (s === 'true' || s === 'oui' || s === '1') {
+        return true;
+      }
+      if (s === 'false' || s === 'non' || s === '0') {
+        return false;
+      }
+      return s;
+    }, z.boolean().optional())
     .optional(),
 });
 
@@ -188,7 +191,12 @@ export async function verifierUniciteExistante(
 // Adaptateurs par type
 // ---------------------------------------------------------------------------
 
-function erreurLigne(ligne: number, champ: string, valeur: string, motif: string): ErreurLigneImport {
+function erreurLigne(
+  ligne: number,
+  champ: string,
+  valeur: string,
+  motif: string,
+): ErreurLigneImport {
   return { ligne, champ, valeur, motif };
 }
 
@@ -213,10 +221,19 @@ const ADAPTATEURS: ImportAdaptateur[] = [
       }
       const { code, libelle } = validation.data;
       if (ctx.vus.codes.has(code)) {
-        return { erreur: erreurLigne(Number(donnees.__ligne), 'code', code, 'Ce code est déjà utilisé dans le fichier') };
+        return {
+          erreur: erreurLigne(
+            Number(donnees.__ligne),
+            'code',
+            code,
+            'Ce code est déjà utilisé dans le fichier',
+          ),
+        };
       }
       if (ctx.caches.sites.has(code)) {
-        return { erreur: erreurLigne(Number(donnees.__ligne), 'code', code, 'Ce code existe déjà en base') };
+        return {
+          erreur: erreurLigne(Number(donnees.__ligne), 'code', code, 'Ce code existe déjà en base'),
+        };
       }
       const cree = await ctx.tx.site.create({ data: { code, libelle }, select: { id: true } });
       ctx.vus.codes.add(code);
@@ -244,10 +261,19 @@ const ADAPTATEURS: ImportAdaptateur[] = [
       }
       const { code, libelle } = validation.data;
       if (ctx.vus.codes.has(code)) {
-        return { erreur: erreurLigne(Number(donnees.__ligne), 'code', code, 'Ce code est déjà utilisé dans le fichier') };
+        return {
+          erreur: erreurLigne(
+            Number(donnees.__ligne),
+            'code',
+            code,
+            'Ce code est déjà utilisé dans le fichier',
+          ),
+        };
       }
       if (ctx.caches.typesSalle.has(code)) {
-        return { erreur: erreurLigne(Number(donnees.__ligne), 'code', code, 'Ce code existe déjà en base') };
+        return {
+          erreur: erreurLigne(Number(donnees.__ligne), 'code', code, 'Ce code existe déjà en base'),
+        };
       }
       const cree = await ctx.tx.typeSalle.create({ data: { code, libelle }, select: { id: true } });
       ctx.vus.codes.add(code);
@@ -275,9 +301,19 @@ const ADAPTATEURS: ImportAdaptateur[] = [
       }
       const { code, libelle } = validation.data;
       if (ctx.vus.codes.has(code)) {
-        return { erreur: erreurLigne(Number(donnees.__ligne), 'code', code, 'Ce code est déjà utilisé dans le fichier') };
+        return {
+          erreur: erreurLigne(
+            Number(donnees.__ligne),
+            'code',
+            code,
+            'Ce code est déjà utilisé dans le fichier',
+          ),
+        };
       }
-      const cree = await ctx.tx.equipement.create({ data: { code, libelle }, select: { id: true } });
+      const cree = await ctx.tx.equipement.create({
+        data: { code, libelle },
+        select: { id: true },
+      });
       ctx.vus.codes.add(code);
       return { id: cree.id };
     },
@@ -302,15 +338,36 @@ const ADAPTATEURS: ImportAdaptateur[] = [
       }
       const { code, libelle, typeSalle: typeSalleCode, capacite, site: siteCode } = validation.data;
       if (ctx.vus.codes.has(code)) {
-        return { erreur: erreurLigne(Number(donnees.__ligne), 'code', code, 'Ce code est déjà utilisé dans le fichier') };
+        return {
+          erreur: erreurLigne(
+            Number(donnees.__ligne),
+            'code',
+            code,
+            'Ce code est déjà utilisé dans le fichier',
+          ),
+        };
       }
       const siteId = ctx.caches.sites.get(siteCode);
       if (!siteId) {
-        return { erreur: erreurLigne(Number(donnees.__ligne), 'site', siteCode, `Le site "${siteCode}" n'existe pas`) };
+        return {
+          erreur: erreurLigne(
+            Number(donnees.__ligne),
+            'site',
+            siteCode,
+            `Le site "${siteCode}" n'existe pas`,
+          ),
+        };
       }
       const typeSalleId = ctx.caches.typesSalle.get(typeSalleCode);
       if (!typeSalleId) {
-        return { erreur: erreurLigne(Number(donnees.__ligne), 'typeSalle', typeSalleCode, `Le type de salle "${typeSalleCode}" n'existe pas`) };
+        return {
+          erreur: erreurLigne(
+            Number(donnees.__ligne),
+            'typeSalle',
+            typeSalleCode,
+            `Le type de salle "${typeSalleCode}" n'existe pas`,
+          ),
+        };
       }
       const cree = await ctx.tx.salle.create({
         data: { code, libelle, typeSalleId, capacite, siteId },
@@ -340,13 +397,30 @@ const ADAPTATEURS: ImportAdaptateur[] = [
       }
       const { code, libelle, niveau: niveauCode } = validation.data;
       if (ctx.vus.codes.has(code)) {
-        return { erreur: erreurLigne(Number(donnees.__ligne), 'code', code, 'Ce code est déjà utilisé dans le fichier') };
+        return {
+          erreur: erreurLigne(
+            Number(donnees.__ligne),
+            'code',
+            code,
+            'Ce code est déjà utilisé dans le fichier',
+          ),
+        };
       }
       const niveauId = ctx.caches.niveaux.get(niveauCode);
       if (!niveauId) {
-        return { erreur: erreurLigne(Number(donnees.__ligne), 'niveau', niveauCode, `Le niveau "${niveauCode}" n'existe pas`) };
+        return {
+          erreur: erreurLigne(
+            Number(donnees.__ligne),
+            'niveau',
+            niveauCode,
+            `Le niveau "${niveauCode}" n'existe pas`,
+          ),
+        };
       }
-      const cree = await ctx.tx.groupe.create({ data: { code, libelle, niveauId }, select: { id: true } });
+      const cree = await ctx.tx.groupe.create({
+        data: { code, libelle, niveauId },
+        select: { id: true },
+      });
       ctx.vus.codes.add(code);
       return { id: cree.id };
     },
@@ -371,16 +445,37 @@ const ADAPTATEURS: ImportAdaptateur[] = [
       }
       const { matricule, nom, prenom, email, grade: gradeCode, actif } = validation.data;
       if (ctx.vus.matricules.has(matricule)) {
-        return { erreur: erreurLigne(Number(donnees.__ligne), 'matricule', matricule, 'Ce matricule est déjà utilisé dans le fichier') };
+        return {
+          erreur: erreurLigne(
+            Number(donnees.__ligne),
+            'matricule',
+            matricule,
+            'Ce matricule est déjà utilisé dans le fichier',
+          ),
+        };
       }
       if (ctx.vus.emails.has(email)) {
-        return { erreur: erreurLigne(Number(donnees.__ligne), 'email', email, 'Cet e-mail est déjà utilisé dans le fichier') };
+        return {
+          erreur: erreurLigne(
+            Number(donnees.__ligne),
+            'email',
+            email,
+            'Cet e-mail est déjà utilisé dans le fichier',
+          ),
+        };
       }
       let gradeId: string | undefined;
       if (gradeCode !== undefined && gradeCode !== '') {
         gradeId = ctx.caches.grades.get(gradeCode);
         if (!gradeId) {
-          return { erreur: erreurLigne(Number(donnees.__ligne), 'grade', gradeCode, `Le grade "${gradeCode}" n'existe pas`) };
+          return {
+            erreur: erreurLigne(
+              Number(donnees.__ligne),
+              'grade',
+              gradeCode,
+              `Le grade "${gradeCode}" n'existe pas`,
+            ),
+          };
         }
       }
       const cree = await ctx.tx.enseignant.create({

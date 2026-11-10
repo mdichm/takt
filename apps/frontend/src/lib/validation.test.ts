@@ -95,9 +95,7 @@ describe('validerReponseApi', () => {
     }
     expect(erreurCapturée).not.toBeNull();
     expect(erreurCapturée).toBeInstanceOf(Error);
-    expect((erreurCapturée as unknown as { code: string }).code).toBe(
-      'VALIDATION_ERROR',
-    );
+    expect((erreurCapturée as unknown as { code: string }).code).toBe('VALIDATION_ERROR');
     expect((erreurCapturée as unknown as { statut: number }).statut).toBe(400);
   });
 });

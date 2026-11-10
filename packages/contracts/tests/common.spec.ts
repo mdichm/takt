@@ -3,7 +3,14 @@
 
 import { describe, expect, it } from 'vitest';
 import { z } from 'zod';
-import { zCodeErreurApi, zEnvelope, zErreurApi, zMetaApi, zPaginationMeta, zPaginationQuery } from '../src/common';
+import {
+  zCodeErreurApi,
+  zEnvelope,
+  zErreurApi,
+  zMetaApi,
+  zPaginationMeta,
+  zPaginationQuery,
+} from '../src/common';
 
 describe('contrats communs', () => {
   it('applique les valeurs de pagination par défaut', () => {
@@ -29,9 +36,11 @@ describe('contrats communs', () => {
   });
 
   it('valide les métadonnées paginées', () => {
-    expect(
-      zPaginationMeta.parse({ page: 1, pageSize: 20, total: 150 }),
-    ).toEqual({ page: 1, pageSize: 20, total: 150 });
+    expect(zPaginationMeta.parse({ page: 1, pageSize: 20, total: 150 })).toEqual({
+      page: 1,
+      pageSize: 20,
+      total: 150,
+    });
   });
 
   it.each([
@@ -52,9 +61,10 @@ describe('contrats communs', () => {
   });
 
   it('valide un corps d’erreur métier', () => {
-    expect(
-      zErreurApi.parse({ code: 'UNAUTHORIZED', message: 'session expirée' }),
-    ).toEqual({ code: 'UNAUTHORIZED', message: 'session expirée' });
+    expect(zErreurApi.parse({ code: 'UNAUTHORIZED', message: 'session expirée' })).toEqual({
+      code: 'UNAUTHORIZED',
+      message: 'session expirée',
+    });
     expect(zErreurApi.parse({ code: 'INTERNAL_ERROR' })).toEqual({
       code: 'INTERNAL_ERROR',
     });
@@ -86,9 +96,7 @@ describe('contrats communs', () => {
       pageSize: 20,
       total: 150,
     });
-    expect(
-      zMetaApi.safeParse({ timestamp: '2026-11-06T00:00:00Z' }).success,
-    ).toBe(false); // requestId requis
+    expect(zMetaApi.safeParse({ timestamp: '2026-11-06T00:00:00Z' }).success).toBe(false); // requestId requis
   });
 
   it('construit une enveloppe de succès avec data', () => {

@@ -3,7 +3,9 @@
 
 import { expect, test } from '@playwright/test';
 
-test('la racine redirige vers l écran de connexion pour un utilisateur non authentifié', async ({ page }) => {
+test('la racine redirige vers l écran de connexion pour un utilisateur non authentifié', async ({
+  page,
+}) => {
   const reponse = await page.goto('/', { waitUntil: 'networkidle' });
   expect(reponse?.status()).toBe(200);
   // Pas de session : la racine redirige vers le tableau de bord puis vers /login.

@@ -15,10 +15,9 @@
     "skipLibCheck": true,
     "declaration": true,
     "sourceMap": true,
-    "baseUrl": ".",
     "paths": {
-      "@takt/design-tokens": ["packages/design-tokens/src/index.ts"],
-      "@takt/solver-client": ["packages/solver-client/src/index.ts"]
+      "@takt/design-tokens": ["./packages/design-tokens/src/index.ts"],
+      "@takt/solver-client": ["./packages/solver-client/src/index.ts"]
     }
   }
 }

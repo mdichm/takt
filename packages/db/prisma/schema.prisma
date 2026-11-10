@@ -1,6 +1,6 @@
 // ============================================================================
 // TAKT — Modèle de données (MLD/MDP)
-// Fichier : packages/db/prisma/contract.prisma
+// Fichier : packages/db/prisma/schema.prisma (source de vérité, DL-09)
 // Étape E0.5 — Conforme à docs/ST_TAKT.md §2
 // Générateur : Prisma Client (@takt/db)
 // ============================================================================
@@ -34,8 +34,8 @@ model Utilisateur {
   departement      Departement?        @relation(fields: [departementId], references: [id])
   sessionsRefresh  SessionRefresh[]    // familles de jetons de rafraîchissement (rotation)
   verrous          VerrouSeance[]
-  affectations     AffectationPedagogique[]
   journalAudit     JournalAudit[]
+  notifications    Notification[]      // notifications in-app (TAKT-L05-05)
 
   @@index([email])
   @@index([roleId])
@@ -82,7 +82,10 @@ model Departement {
   utilisateurs    Utilisateur[]
   affectations    AffectationPedagogique[]
   parcours        Parcours[]
+  planEtudes      PlanEtudes[]
   enseignants     EnseignantDepartement[]
+  snapshots       Snapshot[]
+  validationRepartitions ValidationRepartition[] // état de validation par département (TAKT-L05-05)
 
   @@index([code])
   @@index([etablissementId])
@@ -101,6 +104,7 @@ model Parcours {
   updatedAt   DateTime @updatedAt
   departement Departement @relation(fields: [departementId], references: [id])
   niveaux     Niveau[]
+  planEtudes  PlanEtudes[]
 
   @@index([code])
   @@index([departementId])
@@ -119,10 +123,17 @@ model Niveau {
   updatedAt DateTime @updatedAt
   parcours  Parcours @relation(fields: [parcoursId], references: [id])
   groupes   Groupe[]
+  planEtudes PlanEtudes[]
 
   @@index([code])
   @@index([parcoursId])
 }
+
+// ----------------------------------------------------------------------------
+// 10. Groupe — dépréciation du lien direct avec le plan d'études
+// ----------------------------------------------------------------------------
+// Un groupe hérite du plan d'études de son niveau (Groupe → Niveau → PlanEtudes).
+// Aucune FK directe Groupe.planEtudesId n'est créée (TAKT-L05-01, héritage par niveau).
 
 // ----------------------------------------------------------------------------
 // 7. Groupe — Référentiel des groupes d'étudiants
@@ -136,10 +147,63 @@ model Groupe {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   niveau    Niveau @relation(fields: [niveauId], references: [id])
+  affectations AffectationPedagogique[]
 
   @@index([code])
   @@index([niveauId])
   @@unique([originId])
+}
+
+// ----------------------------------------------------------------------------
+// 8. PlanEtudes — Plan d'études d'un niveau pour une année et un semestre
+// ----------------------------------------------------------------------------
+model PlanEtudes {
+  id                 String   @id @default(uuid()) @db.Uuid
+  parcoursId         String   @db.Uuid
+  niveauId           String   @db.Uuid
+  anneeUniversitaireId String @db.Uuid
+  semestreId         String   @db.Uuid
+  departementId      String   @db.Uuid
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  parcours             Parcours             @relation(fields: [parcoursId], references: [id])
+  niveau               Niveau               @relation(fields: [niveauId], references: [id])
+  anneeUniversitaire   AnneeUniversitaire   @relation(fields: [anneeUniversitaireId], references: [id])
+  semestre             Semestre             @relation(fields: [semestreId], references: [id])
+  departement          Departement          @relation(fields: [departementId], references: [id])
+  planEtudesMatieres   PlanEtudesMatiere[]
+
+  @@index([parcoursId])
+  @@index([niveauId])
+  @@index([anneeUniversitaireId])
+  @@index([semestreId])
+  @@index([departementId])
+  @@unique([niveauId, anneeUniversitaireId, semestreId])
+}
+
+// ----------------------------------------------------------------------------
+// 9. PlanEtudesMatiere — Matière d'un plan d'études avec volume horaire
+// ----------------------------------------------------------------------------
+model PlanEtudesMatiere {
+  id               String   @id @default(uuid()) @db.Uuid
+  planEtudesId     String   @db.Uuid
+  matiereId        String   @db.Uuid
+  typeEnseignementId String @db.Uuid
+  volumeHoraire    Int      // volume horaire hebdomadaire, strictement positif
+  dureeCreneaux    Int      // durée d'un créneau en minutes, strictement positive
+  coefficient      Int      // coefficient pédagogique, strictement positif
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  planEtudes       PlanEtudes       @relation(fields: [planEtudesId], references: [id])
+  matiere          Matiere          @relation(fields: [matiereId], references: [id])
+  typeEnseignement TypeEnseignement @relation(fields: [typeEnseignementId], references: [id])
+
+  @@index([planEtudesId])
+  @@index([matiereId])
+  @@index([typeEnseignementId])
+  @@unique([planEtudesId, matiereId])
 }
 
 // ----------------------------------------------------------------------------
@@ -151,6 +215,7 @@ model AnneeUniversitaire {
   dateDebut DateTime
   dateFin   DateTime
   semestres Semestre[]
+  planEtudes PlanEtudes[]
 
   @@index([libelle])
 }
@@ -167,6 +232,7 @@ model Semestre {
   anneeUniversitaire AnneeUniversitaire @relation(fields: [anneeUniversitaireId], references: [id])
   versions          Version[]
   affectations      AffectationPedagogique[]
+  planEtudes         PlanEtudes[]
 
   @@index([anneeUniversitaireId])
   @@index([numero])
@@ -184,12 +250,14 @@ model Version {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  semestre    Semestre    @relation(fields: [semestreId], references: [id])
+  semestre    Semestre          @relation(fields: [semestreId], references: [id])
   seances     Seance[]
   snapshots   Snapshot[]
   generations Generation[]
   exports     Export[]
   contraintes Contrainte[]
+  affectations AffectationPedagogique[]
+  validationRepartitions ValidationRepartition[] // état de validation par département (TAKT-L05-05)
 
   @@index([semestreId])
   @@index([etat])
@@ -199,40 +267,90 @@ model Version {
 // 7. Snapshot — Snapshot immuable des données d'une version
 // ----------------------------------------------------------------------------
 model Snapshot {
-  id        String   @id @default(uuid()) @db.Uuid
-  versionId String   @db.Uuid
-  donnees   Json     // données JSONB du snapshot
-  hash      String   // hash d'intégrité du snapshot
-  createdAt DateTime @default(now())
+  id            String      @id @default(uuid()) @db.Uuid
+  versionId     String      @db.Uuid
+  departementId String?     @db.Uuid // snapshot de répartition : un par (versionId, departementId) ; snapshot de publication : NULL
+  revision      Int         @default(1) // numéro de révision du snapshot (historique des revalidations)
+  estCourant    Boolean     @default(true) // true = snapshot actuellement en vigueur pour le département
+  donnees       Json        // données JSONB du snapshot
+  hash          String      // hash d'intégrité du snapshot
+  createdAt     DateTime    @default(now())
 
-  version   Version  @relation(fields: [versionId], references: [id])
+  version       Version       @relation(fields: [versionId], references: [id])
+  departement   Departement?  @relation(fields: [departementId], references: [id])
+
+  // Historique des revalidations ciblées par département.
+  validationRepartitionsCourant  ValidationRepartition[] @relation("SnapshotCourant")
+  validationRepartitionsPrecedent ValidationRepartition[] @relation("SnapshotPrecedent")
 
   @@index([versionId])
-  @@unique([versionId])
+  @@index([versionId, departementId])
+  @@index([departementId])
+}
+
+// ----------------------------------------------------------------------------
+// 7b. ValidationRepartition — État de validation d’un département pour une version
+// ----------------------------------------------------------------------------
+model ValidationRepartition {
+  id                        String   @id @default(uuid()) @db.Uuid
+  versionId                 String   @db.Uuid
+  departementId             String   @db.Uuid
+  etat                      String   // EN_COURS | VALIDE | REVALIDATION_REQUISE | REJETE
+  revision                  Int      @default(1)
+  hashAffectations          String?  // hash des affectations validées (détection d’impact par département)
+  snapshotCourantId         String?  @db.Uuid
+  snapshotPrecedentId       String?  @db.Uuid
+  motif                     String?
+  revalidationDemandeeLe    DateTime?
+  revalidationDemandeePar   String?  @db.Uuid
+  valideLe                  DateTime?
+  validePar                 String?  @db.Uuid
+  createdAt                 DateTime @default(now())
+  updatedAt                 DateTime @updatedAt
+
+  version        Version              @relation(fields: [versionId], references: [id])
+  departement    Departement          @relation(fields: [departementId], references: [id])
+  snapshotCourant    Snapshot?        @relation("SnapshotCourant", fields: [snapshotCourantId], references: [id])
+  snapshotPrecedent  Snapshot?        @relation("SnapshotPrecedent", fields: [snapshotPrecedentId], references: [id])
+
+  @@index([versionId])
+  @@index([departementId])
+  @@index([versionId, departementId])
 }
 
 // ----------------------------------------------------------------------------
 // 8. AffectationPedagogique — Enseignant ↔ Matière ↔ Groupe, volume horaire
 // ----------------------------------------------------------------------------
 model AffectationPedagogique {
-  id                String   @id @default(uuid()) @db.Uuid
-  semestreId        String   @db.Uuid
-  departementId     String   @db.Uuid
-  enseignantId      String   @db.Uuid
-  matiereId         String   @db.Uuid
-  groupeId          String   @db.Uuid
-  volumeHoraire     Int      // volume horaire annuel ou semestriel
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id                 String   @id @default(uuid()) @db.Uuid
+  versionId          String   @db.Uuid
+  semestreId         String   @db.Uuid
+  departementId      String   @db.Uuid
+  enseignantId       String   @db.Uuid
+  matiereId          String   @db.Uuid
+  groupeId           String   @db.Uuid
+  typeEnseignementId String?  @db.Uuid
+  volumeHebdo        Int      // volume horaire hebdomadaire
+  dureeCreneaux      Int?     // durée d'un créneau (minutes)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
 
-  semestre    Semestre        @relation(fields: [semestreId], references: [id])
-  departement Departement     @relation(fields: [departementId], references: [id])
-  enseignant  Utilisateur     @relation(fields: [enseignantId], references: [id])
-  // matiereId et groupeId sont des références logiques (pas de table dédiée dans le périmètre E0.5)
+  version            Version              @relation(fields: [versionId], references: [id])
+  semestre           Semestre             @relation(fields: [semestreId], references: [id])
+  departement        Departement          @relation(fields: [departementId], references: [id])
+  enseignant         Enseignant           @relation(fields: [enseignantId], references: [id])
+  matiere            Matiere              @relation(fields: [matiereId], references: [id])
+  groupe             Groupe               @relation(fields: [groupeId], references: [id])
+  typeEnseignement   TypeEnseignement?    @relation(fields: [typeEnseignementId], references: [id])
 
+  @@unique([versionId, enseignantId, matiereId, groupeId])
+  @@index([versionId])
   @@index([semestreId])
   @@index([departementId])
   @@index([enseignantId])
+  @@index([matiereId])
+  @@index([groupeId])
+  @@index([typeEnseignementId])
 }
 
 // ----------------------------------------------------------------------------
@@ -398,6 +516,8 @@ model TypeEnseignement {
   updatedAt   DateTime @updatedAt
   modules     Module[]
   gradeType   GradeTypeEnseignement[]
+  planEtudesMatieres PlanEtudesMatiere[]
+  affectations AffectationPedagogique[]
 
   @@index([code])
 }
@@ -469,6 +589,8 @@ model Matiere {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   module      Module   @relation(fields: [moduleId], references: [id])
+  planEtudesMatieres PlanEtudesMatiere[]
+  affectations  AffectationPedagogique[]
 
   @@index([code])
   @@index([moduleId])
@@ -491,6 +613,7 @@ model Enseignant {
 
   grade         Grade?                 @relation(fields: [gradeId], references: [id])
   departements  EnseignantDepartement[]
+  affectations  AffectationPedagogique[]
 
   @@index([matricule])
   @@index([email])
@@ -516,16 +639,28 @@ model EnseignantDepartement {
 }
 
 // ----------------------------------------------------------------------------
-// 22 (bis). ChargeRuleSet — Règles de charge horaire (amorcée, complétée en L05-03)
+// 22 (bis). ChargeRuleSet — Règles de charge horaire (complétée en L05-03)
 // ----------------------------------------------------------------------------
 model ChargeRuleSet {
-  id          String   @id @default(uuid()) @db.Uuid
-  code        String   @unique
-  libelle     String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id                       String   @id @default(uuid()) @db.Uuid
+  code                     String
+  libelle                  String
+  version                  Int      @default(1)
+  estActive                Boolean  @default(false)
+  seuilAlerte              Int      @default(90)
+  plafondHebdomadaire      Int      @default(20)
+  arrondi                  String   @default("UNITAIRE") // UNITAIRE | DEMI_JOURNEE | JOURNEE
+  dureeJournee             Float    @default(7)
+  dureeDemiJournee         Float    @default(3.5)
+  coefficientsParType      Json     // { [typeCode: string]: number }
+  cibleHebdomadaireParGrade Json    // { [gradeCode: string]: number }
+  toleranceEquilibrage     Float    @default(5)
+  createdAt                DateTime @default(now())
+  updatedAt                DateTime @updatedAt
 
+  @@unique([code, version])
   @@index([code])
+  @@index([estActive])
 }
 
 // ----------------------------------------------------------------------------
@@ -652,4 +787,22 @@ model ConfigSysteme {
   creneauxParJour   Int      @default(24)
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
+}
+
+// ----------------------------------------------------------------------------
+// 31. Notification — Notification in-app émise à un utilisateur (TAKT-L05-05)
+// ----------------------------------------------------------------------------
+model Notification {
+  id            String   @id @default(uuid()) @db.Uuid
+  utilisateurId String   @db.Uuid
+  type          String   // REVALIDATION_DEMANDEE | REVALIDATION_VALIDEE | ...
+  titre         String
+  message       String
+  lue           Boolean  @default(false)
+  createdAt     DateTime @default(now())
+
+  utilisateur Utilisateur @relation(fields: [utilisateurId], references: [id])
+
+  @@index([utilisateurId])
+  @@index([utilisateurId, lue])
 }

@@ -43,7 +43,14 @@ export function Input({
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-xxs)' }}>
-      <label htmlFor={champId} style={{ fontSize: 'var(--font-size-caption)', fontWeight: 500, color: 'var(--color-text-secondary)' }}>
+      <label
+        htmlFor={champId}
+        style={{
+          fontSize: 'var(--font-size-caption)',
+          fontWeight: 500,
+          color: 'var(--color-text-secondary)',
+        }}
+      >
         {label}
         {required && (
           <span style={{ color: 'var(--color-error)', marginLeft: 'var(--space-xxs)' }}>*</span>
@@ -73,7 +80,11 @@ export function Input({
         className={className}
       />
       {messageErreur && (
-        <span id={`${champId}-erreur`} role="alert" style={{ fontSize: 'var(--font-size-caption)', color: 'var(--color-error)' }}>
+        <span
+          id={`${champId}-erreur`}
+          role="alert"
+          style={{ fontSize: 'var(--font-size-caption)', color: 'var(--color-error)' }}
+        >
           {messageErreur}
         </span>
       )}

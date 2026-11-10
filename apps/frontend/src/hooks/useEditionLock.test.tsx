@@ -67,10 +67,7 @@ describe('useEditionLock (bail d édition, contrat L06-07)', () => {
     await viderMicrotaches();
 
     expect(await screen.findByTestId('acquis')).toHaveTextContent('bail acquis');
-    expect(vi.mocked(api.post)).toHaveBeenCalledWith(
-      '/versions/version-1/bail',
-      undefined,
-    );
+    expect(vi.mocked(api.post)).toHaveBeenCalledWith('/versions/version-1/bail', undefined);
   });
 
   it('expose le détenteur en cas de 423 (SEANCE_LOCKED)', async () => {
@@ -131,9 +128,7 @@ describe('useEditionLock (bail d édition, contrat L06-07)', () => {
     expect(screen.getByTestId('acquis')).toBeInTheDocument();
 
     // Le renouvellement suivant échoue → libération
-    vi.mocked(api.post).mockRejectedValueOnce(
-      new ErreurHttp('INTERNAL_ERROR', 500, 'Erreur'),
-    );
+    vi.mocked(api.post).mockRejectedValueOnce(new ErreurHttp('INTERNAL_ERROR', 500, 'Erreur'));
     vi.advanceTimersByTime(5 * 60 * 1000);
     await viderMicrotaches();
 

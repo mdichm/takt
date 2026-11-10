@@ -77,7 +77,7 @@ describe('analyserCsv — guillemets (L04-07)', () => {
     expect(resultat.lignes[1]!.valeurs.code).toBe('S2');
   });
 
-  test('séparateur à l\'intérieur de guillemets conservé', () => {
+  test("séparateur à l'intérieur de guillemets conservé", () => {
     const resultat = analyserCsv('code;libelle\nS1;"A; B"\n');
     expect(resultat.lignes[0]!.valeurs.libelle).toBe('A; B');
   });

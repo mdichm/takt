@@ -30,7 +30,7 @@ export const DEPENDANCES_AUTORISEES: Readonly<Record<ModuleMetier, readonly stri
   auth: ['common', 'users', 'audit'],
   users: ['common', 'audit', 'auth'],
   referentiels: ['common', 'audit'],
-  repartition: ['common', 'referentiels', 'versions'],
+  repartition: ['common', 'referentiels', 'versions', 'audit', 'notifications'],
   versions: ['common', 'referentiels'],
   planning: ['common', 'referentiels', 'versions'],
   generation: ['common', 'referentiels', 'versions', 'planning'],

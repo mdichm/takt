@@ -34,12 +34,23 @@ describe('Matière (TAKT-L04-02)', () => {
     await ctx.prisma.module.upsert({
       where: { id: ID_MODULE },
       update: {},
-      create: { id: ID_MODULE, code: 'MOD-TEST', libelle: 'Module test', typeEnseignementId: ID_TYPE, gradeId: ID_GRADE },
+      create: {
+        id: ID_MODULE,
+        code: 'MOD-TEST',
+        libelle: 'Module test',
+        typeEnseignementId: ID_TYPE,
+        gradeId: ID_GRADE,
+      },
     });
     await ctx.prisma.matiere.upsert({
       where: { id: ID_MATIERE_EXISTANT },
       update: {},
-      create: { id: ID_MATIERE_EXISTANT, code: 'MAT-TEST', libelle: 'Matière test', moduleId: ID_MODULE },
+      create: {
+        id: ID_MATIERE_EXISTANT,
+        code: 'MAT-TEST',
+        libelle: 'Matière test',
+        moduleId: ID_MODULE,
+      },
     });
   });
 
@@ -48,7 +59,9 @@ describe('Matière (TAKT-L04-02)', () => {
     await ctx.prisma.matiere.deleteMany({ where: { moduleId: ID_MODULE } });
     await ctx.prisma.matiere.deleteMany({ where: { id: { in: [ID_MATIERE_EXISTANT] } } });
     await ctx.prisma.module.deleteMany({ where: { id: ID_MODULE } });
-    await ctx.prisma.gradeTypeEnseignement.deleteMany({ where: { gradeId: ID_GRADE, typeEnseignementId: ID_TYPE } });
+    await ctx.prisma.gradeTypeEnseignement.deleteMany({
+      where: { gradeId: ID_GRADE, typeEnseignementId: ID_TYPE },
+    });
     await ctx.prisma.grade.deleteMany({ where: { id: ID_GRADE } });
     await ctx.prisma.typeEnseignement.deleteMany({ where: { id: ID_TYPE } });
   });
@@ -77,7 +90,11 @@ describe('Matière (TAKT-L04-02)', () => {
     const reponse = await ctx.agent
       .post('/api/v1/referentiels/matieres')
       .set('Authorization', `Bearer ${ctx.tokenAdmin}`)
-      .send({ code: 'MAT-INVALIDE', libelle: 'Invalide', moduleId: '00000000-0000-0000-0000-000000000999' })
+      .send({
+        code: 'MAT-INVALIDE',
+        libelle: 'Invalide',
+        moduleId: '00000000-0000-0000-0000-000000000999',
+      })
       .expect(400);
     expect(reponse.body.error.code).toBe('VALIDATION_ERROR');
   });

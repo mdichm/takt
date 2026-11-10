@@ -1,10 +1,7 @@
 // Copyright (C) 2026 TAKT
 // SPDX-License-Identifier: AGPL-3.0-only
 
-import {
-  ExecutionContext,
-  Injectable,
-} from '@nestjs/common';
+import { ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { ApiError } from '../http/api-error';
 import { CODES_ERREUR_API } from '../http/api-error';
@@ -37,10 +34,7 @@ export class DepartmentScopeGuard {
       return true;
     }
     const requis =
-      this.reflector.get<boolean>(
-        DEPARTMENT_SCOPE_KEY,
-        context.getHandler(),
-      ) ??
+      this.reflector.get<boolean>(DEPARTMENT_SCOPE_KEY, context.getHandler()) ??
       this.reflector.get<boolean>(DEPARTMENT_SCOPE_KEY, context.getClass());
 
     if (!requis) {
@@ -51,11 +45,7 @@ export class DepartmentScopeGuard {
     const utilisateur = request.user as UtilisateurConnecte | undefined;
 
     if (!utilisateur) {
-      throw new ApiError(
-        CODES_ERREUR_API.FORBIDDEN,
-        403,
-        'Utilisateur non authentifié',
-      );
+      throw new ApiError(CODES_ERREUR_API.FORBIDDEN, 403, 'Utilisateur non authentifié');
     }
 
     const departementIds = utilisateur.departementIds ?? [];

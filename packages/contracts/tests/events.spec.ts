@@ -7,7 +7,11 @@ import { zEvenementApplicatif } from '../src/events';
 describe('contrats d’événements', () => {
   it('accepte les quatre types d’événements canoniques', () => {
     const evenements = [
-      { type: 'generation.progress', versionId: '11111111-1111-4111-8111-111111111111', progression: 50 },
+      {
+        type: 'generation.progress',
+        versionId: '11111111-1111-4111-8111-111111111111',
+        progression: 50,
+      },
       { type: 'generation.done', versionId: '11111111-1111-4111-8111-111111111111' },
       {
         type: 'export.ready',

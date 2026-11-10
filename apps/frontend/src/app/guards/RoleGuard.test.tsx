@@ -3,11 +3,7 @@
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import {
-  MemoryRouter,
-  Routes,
-  Route,
-} from 'react-router-dom';
+import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { RoleGuard } from './RoleGuard';
 import { userStore } from '@/stores/userStore';
 import type { SessionUtilisateur } from '@/stores/types';
@@ -45,7 +41,7 @@ function monter({ roles, session }: { roles: string[]; session: SessionUtilisate
           }
         />
       </Routes>
-    </MemoryRouter>
+    </MemoryRouter>,
   );
 }
 

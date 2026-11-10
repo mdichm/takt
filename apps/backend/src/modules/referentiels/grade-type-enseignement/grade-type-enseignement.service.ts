@@ -6,9 +6,7 @@ import { PRISMA } from '../../common/di/prisma.token';
 import { PrismaClient } from '@takt/db';
 import { CODES_ERREUR_API, ApiError } from '../../common/http/api-error';
 import { AuditService } from '../../audit/audit.service';
-import type {
-  GradeTypeEnseignementCreate,
-} from '@takt/contracts';
+import type { GradeTypeEnseignementCreate } from '@takt/contracts';
 
 /**
  * Service de gestion de la matrice GradeTypeEnseignement (couples grade × type).
@@ -71,24 +69,18 @@ export class GradeTypeEnseignementService {
       where: { id: donnees.gradeId },
     });
     if (!gradeExiste) {
-      throw new ApiError(
-        CODES_ERREUR_API.BAD_REQUEST,
-        400,
-        'Le grade n’existe pas',
-        { champ: 'gradeId' },
-      );
+      throw new ApiError(CODES_ERREUR_API.BAD_REQUEST, 400, 'Le grade n’existe pas', {
+        champ: 'gradeId',
+      });
     }
 
     const typeExiste = await this.prisma.typeEnseignement.findUnique({
       where: { id: donnees.typeEnseignementId },
     });
     if (!typeExiste) {
-      throw new ApiError(
-        CODES_ERREUR_API.BAD_REQUEST,
-        400,
-        'Le type d’enseignement n’existe pas',
-        { champ: 'typeEnseignementId' },
-      );
+      throw new ApiError(CODES_ERREUR_API.BAD_REQUEST, 400, 'Le type d’enseignement n’existe pas', {
+        champ: 'typeEnseignementId',
+      });
     }
 
     const couple = await this.prisma.gradeTypeEnseignement.create({
@@ -113,7 +105,9 @@ export class GradeTypeEnseignementService {
       },
     });
 
-    this.logger.log(`Couple matrice créé : grade=${couple.gradeId}, type=${couple.typeEnseignementId}`);
+    this.logger.log(
+      `Couple matrice créé : grade=${couple.gradeId}, type=${couple.typeEnseignementId}`,
+    );
     return {
       id: couple.id,
       gradeId: couple.gradeId,
@@ -134,11 +128,7 @@ export class GradeTypeEnseignementService {
       },
     });
     if (!couple) {
-      throw new ApiError(
-        CODES_ERREUR_API.NOT_FOUND,
-        404,
-        'Couple introuvable dans la matrice',
-      );
+      throw new ApiError(CODES_ERREUR_API.NOT_FOUND, 404, 'Couple introuvable dans la matrice');
     }
     return {
       id: couple.id,
@@ -156,11 +146,7 @@ export class GradeTypeEnseignementService {
       where: { id },
     });
     if (!existant) {
-      throw new ApiError(
-        CODES_ERREUR_API.NOT_FOUND,
-        404,
-        'Couple introuvable dans la matrice',
-      );
+      throw new ApiError(CODES_ERREUR_API.NOT_FOUND, 404, 'Couple introuvable dans la matrice');
     }
 
     const nbModules = await this.prisma.module.count({
@@ -191,7 +177,9 @@ export class GradeTypeEnseignementService {
       },
     });
 
-    this.logger.log(`Couple matrice supprimé : grade=${existant.gradeId}, type=${existant.typeEnseignementId}`);
+    this.logger.log(
+      `Couple matrice supprimé : grade=${existant.gradeId}, type=${existant.typeEnseignementId}`,
+    );
     return { id };
   }
 }

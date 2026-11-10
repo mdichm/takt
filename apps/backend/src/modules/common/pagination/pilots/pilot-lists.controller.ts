@@ -20,9 +20,7 @@ import { PilotListsService } from './pilot-lists.service';
 @ApiTags('Pilotes techniques de listes')
 @Controller('pilotes')
 export class PilotListsController {
-  constructor(
-    @Inject(PilotListsService) private readonly service: PilotListsService,
-  ) {}
+  constructor(@Inject(PilotListsService) private readonly service: PilotListsService) {}
 
   @Get('users')
   @ApiOperation({ summary: 'Liste paginée des utilisateurs (pilote technique)' })

@@ -1,7 +1,17 @@
 // Copyright (C) 2026 TAKT
 // SPDX-License-Identifier: AGPL-3.0-only
 
-import { Body, Controller, Inject, Post, Req, Res, HttpCode, HttpStatus, UnauthorizedException } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Inject,
+  Post,
+  Req,
+  Res,
+  HttpCode,
+  HttpStatus,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { zLogin, zRefreshCookie, LoginInput, RefreshCookieInput } from '@takt/contracts';
 import { ZodValidation } from '../common/pipes/zod-validation.decorator';
@@ -75,16 +85,20 @@ export class AuthController {
     const ip = (req as { ip?: string }).ip ?? 'inconnu';
     const resultat = await this.authService.login(corps.email, corps.motDePasse, ip);
 
-    (res as { cookie: (nom: string, valeur: string, options: { httpOnly: boolean; secure: boolean; sameSite: string; path: string }) => void }).cookie(
-      COOKIE_REFRESH_TOKEN,
-      resultat.refreshToken,
-      {
-        httpOnly: true,
-        secure: true,
-        sameSite: 'strict',
-        path: '/',
-      },
-    );
+    (
+      res as {
+        cookie: (
+          nom: string,
+          valeur: string,
+          options: { httpOnly: boolean; secure: boolean; sameSite: string; path: string },
+        ) => void;
+      }
+    ).cookie(COOKIE_REFRESH_TOKEN, resultat.refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'strict',
+      path: '/',
+    });
 
     return { accessToken: resultat.accessToken, utilisateur: resultat.utilisateur };
   }
@@ -107,16 +121,20 @@ export class AuthController {
     }
     const resultat = await this.authService.refresh(refreshToken);
 
-    (res as { cookie: (nom: string, valeur: string, options: { httpOnly: boolean; secure: boolean; sameSite: string; path: string }) => void }).cookie(
-      COOKIE_REFRESH_TOKEN,
-      resultat.refreshToken,
-      {
-        httpOnly: true,
-        secure: true,
-        sameSite: 'strict',
-        path: '/',
-      },
-    );
+    (
+      res as {
+        cookie: (
+          nom: string,
+          valeur: string,
+          options: { httpOnly: boolean; secure: boolean; sameSite: string; path: string },
+        ) => void;
+      }
+    ).cookie(COOKIE_REFRESH_TOKEN, resultat.refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'strict',
+      path: '/',
+    });
 
     return { accessToken: resultat.accessToken };
   }
@@ -140,7 +158,10 @@ export class AuthController {
     await this.authService.logout(refreshToken);
 
     // Efface le cookie côté client.
-    (res as { clearCookie: (nom: string, options: { path: string }) => void }).clearCookie(COOKIE_REFRESH_TOKEN, { path: '/' });
+    (res as { clearCookie: (nom: string, options: { path: string }) => void }).clearCookie(
+      COOKIE_REFRESH_TOKEN,
+      { path: '/' },
+    );
 
     return {};
   }

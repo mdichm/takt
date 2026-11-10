@@ -16,7 +16,11 @@ interface DataTableRowProps extends PropsBase {
 }
 
 /** Une ligne de tableau de données. Utilise des éléments sémantiques <tr>/<td>. */
-export function DataTableRow({ cellules, selectionnee = false, className }: DataTableRowProps): JSX.Element {
+export function DataTableRow({
+  cellules,
+  selectionnee = false,
+  className,
+}: DataTableRowProps): JSX.Element {
   return (
     <tr
       role="row"
@@ -37,7 +41,10 @@ export function DataTableRow({ cellules, selectionnee = false, className }: Data
           style={{
             padding: `0 var(--space-m)`,
             fontSize: 'var(--font-size-body)',
-            borderRight: index < cellules.length - 1 ? `var(--border-width) solid var(--color-divider)` : 'none',
+            borderRight:
+              index < cellules.length - 1
+                ? `var(--border-width) solid var(--color-divider)`
+                : 'none',
           }}
         >
           {cellule.valeur}

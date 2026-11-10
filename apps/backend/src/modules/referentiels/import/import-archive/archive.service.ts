@@ -15,12 +15,7 @@ import {
   type RapportImportArchive,
   type TypeImportArchive,
 } from '@takt/contracts';
-import {
-  collecterSources,
-  codeClone,
-  anneeDebut,
-  empreinteApercu,
-} from './archive.sources';
+import { collecterSources, codeClone, anneeDebut, empreinteApercu } from './archive.sources';
 import { type SourceReferentielArchive } from './archive.types';
 
 const ORDRE_TYPES: TypeImportArchive[] = ['module', 'parcours', 'groupe', 'matiere', 'salle'];
@@ -58,10 +53,7 @@ export class ArchiveImportService {
     return cloturees.map((a) => ({ id: a.id, libelle: a.libelle }));
   }
 
-  private async verifierAnneeCloturee(
-    tx: PrismaClient,
-    anneeSourceId: string,
-  ): Promise<number> {
+  private async verifierAnneeCloturee(tx: PrismaClient, anneeSourceId: string): Promise<number> {
     const annee = await tx.anneeUniversitaire.findUnique({
       where: { id: anneeSourceId },
       include: { semestres: { include: { versions: true } } },
@@ -72,11 +64,7 @@ export class ArchiveImportService {
     const versions = annee.semestres.flatMap((s) => s.versions);
     const estCloturee = versions.length > 0 && versions.every((v) => v.etat === 'archive');
     if (!estCloturee) {
-      throw new ApiError(
-        CODES_ERREUR_API.CONFLICT,
-        409,
-        "L'année source n'est pas clôturée",
-      );
+      throw new ApiError(CODES_ERREUR_API.CONFLICT, 409, "L'année source n'est pas clôturée");
     }
     return anneeDebut(annee);
   }
@@ -205,10 +193,7 @@ export class ArchiveImportService {
     };
   }
 
-  async executer(
-    dto: ImportArchiveConfirme,
-    utilisateurId: string,
-  ): Promise<RapportImportArchive> {
+  async executer(dto: ImportArchiveConfirme, utilisateurId: string): Promise<RapportImportArchive> {
     const anneeAnnee = await this.verifierAnneeCloturee(this.prisma, dto.anneeSourceId);
 
     const sourcesParType: Record<TypeImportArchive, SourceReferentielArchive[]> = {} as Record<
@@ -283,10 +268,10 @@ export class ArchiveImportService {
       dejaImportes[type] = new Set(existants.map((e) => e.originId!));
     }
 
-    const compteurs: Record<TypeImportArchive, { importes: number; dejaImports: number; rejets: number }> = {} as Record<
+    const compteurs: Record<
       TypeImportArchive,
       { importes: number; dejaImports: number; rejets: number }
-    >;
+    > = {} as Record<TypeImportArchive, { importes: number; dejaImports: number; rejets: number }>;
     for (const type of dto.types) {
       compteurs[type] = { importes: 0, dejaImports: 0, rejets: 0 };
     }

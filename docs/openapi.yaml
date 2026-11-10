@@ -1023,6 +1023,121 @@ info:
   version: 1.0.0
 openapi: 3.0.0
 paths:
+  /api/v1/affectations:
+    get:
+      operationId: AffectationPedagogiqueController_list
+      parameters: []
+      responses:
+        '200':
+          description: Liste des affectations pédagogiques
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Liste paginée des affectations pédagogiques
+      tags:
+        - Répartition
+    post:
+      operationId: AffectationPedagogiqueController_creer
+      parameters: []
+      responses:
+        '201':
+          description: Affectation pédagogique créée
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Version ou ressource introuvable
+        '409':
+          description: Conflit (triplet déjà affecté)
+      security:
+        - bearerAuth: []
+      summary: Crée une affectation pédagogique
+      tags:
+        - Répartition
+  /api/v1/affectations/cascade:
+    post:
+      operationId: AffectationPedagogiqueController_creerCascade
+      parameters: []
+      responses:
+        '201':
+          description: Affectations créées en cascade
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Ressource introuvable
+        '409':
+          description: Conflit (triplet déjà affecté)
+      security:
+        - bearerAuth: []
+      summary: Crée des affectations en cascade depuis un plan d’études
+      tags:
+        - Répartition
+  /api/v1/affectations/{id}:
+    delete:
+      operationId: AffectationPedagogiqueController_supprimer
+      parameters: []
+      responses:
+        '200':
+          description: Affectation pédagogique supprimée
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Affectation pédagogique introuvable
+      security:
+        - bearerAuth: []
+      summary: Supprime une affectation pédagogique
+      tags:
+        - Répartition
+    get:
+      operationId: AffectationPedagogiqueController_getOne
+      parameters: []
+      responses:
+        '200':
+          description: Affectation pédagogique trouvée
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit ou hors périmètre
+        '404':
+          description: Affectation pédagogique introuvable
+      security:
+        - bearerAuth: []
+      summary: Détail d’une affectation pédagogique
+      tags:
+        - Répartition
+    patch:
+      operationId: AffectationPedagogiqueController_mettreAJour
+      parameters: []
+      responses:
+        '200':
+          description: Affectation pédagogique modifiée
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Affectation pédagogique introuvable
+        '409':
+          description: Conflit (triplet déjà affecté)
+      security:
+        - bearerAuth: []
+      summary: Modifie une affectation pédagogique
+      tags:
+        - Répartition
   /api/v1/auth/login:
     post:
       operationId: AuthController_login
@@ -1086,6 +1201,230 @@ paths:
       security:
         - bearerAuth: []
       summary: S’abonner aux événements temps réel de l’utilisateur
+  /api/v1/plans-etudes:
+    get:
+      operationId: PlanEtudesController_list
+      parameters: []
+      responses:
+        '200':
+          description: Liste des plans d’études
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Liste paginée des plans d’études
+      tags:
+        - Plans d’études
+    post:
+      operationId: PlanEtudesController_create
+      parameters: []
+      responses:
+        '201':
+          description: Plan d’études créé
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '409':
+          description: Conflit (plan déjà existant)
+      security:
+        - bearerAuth: []
+      summary: Crée un plan d’études
+      tags:
+        - Plans d’études
+  /api/v1/plans-etudes/{id}:
+    delete:
+      operationId: PlanEtudesController_delete
+      parameters: []
+      responses:
+        '200':
+          description: Plan d’études supprimé
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Plan d’études introuvable
+        '409':
+          description: Conflit (matières associées)
+      security:
+        - bearerAuth: []
+      summary: Supprime un plan d’études
+      tags:
+        - Plans d’études
+    get:
+      operationId: PlanEtudesController_getOne
+      parameters: []
+      responses:
+        '200':
+          description: Plan d’études trouvé
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit ou hors périmètre
+        '404':
+          description: Plan d’études introuvable
+      security:
+        - bearerAuth: []
+      summary: Détail d’un plan d’études
+      tags:
+        - Plans d’études
+    patch:
+      operationId: PlanEtudesController_update
+      parameters: []
+      responses:
+        '200':
+          description: Plan d’études modifié
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Plan d’études introuvable
+        '409':
+          description: Conflit (plan déjà existant)
+      security:
+        - bearerAuth: []
+      summary: Modifie un plan d’études
+      tags:
+        - Plans d’études
+  /api/v1/plans-etudes/{id}/groupes-herites:
+    get:
+      operationId: PlanEtudesController_groupesHerites
+      parameters: []
+      responses:
+        '200':
+          description: Liste des groupes héritiers
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit ou hors périmètre
+        '404':
+          description: Plan d’études introuvable
+      security:
+        - bearerAuth: []
+      summary: Groupes héritant du plan d’études
+      tags:
+        - Plans d’études
+  /api/v1/plans-etudes/{id}/volume-total:
+    get:
+      operationId: PlanEtudesController_volumeTotal
+      parameters: []
+      responses:
+        '200':
+          description: Volume total du plan d’études
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit ou hors périmètre
+        '404':
+          description: Plan d’études introuvable
+      security:
+        - bearerAuth: []
+      summary: Volume total hebdomadaire d’un plan d’études
+      tags:
+        - Plans d’études
+  /api/v1/plans-etudes/{planEtudesId}/matieres:
+    get:
+      operationId: PlanEtudesController_listMatieres
+      parameters: []
+      responses:
+        '200':
+          description: Liste des matières du plan
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit ou hors périmètre
+        '404':
+          description: Plan d’études introuvable
+      security:
+        - bearerAuth: []
+      summary: Liste des matières d’un plan d’études
+      tags:
+        - Plans d’études
+    post:
+      operationId: PlanEtudesController_ajouterMatiere
+      parameters: []
+      responses:
+        '201':
+          description: Matière ajoutée
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Plan d’études introuvable
+        '409':
+          description: Conflit (matière déjà présente)
+      security:
+        - bearerAuth: []
+      summary: Ajoute une matière à un plan d’études
+      tags:
+        - Plans d’études
+  /api/v1/plans-etudes/{planEtudesId}/matieres/{id}:
+    delete:
+      operationId: PlanEtudesController_deleteMatiere
+      parameters: []
+      responses:
+        '200':
+          description: Matière supprimée
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Matière introuvable
+      security:
+        - bearerAuth: []
+      summary: Supprime une matière de plan d’études
+      tags:
+        - Plans d’études
+    get:
+      operationId: PlanEtudesController_getMatiere
+      parameters: []
+      responses:
+        '200':
+          description: Matière du plan d’études
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit ou hors périmètre
+        '404':
+          description: Matière introuvable
+      security:
+        - bearerAuth: []
+      summary: Détail d’une matière de plan d’études
+      tags:
+        - Plans d’études
+    patch:
+      operationId: PlanEtudesController_updateMatiere
+      parameters: []
+      responses:
+        '200':
+          description: Matière modifiée
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Matière introuvable
+        '409':
+          description: Conflit (matière déjà présente)
+      security:
+        - bearerAuth: []
+      summary: Modifie une matière de plan d’études
+      tags:
+        - Plans d’études
   /api/v1/referentiels/arbre:
     get:
       operationId: ArbreController_arbre
@@ -2731,6 +3070,106 @@ paths:
       summary: Modifie un type de salle
       tags:
         - Référentiels
+  /api/v1/repartition/annuler:
+    post:
+      operationId: RepartitionController_annuler
+      parameters: []
+      responses:
+        '200':
+          description: Répartition annulée, retour à l'état initial
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit ou hors périmètre
+        '404':
+          description: Aucun snapshot de répartition courant à annuler
+        '409':
+          description: État de version invalide pour annulation
+      security:
+        - bearerAuth: []
+      summary: Annule la répartition pédagogique du département
+      tags:
+        - Répartition
+  /api/v1/repartition/revalidation/detecter:
+    post:
+      operationId: RevalidationController_detecter
+      parameters: []
+      responses:
+        '200':
+          description: Départements impactés et notifications envoyées
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit ou hors périmètre
+        '404':
+          description: Version introuvable
+      security:
+        - bearerAuth: []
+      summary: Détecte les départements impactés d’une version
+      tags:
+        - Revalidation
+  /api/v1/repartition/revalidation/statuts:
+    get:
+      operationId: RevalidationController_statuts
+      parameters: []
+      responses:
+        '200':
+          description: États de validation des départements
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit ou hors périmètre
+      security:
+        - bearerAuth: []
+      summary: Liste les états de validation par département
+      tags:
+        - Revalidation
+  /api/v1/repartition/revalidation/valider:
+    post:
+      operationId: RevalidationController_revalider
+      parameters: []
+      responses:
+        '200':
+          description: Département revalidé, nouveau snapshot créé
+        '400':
+          description: Répartition incomplète ou charge bloquante
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit ou hors périmètre
+        '404':
+          description: Aucune validation de répartition trouvée
+        '409':
+          description: Aucune demande de revalidation en cours
+      security:
+        - bearerAuth: []
+      summary: Revalide la répartition d’un département impacté
+      tags:
+        - Revalidation
+  /api/v1/repartition/valider:
+    post:
+      operationId: RepartitionController_valider
+      parameters: []
+      responses:
+        '200':
+          description: Répartition validée, snapshot créé
+        '400':
+          description: Répartition incomplète ou dépassement de charge
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit ou hors périmètre
+        '404':
+          description: Version ou plan d'études introuvable
+        '409':
+          description: État de version invalide pour validation
+      security:
+        - bearerAuth: []
+      summary: Valide la répartition pédagogique du département
+      tags:
+        - Répartition
   /api/v1/users:
     get:
       operationId: UsersController_list

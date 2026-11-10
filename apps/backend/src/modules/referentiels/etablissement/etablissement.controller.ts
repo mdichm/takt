@@ -28,10 +28,7 @@ import {
 } from '@takt/contracts';
 import { ZodValidation } from '../../common/pipes/zod-validation.decorator';
 import { EtablissementService } from './etablissement.service';
-import {
-  JwtAuthGuard,
-  UtilisateurConnecte,
-} from '../../common/guards/jwt-auth.guard';
+import { JwtAuthGuard, UtilisateurConnecte } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { DepartmentScopeGuard } from '../../common/guards/department-scope.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
@@ -48,7 +45,9 @@ interface RequeteAvecUtilisateur {
 @ApiBearerAuth()
 @Controller('referentiels/etablissements')
 export class EtablissementController {
-  constructor(@Inject(EtablissementService) private readonly etablissementService: EtablissementService) {}
+  constructor(
+    @Inject(EtablissementService) private readonly etablissementService: EtablissementService,
+  ) {}
 
   /** Liste paginée des établissements (GET /api/v1/referentiels/etablissements). */
   @Get()
@@ -77,9 +76,7 @@ export class EtablissementController {
   @ApiResponse({ status: 401, description: 'Non authentifié' })
   @ApiResponse({ status: 403, description: 'Interdit' })
   @ApiResponse({ status: 404, description: 'Établissement introuvable' })
-  async getOne(
-    @Param() params: EtablissementParams,
-  ): Promise<unknown> {
+  async getOne(@Param() params: EtablissementParams): Promise<unknown> {
     return this.etablissementService.getOne(params.id);
   }
 

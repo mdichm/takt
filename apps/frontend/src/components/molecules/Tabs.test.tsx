@@ -18,7 +18,7 @@ describe('Tabs', () => {
     expect(screen.getByRole('tab', { name: 'Onglet A' })).toBeInTheDocument();
   });
 
-  it('marque l\'onglet actif avec aria-selected', () => {
+  it("marque l'onglet actif avec aria-selected", () => {
     render(<Tabs onglets={onglets} valeur="b" onChange={() => {}} />);
     expect(screen.getByRole('tab', { name: 'Onglet B' })).toHaveAttribute('aria-selected', 'true');
     expect(screen.getByRole('tab', { name: 'Onglet A' })).toHaveAttribute('aria-selected', 'false');
@@ -31,7 +31,7 @@ describe('Tabs', () => {
     expect(onChange).toHaveBeenCalledWith('c');
   });
 
-  it('navigue vers l\'onglet suivant avec la fleche droite', () => {
+  it("navigue vers l'onglet suivant avec la fleche droite", () => {
     render(<Tabs onglets={onglets} valeur="a" onChange={() => {}} />);
     const tabA = screen.getByRole('tab', { name: 'Onglet A' });
     fireEvent.keyDown(tabA, { key: 'ArrowRight' });

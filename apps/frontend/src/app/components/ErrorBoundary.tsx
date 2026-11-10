@@ -27,9 +27,7 @@ export class ErrorBoundary extends Component<Props, State> {
   override render(): ReactNode {
     if (this.state.hasError) {
       return (
-        <div data-testid="error-boundary">
-          Une erreur est survenue lors du rendu de cet écran.
-        </div>
+        <div data-testid="error-boundary">Une erreur est survenue lors du rendu de cet écran.</div>
       );
     }
     return this.props.children;

@@ -42,9 +42,7 @@ interface RequeteAvecUtilisateur {
 @ApiBearerAuth()
 @Controller('referentiels/type-salles')
 export class TypeSalleController {
-  constructor(
-    @Inject(TypeSalleService) private readonly typeSalleService: TypeSalleService,
-  ) {}
+  constructor(@Inject(TypeSalleService) private readonly typeSalleService: TypeSalleService) {}
 
   /** Liste paginée des types de salle (GET /api/v1/referentiels/type-salles). */
   @Get()

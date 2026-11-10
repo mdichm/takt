@@ -3,11 +3,7 @@
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import {
-  MemoryRouter,
-  Routes,
-  Route,
-} from 'react-router-dom';
+import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { ProtectedRoute } from './ProtectedRoute';
 import { userStore } from '@/stores/userStore';
 import type { SessionUtilisateur } from '@/stores/types';
@@ -53,16 +49,13 @@ function monter({
         <Route
           path="/cible"
           element={
-            <ProtectedRoute
-              roles={roles ?? ['admin']}
-              departement={departement ?? false}
-            >
+            <ProtectedRoute roles={roles ?? ['admin']} departement={departement ?? false}>
               <Cible />
             </ProtectedRoute>
           }
         />
       </Routes>
-    </MemoryRouter>
+    </MemoryRouter>,
   );
 }
 
@@ -144,4 +137,3 @@ describe('DepartmentGuard (RB-UI-01)', () => {
     expect(screen.getByTestId('page-cible')).toBeInTheDocument();
   });
 });
-

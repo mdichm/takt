@@ -6,11 +6,7 @@ import { PRISMA } from '../../common/di/prisma.token';
 import { PrismaClient } from '@takt/db';
 import { CODES_ERREUR_API, ApiError } from '../../common/http/api-error';
 import { AuditService } from '../../audit/audit.service';
-import type {
-  MatiereCreate,
-  MatiereUpdate,
-  MatiereListFilters,
-} from '@takt/contracts';
+import type { MatiereCreate, MatiereUpdate, MatiereListFilters } from '@takt/contracts';
 
 /**
  * Service de gestion des matières.
@@ -33,12 +29,9 @@ export class MatiereService {
       where: { id: donnees.moduleId },
     });
     if (!moduleExiste) {
-      throw new ApiError(
-        CODES_ERREUR_API.BAD_REQUEST,
-        400,
-        'Le module associé n’existe pas',
-        { champ: 'moduleId' },
-      );
+      throw new ApiError(CODES_ERREUR_API.BAD_REQUEST, 400, 'Le module associé n’existe pas', {
+        champ: 'moduleId',
+      });
     }
 
     const existant = await this.prisma.matiere.findUnique({
@@ -142,11 +135,7 @@ export class MatiereService {
       },
     });
     if (!matiere) {
-      throw new ApiError(
-        CODES_ERREUR_API.NOT_FOUND,
-        404,
-        'Matière introuvable',
-      );
+      throw new ApiError(CODES_ERREUR_API.NOT_FOUND, 404, 'Matière introuvable');
     }
     return {
       id: matiere.id,
@@ -163,11 +152,7 @@ export class MatiereService {
   async update(id: string, donnees: MatiereUpdate, utilisateurIdModifiePar: string) {
     const existant = await this.prisma.matiere.findUnique({ where: { id } });
     if (!existant) {
-      throw new ApiError(
-        CODES_ERREUR_API.NOT_FOUND,
-        404,
-        'Matière introuvable',
-      );
+      throw new ApiError(CODES_ERREUR_API.NOT_FOUND, 404, 'Matière introuvable');
     }
 
     if (donnees.code !== undefined && donnees.code !== existant.code) {
@@ -189,12 +174,9 @@ export class MatiereService {
         where: { id: donnees.moduleId },
       });
       if (!moduleExiste) {
-        throw new ApiError(
-          CODES_ERREUR_API.BAD_REQUEST,
-          400,
-          'Le module associé n’existe pas',
-          { champ: 'moduleId' },
-        );
+        throw new ApiError(CODES_ERREUR_API.BAD_REQUEST, 400, 'Le module associé n’existe pas', {
+          champ: 'moduleId',
+        });
       }
     }
 
@@ -240,11 +222,7 @@ export class MatiereService {
       where: { id },
     });
     if (!existant) {
-      throw new ApiError(
-        CODES_ERREUR_API.NOT_FOUND,
-        404,
-        'Matière introuvable',
-      );
+      throw new ApiError(CODES_ERREUR_API.NOT_FOUND, 404, 'Matière introuvable');
     }
 
     const nbAffectations = await this.prisma.affectationPedagogique.count({

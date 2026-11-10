@@ -2,7 +2,13 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import { describe, expect, it } from 'vitest';
-import { zAccessTokenClaims, zLogin, zRefresh, zRefreshCookie, zRefreshTokenClaims } from '../src/auth';
+import {
+  zAccessTokenClaims,
+  zLogin,
+  zRefresh,
+  zRefreshCookie,
+  zRefreshTokenClaims,
+} from '../src/auth';
 
 describe('contrats d’authentification', () => {
   it('accepte une charge utile de connexion valide', () => {

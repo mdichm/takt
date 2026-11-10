@@ -21,7 +21,10 @@ const RACINE_PACKAGE = join(__dirname, '..');
 
 /** Convertit un nom lisible en identifiant CSS (kebab-case, sans préfixe). */
 function identifiantCSS(nom: string): string {
-  return nom.toLowerCase().replace(/[^a-z0-9]+/gi, '-').replace(/^-+|-+$/g, '');
+  return nom
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/gi, '-')
+    .replace(/^-+|-+$/g, '');
 }
 
 /** Génère le contenu d'un fichier CSS pour un thème. */

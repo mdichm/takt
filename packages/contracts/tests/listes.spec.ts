@@ -24,11 +24,12 @@ describe('contrats de filtrage des listes', () => {
         sortBy: 'champInconnu',
         sortDirection: 'asc',
       });
-    expect(resultat.success).toBe(false);
-    if (!resultat.success) {
-      expect(resultat.error.issues[0]?.message).toBe('Le champ de tri n’est pas autorisé');
-    }
-  });
+      expect(resultat.success).toBe(false);
+      if (!resultat.success) {
+        expect(resultat.error.issues[0]?.message).toBe('Le champ de tri n’est pas autorisé');
+      }
+    },
+  );
 
   it('valide la liste des versions avec ses filtres', () => {
     expect(

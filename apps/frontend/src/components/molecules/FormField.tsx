@@ -20,7 +20,16 @@ interface FormFieldProps extends PropsBase {
 }
 
 /** Champ de formulaire complet : label + input + message d'erreur, accessible. */
-export function FormField({ label, value, invalide = false, messageErreur, disabled, onChange, id, className }: FormFieldProps): JSX.Element {
+export function FormField({
+  label,
+  value,
+  invalide = false,
+  messageErreur,
+  disabled,
+  onChange,
+  id,
+  className,
+}: FormFieldProps): JSX.Element {
   return (
     <Input
       label={label}

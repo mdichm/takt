@@ -120,7 +120,10 @@ export class CreneauController {
   @ApiResponse({ status: 401, description: 'Non authentifié' })
   @ApiResponse({ status: 403, description: 'Interdit' })
   @ApiResponse({ status: 404, description: 'Créneau introuvable' })
-  async delete(@Param() params: CreneauParams, @Req() req: RequeteAvecUtilisateur): Promise<unknown> {
+  async delete(
+    @Param() params: CreneauParams,
+    @Req() req: RequeteAvecUtilisateur,
+  ): Promise<unknown> {
     return this.creneauService.delete(params.id, req.user!.sub);
   }
 }

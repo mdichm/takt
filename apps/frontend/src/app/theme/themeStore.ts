@@ -20,6 +20,6 @@ export const themeStore = create<ThemeState>()(
     {
       name: 'takt-theme',
       storage: createJSONStorage(() => localStorage),
-    }
-  )
+    },
+  ),
 );

@@ -7,8 +7,22 @@ import { PanneauConflits } from './PanneauConflits';
 
 describe('PanneauConflits', () => {
   const conflits = [
-    { id: 'c1', type: 'salle' as const, entiteA: 'Salle A101', entiteB: 'Salle A101', seance: 'Lundi 08h', gravite: 'bloquant' as const },
-    { id: 'c2', type: 'enseignant' as const, entiteA: 'M. Dupont', entiteB: 'Mme Martin', seance: 'Mardi 10h', gravite: 'warning' as const },
+    {
+      id: 'c1',
+      type: 'salle' as const,
+      entiteA: 'Salle A101',
+      entiteB: 'Salle A101',
+      seance: 'Lundi 08h',
+      gravite: 'bloquant' as const,
+    },
+    {
+      id: 'c2',
+      type: 'enseignant' as const,
+      entiteA: 'M. Dupont',
+      entiteB: 'Mme Martin',
+      seance: 'Mardi 10h',
+      gravite: 'warning' as const,
+    },
   ];
 
   it('rend la liste des conflits', () => {

@@ -10,7 +10,15 @@ interface EtatVideProps extends PropsBase {
   /** Titre optionnel. */
   readonly titre?: string;
   /** Icône à afficher (défaut: aucune). */
-  readonly icone?: 'accueil' | 'utilisateur' | 'calendrier' | 'recherche' | 'alerte' | 'succès' | 'info' | 'verrou';
+  readonly icone?:
+    | 'accueil'
+    | 'utilisateur'
+    | 'calendrier'
+    | 'recherche'
+    | 'alerte'
+    | 'succès'
+    | 'info'
+    | 'verrou';
 }
 
 /** État vide : aucune donnée disponible. */
@@ -32,7 +40,14 @@ export function EtatVide({ message, titre, icone, className }: EtatVideProps): J
     >
       {icone && <Icone nom={icone} taille={48} aria-hidden />}
       {titre && (
-        <h3 style={{ fontSize: 'var(--font-size-h3)', fontWeight: 600, marginBottom: 'var(--space-xs)', color: 'var(--color-text-primary)' }}>
+        <h3
+          style={{
+            fontSize: 'var(--font-size-h3)',
+            fontWeight: 600,
+            marginBottom: 'var(--space-xs)',
+            color: 'var(--color-text-primary)',
+          }}
+        >
           {titre}
         </h3>
       )}

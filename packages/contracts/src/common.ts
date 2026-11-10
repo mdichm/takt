@@ -60,11 +60,15 @@ export const zPaginationQuery = z.object({
 });
 
 /** Construit les paramètres de tri d'une liste à partir de sa liste blanche. */
-export function creerSchemaTri<const Champs extends readonly [string, ...string[]]>(champs: Champs) {
+export function creerSchemaTri<const Champs extends readonly [string, ...string[]]>(
+  champs: Champs,
+) {
   return z.object({
-    sortBy: z.enum(champs, {
-      errorMap: () => ({ message: 'Le champ de tri n’est pas autorisé' }),
-    }).optional(),
+    sortBy: z
+      .enum(champs, {
+        errorMap: () => ({ message: 'Le champ de tri n’est pas autorisé' }),
+      })
+      .optional(),
     sortDirection: zSortDirection.optional(),
   });
 }
@@ -110,7 +114,9 @@ export const zMetaApi = z.object({
 });
 
 /** Construit le schéma d'enveloppe { data, error, meta } pour un type de données T. */
-export function zEnvelope<T extends z.ZodTypeAny>(dataSchema: T): z.ZodObject<{
+export function zEnvelope<T extends z.ZodTypeAny>(
+  dataSchema: T,
+): z.ZodObject<{
   data: z.ZodNullable<T>;
   error: z.ZodNullable<typeof zErreurApi>;
   meta: typeof zMetaApi;

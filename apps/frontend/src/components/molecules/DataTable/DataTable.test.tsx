@@ -64,7 +64,9 @@ describe('DataTable', () => {
   });
 
   it('affiche l etat erreur avec role alert et message', () => {
-    render(<Renderer etat="erreur" donnees={[]} messageErreur="Indisponible" surReessayer={vi.fn()} />);
+    render(
+      <Renderer etat="erreur" donnees={[]} messageErreur="Indisponible" surReessayer={vi.fn()} />,
+    );
     expect(screen.getByRole('alert')).toBeInTheDocument();
     expect(screen.getByText('Indisponible')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Réessayer' })).toBeInTheDocument();
@@ -99,7 +101,12 @@ describe('DataTable', () => {
 
   it('appelle surChangementPage quand on change de page', () => {
     const surChangementPage = vi.fn();
-    render(<Renderer meta={{ page: 1, pageSize: 20, total: 45 }} surChangementPage={surChangementPage} />);
+    render(
+      <Renderer
+        meta={{ page: 1, pageSize: 20, total: 45 }}
+        surChangementPage={surChangementPage}
+      />,
+    );
     fireEvent.click(screen.getByRole('button', { name: 'Suivante' }));
     expect(surChangementPage).toHaveBeenCalledWith(2);
   });
@@ -118,7 +125,11 @@ describe('DataTable', () => {
   });
 
   it('rend les cellules d actions quand la fonction actions est fournie', () => {
-    const actions = vi.fn((item: Utilisateur) => <button key={item.id} type="button" name={`modifier-${item.id}`}>Modifier</button>);
+    const actions = vi.fn((item: Utilisateur) => (
+      <button key={item.id} type="button" name={`modifier-${item.id}`}>
+        Modifier
+      </button>
+    ));
     render(<Renderer actions={actions} />);
     expect(screen.getAllByRole('button', { name: 'Modifier' })).toHaveLength(3);
     expect(actions).toHaveBeenCalledTimes(3);

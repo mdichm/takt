@@ -22,12 +22,8 @@ const donneesApercu = {
   totalLignes: 3,
   lignesValides: 2,
   lignesInvalides: 1,
-  erreurs: [
-    { ligne: 3, champ: 'code', valeur: '', motif: 'Le code est requis' },
-  ],
-  apercuLignes: [
-    { ligne: 2, code: 'S1', libelle: 'Site 1' },
-  ],
+  erreurs: [{ ligne: 3, champ: 'code', valeur: '', motif: 'Le code est requis' }],
+  apercuLignes: [{ ligne: 2, code: 'S1', libelle: 'Site 1' }],
 };
 
 const donneesRapport = {
@@ -35,9 +31,7 @@ const donneesRapport = {
   empreinte: 'a'.repeat(64),
   importes: 2,
   rejets: 1,
-  erreurs: [
-    { ligne: 3, champ: 'code', valeur: '', motif: 'Le code est requis' },
-  ],
+  erreurs: [{ ligne: 3, champ: 'code', valeur: '', motif: 'Le code est requis' }],
 };
 
 beforeEach(() => {

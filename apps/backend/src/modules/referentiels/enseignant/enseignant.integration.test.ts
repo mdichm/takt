@@ -30,12 +30,22 @@ describe('Enseignant (TAKT-L04-03)', () => {
     await ctx.prisma.departement.upsert({
       where: { id: DEPARTEMENT_INFO },
       update: { code: 'INFO', libelle: 'Informatique' },
-      create: { id: DEPARTEMENT_INFO, code: 'INFO', libelle: 'Informatique', etablissementId: ETABLISSEMENT_ID },
+      create: {
+        id: DEPARTEMENT_INFO,
+        code: 'INFO',
+        libelle: 'Informatique',
+        etablissementId: ETABLISSEMENT_ID,
+      },
     });
     await ctx.prisma.departement.upsert({
       where: { id: DEPARTEMENT_MATH },
       update: { code: 'MATH', libelle: 'Mathématiques' },
-      create: { id: DEPARTEMENT_MATH, code: 'MATH', libelle: 'Mathématiques', etablissementId: ETABLISSEMENT_ID },
+      create: {
+        id: DEPARTEMENT_MATH,
+        code: 'MATH',
+        libelle: 'Mathématiques',
+        etablissementId: ETABLISSEMENT_ID,
+      },
     });
   });
 
@@ -44,7 +54,9 @@ describe('Enseignant (TAKT-L04-03)', () => {
     await ctx.prisma.enseignantDepartement.deleteMany({});
     await ctx.prisma.enseignant.deleteMany({ where: { matricule: { contains: 'TEST' } } });
     await ctx.prisma.grade.deleteMany({ where: { id: CODE_GRADE_EXISTANT } });
-    await ctx.prisma.departement.deleteMany({ where: { id: { in: [DEPARTEMENT_INFO, DEPARTEMENT_MATH] } } });
+    await ctx.prisma.departement.deleteMany({
+      where: { id: { in: [DEPARTEMENT_INFO, DEPARTEMENT_MATH] } },
+    });
     await ctx.prisma.etablissement.deleteMany({ where: { id: ETABLISSEMENT_ID } });
   });
 

@@ -42,7 +42,10 @@ interface RequeteAvecUtilisateur {
 @ApiBearerAuth()
 @Controller('referentiels/creneaux-affichage')
 export class CreneauAffichageController {
-  constructor(@Inject(CreneauAffichageService) private readonly creneauAffichageService: CreneauAffichageService) {}
+  constructor(
+    @Inject(CreneauAffichageService)
+    private readonly creneauAffichageService: CreneauAffichageService,
+  ) {}
 
   /** Liste paginée des variantes d'affichage (GET /api/v1/referentiels/creneaux-affichage). */
   @Get()
@@ -85,7 +88,10 @@ export class CreneauAffichageController {
   @ApiResponse({ status: 400, description: 'Requête invalide' })
   @ApiResponse({ status: 401, description: 'Non authentifié' })
   @ApiResponse({ status: 403, description: 'Interdit' })
-  async create(@Body() corps: CreneauAffichageCreate, @Req() req: RequeteAvecUtilisateur): Promise<unknown> {
+  async create(
+    @Body() corps: CreneauAffichageCreate,
+    @Req() req: RequeteAvecUtilisateur,
+  ): Promise<unknown> {
     return this.creneauAffichageService.create(corps, req.user!.sub);
   }
 
@@ -120,7 +126,10 @@ export class CreneauAffichageController {
   @ApiResponse({ status: 401, description: 'Non authentifié' })
   @ApiResponse({ status: 403, description: 'Interdit' })
   @ApiResponse({ status: 404, description: 'Variante d’affichage introuvable' })
-  async delete(@Param() params: CreneauAffichageParams, @Req() req: RequeteAvecUtilisateur): Promise<unknown> {
+  async delete(
+    @Param() params: CreneauAffichageParams,
+    @Req() req: RequeteAvecUtilisateur,
+  ): Promise<unknown> {
     return this.creneauAffichageService.delete(params.id, req.user!.sub);
   }
 }

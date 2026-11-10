@@ -2,11 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import { type ZodTypeAny } from 'zod';
-import {
-  validerReponseApi,
-  zReponseRefresh,
-  type ReponseRefresh,
-} from './validation';
+import { validerReponseApi, zReponseRefresh, type ReponseRefresh } from './validation';
 import { mapHttpError, type ErreurApi } from './errors';
 import { type MetaApi } from '@takt/contracts';
 
@@ -73,9 +69,9 @@ async function rafraichirJeton(): Promise<string | null> {
       if (!reponse.ok) {
         return null;
       }
-      const corps = (await reponse
-        .json()
-        .catch(() => null)) as { data: ReponseRefresh['data'] } | null;
+      const corps = (await reponse.json().catch(() => null)) as {
+        data: ReponseRefresh['data'];
+      } | null;
       if (!corps || !corps.data) {
         return null;
       }
@@ -95,9 +91,7 @@ function journaliserRequete(
   dureeMs: number,
   contenu: { meta?: unknown } | null,
 ): void {
-  const requestId = contenu?.meta
-    ? (contenu.meta as { requestId?: string }).requestId
-    : undefined;
+  const requestId = contenu?.meta ? (contenu.meta as { requestId?: string }).requestId : undefined;
   const evenement: EvenementJournal = {
     methode,
     chemin,
@@ -114,14 +108,7 @@ async function requete<T>(
   options: OptionsRequete,
   obtenirJetonOverride?: () => string | null,
 ): Promise<ReponseApi<T>> {
-  const {
-    methode,
-    chemin,
-    corps,
-    schema,
-    signal,
-    tentativeRefresh = false,
-  } = options;
+  const { methode, chemin, corps, schema, signal, tentativeRefresh = false } = options;
 
   const enTetes: Record<string, string> = {};
   const jeton = (obtenirJetonOverride ?? configuration.obtenirJeton)();
@@ -146,9 +133,11 @@ async function requete<T>(
   const reponse = await fetch(url, init);
   const dureeMs = Date.now() - debut;
 
-  const contenu = (await reponse
-    .json()
-    .catch(() => null)) as { data: unknown; error: unknown; meta: unknown } | null;
+  const contenu = (await reponse.json().catch(() => null)) as {
+    data: unknown;
+    error: unknown;
+    meta: unknown;
+  } | null;
 
   journaliserRequete(methode, chemin, reponse, dureeMs, contenu);
 
@@ -169,10 +158,7 @@ async function requete<T>(
       }
       const nouveauJeton = await rafraichirJeton();
       if (nouveauJeton) {
-        return requete(
-          { ...options, tentativeRefresh: true },
-          () => nouveauJeton,
-        );
+        return requete({ ...options, tentativeRefresh: true }, () => nouveauJeton);
       }
       purgerJeton();
       configuration.surSessionExpirée();
@@ -188,7 +174,10 @@ async function requete<T>(
   }
 
   if (contenu.error !== null) {
-    const erreur = mapHttpError(reponse, contenu.error as { code?: string; message?: string; details?: unknown; requestId?: string });
+    const erreur = mapHttpError(
+      reponse,
+      contenu.error as { code?: string; message?: string; details?: unknown; requestId?: string },
+    );
     throw erreur;
   }
 

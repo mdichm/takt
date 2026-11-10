@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Source de vérité unique du backlog TAKT.
-Contient la liste complète des 89 tickets avec leurs métadonnées.
+Contient la liste complète des 91 tickets avec leurs métadonnées.
 Ne pas éditer les fichiers générés dans dist/ – modifier uniquement ce fichier.
 """
 from dataclasses import dataclass, asdict
@@ -63,6 +63,15 @@ TICKETS: List[Ticket] = [
         status="Terminé",
         deps=['TAKT-L00-01`…`TAKT-L00-04'],
         exigences=['DL-01 à DL-08', 'DL-TE-01 à DL-TE-08', 'DL-UI-01 à DL-UI-04', 'DL-FS-*.'],
+    ),
+    Ticket(
+        id="TAKT-L00-06",
+        lot="L00",
+        titre="Trancher la source de vérité du modèle de données Prisma",
+        sp=2,
+        status="Terminé",
+        deps=[],
+        exigences=['DL-09'],
     ),
     Ticket(
         id="TAKT-L01-01",
@@ -321,7 +330,7 @@ TICKETS: List[Ticket] = [
         lot="L05",
         titre="Implémenter le plan d'études (parcours → niveaux → matières → volumes)",
         sp=5,
-        status="À faire",
+        status="Terminé",
         deps=['TAKT-L04-01', 'TAKT-L04-02'],
         exigences=['EX-REP-01', 'EX-DAT-02', 'PLAN_MACRO E2.2', 'EC-GES-02', 'IX-GES-03.'],
     ),
@@ -330,7 +339,7 @@ TICKETS: List[Ticket] = [
         lot="L05",
         titre="Implémenter les affectations pédagogiques (enseignant ↔ matière ↔ groupe)",
         sp=6,
-        status="À faire",
+        status="Terminé",
         deps=['TAKT-L05-01', 'TAKT-L04-03'],
         exigences=['EX-REP-01', 'EX-REP-02', 'EX-DAT-01', 'TE-MET-03', 'IX-RDEP-01.'],
     ),
@@ -339,7 +348,7 @@ TICKETS: List[Ticket] = [
         lot="L05",
         titre="Implémenter le moteur de charge horaire (ChargeRuleSet)",
         sp=8,
-        status="À faire",
+        status="Terminé",
         deps=['TAKT-L05-02', 'TAKT-L04-02'],
         exigences=['EX-PRI-05', 'DL-07', 'ST_TAKT §0.2 B6', 'SC-LOAD-01 à SC-LOAD-03', 'TE-TEST-02.'],
     ),
@@ -348,7 +357,7 @@ TICKETS: List[Ticket] = [
         lot="L05",
         titre="Implémenter la validation de la répartition pédagogique et son snapshot immuable",
         sp=5,
-        status="À faire",
+        status="Terminé",
         deps=['TAKT-L05-02', 'TAKT-L05-03'],
         exigences=['EX-REP-02', 'EX-REP-03', 'EX-REP-05', 'EX-DAT-01', 'EX-PRI-02', 'DL-07', 'IX-RDEP-02.'],
     ),
@@ -357,7 +366,7 @@ TICKETS: List[Ticket] = [
         lot="L05",
         titre="Implémenter la revalidation ciblée d'un département impacté",
         sp=5,
-        status="À faire",
+        status="Terminé",
         deps=['TAKT-L05-04', 'TAKT-L06-02'],
         exigences=['EX-REP-04', 'EX-WKF-09', 'IX-RDEP-04', 'EC-RDEP-04', 'ST_TAKT §1.4.'],
     ),
@@ -366,7 +375,7 @@ TICKETS: List[Ticket] = [
         lot="L05",
         titre="Fournir l'UI de saisie et de validation de la répartition pédagogique",
         sp=8,
-        status="À faire",
+        status="Terminé",
         deps=['TAKT-L05-04', 'TAKT-L08-04'],
         exigences=['EX-REP-01', 'EX-REP-02', 'EC-RDEP-01', 'EC-RDEP-02', 'IX-RDEP-01', 'IX-RDEP-02', 'UF-RDEP-01.'],
     ),

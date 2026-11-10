@@ -12,7 +12,8 @@
 
 import { creerPrismaClient } from '@takt/db';
 
-const DATABASE_URL = process.env.DATABASE_URL ?? 'postgresql://postgres:postgres@localhost:5432/takt_test';
+const DATABASE_URL =
+  process.env.DATABASE_URL ?? 'postgresql://postgres:postgres@localhost:5432/takt_test';
 const prisma = creerPrismaClient(DATABASE_URL);
 
 // Ordre des tables à tronquer : les tables dépendantes d'abord,
@@ -26,9 +27,11 @@ const TABLES = [
   'Seance',
   'VerrouSeance',
   'Contrainte',
+  'ValidationRepartition',
   'Snapshot',
   'JournalAudit',
   'SessionRefresh',
+  'Notification',
   'Utilisateur',
   'Role',
   'Departement',
@@ -50,8 +53,6 @@ const TABLES = [
 ];
 
 await prisma.$executeRawUnsafe('SET session_replication_role = replica;');
-await prisma.$executeRawUnsafe(
-  `TRUNCATE TABLE "${TABLES.join('", "')}" CASCADE;`
-);
+await prisma.$executeRawUnsafe(`TRUNCATE TABLE "${TABLES.join('", "')}" CASCADE;`);
 await prisma.$executeRawUnsafe('SET session_replication_role = origin;');
 await prisma.$disconnect();

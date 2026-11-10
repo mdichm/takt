@@ -1,7 +1,7 @@
 ---
 name: Ticket TAKT
 about: Proposer ou suivre un ticket du backlog TAKT
-title: "TAKT-Lxx-nn — "
+title: 'TAKT-Lxx-nn — '
 labels: ticket
 ---
 

@@ -22,7 +22,15 @@ interface ModalProps extends PropsBase {
 }
 
 /** Fenêtre modale accessible : focus trap, Échap, retour du focus à la fermeture. */
-export function Modal({ ouvert, titre, onFermer, children, libelleValider, onValider, className }: ModalProps): JSX.Element | null {
+export function Modal({
+  ouvert,
+  titre,
+  onFermer,
+  children,
+  libelleValider,
+  onValider,
+  className,
+}: ModalProps): JSX.Element | null {
   const [montage, setMontage] = useState(false);
   const triggerRef = useRef<HTMLElement | null>(null);
   const dialogRef = useRef<HTMLDivElement | null>(null);
@@ -48,7 +56,9 @@ export function Modal({ ouvert, titre, onFermer, children, libelleValider, onVal
     setMontage(true);
 
     // Focus sur le premier élément focusable de la modal
-    const focusables = dialog.querySelectorAll<HTMLElement>('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+    const focusables = dialog.querySelectorAll<HTMLElement>(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+    );
     if (focusables.length > 0) {
       firstFocusableRef.current = focusables[0] ?? null;
       lastFocusableRef.current = focusables[focusables.length - 1] ?? null;
@@ -66,13 +76,17 @@ export function Modal({ ouvert, titre, onFermer, children, libelleValider, onVal
           if (document.activeElement === firstFocusableRef.current) {
             lastFocusableRef.current?.focus();
           } else {
-            ((document.activeElement as HTMLElement)?.previousElementSibling as HTMLElement | null)?.focus();
+            (
+              (document.activeElement as HTMLElement)?.previousElementSibling as HTMLElement | null
+            )?.focus();
           }
         } else {
           if (document.activeElement === lastFocusableRef.current) {
             firstFocusableRef.current?.focus();
           } else {
-            ((document.activeElement as HTMLElement)?.nextElementSibling as HTMLElement | null)?.focus();
+            (
+              (document.activeElement as HTMLElement)?.nextElementSibling as HTMLElement | null
+            )?.focus();
           }
         }
       }
@@ -127,8 +141,18 @@ export function Modal({ ouvert, titre, onFermer, children, libelleValider, onVal
           }}
           className={className}
         >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-m)' }}>
-            <h2 id="modal-titre" style={{ fontSize: 'var(--font-size-h2)', fontWeight: 600, margin: 0 }}>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: 'var(--space-m)',
+            }}
+          >
+            <h2
+              id="modal-titre"
+              style={{ fontSize: 'var(--font-size-h2)', fontWeight: 600, margin: 0 }}
+            >
               {titre}
             </h2>
             <Bouton
@@ -144,7 +168,14 @@ export function Modal({ ouvert, titre, onFermer, children, libelleValider, onVal
           <div style={{ maxHeight: '60vh', overflowY: 'auto' }} data-testid="modal-contenu">
             {children}
           </div>
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--space-s)', marginTop: 'var(--space-m)' }}>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'flex-end',
+              gap: 'var(--space-s)',
+              marginTop: 'var(--space-m)',
+            }}
+          >
             {libelleValider && onValider && (
               <Bouton variante="primaire" libelle={libelleValider} onClick={onValider} />
             )}

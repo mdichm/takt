@@ -17,11 +17,11 @@ Garantir la conformité WCAG 2.1 niveau AA sur les deux thèmes (Normal et Ramad
 
 ## 2. Référentiels et standards
 
-| Standard | Version | Niveau cible | Périmètre |
-|----------|---------|--------------|-----------|
-| WCAG | 2.1 | AA | Tous les écrans, les deux thèmes |
-| RGAA | 4.1.2 | AA | Référentiel français (aligné WCAG) |
-| EN 301 549 | v3.2.1 | — | Accessibilité TIC (Europe) |
+| Standard   | Version | Niveau cible | Périmètre                          |
+| ---------- | ------- | ------------ | ---------------------------------- |
+| WCAG       | 2.1     | AA           | Tous les écrans, les deux thèmes   |
+| RGAA       | 4.1.2   | AA           | Référentiel français (aligné WCAG) |
+| EN 301 549 | v3.2.1  | —            | Accessibilité TIC (Europe)         |
 
 ---
 
@@ -29,67 +29,68 @@ Garantir la conformité WCAG 2.1 niveau AA sur les deux thèmes (Normal et Ramad
 
 ### 3.1 Perceptible
 
-| Critère | Exigence | Test |
-|---------|----------|------|
-| 1.4.3 Contraste (minimum) | Ratio 4.5:1 (texte normal), 3:1 (texte large ≥ 18pt ou 14pt bold) | Automatisé (axe-core) + manuel |
-| 1.4.11 Contraste non-textuel | Ratio 3:1 pour composants UI, états focus, bordures | Automatisé + manuel |
-| 1.4.12 Espacement du texte | Pas de perte de contenu/fonctionnalité avec espacement personnalisé | Manuel |
-| 1.4.13 Contenu au survol/focus | Contenu additionnel dismissible, hoverable, persistent | Manuel |
+| Critère                        | Exigence                                                            | Test                           |
+| ------------------------------ | ------------------------------------------------------------------- | ------------------------------ |
+| 1.4.3 Contraste (minimum)      | Ratio 4.5:1 (texte normal), 3:1 (texte large ≥ 18pt ou 14pt bold)   | Automatisé (axe-core) + manuel |
+| 1.4.11 Contraste non-textuel   | Ratio 3:1 pour composants UI, états focus, bordures                 | Automatisé + manuel            |
+| 1.4.12 Espacement du texte     | Pas de perte de contenu/fonctionnalité avec espacement personnalisé | Manuel                         |
+| 1.4.13 Contenu au survol/focus | Contenu additionnel dismissible, hoverable, persistent              | Manuel                         |
 
 ### 3.2 Utilisable
 
-| Critère | Exigence | Test |
-|---------|----------|------|
-| 2.1.1 Clavier | Toute fonctionnalité accessible au clavier | Automatisé (tab navigation) + manuel |
-| 2.1.2 Pas de piège clavier | Focus mobile, pas de trap | Manuel |
-| 2.4.3 Ordre de focus | Ordre logique, prévisible | Automatisé + manuel |
-| 2.4.7 Focus visible | Indicateur de focus visible (pas outline: none) | Automatisé (axe-core) |
-| 2.5.3 Étiquette dans le nom | Nom accessible = label visible | Automatisé |
+| Critère                     | Exigence                                        | Test                                 |
+| --------------------------- | ----------------------------------------------- | ------------------------------------ |
+| 2.1.1 Clavier               | Toute fonctionnalité accessible au clavier      | Automatisé (tab navigation) + manuel |
+| 2.1.2 Pas de piège clavier  | Focus mobile, pas de trap                       | Manuel                               |
+| 2.4.3 Ordre de focus        | Ordre logique, prévisible                       | Automatisé + manuel                  |
+| 2.4.7 Focus visible         | Indicateur de focus visible (pas outline: none) | Automatisé (axe-core)                |
+| 2.5.3 Étiquette dans le nom | Nom accessible = label visible                  | Automatisé                           |
 
 ### 3.3 Compréhensible
 
-| Critère | Exigence | Test |
-|---------|----------|------|
-| 3.1.1 Langue de la page | `lang="fr"` sur `<html>` | Automatisé |
-| 3.2.1 Au focus | Pas de changement de contexte au focus | Manuel |
-| 3.2.2 À la saisie | Pas de changement de contexte à la saisie | Manuel |
-| 3.3.1 Identification erreurs | Erreurs identifiées, décrites en texte | Automatisé + manuel |
-| 3.3.2 Étiquettes/instructions | Labels sur tous les champs | Automatisé |
+| Critère                       | Exigence                                  | Test                |
+| ----------------------------- | ----------------------------------------- | ------------------- |
+| 3.1.1 Langue de la page       | `lang="fr"` sur `<html>`                  | Automatisé          |
+| 3.2.1 Au focus                | Pas de changement de contexte au focus    | Manuel              |
+| 3.2.2 À la saisie             | Pas de changement de contexte à la saisie | Manuel              |
+| 3.3.1 Identification erreurs  | Erreurs identifiées, décrites en texte    | Automatisé + manuel |
+| 3.3.2 Étiquettes/instructions | Labels sur tous les champs                | Automatisé          |
 
 ### 3.4 Robuste
 
-| Critère | Exigence | Test |
-|---------|----------|------|
-| 4.1.2 Nom, rôle, valeur | Composants : name, role, value, states via ARIA | Automatisé (axe-core) |
-| 4.1.3 Messages de statut | Messages dynamiques via `aria-live` | Automatisé + manuel |
+| Critère                  | Exigence                                        | Test                  |
+| ------------------------ | ----------------------------------------------- | --------------------- |
+| 4.1.2 Nom, rôle, valeur  | Composants : name, role, value, states via ARIA | Automatisé (axe-core) |
+| 4.1.3 Messages de statut | Messages dynamiques via `aria-live`             | Automatisé + manuel   |
+
 ---
 
 ## 4. Spécificités thèmes TAKT
 
 ### 4.1 Thème Normal
 
-| Token | Couleur Normal | Contraste sur Surface (#FFFFFF) | Contraste sur Background (#F1F5F9) |
-|-------|----------------|----------------------------------|-------------------------------------|
-| Primary (#2563EB) | #2563EB | 5.1:1 ✅ | 4.2:1 ✅ |
-| Text Primary (#0F172A) | #0F172A | 14.9:1 ✅ | 12.6:1 ✅ |
-| Text Secondary (#475569) | #475569 | 7.3:1 ✅ | 6.2:1 ✅ |
-| Success (#10B981) | #10B981 | 3.8:1 ⚠️ (large text only) | 3.2:1 ⚠️ |
-| Warning (#F59E0B) | #F59E0B | 2.7:1 ❌ | 2.3:1 ❌ |
-| Error (#EF4444) | #EF4444 | 4.5:1 ✅ | 3.9:1 ✅ |
-| Lock (#94A3B8) | #94A3B8 | 2.9:1 ❌ | 2.5:1 ❌ |
+| Token                    | Couleur Normal | Contraste sur Surface (#FFFFFF) | Contraste sur Background (#F1F5F9) |
+| ------------------------ | -------------- | ------------------------------- | ---------------------------------- |
+| Primary (#2563EB)        | #2563EB        | 5.1:1 ✅                        | 4.2:1 ✅                           |
+| Text Primary (#0F172A)   | #0F172A        | 14.9:1 ✅                       | 12.6:1 ✅                          |
+| Text Secondary (#475569) | #475569        | 7.3:1 ✅                        | 6.2:1 ✅                           |
+| Success (#10B981)        | #10B981        | 3.8:1 ⚠️ (large text only)      | 3.2:1 ⚠️                           |
+| Warning (#F59E0B)        | #F59E0B        | 2.7:1 ❌                        | 2.3:1 ❌                           |
+| Error (#EF4444)          | #EF4444        | 4.5:1 ✅                        | 3.9:1 ✅                           |
+| Lock (#94A3B8)           | #94A3B8        | 2.9:1 ❌                        | 2.5:1 ❌                           |
 
 > **Action requise :** Ajuster Warning, Lock pour atteindre 3:1 minimum sur composants UI
 
 ### 4.2 Thème Ramadan
 
-| Token | Couleur Ramadan | Contraste sur Surface (#FAF5FF) | Contraste sur Background (#F1F5F9) |
-|-------|-----------------|----------------------------------|-------------------------------------|
-| Primary Ramadan (#7C3AED) | #7C3AED | 6.2:1 ✅ | 5.1:1 ✅ |
-| Accent Ramadan (#FBBF24) | #FBBF24 | 1.8:1 ❌ | 1.5:1 ❌ |
-| Success (#059669) | #059669 | 5.8:1 ✅ | 4.9:1 ✅ |
-| Warning (#D97706) | #D97706 | 3.4:1 ✅ | 2.8:1 ⚠️ |
-| Error (#DC2626) | #DC2626 | 5.2:1 ✅ | 4.3:1 ✅ |
-| Lock (#64748B) | #64748B | 4.1:1 ✅ | 3.5:1 ✅ |
+| Token                     | Couleur Ramadan | Contraste sur Surface (#FAF5FF) | Contraste sur Background (#F1F5F9) |
+| ------------------------- | --------------- | ------------------------------- | ---------------------------------- |
+| Primary Ramadan (#7C3AED) | #7C3AED         | 6.2:1 ✅                        | 5.1:1 ✅                           |
+| Accent Ramadan (#FBBF24)  | #FBBF24         | 1.8:1 ❌                        | 1.5:1 ❌                           |
+| Success (#059669)         | #059669         | 5.8:1 ✅                        | 4.9:1 ✅                           |
+| Warning (#D97706)         | #D97706         | 3.4:1 ✅                        | 2.8:1 ⚠️                           |
+| Error (#DC2626)           | #DC2626         | 5.2:1 ✅                        | 4.3:1 ✅                           |
+| Lock (#64748B)            | #64748B         | 4.1:1 ✅                        | 3.5:1 ✅                           |
 
 > **Action requise :** Ajuster Accent Ramadan (#FBBF24) pour atteindre 3:1 minimum
 
@@ -99,13 +100,13 @@ Garantir la conformité WCAG 2.1 niveau AA sur les deux thèmes (Normal et Ramad
 
 ### 5.1 Pyramide de tests accessibilité
 
-| Niveau | Outil | Couverture | Fréquence |
-|--------|-------|------------|-----------|
-| **Unit (tokens)** | `jest-axe` + custom contrast tests | 100% tokens couleurs | Chaque commit |
-| **Composants** | `testing-library` + `jest-axe` | Tous composants `atoms/`, `molecules/` | Chaque PR |
-| **Intégration (écrans)** | `playwright-axe` | 26 écrans (EC-*) | Chaque PR + nightly |
-| **E2E parcours critiques** | `playwright-axe` + manuel | 12 parcours UF-* | Chaque release |
-| **Audit manuel** | NVDA / JAWS + clavier seul | 5 parcours critiques | Sprint review |
+| Niveau                     | Outil                              | Couverture                             | Fréquence           |
+| -------------------------- | ---------------------------------- | -------------------------------------- | ------------------- |
+| **Unit (tokens)**          | `jest-axe` + custom contrast tests | 100% tokens couleurs                   | Chaque commit       |
+| **Composants**             | `testing-library` + `jest-axe`     | Tous composants `atoms/`, `molecules/` | Chaque PR           |
+| **Intégration (écrans)**   | `playwright-axe`                   | 26 écrans (EC-\*)                      | Chaque PR + nightly |
+| **E2E parcours critiques** | `playwright-axe` + manuel          | 12 parcours UF-\*                      | Chaque release      |
+| **Audit manuel**           | NVDA / JAWS + clavier seul         | 5 parcours critiques                   | Sprint review       |
 
 ### 5.2 Configuration axe-core
 
@@ -121,7 +122,7 @@ export const axeConfig: AxeCore.RunOptions = {
   rules: {
     'color-contrast': { enabled: true },
     'focus-visible': { enabled: true },
-    'label': { enabled: true },
+    label: { enabled: true },
     'aria-required-attr': { enabled: true },
     'aria-valid-attr-value': { enabled: true },
     'button-name': { enabled: true },
@@ -129,7 +130,7 @@ export const axeConfig: AxeCore.RunOptions = {
     'image-alt': { enabled: true },
     'form-field-multiple-labels': { enabled: true },
     'landmark-one-main': { enabled: true },
-    'region': { enabled: true },
+    region: { enabled: true },
     'skip-link': { enabled: true },
   },
   resultTypes: ['violations', 'incomplete'],
@@ -152,10 +153,15 @@ describe('Design Tokens - Contraste WCAG AA', () => {
     { fg: 'DT-COLOR-21', bg: 'DT-COLOR-05', min: 3, ctx: 'Warning on Surface (UI component)' },
     { fg: 'DT-COLOR-22', bg: 'DT-COLOR-05', min: 4.5, ctx: 'Error on Surface' },
     { fg: 'DT-COLOR-24', bg: 'DT-COLOR-05', min: 3, ctx: 'Lock on Surface (UI component)' },
-    { fg: 'DT-COLOR-25', bg: 'DT-COLOR-05', min: 3, ctx: 'Lock Incompatible on Surface (UI component)' },
+    {
+      fg: 'DT-COLOR-25',
+      bg: 'DT-COLOR-05',
+      min: 3,
+      ctx: 'Lock Incompatible on Surface (UI component)',
+    },
   ];
 
-  ['normal', 'ramadan'].forEach(theme => {
+  ['normal', 'ramadan'].forEach((theme) => {
     const tokens = theme === 'normal' ? tokensNormal : tokensRamadan;
     testCases.forEach(({ fg, bg, min, ctx }) => {
       test(`${theme} - ${ctx} (${fg} on ${bg}) ≥ ${min}:1`, () => {
@@ -166,6 +172,7 @@ describe('Design Tokens - Contraste WCAG AA', () => {
   });
 });
 ```
+
 ---
 
 ## 6. Tests E2E accessibilité (Playwright)
@@ -187,7 +194,7 @@ const criticalScreens = [
   { path: '/admin/audit', name: 'EC-ADM-04 Audit' },
 ];
 
-['normal', 'ramadan'].forEach(theme => {
+['normal', 'ramadan'].forEach((theme) => {
   test.describe(`Accessibilité - Thème ${theme}`, () => {
     test.beforeEach(async ({ page }) => {
       await page.goto('/login');
@@ -219,7 +226,7 @@ const criticalScreens = [
       await page.keyboard.press('Tab');
       const focusableElements = await page.$$eval(
         'a, button, input, select, textarea, [tabindex]:not([tabindex="-1"])',
-        els => els.map(el => el.tagName)
+        (els) => els.map((el) => el.tagName),
       );
       expect(focusableElements.length).toBeGreaterThan(0);
     });
@@ -245,47 +252,47 @@ const criticalScreens = [
 ### 7.1 Étape accessibilité dans `.github/workflows/ci.yml`
 
 ```yaml
-  accessibility:
-    name: Accessibilité (axe-core)
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    needs: build
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+accessibility:
+  name: Accessibilité (axe-core)
+  runs-on: ubuntu-latest
+  timeout-minutes: 15
+  needs: build
+  steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        version: 9
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 24
-          cache: 'pnpm'
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 24
+        cache: 'pnpm'
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+    - name: Install dependencies
+      run: pnpm install --frozen-lockfile
 
-      - name: Install Playwright
-        run: pnpm --filter @takt/frontend exec playwright install --with-deps chromium
+    - name: Install Playwright
+      run: pnpm --filter @takt/frontend exec playwright install --with-deps chromium
 
-      - name: Run Unit Accessibility Tests (tokens + components)
-        run: pnpm --filter @takt/frontend test:a11y:unit
+    - name: Run Unit Accessibility Tests (tokens + components)
+      run: pnpm --filter @takt/frontend test:a11y:unit
 
-      - name: Run E2E Accessibility Tests
-        run: pnpm --filter @takt/frontend test:a11y:e2e
-        env:
-          BASE_URL: http://localhost:3000
+    - name: Run E2E Accessibility Tests
+      run: pnpm --filter @takt/frontend test:a11y:e2e
+      env:
+        BASE_URL: http://localhost:3000
 
-      - name: Upload Axe Report
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: axe-report
-          path: apps/frontend/axe-results/
-          retention-days: 7
+    - name: Upload Axe Report
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: axe-report
+        path: apps/frontend/axe-results/
+        retention-days: 7
 ```
 
 ### 7.2 Scripts package.json (frontend)
@@ -304,25 +311,25 @@ const criticalScreens = [
 
 ## 8. Tests manuels complémentaires (Checklist Sprint Review)
 
-| Test | Périmètre | Outil | Critère de passage |
-|------|-----------|-------|-------------------|
-| Navigation clavier seule | 12 parcours UF-* | Clavier seul (Tab, Enter, Escape, Arrows) | Tous les éléments interactifs atteignables, ordre logique |
-| Lecteur d'écran | 5 parcours critiques | NVDA (Windows) / VoiceOver (Mac) | Annonces correctes, labels, états, messages dynamiques |
-| Zoom 200% | Tous écrans | Navigateur (Ctrl++) | Pas de perte contenu, pas de scroll horizontal |
-| Mode contraste élevé | Tous écrans | OS High Contrast / extension | Lisibilité maintenue |
-| Redimensionnement texte | Tous écrans | Navigateur (texte seulement 200%) | Pas de troncature, pas de chevauchement |
+| Test                     | Périmètre            | Outil                                     | Critère de passage                                        |
+| ------------------------ | -------------------- | ----------------------------------------- | --------------------------------------------------------- |
+| Navigation clavier seule | 12 parcours UF-\*    | Clavier seul (Tab, Enter, Escape, Arrows) | Tous les éléments interactifs atteignables, ordre logique |
+| Lecteur d'écran          | 5 parcours critiques | NVDA (Windows) / VoiceOver (Mac)          | Annonces correctes, labels, états, messages dynamiques    |
+| Zoom 200%                | Tous écrans          | Navigateur (Ctrl++)                       | Pas de perte contenu, pas de scroll horizontal            |
+| Mode contraste élevé     | Tous écrans          | OS High Contrast / extension              | Lisibilité maintenue                                      |
+| Redimensionnement texte  | Tous écrans          | Navigateur (texte seulement 200%)         | Pas de troncature, pas de chevauchement                   |
 
 ---
 
 ## 9. Métriques de suivi accessibilité
 
-| Métrique | Cible | Outil |
-|----------|-------|-------|
-| Violations axe-core (CI) | 0 sur wcag2aa/wcag21aa | GitHub Actions |
-| Couverture tests a11y unitaires | 100% tokens + composants | Vitest |
-| Couverture tests a11y E2E | 100% écrans critiques | Playwright |
-| Temps de correction violation | < 1 sprint | Jira/GitHub Issues |
-| Régression accessibilité | 0 entre releases | Comparaison rapports |
+| Métrique                        | Cible                    | Outil                |
+| ------------------------------- | ------------------------ | -------------------- |
+| Violations axe-core (CI)        | 0 sur wcag2aa/wcag21aa   | GitHub Actions       |
+| Couverture tests a11y unitaires | 100% tokens + composants | Vitest               |
+| Couverture tests a11y E2E       | 100% écrans critiques    | Playwright           |
+| Temps de correction violation   | < 1 sprint               | Jira/GitHub Issues   |
+| Régression accessibilité        | 0 entre releases         | Comparaison rapports |
 
 ---
 
@@ -338,4 +345,4 @@ const criticalScreens = [
 
 ---
 
-*Fin du SPEC_ACCESSIBILITE.md — TAKT v1.0*
+_Fin du SPEC_ACCESSIBILITE.md — TAKT v1.0_

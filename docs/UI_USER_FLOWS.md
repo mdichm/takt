@@ -16,20 +16,20 @@
 
 ## §1. Vue d'ensemble des parcours critiques
 
-| Code | Parcours | Rôle principal | États workflow | Écrans principaux |
-|------|----------|----------------|----------------|-------------------|
-| `UF-GES-01` | Initialisation année/semestre | `gest` | — → `initial` | `EC-COM-02`, `EC-GES-01` |
-| `UF-RDEP-01` | Saisie et validation répartition pédagogique | `rdep` | `initial` → `brouillon` | `EC-RDEP-01`, `EC-RDEP-02` |
-| `UF-GES-02` | Préparation des contraintes et plans d'études | `gest` | `brouillon` → `brouillon` | `EC-GES-02`, `EC-GES-03` |
-| `UF-GES-03` | Lancement et suivi de génération | `gest` | `brouillon` → `generation` | `EC-GES-04` |
-| `UF-GES-04` | Sélection scénario et édition | `gest` | `generation` → `edition` | `EC-GES-05`, `EC-GES-06` |
-| `UF-GES-05` | Modification drag&drop et verrous | `gest` | `edition` → `edition` | `EC-GES-06`, `EC-GES-07`, `EC-GES-12` |
-| `UF-GES-06` | Soumission validation Département | `gest` | `edition` → `valid_pedag` | `EC-GES-08` |
-| `UF-RDEP-02` | Validation départementale | `rdep` | `valid_pedag` → `valid_dir` ou `edition` (rejet) | `EC-RDEP-03` |
-| `UF-DIR-01` | Validation finale Direction | `dir` | `valid_dir` → `valide` / `rep_pedag` / `edition` | `EC-DIR-01`, `EC-DIR-02`, `EC-DIR-03` |
-| `UF-GES-07` | Publication et exports | `gest` | `valide` → `publie` | `EC-GES-09`, `EC-GES-11` |
-| `UF-ADM-01` | Archivage et audit | `admin` | `publie` / `valide` → `archive` | `EC-ADM-04`, `EC-GES-10` |
-| `UF-GES-08` | Nouvelle version depuis archive | `gest` | `archive` → `initial` | `EC-GES-10` |
+| Code         | Parcours                                      | Rôle principal | États workflow                                   | Écrans principaux                     |
+| ------------ | --------------------------------------------- | -------------- | ------------------------------------------------ | ------------------------------------- |
+| `UF-GES-01`  | Initialisation année/semestre                 | `gest`         | — → `initial`                                    | `EC-COM-02`, `EC-GES-01`              |
+| `UF-RDEP-01` | Saisie et validation répartition pédagogique  | `rdep`         | `initial` → `brouillon`                          | `EC-RDEP-01`, `EC-RDEP-02`            |
+| `UF-GES-02`  | Préparation des contraintes et plans d'études | `gest`         | `brouillon` → `brouillon`                        | `EC-GES-02`, `EC-GES-03`              |
+| `UF-GES-03`  | Lancement et suivi de génération              | `gest`         | `brouillon` → `generation`                       | `EC-GES-04`                           |
+| `UF-GES-04`  | Sélection scénario et édition                 | `gest`         | `generation` → `edition`                         | `EC-GES-05`, `EC-GES-06`              |
+| `UF-GES-05`  | Modification drag&drop et verrous             | `gest`         | `edition` → `edition`                            | `EC-GES-06`, `EC-GES-07`, `EC-GES-12` |
+| `UF-GES-06`  | Soumission validation Département             | `gest`         | `edition` → `valid_pedag`                        | `EC-GES-08`                           |
+| `UF-RDEP-02` | Validation départementale                     | `rdep`         | `valid_pedag` → `valid_dir` ou `edition` (rejet) | `EC-RDEP-03`                          |
+| `UF-DIR-01`  | Validation finale Direction                   | `dir`          | `valid_dir` → `valide` / `rep_pedag` / `edition` | `EC-DIR-01`, `EC-DIR-02`, `EC-DIR-03` |
+| `UF-GES-07`  | Publication et exports                        | `gest`         | `valide` → `publie`                              | `EC-GES-09`, `EC-GES-11`              |
+| `UF-ADM-01`  | Archivage et audit                            | `admin`        | `publie` / `valide` → `archive`                  | `EC-ADM-04`, `EC-GES-10`              |
+| `UF-GES-08`  | Nouvelle version depuis archive               | `gest`         | `archive` → `initial`                            | `EC-GES-10`                           |
 
 **Total :** 12 parcours critiques couverts.
 
@@ -45,6 +45,7 @@
 **États de workflow :** — → `initial`.
 
 **Étapes :**
+
 1. `EC-COM-02` : Le `gest` accède au tableau de bord et sélectionne "Initialiser un nouveau semestre".
 2. `EC-GES-01` : Le `gest` remplit le formulaire d'initialisation (année, numéro de semestre).
 3. `EC-GES-01` : Le `gest` peut choisir d'importer tout ou partie des données de l'année/semestre précédent.
@@ -65,6 +66,7 @@
 **États de workflow :** `initial` → `rep_pedag` → `brouillon`.
 
 **Étapes :**
+
 1. `EC-RDEP-01` : Le `rdep` saisit les affectations enseignants ↔ matières ↔ groupes, volumes horaires et type d'enseignement.
 2. `EC-RDEP-02` : Le `rdep` consulte le suivi des charges horaires (alertes si dépassement de fourchette, blocage si seuil bloquant).
 3. `EC-RDEP-01` : Le `rdep` valide sa répartition pédagogique pour son périmètre.
@@ -85,6 +87,7 @@
 **États de workflow :** `brouillon` → `brouillon` (préparation interne, pas de changement d'état).
 
 **Étapes :**
+
 1. `EC-GES-02` : Le `gest` vérifie les parcours, matières, volumes horaires, types d'enseignement, groupes ; hérite automatiquement des plans d'études par groupe.
 2. `EC-GES-03` : Le `gest` saisit les contraintes, vœux, exigences de salle, indisponibilités enseignants.
 3. `EC-GES-03` : Le `gest` consulte les indicateurs de couverture et les alarmes de faisabilité.
@@ -102,6 +105,7 @@
 **États de workflow :** `brouillon` → `generation`.
 
 **Étapes :**
+
 1. `EC-GES-04` : Le `gest` clique sur "Lancer génération".
 2. Système : Vérifie que tous les départements ont validé leur affectation pédagogique (EX-REP-06).
 3. Système : Soumet le job CP-SAT au worker, affiche la barre de progression.
@@ -122,6 +126,7 @@
 **États de workflow :** `generation` → `edition`.
 
 **Étapes :**
+
 1. `EC-GES-05` : Le `gest` consulte la liste des scénarios notés (score global 0-100, sous-scores).
 2. `EC-GES-05` : Le `gest` sélectionne le scénario le plus pertinent comme base d'édition.
 3. Système : Crée une version en édition avec les séances du scénario adopté.
@@ -141,6 +146,7 @@
 **États de workflow :** `edition` → `edition` (modifications internes, pas de changement d'état).
 
 **Étapes :**
+
 1. `EC-GES-06` : Le `gest` effectue des déplacements par glisser-déposer sur la grille EDT.
 2. Système : Recalcule immédiatement les conflits, vérifie les règles, met à jour les indicateurs.
 3. `EC-GES-07` : Pour une séance en conflit, le `gest` consulte jusqu'à 20 alternatives classées (sans écriture immédiate).
@@ -161,6 +167,7 @@
 **États de workflow :** `edition` → `valid_pedag`.
 
 **Étapes :**
+
 1. `EC-GES-08` : Le `gest` consulte le récapitulatif des scores et conflits.
 2. `EC-GES-08` : Le `gest` clique sur "Soumettre pour validation Département".
 3. Système : Vérifie que les verrous sont résolus et qu'aucun conflit dur n'est non résolu.
@@ -175,7 +182,6 @@
 
 ### UF-GES-07 — Publication et exports
 
-
 ### UF-RDEP-02 — Validation départementale
 
 **Déclencheur :** Version en état `valid_pedag`, le `rdep` doit valider ou rejeter pour son périmètre.  
@@ -184,6 +190,7 @@
 **États de workflow :** `valid_pedag` → `valid_dir` (validation) ou `edition` (rejet).
 
 **Étapes :**
+
 1. `EC-RDEP-03` : Le `rdep` consulte la version soumise pour son département.
 2. `EC-RDEP-03` : Le `rdep` clique sur "Valider" ou "Rejeter".
 3. Si rejet : le `rdep` saisit un motif de rejet (texte libre obligatoire).
@@ -204,6 +211,7 @@
 **États de workflow :** `valid_dir` → `valide` (validation) ou `rep_pedag` / `edition` (rejet).
 
 **Étapes :**
+
 1. `EC-DIR-01` : Le `dir` consulte le scénario, ses scores et le détail des séances.
 2. `EC-DIR-02` : Le `dir` clique sur "Valider définitivement" ou "Rejeter".
 3. Si validation : Système passe la version à `valide`, notifie le `gest` et le `rdep`.
@@ -225,6 +233,7 @@
 **États de workflow :** `publie` → `archive` ou `valide` → `archive`.
 
 **Étapes :**
+
 1. `EC-GES-10` : L'admin ou le `gest` sélectionne la version à archiver.
 2. `EC-GES-10` : Clic sur "Archiver".
 3. Système : Passe la version à `archive`, conserve l'originale consultable pour l'audit.
@@ -245,6 +254,7 @@
 **États de workflow :** `archive` → `initial`.
 
 **Étapes :**
+
 1. `EC-GES-10` : Le `gest` sélectionne une version archivée comme base.
 2. `EC-GES-10` : Clic sur "Nouvelle version depuis archive".
 3. Système : Crée un nouveau squelette en état `initial` basé sur l'archivée, l'originale reste archivée.
@@ -259,6 +269,7 @@
 **États de workflow :** `valide` → `publie`.
 
 **Étapes :**
+
 1. `EC-GES-09` : Le `gest` clique sur "Publier".
 2. Système : Confirme l'immutabilité de la version à partir de cet instant.
 3. Système : Passe la version à `publie`.
@@ -271,69 +282,69 @@
 
 ## §3. Parcours transversaux
 
-| Code | Parcours | Rôles | Description |
-|------|----------|-------|-------------|
-| `UF-COM-01` | Connexion / Déconnexion | Tous | Authentification JWT (argon2id, accès court 15 min + refresh rotatif 7 j), gestion de session |
-| `UF-COM-02` | Tableau de bord centralisé | Tous | Vue d'état global des versions en cours, notifications, actions rapides, rafraîchissement automatique à intervalle configurable |
+| Code        | Parcours                   | Rôles | Description                                                                                                                     |
+| ----------- | -------------------------- | ----- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `UF-COM-01` | Connexion / Déconnexion    | Tous  | Authentification JWT (argon2id, accès court 15 min + refresh rotatif 7 j), gestion de session                                   |
+| `UF-COM-02` | Tableau de bord centralisé | Tous  | Vue d'état global des versions en cours, notifications, actions rapides, rafraîchissement automatique à intervalle configurable |
 
 ---
 
 ## §4. Matrice Parcours ↔ Écrans ↔ États de workflow
 
-| Parcours | Écrans | État départ | État arrivée | Rôle |
-|----------|--------|-------------|--------------|------|
-| `UF-GES-01` | `EC-COM-02`, `EC-GES-01` | — | `initial` | `gest` / `admin` |
-| `UF-RDEP-01` | `EC-RDEP-01`, `EC-RDEP-02` | `initial` | `brouillon` | `rdep` |
-| `UF-GES-02` | `EC-GES-02`, `EC-GES-03` | `brouillon` | `brouillon` | `gest` |
-| `UF-GES-03` | `EC-GES-04` | `brouillon` | `generation` | `gest` |
-| `UF-GES-04` | `EC-GES-05`, `EC-GES-06` | `generation` | `edition` | `gest` |
-| `UF-GES-05` | `EC-GES-06`, `EC-GES-07`, `EC-GES-12` | `edition` | `edition` | `gest` |
-| `UF-GES-06` | `EC-GES-08` | `edition` | `valid_pedag` | `gest` |
-| `UF-RDEP-02` | `EC-RDEP-03` | `valid_pedag` | `valid_dir` / `edition` | `rdep` |
-| `UF-DIR-01` | `EC-DIR-01`, `EC-DIR-02`, `EC-DIR-03` | `valid_dir` | `valide` / `rep_pedag` / `edition` | `dir` |
-| `UF-GES-07` | `EC-GES-09`, `EC-GES-11` | `valide` | `publie` | `gest` |
-| `UF-ADM-01` | `EC-ADM-04`, `EC-GES-10` | `publie` / `valide` | `archive` | `admin` / `gest` |
-| `UF-GES-08` | `EC-GES-10` | `archive` | `initial` | `gest` |
+| Parcours     | Écrans                                | État départ         | État arrivée                       | Rôle             |
+| ------------ | ------------------------------------- | ------------------- | ---------------------------------- | ---------------- |
+| `UF-GES-01`  | `EC-COM-02`, `EC-GES-01`              | —                   | `initial`                          | `gest` / `admin` |
+| `UF-RDEP-01` | `EC-RDEP-01`, `EC-RDEP-02`            | `initial`           | `brouillon`                        | `rdep`           |
+| `UF-GES-02`  | `EC-GES-02`, `EC-GES-03`              | `brouillon`         | `brouillon`                        | `gest`           |
+| `UF-GES-03`  | `EC-GES-04`                           | `brouillon`         | `generation`                       | `gest`           |
+| `UF-GES-04`  | `EC-GES-05`, `EC-GES-06`              | `generation`        | `edition`                          | `gest`           |
+| `UF-GES-05`  | `EC-GES-06`, `EC-GES-07`, `EC-GES-12` | `edition`           | `edition`                          | `gest`           |
+| `UF-GES-06`  | `EC-GES-08`                           | `edition`           | `valid_pedag`                      | `gest`           |
+| `UF-RDEP-02` | `EC-RDEP-03`                          | `valid_pedag`       | `valid_dir` / `edition`            | `rdep`           |
+| `UF-DIR-01`  | `EC-DIR-01`, `EC-DIR-02`, `EC-DIR-03` | `valid_dir`         | `valide` / `rep_pedag` / `edition` | `dir`            |
+| `UF-GES-07`  | `EC-GES-09`, `EC-GES-11`              | `valide`            | `publie`                           | `gest`           |
+| `UF-ADM-01`  | `EC-ADM-04`, `EC-GES-10`              | `publie` / `valide` | `archive`                          | `admin` / `gest` |
+| `UF-GES-08`  | `EC-GES-10`                           | `archive`           | `initial`                          | `gest`           |
 
 ---
 
 ## §5. Règles de navigation et guards UI
 
-| Règle | Description |
-|-------|-------------|
-| `RB-UF-01` | Un `rdep` ne peut accéder aux écrans de gestion des autres départements qu'en lecture seule (`EC-RDEP-05`). |
-| `RB-UF-02` | Le bail d'édition exclusif (30 min, renouvelable) bloque l'accès en écriture à `EC-GES-06` pour un second utilisateur. |
-| `RB-UF-03` | La soumission vers `valid_pedag` est désactivée si la couverture < 100 % ou si un conflit dur persiste. |
-| `RB-UF-04` | Un verrou incompatible avec les contraintes bloque le bouton "Lancer génération" sur `EC-GES-04`. |
-| `RB-UF-05` | Les résultats partiels (séances `NON_PLACÉE`) affichent un avertissement sur `EC-GES-05` avant sélection. |
-| `RB-UF-06` | Le rejet Direction depuis `valid_dir` présente un sélecteur de motif (pédagogique → `rep_pedag`, planning → `edition`). |
-| `RB-UF-07` | Un `rdep` ne voit et ne modifie que les données de son département (RBAC par département). |
+| Règle      | Description                                                                                                                    |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `RB-UF-01` | Un `rdep` ne peut accéder aux écrans de gestion des autres départements qu'en lecture seule (`EC-RDEP-05`).                    |
+| `RB-UF-02` | Le bail d'édition exclusif (30 min, renouvelable) bloque l'accès en écriture à `EC-GES-06` pour un second utilisateur.         |
+| `RB-UF-03` | La soumission vers `valid_pedag` est désactivée si la couverture < 100 % ou si un conflit dur persiste.                        |
+| `RB-UF-04` | Un verrou incompatible avec les contraintes bloque le bouton "Lancer génération" sur `EC-GES-04`.                              |
+| `RB-UF-05` | Les résultats partiels (séances `NON_PLACÉE`) affichent un avertissement sur `EC-GES-05` avant sélection.                      |
+| `RB-UF-06` | Le rejet Direction depuis `valid_dir` présente un sélecteur de motif (pédagogique → `rep_pedag`, planning → `edition`).        |
+| `RB-UF-07` | Un `rdep` ne voit et ne modifie que les données de son département (RBAC par département).                                     |
 | `RB-UF-08` | Un contrôle optimiste protège en seconde ligne contre les modifications concurrentes (vérification de version avant écriture). |
 
 ---
 
 ## §6. Decision Log UX
 
-| # | Décision | Conséquence |
-|---|----------|-------------|
-| DL-UX-01 | Pas d'écran enseignant | Diffusion par e-mail uniquement (.ics, PDF), pas d'interface enseignant |
-| DL-UX-02 | Grille EDT drag&drop avec dnd-kit | Dépendance frontend `@dnd-kit` pour la grille interactive |
-| DL-UX-03 | Bail d'édition 30 min | Verrou exclusif par version, `admin` peut forcer la libération |
-| DL-UX-04 | WCAG AA | Contraste conforme, états jamais rendus par la seule couleur (libellé + icône) |
+| #        | Décision                          | Conséquence                                                                    |
+| -------- | --------------------------------- | ------------------------------------------------------------------------------ |
+| DL-UX-01 | Pas d'écran enseignant            | Diffusion par e-mail uniquement (.ics, PDF), pas d'interface enseignant        |
+| DL-UX-02 | Grille EDT drag&drop avec dnd-kit | Dépendance frontend `@dnd-kit` pour la grille interactive                      |
+| DL-UX-03 | Bail d'édition 30 min             | Verrou exclusif par version, `admin` peut forcer la libération                 |
+| DL-UX-04 | WCAG AA                           | Contraste conforme, états jamais rendus par la seule couleur (libellé + icône) |
 
 ---
 
 ## §7. Glossaire des termes de parcours
 
-| Terme | Définition |
-|-------|------------|
-| Parcours critique | Séquence d'actions utilisateur menant d'un état de workflow à un autre, avec écrans, déclencheur et conditions de garde |
-| Déclencheur | Événement utilisateur ou système qui initie un parcours |
-| Condition de garde | Prérequis qui doivent être remplis pour qu'une transition soit autorisée |
-| Cas alternatif | Déviation du parcours nominal (rejet, annulation, retour arrière, erreur) |
-| Bail d'édition | Verrou exclusif sur une version pendant l'édition manuelle (30 min, renouvelable) |
-| Couverture | Rapport entre le volume placé et le volume attendu pour une affectation (doit être 100 % pour soumission) |
+| Terme              | Définition                                                                                                              |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------------- |
+| Parcours critique  | Séquence d'actions utilisateur menant d'un état de workflow à un autre, avec écrans, déclencheur et conditions de garde |
+| Déclencheur        | Événement utilisateur ou système qui initie un parcours                                                                 |
+| Condition de garde | Prérequis qui doivent être remplis pour qu'une transition soit autorisée                                                |
+| Cas alternatif     | Déviation du parcours nominal (rejet, annulation, retour arrière, erreur)                                               |
+| Bail d'édition     | Verrou exclusif sur une version pendant l'édition manuelle (30 min, renouvelable)                                       |
+| Couverture         | Rapport entre le volume placé et le volume attendu pour une affectation (doit être 100 % pour soumission)               |
 
 ---
 
-*Fin du UI_USER_FLOWS.md — TAKT v0.1 (E0.3b — validé)*
+_Fin du UI_USER_FLOWS.md — TAKT v0.1 (E0.3b — validé)_

@@ -17,7 +17,14 @@ interface ChipProps extends PropsBase {
 }
 
 /** Puce (chip) interactive, accessible au clavier. 0 couleur en dur. */
-export function Chip({ libelle, active = false, onClick, supprimer = false, onSupprimer, className }: ChipProps): JSX.Element {
+export function Chip({
+  libelle,
+  active = false,
+  onClick,
+  supprimer = false,
+  onSupprimer,
+  className,
+}: ChipProps): JSX.Element {
   const fond = active ? 'var(--color-primary)' : 'var(--color-surface-variant)';
   const texte = active ? 'var(--color-surface)' : 'var(--color-text-primary)';
   const bordure = active ? 'transparent' : 'var(--color-border)';
@@ -27,8 +34,15 @@ export function Chip({ libelle, active = false, onClick, supprimer = false, onSu
       type="button"
       role="button"
       aria-pressed={active}
-        aria-label={supprimer ? `Supprimer ${libelle}` : libelle}
-      onClick={onSupprimer ? (e) => { e.stopPropagation(); onSupprimer?.(); } : onClick}
+      aria-label={supprimer ? `Supprimer ${libelle}` : libelle}
+      onClick={
+        onSupprimer
+          ? (e) => {
+              e.stopPropagation();
+              onSupprimer?.();
+            }
+          : onClick
+      }
       style={{
         display: 'inline-flex',
         alignItems: 'center',
@@ -50,7 +64,10 @@ export function Chip({ libelle, active = false, onClick, supprimer = false, onSu
       {supprimer && onSupprimer && (
         <span
           aria-label="Supprimer"
-          onClick={(e) => { e.stopPropagation(); onSupprimer?.(); }}
+          onClick={(e) => {
+            e.stopPropagation();
+            onSupprimer?.();
+          }}
           style={{
             display: 'flex',
             alignItems: 'center',

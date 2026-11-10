@@ -11,7 +11,11 @@ interface SpinnerProps extends PropsBase {
 }
 
 /** Indicateur de chargement accessible (role="status", animation via CSS var). */
-export function Spinner({ ariaLabel = 'Chargement en cours', taille = 24, className }: SpinnerProps): JSX.Element {
+export function Spinner({
+  ariaLabel = 'Chargement en cours',
+  taille = 24,
+  className,
+}: SpinnerProps): JSX.Element {
   const taillePx = `${taille}px`;
   const bordure = `${Math.max(1, Math.floor(taille / 12))}px`;
   return (
@@ -29,7 +33,21 @@ export function Spinner({ ariaLabel = 'Chargement en cours', taille = 24, classN
       }}
       className={className}
     >
-      <span style={{ position: 'absolute', width: '1px', height: '1px', padding: '0', margin: '-1px', overflow: 'hidden', clip: 'rect(0, 0, 0, 0)', whiteSpace: 'nowrap', border: '0' }}>{ariaLabel}</span>
+      <span
+        style={{
+          position: 'absolute',
+          width: '1px',
+          height: '1px',
+          padding: '0',
+          margin: '-1px',
+          overflow: 'hidden',
+          clip: 'rect(0, 0, 0, 0)',
+          whiteSpace: 'nowrap',
+          border: '0',
+        }}
+      >
+        {ariaLabel}
+      </span>
     </div>
   );
 }

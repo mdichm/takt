@@ -15,8 +15,14 @@ import { PasswordService } from './password.service';
 
 const DOSSIER_CLES = mkdtempSync(join(tmpdir(), 'takt-auth-test-jwt-'));
 const premiere = generateKeyPairSync('rsa', { modulusLength: 2048 });
-writeFileSync(join(DOSSIER_CLES, 'active.private.pem'), premiere.privateKey.export({ type: 'pkcs8', format: 'pem' }));
-writeFileSync(join(DOSSIER_CLES, 'active.public.pem'), premiere.publicKey.export({ type: 'spki', format: 'pem' }));
+writeFileSync(
+  join(DOSSIER_CLES, 'active.private.pem'),
+  premiere.privateKey.export({ type: 'pkcs8', format: 'pem' }),
+);
+writeFileSync(
+  join(DOSSIER_CLES, 'active.public.pem'),
+  premiere.publicKey.export({ type: 'spki', format: 'pem' }),
+);
 
 process.env = {
   ...process.env,
@@ -40,11 +46,12 @@ let idGestionnaire: string;
 let emailGestionnaire: string;
 const idsACleaner: string[] = [];
 
-const emailUnique = () => `takt-test-${Date.now()}-${Math.random().toString(36).slice(2)}@takt.test`;
+const emailUnique = () =>
+  `takt-test-${Date.now()}-${Math.random().toString(36).slice(2)}@takt.test`;
 
 describe('POST /auth/login, /auth/refresh, /auth/logout (TAKT-L03-03)', () => {
   beforeAll(async () => {
-    const { AppModule } = await import('../../app.module');
+    const { AppModule } = await import('../../app.module.js');
     const moduleRef = await Test.createTestingModule({ imports: [AppModule] })
       .overrideProvider(PRISMA)
       .useValue(creerPrismaClient(process.env.DATABASE_URL!))
@@ -196,10 +203,7 @@ describe('POST /auth/login, /auth/refresh, /auth/logout (TAKT-L03-03)', () => {
   it('rafraîchit les jetons (rotation du refresh) : nouveau accessToken, nouveau cookie, pas de refreshToken dans le corps', async () => {
     const refreshToken = await obtenirRefreshToken();
 
-    const reponse = await agent
-      .post('/api/v1/auth/refresh')
-      .send({ refreshToken })
-      .expect(200);
+    const reponse = await agent.post('/api/v1/auth/refresh').send({ refreshToken }).expect(200);
 
     expect(reponse.body.error).toBeNull();
     expect(reponse.body.data.accessToken).toBeTypeOf('string');
@@ -231,15 +235,9 @@ describe('POST /auth/login, /auth/refresh, /auth/logout (TAKT-L03-03)', () => {
   it('rejette un refresh token déjà consommé (rejeu après rotation)', async () => {
     const refreshToken = await obtenirRefreshToken();
 
-    await agent
-      .post('/api/v1/auth/refresh')
-      .send({ refreshToken })
-      .expect(200);
+    await agent.post('/api/v1/auth/refresh').send({ refreshToken }).expect(200);
 
-    const reponse = await agent
-      .post('/api/v1/auth/refresh')
-      .send({ refreshToken })
-      .expect(401);
+    const reponse = await agent.post('/api/v1/auth/refresh').send({ refreshToken }).expect(401);
 
     expect(reponse.body.error.code).toBe('UNAUTHORIZED');
   });
@@ -247,20 +245,14 @@ describe('POST /auth/login, /auth/refresh, /auth/logout (TAKT-L03-03)', () => {
   it('révoque la famille au logout et refuse tout refresh ultérieur', async () => {
     const refreshToken = await obtenirRefreshToken();
 
-    await agent
-      .post('/api/v1/auth/logout')
-      .send({ refreshToken })
-      .expect(200);
+    await agent.post('/api/v1/auth/logout').send({ refreshToken }).expect(200);
 
     const journal = await prisma.journalAudit.findFirst({
       where: { action: 'LOGOUT', utilisateurId: idGestionnaire },
     });
     expect(journal).toBeDefined();
 
-    const reponse = await agent
-      .post('/api/v1/auth/refresh')
-      .send({ refreshToken })
-      .expect(401);
+    const reponse = await agent.post('/api/v1/auth/refresh').send({ refreshToken }).expect(401);
 
     expect(reponse.body.error.code).toBe('UNAUTHORIZED');
   });

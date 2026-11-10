@@ -1,10 +1,7 @@
 // Copyright (C) 2026 TAKT
 // SPDX-License-Identifier: AGPL-3.0-only
 
-import {
-  ExecutionContext,
-  Injectable,
-} from '@nestjs/common';
+import { ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { RoleCode } from '@takt/contracts';
 import { ApiError } from '../http/api-error';
@@ -26,8 +23,7 @@ export const ROLES_KEY = 'roles';
  */
 @Injectable()
 export class RolesGuard {
-  constructor(private readonly reflector: Reflector) {
-  }
+  constructor(private readonly reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
     if (!this.reflector) {
@@ -42,16 +38,10 @@ export class RolesGuard {
       return true;
     }
 
-    const utilisateur = context.switchToHttp().getRequest<
-      { user?: UtilisateurConnecte }
-    >().user;
+    const utilisateur = context.switchToHttp().getRequest<{ user?: UtilisateurConnecte }>().user;
 
     if (!utilisateur) {
-      throw new ApiError(
-        CODES_ERREUR_API.FORBIDDEN,
-        403,
-        'Utilisateur non authentifié',
-      );
+      throw new ApiError(CODES_ERREUR_API.FORBIDDEN, 403, 'Utilisateur non authentifié');
     }
 
     const aAutorisation = rolesAutorises.includes(utilisateur.role);

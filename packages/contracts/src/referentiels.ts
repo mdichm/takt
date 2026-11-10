@@ -484,12 +484,8 @@ export const zGradeTypeEnseignementParams = z.object({
 });
 
 export type GradeTypeEnseignement = z.infer<typeof zGradeTypeEnseignement>;
-export type GradeTypeEnseignementCreate = z.infer<
-  typeof zGradeTypeEnseignementCreate
->;
-export type GradeTypeEnseignementParams = z.infer<
-  typeof zGradeTypeEnseignementParams
->;
+export type GradeTypeEnseignementCreate = z.infer<typeof zGradeTypeEnseignementCreate>;
+export type GradeTypeEnseignementParams = z.infer<typeof zGradeTypeEnseignementParams>;
 
 // ============================================================================
 // Enseignant
@@ -702,7 +698,7 @@ export const zSalleCreate = z.object({
       z.object({
         equipementId: zUuid,
         quantite: z.number().int().nonnegative().default(1),
-      })
+      }),
     )
     .optional(),
 });
@@ -713,17 +709,13 @@ export const zSalleUpdate = z.object({
   libelle: z.string().trim().min(1, 'Le libellé est requis').optional(),
   typeSalleId: zUuid.optional(),
   siteId: zUuid.optional(),
-  capacite: z
-    .number()
-    .int()
-    .positive('La capacité doit être supérieure à 0')
-    .optional(),
+  capacite: z.number().int().positive('La capacité doit être supérieure à 0').optional(),
   equipements: z
     .array(
       z.object({
         equipementId: zUuid,
         quantite: z.number().int().nonnegative().default(1),
-      })
+      }),
     )
     .optional(),
 });
@@ -762,8 +754,12 @@ export type VarianteAffichage = z.infer<typeof zVarianteAffichage>;
 /** Créneau horaire de la grille. */
 export const zCreneau = z.object({
   id: zUuid,
-  jour: z.number().int().min(1, 'Le jour doit être compris entre 1 et 6').max(6, 'Le jour doit être compris entre 1 et 6'),
-  ordre: z.number().int().positive('L\'ordre doit être supérieur à 0'),
+  jour: z
+    .number()
+    .int()
+    .min(1, 'Le jour doit être compris entre 1 et 6')
+    .max(6, 'Le jour doit être compris entre 1 et 6'),
+  ordre: z.number().int().positive("L'ordre doit être supérieur à 0"),
   heureDebut: zDateIso,
   heureFin: zDateIso,
   dureeMinutes: z.number().int().positive('La durée doit être supérieure à 0'),
@@ -773,8 +769,12 @@ export const zCreneau = z.object({
 
 /** Données de création d'un créneau. */
 export const zCreneauCreate = z.object({
-  jour: z.number().int().min(1, 'Le jour doit être compris entre 1 et 6').max(6, 'Le jour doit être compris entre 1 et 6'),
-  ordre: z.number().int().positive('L\'ordre doit être supérieur à 0'),
+  jour: z
+    .number()
+    .int()
+    .min(1, 'Le jour doit être compris entre 1 et 6')
+    .max(6, 'Le jour doit être compris entre 1 et 6'),
+  ordre: z.number().int().positive("L'ordre doit être supérieur à 0"),
   heureDebut: zDateIso,
   heureFin: zDateIso,
   dureeMinutes: z.number().int().positive('La durée doit être supérieure à 0').default(30),
@@ -782,8 +782,13 @@ export const zCreneauCreate = z.object({
 
 /** Données de modification d'un créneau. */
 export const zCreneauUpdate = z.object({
-  jour: z.number().int().min(1, 'Le jour doit être compris entre 1 et 6').max(6, 'Le jour doit être compris entre 1 et 6').optional(),
-  ordre: z.number().int().positive('L\'ordre doit être supérieur à 0').optional(),
+  jour: z
+    .number()
+    .int()
+    .min(1, 'Le jour doit être compris entre 1 et 6')
+    .max(6, 'Le jour doit être compris entre 1 et 6')
+    .optional(),
+  ordre: z.number().int().positive("L'ordre doit être supérieur à 0").optional(),
   heureDebut: zDateIso.optional(),
   heureFin: zDateIso.optional(),
   dureeMinutes: z.number().int().positive('La durée doit être supérieure à 0').optional(),
@@ -866,23 +871,48 @@ export const zConfigSysteme = z.object({
   id: zUuid,
   pasDeTempsMinutes: z.number().int().positive('Le pas de temps doit être supérieur à 0'),
   joursOuvres: z.string().regex(/^[1-6](,[1-6])*$/, 'Format attendu : "1,2,3,4,5,6"'),
-  creneauxParJour: z.number().int().positive('Le nombre de créneaux par jour doit être supérieur à 0'),
+  creneauxParJour: z
+    .number()
+    .int()
+    .positive('Le nombre de créneaux par jour doit être supérieur à 0'),
   createdAt: zDateIso,
   updatedAt: zDateIso,
 });
 
 /** Données de création des paramètres système. */
 export const zConfigSystemeCreate = z.object({
-  pasDeTempsMinutes: z.number().int().positive('Le pas de temps doit être supérieur à 0').default(30),
-  joursOuvres: z.string().regex(/^[1-6](,[1-6])*$/, 'Format attendu : "1,2,3,4,5,6"').default('1,2,3,4,5,6'),
-  creneauxParJour: z.number().int().positive('Le nombre de créneaux par jour doit être supérieur à 0').default(24),
+  pasDeTempsMinutes: z
+    .number()
+    .int()
+    .positive('Le pas de temps doit être supérieur à 0')
+    .default(30),
+  joursOuvres: z
+    .string()
+    .regex(/^[1-6](,[1-6])*$/, 'Format attendu : "1,2,3,4,5,6"')
+    .default('1,2,3,4,5,6'),
+  creneauxParJour: z
+    .number()
+    .int()
+    .positive('Le nombre de créneaux par jour doit être supérieur à 0')
+    .default(24),
 });
 
 /** Données de modification des paramètres système. */
 export const zConfigSystemeUpdate = z.object({
-  pasDeTempsMinutes: z.number().int().positive('Le pas de temps doit être supérieur à 0').optional(),
-  joursOuvres: z.string().regex(/^[1-6](,[1-6])*$/, 'Format attendu : "1,2,3,4,5,6"').optional(),
-  creneauxParJour: z.number().int().positive('Le nombre de créneaux par jour doit être supérieur à 0').optional(),
+  pasDeTempsMinutes: z
+    .number()
+    .int()
+    .positive('Le pas de temps doit être supérieur à 0')
+    .optional(),
+  joursOuvres: z
+    .string()
+    .regex(/^[1-6](,[1-6])*$/, 'Format attendu : "1,2,3,4,5,6"')
+    .optional(),
+  creneauxParJour: z
+    .number()
+    .int()
+    .positive('Le nombre de créneaux par jour doit être supérieur à 0')
+    .optional(),
 });
 
 export type ConfigSysteme = z.infer<typeof zConfigSysteme>;
@@ -918,27 +948,17 @@ export const ENTETES_CSV_PAR_TYPE: Record<TypeReferentielImportable, readonly st
 /** Données brutes de l'import CSV (corps de la requête d'aperçu et d'import). */
 export const zImportReferentielCsv = z.object({
   type: zTypeReferentielImportable,
-  contenu: z
-    .string()
-    .min(1, 'Le fichier CSV est vide')
-    .max(2_000_000, 'Le fichier dépasse 2 Mo'),
+  contenu: z.string().min(1, 'Le fichier CSV est vide').max(2_000_000, 'Le fichier dépasse 2 Mo'),
 });
 
 export type ImportReferentielCsv = z.infer<typeof zImportReferentielCsv>;
 
 /** Requête de confirmation d'import : le contenu doit être identique à l'aperçu. */
 export const zImportReferentielCsvConfirme = zImportReferentielCsv.extend({
-  empreinte: z
-    .string()
-    .regex(
-      /^[a-f0-9]{64}$/,
-      'L\'empreinte du fichier est invalide',
-    ),
+  empreinte: z.string().regex(/^[a-f0-9]{64}$/, "L'empreinte du fichier est invalide"),
 });
 
-export type ImportReferentielCsvConfirme = z.infer<
-  typeof zImportReferentielCsvConfirme
->;
+export type ImportReferentielCsvConfirme = z.infer<typeof zImportReferentielCsvConfirme>;
 
 /** Erreur sur une ligne du CSV importé. */
 export const zErreurLigneImport = z.object({
@@ -985,13 +1005,7 @@ export type RapportImport = z.infer<typeof zRapportImport>;
 // ============================================================================
 
 /** Types de référentiels importables depuis une année archivée (liste fermée, ST_TAKT §B5). */
-export const zTypeImportArchive = z.enum([
-  'parcours',
-  'groupe',
-  'matiere',
-  'module',
-  'salle',
-]);
+export const zTypeImportArchive = z.enum(['parcours', 'groupe', 'matiere', 'module', 'salle']);
 
 export type TypeImportArchive = z.infer<typeof zTypeImportArchive>;
 

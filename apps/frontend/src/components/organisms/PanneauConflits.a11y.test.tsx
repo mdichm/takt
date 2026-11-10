@@ -8,7 +8,14 @@ import { PanneauConflits } from './PanneauConflits';
 
 describe('PanneauConflits — accessibilité', () => {
   const conflits = [
-    { id: 'c1', type: 'salle' as const, entiteA: 'Salle A101', entiteB: 'Salle A101', seance: 'Lundi 08h', gravite: 'bloquant' as const },
+    {
+      id: 'c1',
+      type: 'salle' as const,
+      entiteA: 'Salle A101',
+      entiteB: 'Salle A101',
+      seance: 'Lundi 08h',
+      gravite: 'bloquant' as const,
+    },
   ];
 
   it('ne produit aucune violation axe', async () => {

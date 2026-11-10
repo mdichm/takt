@@ -19,7 +19,8 @@ let prisma: ReturnType<typeof creerPrismaClient>;
 let service: UsersService;
 const idsACleaner: string[] = [];
 
-const emailUnique = () => `takt-rbac-svc-${Date.now()}-${Math.random().toString(36).slice(2)}@takt.test`;
+const emailUnique = () =>
+  `takt-rbac-svc-${Date.now()}-${Math.random().toString(36).slice(2)}@takt.test`;
 
 async function creerUtilisateur(
   email: string,
@@ -47,7 +48,7 @@ async function creerUtilisateur(
 
 describe('RBAC service - portée par département (TAKT-L03-05)', () => {
   beforeAll(async () => {
-    const { AppModule } = await import('../../app.module');
+    const { AppModule } = await import('../../app.module.js');
     const moduleRef = await Test.createTestingModule({ imports: [AppModule] })
       .overrideProvider(PRISMA)
       .useValue(creerPrismaClient(process.env.DATABASE_URL!))
@@ -151,7 +152,7 @@ describe('RBAC service - portée par département (TAKT-L03-05)', () => {
     expect(ids).not.toContain(idDeptB);
   });
 
-  it('getUser admin peut consulter n\'importe qui', async () => {
+  it("getUser admin peut consulter n'importe qui", async () => {
     const deptA = await prisma.departement.findUnique({ where: { code: 'DEPT-A' } });
     const idUtilisateur = await creerUtilisateur(emailUnique(), 'gest', deptA!.id);
 
@@ -163,7 +164,7 @@ describe('RBAC service - portée par département (TAKT-L03-05)', () => {
     expect(utilisateur.id).toBe(idUtilisateur);
   });
 
-  it('getUser rdep ne peut pas consulter un utilisateur d\'un autre département → 403', async () => {
+  it("getUser rdep ne peut pas consulter un utilisateur d'un autre département → 403", async () => {
     const deptA = await prisma.departement.findUnique({ where: { code: 'DEPT-A' } });
     const deptB = await prisma.departement.findUnique({ where: { code: 'DEPT-B' } });
 
@@ -191,7 +192,7 @@ describe('RBAC service - portée par département (TAKT-L03-05)', () => {
     expect(utilisateur.id).toBe(idUtilisateur);
   });
 
-  it('updateUser rdep ne peut pas modifier un utilisateur d\'un autre département → 403', async () => {
+  it("updateUser rdep ne peut pas modifier un utilisateur d'un autre département → 403", async () => {
     const deptA = await prisma.departement.findUnique({ where: { code: 'DEPT-A' } });
     const deptB = await prisma.departement.findUnique({ where: { code: 'DEPT-B' } });
 

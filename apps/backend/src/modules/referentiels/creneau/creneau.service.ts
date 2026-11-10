@@ -105,7 +105,14 @@ export class CreneauService {
 
   /** Liste paginée des créneaux avec filtres. */
   async list(filtres: CreneauListFilters) {
-    const { page = 1, pageSize = 20, sortBy = 'ordre', sortDirection = 'asc', jour, search } = filtres;
+    const {
+      page = 1,
+      pageSize = 20,
+      sortBy = 'ordre',
+      sortDirection = 'asc',
+      jour,
+      search,
+    } = filtres;
 
     const where: Record<string, unknown> = {};
     if (jour !== undefined) {

@@ -5,7 +5,7 @@
 **Date :** 30 octobre 2026
 **Responsable :** Backend Lead + Architecte
 **Statut :** Validé — G1 résolu
-**Documents liés :** ST_TAKT.md (§2), PLAN_MACRO.md, DEPLOIEMENT.md, contract.prisma
+**Documents liés :** ST_TAKT.md (§2), PLAN_MACRO.md, DEPLOIEMENT.md, schema.prisma (DL-09)
 
 ---
 
@@ -17,13 +17,13 @@ Définir une stratégie de migration de base de données robuste, reproductible 
 
 ## 2. Principes directeurs
 
-| Principe | Description |
-|----------|-------------|
-| **Versionnage explicite** | Chaque changement de schéma est une migration nommée, horodatée, stockée en SQL dans `packages/db/prisma/migrations/` |
-| **Séparation des responsabilités** | `prisma migrate dev` en développement ; `prisma migrate deploy` en recette/production |
-| **Traçabilité complète** | Historique Git des migrations = audit trail du schéma |
-| **Rollback maîtrisé** | Chaque migration critique maintient un fichier `down.sql` testé |
-| **Seed déterministe** | Données de référence injectées via `prisma db seed` (idempotent) |
+| Principe                           | Description                                                                                                           |
+| ---------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| **Versionnage explicite**          | Chaque changement de schéma est une migration nommée, horodatée, stockée en SQL dans `packages/db/prisma/migrations/` |
+| **Séparation des responsabilités** | `prisma migrate dev` en développement ; `prisma migrate deploy` en recette/production                                 |
+| **Traçabilité complète**           | Historique Git des migrations = audit trail du schéma                                                                 |
+| **Rollback maîtrisé**              | Chaque migration critique maintient un fichier `down.sql` testé                                                       |
+| **Seed déterministe**              | Données de référence injectées via `prisma db seed` (idempotent)                                                      |
 
 ---
 
@@ -31,7 +31,7 @@ Définir une stratégie de migration de base de données robuste, reproductible 
 
 ```
 packages/db/prisma/
-├── contract.prisma          # Schéma source de vérité (déjà existant)
+├── schema.prisma            # Schéma source de vérité exécutable (DL-09)
 ├── migrations/              # Dossier versionné (créé par Prisma Migrate)
 │   ├── 20261030000000_init/ # Migration initiale
 │   │   ├── migration.sql    # SQL up
@@ -41,10 +41,11 @@ packages/db/prisma/
 │       └── down.sql
 ├── seed.ts                  # Script de seed (données de référence)
 ├── seed.recette.ts          # Données de recette (anonymisées)
-└── schema.prisma            # Généré à partir de contract.prisma (ne pas éditer)
+└── schema.prisma            # Schéma exécutable unique (DL-09) — ne pas éditer manuellement en dehors des migrations
 ```
 
-> **Note :** `contract.prisma` est le fichier source. `schema.prisma` est généré par le script de build pour compatibilité Prisma Client.
+> **Note (DL-09) :** `schema.prisma` est le fichier source de vérité exécutable. L'ancien contrat `contract.prisma` (E0.5) a été archivé sous `docs/archives/contract.prisma` et n'est plus utilisé pour générer le client Prisma ni pour créer des migrations.
+
 ---
 
 ## 4. Commandes par environnement
@@ -52,7 +53,7 @@ packages/db/prisma/
 ### 4.1 Développement (local)
 
 ```bash
-# Créer une nouvelle migration après modification de contract.prisma
+# Créer une nouvelle migration après modification de schema.prisma
 pnpm --filter @takt/db prisma migrate dev --name <description_courte>
 
 # Appliquer les migrations existantes (nouveau clone)
@@ -93,12 +94,13 @@ pnpm --filter @takt/db prisma db seed -- --env=recette
 
 ## 5. Convention de nommage des migrations
 
-| Format | Exemple | Description |
-|--------|---------|-------------|
-| `YYYYMMDDHHMMSS_<action>_<entité>` | `20261101120000_add_index_seance_version` | Action + entité concernée |
-| Actions : `create`, `add`, `remove`, `rename`, `alter`, `drop` | | Verbe à l'infinitif, entité au singulier |
+| Format                                                         | Exemple                                   | Description                              |
+| -------------------------------------------------------------- | ----------------------------------------- | ---------------------------------------- |
+| `YYYYMMDDHHMMSS_<action>_<entité>`                             | `20261101120000_add_index_seance_version` | Action + entité concernée                |
+| Actions : `create`, `add`, `remove`, `rename`, `alter`, `drop` |                                           | Verbe à l'infinitif, entité au singulier |
 
 **Exemples :**
+
 - `20261030000000_init` — Schéma initial complet
 - `20261101100000_add_column_seance_verrou_type` — Ajout colonne
 - `20261101150000_create_table_export` — Création table
@@ -182,11 +184,11 @@ SEED_ENV=recette pnpm --filter @takt/db prisma db seed
 
 ## 8. Matrice de compatibilité Application ↔ Schéma
 
-| Version App | Version Schéma (migration) | Compatibilité | Notes |
-|-------------|----------------------------|---------------|-------|
-| 1.0.0 | `20261030000000_init` | ✅ Baseline | Première release |
-| 1.1.0 | `20261101120000_add_...` | ✅ Forward | Ajout index performance |
-| 1.2.0 | `20261115090000_create_...` | ⚠️ Breaking | Nouvelle table `Export` — migration requise avant déploiement |
+| Version App | Version Schéma (migration)  | Compatibilité | Notes                                                         |
+| ----------- | --------------------------- | ------------- | ------------------------------------------------------------- |
+| 1.0.0       | `20261030000000_init`       | ✅ Baseline   | Première release                                              |
+| 1.1.0       | `20261101120000_add_...`    | ✅ Forward    | Ajout index performance                                       |
+| 1.2.0       | `20261115090000_create_...` | ⚠️ Breaking   | Nouvelle table `Export` — migration requise avant déploiement |
 
 **Règle :** Toute version d'application qui introduit un changement de schéma **doit** inclure la migration correspondante dans le même commit/PR.
 
@@ -194,19 +196,19 @@ SEED_ENV=recette pnpm --filter @takt/db prisma db seed
 
 ## 9. Intégration dans le pipeline CI/CD
 
-| Étape | Commande | Environnement | Condition de succès |
-|-------|----------|---------------|---------------------|
-| Generate | `prisma generate` | Tous | Client Prisma généré sans erreur |
-| Validate | `prisma validate` | Tous | Schéma syntaxiquement valide |
-| Migrate Dev | `prisma migrate dev` | Dev (local) | Migration créée, DB à jour |
-| Migrate Deploy | `prisma migrate deploy` | Recette/Prod | Migrations appliquées, 0 erreur |
-| Seed | `prisma db seed` | Dev/Recette | Données injectées, idempotent |
+| Étape          | Commande                | Environnement | Condition de succès              |
+| -------------- | ----------------------- | ------------- | -------------------------------- |
+| Generate       | `prisma generate`       | Tous          | Client Prisma généré sans erreur |
+| Validate       | `prisma validate`       | Tous          | Schéma syntaxiquement valide     |
+| Migrate Dev    | `prisma migrate dev`    | Dev (local)   | Migration créée, DB à jour       |
+| Migrate Deploy | `prisma migrate deploy` | Recette/Prod  | Migrations appliquées, 0 erreur  |
+| Seed           | `prisma db seed`        | Dev/Recette   | Données injectées, idempotent    |
 
 ---
 
 ## 10. Checklist de validation avant merge (Definition of Done)
 
-- [ ] `contract.prisma` modifié avec la convention de nommage
+- [ ] `schema.prisma` modifié avec la convention de nommage (DL-09)
 - [ ] Migration générée via `prisma migrate dev --name ...`
 - [ ] Fichiers `migration.sql` et `down.sql` présents dans `migrations/`
 - [ ] `down.sql` testé localement (rollback fonctionnel)
@@ -225,4 +227,4 @@ SEED_ENV=recette pnpm --filter @takt/db prisma db seed
 
 ---
 
-*Fin du DOC_MIGRATION_DB.md — TAKT v1.0*
+_Fin du DOC_MIGRATION_DB.md — TAKT v1.0_

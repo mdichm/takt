@@ -3,11 +3,7 @@
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { render, screen, cleanup } from '@testing-library/react';
-import {
-  MemoryRouter,
-  Routes,
-  Route,
-} from 'react-router-dom';
+import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { Layout } from './Layout';
 import { userStore } from '@/stores/userStore';
 import type { SessionUtilisateur } from '@/stores/types';
@@ -38,7 +34,7 @@ function monter() {
           <Route index element={<div data-testid="contenu">Contenu par défaut</div>} />
         </Route>
       </Routes>
-    </MemoryRouter>
+    </MemoryRouter>,
   );
 }
 
