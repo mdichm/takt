@@ -1,7 +1,7 @@
 // Copyright (C) 2026 TAKT
 // SPDX-License-Identifier: AGPL-3.0-only
 
-import { ExecutionContext, Injectable } from '@nestjs/common';
+import { ExecutionContext, Injectable, Inject } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { ApiError } from '../http/api-error';
 import { CODES_ERREUR_API } from '../http/api-error';
@@ -27,12 +27,9 @@ export const DEPARTMENT_SCOPE_KEY = 'departmentScope';
  */
 @Injectable()
 export class DepartmentScopeGuard {
-  constructor(private readonly reflector: Reflector) {}
+  constructor(@Inject(Reflector) private readonly reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
-    if (!this.reflector) {
-      return true;
-    }
     const requis =
       this.reflector.get<boolean>(DEPARTMENT_SCOPE_KEY, context.getHandler()) ??
       this.reflector.get<boolean>(DEPARTMENT_SCOPE_KEY, context.getClass());

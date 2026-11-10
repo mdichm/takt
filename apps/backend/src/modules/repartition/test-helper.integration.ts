@@ -107,9 +107,10 @@ export async function creerContexteTestRepartition(): Promise<ContexteTestRepart
   const { TokenService } = await import('../../modules/auth/token.service.js');
   const { JwtAuthGuard } = await import('../common/guards/jwt-auth.guard.js');
   const { Reflector } = await import('@nestjs/core');
+  const { DepartmentScopeGuard } = await import('../common/guards/department-scope.guard.js');
   const moduleRef = await Test.createTestingModule({
     imports: [AppModule],
-    providers: [Reflector],
+    providers: [Reflector, DepartmentScopeGuard],
   })
     .overrideProvider(PRISMA)
     .useValue(creerPrismaClient(process.env.DATABASE_URL!))
@@ -121,25 +122,13 @@ export async function creerContexteTestRepartition(): Promise<ContexteTestRepart
 
   // Récupérer le TokenService et configurer le JwtAuthGuard réel
   const tokenService = moduleRef.get(TokenService);
-  const jwtAuthGuard = application.get(JwtAuthGuard, { strict: false });
+  const jwtAuthGuard = moduleRef.get(JwtAuthGuard, { strict: false });
   if (jwtAuthGuard) {
     // Remplacer le vérificateur par le vrai (propriété privée en lecture seule)
     Object.defineProperty(jwtAuthGuard, 'verificateur', {
       value: {
         verifier: (token: string) => tokenService.verifyAccessToken(token),
       } as VerificateurJwt,
-      writable: true,
-      configurable: true,
-    });
-  }
-
-  // Configurer le DepartmentScopeGuard avec le Reflector
-  const { DepartmentScopeGuard } = await import('../common/guards/department-scope.guard.js');
-  const deptScopeGuard = application.get(DepartmentScopeGuard, { strict: false });
-  if (deptScopeGuard) {
-    const reflector = application.get(Reflector);
-    Object.defineProperty(deptScopeGuard, 'reflector', {
-      value: reflector,
       writable: true,
       configurable: true,
     });
@@ -215,7 +204,15 @@ export async function creerContexteTestRepartition(): Promise<ContexteTestRepart
 
   const admin = await prisma.utilisateur.upsert({
     where: { id: ADMIN_ID },
-    update: {},
+    update: {
+      email: emailUnique(),
+      nom: 'Admin',
+      prenom: 'Systeme',
+      roleId: roleAdmin!.id,
+      motDePasseHash: hash,
+      estActif: true,
+      departementId: null,
+    },
     create: {
       id: ADMIN_ID,
       email: emailUnique(),
@@ -228,7 +225,15 @@ export async function creerContexteTestRepartition(): Promise<ContexteTestRepart
   });
   const rdep = await prisma.utilisateur.upsert({
     where: { id: RDEP_ID },
-    update: {},
+    update: {
+      email: emailUnique(),
+      nom: 'Rdep',
+      prenom: 'Test',
+      roleId: roleRdep!.id,
+      motDePasseHash: hash,
+      estActif: true,
+      departementId: DEPARTEMENT_ID,
+    },
     create: {
       id: RDEP_ID,
       email: emailUnique(),
@@ -242,7 +247,15 @@ export async function creerContexteTestRepartition(): Promise<ContexteTestRepart
   });
   const gest = await prisma.utilisateur.upsert({
     where: { id: GEST_ID },
-    update: {},
+    update: {
+      email: emailUnique(),
+      nom: 'Gest',
+      prenom: 'Test',
+      roleId: roleGest!.id,
+      motDePasseHash: hash,
+      estActif: true,
+      departementId: null,
+    },
     create: {
       id: GEST_ID,
       email: emailUnique(),
@@ -255,7 +268,15 @@ export async function creerContexteTestRepartition(): Promise<ContexteTestRepart
   });
   const dir = await prisma.utilisateur.upsert({
     where: { id: DIR_ID },
-    update: {},
+    update: {
+      email: emailUnique(),
+      nom: 'Dir',
+      prenom: 'Test',
+      roleId: roleDir!.id,
+      motDePasseHash: hash,
+      estActif: true,
+      departementId: null,
+    },
     create: {
       id: DIR_ID,
       email: emailUnique(),
@@ -408,7 +429,13 @@ export async function creerContexteTestRepartition(): Promise<ContexteTestRepart
   // PlanEtudes: parcoursId, niveauId, anneeUniversitaireId, semestreId, departementId
   await prisma.planEtudes.upsert({
     where: { id: PLAN_ETUDES_ID },
-    update: {},
+    update: {
+      parcoursId: PARCOURS_ID,
+      niveauId: NIVEAU_ID,
+      anneeUniversitaireId: ANNEE_UNIV_ID,
+      semestreId: SEMESTRE_ID,
+      departementId: DEPARTEMENT_ID,
+    },
     create: {
       id: PLAN_ETUDES_ID,
       parcoursId: PARCOURS_ID,
@@ -422,7 +449,14 @@ export async function creerContexteTestRepartition(): Promise<ContexteTestRepart
   // PlanEtudesMatiere: planEtudesId, matiereId, typeEnseignementId, volumeHoraire, dureeCreneaux, coefficient
   await prisma.planEtudesMatiere.upsert({
     where: { id: PLAN_ETUDES_MATIERE_ID },
-    update: {},
+    update: {
+      planEtudesId: PLAN_ETUDES_ID,
+      matiereId: MATIERE_ID,
+      typeEnseignementId: TYPE_ENS_ID,
+      volumeHoraire: 4,
+      dureeCreneaux: 90,
+      coefficient: 1,
+    },
     create: {
       id: PLAN_ETUDES_MATIERE_ID,
       planEtudesId: PLAN_ETUDES_ID,
