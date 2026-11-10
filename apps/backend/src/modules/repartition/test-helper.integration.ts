@@ -296,12 +296,12 @@ export async function creerContexteTestRepartition(): Promise<ContexteTestRepart
   await prisma.version.upsert({
     where: { id: VERSION_ID },
     update: {},
-    create: { id: VERSION_ID, semestreId: SEMESTRE_ID, etat: 'initial' },
+    create: { id: VERSION_ID, semestreId: SEMESTRE_ID, anneeId: ANNEE_UNIV_ID, etat: 'initial' },
   });
   await prisma.version.upsert({
     where: { id: VERSION2_ID },
     update: {},
-    create: { id: VERSION2_ID, semestreId: SEMESTRE_ID, etat: 'initial' },
+    create: { id: VERSION2_ID, semestreId: SEMESTRE_ID, anneeId: ANNEE_UNIV_ID, etat: 'initial' },
   });
 
   await prisma.parcours.upsert({

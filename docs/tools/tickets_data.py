@@ -384,7 +384,7 @@ TICKETS: List[Ticket] = [
         lot="L06",
         titre="Modéliser la version d'EDT et ses 10 états",
         sp=8,
-        status="À faire",
+        status="Terminé",
         deps=['TAKT-L05-04', 'TAKT-L01-04'],
         exigences=['EX-WKF-01', 'EX-PRI-02', 'EX-DAT-01', 'DL-02', 'DL-05', 'ST_TAKT §2.1.'],
     ),

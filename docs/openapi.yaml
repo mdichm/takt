@@ -969,8 +969,15 @@ components:
       type: object
     Version:
       properties:
+        anneeId:
+          format: uuid
+          type: string
         createdAt:
           format: date-time
+          type: string
+        datePublication:
+          format: date-time
+          nullable: true
           type: string
         etat:
           enum:
@@ -988,6 +995,10 @@ components:
         id:
           format: uuid
           type: string
+        publiePar:
+          format: uuid
+          nullable: true
+          type: string
         semestreId:
           format: uuid
           type: string
@@ -1001,6 +1012,7 @@ components:
       required:
         - id
         - semestreId
+        - anneeId
         - etat
         - createdAt
         - updatedAt
@@ -3259,6 +3271,79 @@ paths:
       summary: Modifie un utilisateur
       tags:
         - Utilisateurs
+  /api/v1/versions:
+    get:
+      operationId: VersionsController_list
+      parameters: []
+      responses:
+        '200':
+          description: Liste des versions
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Liste paginée des versions de planning
+      tags:
+        - Versions
+    post:
+      operationId: VersionsController_create
+      parameters: []
+      responses:
+        '201':
+          description: Version créée
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '409':
+          description: Conflit (version publiée déjà existante)
+      security:
+        - bearerAuth: []
+      summary: Crée une version de planning
+      tags:
+        - Versions
+  /api/v1/versions/{id}:
+    get:
+      operationId: VersionsController_getOne
+      parameters: []
+      responses:
+        '200':
+          description: Version trouvée
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Version introuvable
+      security:
+        - bearerAuth: []
+      summary: Détail d’une version
+      tags:
+        - Versions
+  /api/v1/versions/{id}/dupliquer:
+    post:
+      operationId: VersionsController_dupliquer
+      parameters: []
+      responses:
+        '201':
+          description: Version dupliquee
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Version introuvable
+        '409':
+          description: Conflit (source non archivee ou publiee deja existante)
+      security:
+        - bearerAuth: []
+      summary: Duplique une version archivee
+      tags:
+        - Versions
   /audit:
     get:
       description: Retourne les entrées du journal d'audit avec filtres.
@@ -4505,8 +4590,28 @@ paths:
           application/json:
             schema:
               properties:
+                anneeId:
+                  format: uuid
+                  type: string
+                etat:
+                  enum:
+                    - initial
+                    - rep_pedag
+                    - brouillon
+                    - generation
+                    - edition
+                    - valid_pedag
+                    - valid_dir
+                    - valide
+                    - publie
+                    - archive
+                  type: string
                 semestreId:
                   format: uuid
+                  type: string
+                snapshotId:
+                  format: uuid
+                  nullable: true
                   type: string
               required:
                 - semestreId
@@ -4548,45 +4653,6 @@ paths:
       tags:
         - Versions
   /versions/{id}:
-    delete:
-      operationId: versionsDelete
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            format: uuid
-            type: string
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/EnveloppeReponse'
-          description: Version supprimée
-        '401':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-          description: Non authentifié
-        '403':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-          description: Interdit
-        '404':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-          description: Version non trouvée
-      security:
-        - bearerAuth: []
-      summary: Supprimer une version
-      tags:
-        - Versions
     get:
       operationId: versionsGet
       parameters:
@@ -4626,13 +4692,19 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErreurRFC9457'
           description: Version non trouvée
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Conflit (version publiée immuable)
       security:
         - bearerAuth: []
       summary: Détail d'une version
       tags:
         - Versions
-    put:
-      operationId: versionsUpdate
+    post:
+      operationId: versionsDupliquer
       parameters:
         - in: path
           name: id
@@ -4640,32 +4712,8 @@ paths:
           schema:
             format: uuid
             type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              properties:
-                etat:
-                  enum:
-                    - initial
-                    - rep_pedag
-                    - brouillon
-                    - generation
-                    - edition
-                    - valid_pedag
-                    - valid_dir
-                    - valide
-                    - publie
-                    - archive
-                  type: string
-                snapshotId:
-                  format: uuid
-                  nullable: true
-                  type: string
-              type: object
-        required: true
       responses:
-        '200':
+        '201':
           content:
             application/json:
               schema:
@@ -4675,13 +4723,7 @@ paths:
                       data:
                         $ref: '#/components/schemas/VersionResponse'
                     type: object
-          description: Version modifiée
-        '400':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-          description: Données invalides
+          description: Version dupliquée
         '401':
           content:
             application/json:
@@ -4700,73 +4742,15 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErreurRFC9457'
           description: Version non trouvée
-      security:
-        - bearerAuth: []
-      summary: Modifier une version
-      tags:
-        - Versions
-  /versions/{id}/transition:
-    post:
-      description: Applique une transition d'état sur la version (19 transitions possibles).
-      operationId: versionsTransition
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            format: uuid
-            type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/TransitionRequest'
-        required: true
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/EnveloppeReponse'
-                  - properties:
-                      data:
-                        $ref: '#/components/schemas/VersionResponse'
-                    type: object
-          description: Transition effectuée
-        '400':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-          description: Transition invalide
-        '401':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-          description: Non authentifié
-        '403':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-          description: Interdit (droits insuffisants)
-        '404':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
-          description: Version non trouvée
         '409':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErreurRFC9457'
-          description: Conflit (transition non autorisée pour l'état courant)
+          description: Conflit (source non archivée ou version publiée déjà existante)
       security:
         - bearerAuth: []
-      summary: Transition d'état du workflow
+      summary: Dupliquer une version archivée
       tags:
         - Versions
 security:
@@ -4781,7 +4765,7 @@ tags:
     name: Auth
   - description: Gestion des comptes utilisateurs (CRUD)
     name: Utilisateurs
-  - description: Gestion des versions de planning et workflow (10 états, 19 transitions)
+  - description: Gestion des versions de planning (10 états)
     name: Versions
   - description: Gestion des séances de cours (CRUD, détection de conflits)
     name: Seances
