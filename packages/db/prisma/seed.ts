@@ -259,77 +259,45 @@ async function main(): Promise<void> {
   // Référentiel salles (TAKT-L04-04) — Sites, Types de salle, Équipements, Salles
   // ============================================================================
 
-  // Sites (3)
-  const sites = await Promise.all([
-    getPrisma().site.upsert({
-      where: { code: 'SITE-RDC' },
-      update: { libelle: 'Bâtiment principal – RDC' },
-      create: { code: 'SITE-RDC', libelle: 'Bâtiment principal – RDC' },
-    }),
-    getPrisma().site.upsert({
-      where: { code: 'SITE-ETG1' },
-      update: { libelle: 'Bâtiment principal – Étage 1' },
-      create: { code: 'SITE-ETG1', libelle: 'Bâtiment principal – Étage 1' },
-    }),
-    getPrisma().site.upsert({
-      where: { code: 'SITE-ETG2' },
-      update: { libelle: 'Bâtiment principal – Étage 2' },
-      create: { code: 'SITE-ETG2', libelle: 'Bâtiment principal – Étage 2' },
-    }),
-  ]);
+  // Sites (3) — créés séquentiellement pour éviter les race conditions
+  // avec @prisma/adapter-pg sur les upserts concurrents.
+  const sites = [];
+  for (const { code, libelle } of [
+    { code: 'SITE-RDC', libelle: 'Bâtiment principal – RDC' },
+    { code: 'SITE-ETG1', libelle: 'Bâtiment principal – Étage 1' },
+    { code: 'SITE-ETG2', libelle: 'Bâtiment principal – Étage 2' },
+  ]) {
+    sites.push(
+      await getPrisma().site.upsert({ where: { code }, update: { libelle }, create: { code, libelle } }),
+    );
+  }
 
-  // Types de salle (4)
-  const typesSalle = await Promise.all([
-    getPrisma().typeSalle.upsert({
-      where: { code: 'CM' },
-      update: { libelle: 'Cours magistral' },
-      create: { code: 'CM', libelle: 'Cours magistral' },
-    }),
-    getPrisma().typeSalle.upsert({
-      where: { code: 'TD' },
-      update: { libelle: 'Travaux dirigés' },
-      create: { code: 'TD', libelle: 'Travaux dirigés' },
-    }),
-    getPrisma().typeSalle.upsert({
-      where: { code: 'TP' },
-      update: { libelle: 'Travaux pratiques' },
-      create: { code: 'TP', libelle: 'Travaux pratiques' },
-    }),
-    getPrisma().typeSalle.upsert({
-      where: { code: 'INFO' },
-      update: { libelle: 'Salle informatique' },
-      create: { code: 'INFO', libelle: 'Salle informatique' },
-    }),
-  ]);
+  // Types de salle (4) — créés séquentiellement.
+  const typesSalle = [];
+  for (const { code, libelle } of [
+    { code: 'CM', libelle: 'Cours magistral' },
+    { code: 'TD', libelle: 'Travaux dirigés' },
+    { code: 'TP', libelle: 'Travaux pratiques' },
+    { code: 'INFO', libelle: 'Salle informatique' },
+  ]) {
+    typesSalle.push(
+      await getPrisma().typeSalle.upsert({ where: { code }, update: { libelle }, create: { code, libelle } }),
+    );
+  }
 
-  // Équipements (5)
-  const equipements = await Promise.all([
-    getPrisma().equipement.upsert({
-      where: { code: 'VIDEOPRJ' },
-      update: { libelle: 'Vidéo projecteur' },
-      create: { code: 'VIDEOPRJ', libelle: 'Vidéo projecteur' },
-    }),
-    getPrisma().equipement.upsert({
-      where: { code: 'TABLEAU' },
-      update: { libelle: 'Tableau blanc' },
-      create: { code: 'TABLEAU', libelle: 'Tableau blanc' },
-    }),
-    getPrisma().equipement.upsert({
-      where: { code: 'ORDI' },
-      update: { libelle: 'Ordinateur poste prof' },
-      create: { code: 'ORDI', libelle: 'Ordinateur poste prof' },
-    }),
-    getPrisma().equipement.upsert({
-      where: { code: 'MICRO' },
-      update: { libelle: 'Micro sans fil' },
-      create: { code: 'MICRO', libelle: 'Micro sans fil' },
-    }),
-    getPrisma().equipement.upsert({
-      where: { code: 'TABLEAU_NUM' },
-      update: { libelle: 'Tableau numérique interactif' },
-      create: { code: 'TABLEAU_NUM', libelle: 'Tableau numérique interactif' },
-    }),
-  ]);
+  // Équipements (5) — créés séquentiellement.
+  const equipements = [];
+  for (const { code, libelle } of [
+    { code: 'VIDEOPRJ', libelle: 'Vidéo projecteur' },
+    { code: 'TABLEAU', libelle: 'Tableau blanc' },
+    { code: 'ORDI', libelle: 'Ordinateur poste prof' },
+    { code: 'MICRO', libelle: 'Micro sans fil' },
+    { code: 'TABLEAU_NUM', libelle: 'Tableau numérique interactif' },
+  ]) {
+    equipements.push(
+      await getPrisma().equipement.upsert({ where: { code }, update: { libelle }, create: { code, libelle } }),
+    );
+  }
 
   // 150 salles (SALLE-001 à SALLE-150), réparties sur 3 sites et 4 types
   for (let i = 1; i <= 150; i++) {
