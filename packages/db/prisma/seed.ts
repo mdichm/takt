@@ -356,8 +356,15 @@ async function main(): Promise<void> {
       liensEquipements.push({ equipement: { connect: { id: equipements[2].id } }, quantite: 10 }); // ORDI x10
     }
 
-    await getPrisma().salle.create({
-      data: {
+    await getPrisma().salle.upsert({
+      where: { code },
+      update: {
+        libelle: `Salle ${code}`,
+        typeSalleId: typeSalle.id,
+        siteId: site.id,
+        capacite,
+      },
+      create: {
         code,
         libelle: `Salle ${code}`,
         typeSalleId: typeSalle.id,
@@ -417,8 +424,10 @@ async function main(): Promise<void> {
       const heureDebut = new Date(Date.UTC(2026, 0, 1, hDebut, mDebut, 0, 0));
       const heureFin = new Date(Date.UTC(2026, 0, 1, hFin, mFin, 0, 0));
 
-      await getPrisma().creneau.create({
-        data: {
+      await getPrisma().creneau.upsert({
+        where: { jour_ordre: { jour, ordre } },
+        update: {},
+        create: {
           jour,
           ordre,
           heureDebut,
