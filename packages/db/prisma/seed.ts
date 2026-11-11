@@ -324,25 +324,31 @@ async function main(): Promise<void> {
       liensEquipements.push({ equipement: { connect: { id: equipements[2].id } }, quantite: 10 }); // ORDI x10
     }
 
-    await getPrisma().salle.upsert({
-      where: { code },
-      update: {
-        libelle: `Salle ${code}`,
-        typeSalleId: typeSalle.id,
-        siteId: site.id,
-        capacite,
-      },
-      create: {
-        code,
-        libelle: `Salle ${code}`,
-        typeSalleId: typeSalle.id,
-        siteId: site.id,
-        capacite,
-        ...(liensEquipements.length > 0 && {
-          salleEquipements: { create: liensEquipements },
-        }),
-      },
-    });
+    const salleExistant = await getPrisma().salle.findUnique({ where: { code } });
+    if (salleExistant) {
+      await getPrisma().salle.update({
+        where: { code },
+        data: {
+          libelle: `Salle ${code}`,
+          typeSalleId: typeSalle.id,
+          siteId: site.id,
+          capacite,
+        },
+      });
+    } else {
+      await getPrisma().salle.create({
+        data: {
+          code,
+          libelle: `Salle ${code}`,
+          typeSalleId: typeSalle.id,
+          siteId: site.id,
+          capacite,
+          ...(liensEquipements.length > 0 && {
+            salleEquipements: { create: liensEquipements },
+          }),
+        },
+      });
+    }
   }
 
   // ConfigSysteme (singleton) — paramètres par défaut (L04-05)
@@ -392,17 +398,25 @@ async function main(): Promise<void> {
       const heureDebut = new Date(Date.UTC(2026, 0, 1, hDebut, mDebut, 0, 0));
       const heureFin = new Date(Date.UTC(2026, 0, 1, hFin, mFin, 0, 0));
 
-      await getPrisma().creneau.upsert({
+      const creneauExistant = await getPrisma().creneau.findUnique({
         where: { jour_ordre: { jour, ordre } },
-        update: {},
-        create: {
-          jour,
-          ordre,
-          heureDebut,
-          heureFin,
-          dureeMinutes: 30,
-        },
       });
+      if (creneauExistant) {
+        await getPrisma().creneau.update({
+          where: { jour_ordre: { jour, ordre } },
+          data: {},
+        });
+      } else {
+        await getPrisma().creneau.create({
+          data: {
+            jour,
+            ordre,
+            heureDebut,
+            heureFin,
+            dureeMinutes: 30,
+          },
+        });
+      }
     }
   }
 
