@@ -61,6 +61,27 @@ function resoudreMotDePasseDemo(): string {
   return motDePasseGenere;
 }
 
+/**
+ * Récupère un enregistrement par ses critères de recherche, ou le crée s'il
+ * n'existe pas, puis applique une mise à jour s'il existait déjà.
+ *
+ * Contournement du comportement imprévisible de @prisma/adapter-pg sur
+ * upsert en CI (PostgreSQL 16) : le chemin UPDATE de upsert peut retourner
+ * null, ce qui provoque des violations de clé étrangère ensuite.
+ */
+async function getOrCreate<T extends { id: string }>(
+  findUnique: () => Promise<T | null>,
+  create: () => Promise<T>,
+  update: (id: string) => Promise<void>,
+): Promise<T> {
+  const existant = await findUnique();
+  if (existant) {
+    await update(existant.id);
+    return existant;
+  }
+  return create();
+}
+
 async function main(): Promise<void> {
   if (process.env.NODE_ENV === 'production') {
     throw new Error('Le seed de développement est interdit en production');
@@ -76,19 +97,26 @@ async function main(): Promise<void> {
       ['rdep', 'Responsable de département'],
       ['dir', 'Direction'],
     ].map(([code, libelle]) =>
-      getPrisma().role.upsert({
-        where: { code },
-        update: { libelle },
-        create: { code, libelle },
-      }),
+      getOrCreate(
+        () => getPrisma().role.findUnique({ where: { code } }),
+        () => getPrisma().role.create({ data: { code, libelle } }),
+        (id) => getPrisma().role.update({ where: { id }, data: { libelle } }),
+      ),
     ),
   );
 
-  const etablissement = await getPrisma().etablissement.upsert({
-    where: { code: 'TAKT' },
-    update: { libelle: 'Université de Takt' },
-    create: { code: 'TAKT', libelle: 'Université de Takt' },
-  });
+  const etablissement = await getOrCreate(
+    () => getPrisma().etablissement.findUnique({ where: { code: 'TAKT' } }),
+    () =>
+      getPrisma().etablissement.create({
+        data: { code: 'TAKT', libelle: 'Université de Takt' },
+      }),
+    (id) =>
+      getPrisma().etablissement.update({
+        where: { id },
+        data: { libelle: 'Université de Takt' },
+      }),
+  );
 
   const departements = await Promise.all(
     [
@@ -96,35 +124,55 @@ async function main(): Promise<void> {
       ['MATH', 'Mathématiques'],
       ['PHYS', 'Physique'],
     ].map(([code, libelle]) =>
-      getPrisma().departement.upsert({
-        where: { code },
-        update: { libelle },
-        create: { code, libelle, etablissementId: etablissement.id },
-      }),
+      getOrCreate(
+        () => getPrisma().departement.findUnique({ where: { code } }),
+        () =>
+          getPrisma().departement.create({
+            data: { code, libelle, etablissementId: etablissement.id },
+          }),
+        (id) =>
+          getPrisma().departement.update({
+            where: { id },
+            data: { libelle, etablissementId: etablissement.id },
+          }),
+      ),
     ),
   );
 
-  const annee = await getPrisma().anneeUniversitaire.upsert({
-    where: { libelle: '2026-2027' },
-    update: {},
-    create: {
-      libelle: '2026-2027',
-      dateDebut: new Date('2026-09-01T00:00:00.000Z'),
-      dateFin: new Date('2027-08-31T00:00:00.000Z'),
-    },
-  });
+  const annee = await getOrCreate(
+    () => getPrisma().anneeUniversitaire.findUnique({ where: { libelle: '2026-2027' } }),
+    () =>
+      getPrisma().anneeUniversitaire.create({
+        data: {
+          libelle: '2026-2027',
+          dateDebut: new Date('2026-09-01T00:00:00.000Z'),
+          dateFin: new Date('2027-08-31T00:00:00.000Z'),
+        },
+      }),
+    () =>
+      getPrisma().anneeUniversitaire.update({
+        where: { libelle: '2026-2027' },
+        data: {},
+      }),
+  );
 
   for (const numero of [1, 2]) {
-    await getPrisma().semestre.upsert({
-      where: { anneeUniversitaireId_numero: { anneeUniversitaireId: annee.id, numero } },
-      update: {},
-      create: {
-        numero,
-        anneeUniversitaireId: annee.id,
-        dateDebut: new Date(numero === 1 ? '2026-10-01' : '2027-02-01'),
-        dateFin: new Date(numero === 1 ? '2027-01-31' : '2027-06-30'),
-      },
-    });
+    await getOrCreate(
+      () =>
+        getPrisma().semestre.findUnique({
+          where: { anneeUniversitaireId_numero: { anneeUniversitaireId: annee.id, numero } },
+        }),
+      () =>
+        getPrisma().semestre.create({
+          data: {
+            numero,
+            anneeUniversitaireId: annee.id,
+            dateDebut: new Date(numero === 1 ? '2026-10-01' : '2027-02-01'),
+            dateFin: new Date(numero === 1 ? '2027-01-31' : '2027-06-30'),
+          },
+        }),
+      (id) => getPrisma().semestre.update({ where: { id }, data: {} }),
+    );
   }
 
   const roleByCode = new Map(roles.map((r) => [r.code, r]));
@@ -168,92 +216,174 @@ async function main(): Promise<void> {
     }
     const departement = u.departement ? (deptByCode.get(u.departement) ?? null) : null;
 
-    await getPrisma().utilisateur.upsert({
-      where: { email: u.email },
-      update: {
-        motDePasseHash,
-        nom: u.nom,
-        prenom: u.prenom,
-        roleId: role.id,
-        departementId: departement?.id ?? null,
-        estActif: true,
-      },
-      create: {
-        email: u.email,
-        nom: u.nom,
-        prenom: u.prenom,
-        roleId: role.id,
-        departementId: departement?.id ?? null,
-        estActif: true,
-        motDePasseHash,
-      },
-    });
+    await getOrCreate(
+      () => getPrisma().utilisateur.findUnique({ where: { email: u.email } }),
+      () =>
+        getPrisma().utilisateur.create({
+          data: {
+            email: u.email,
+            nom: u.nom,
+            prenom: u.prenom,
+            roleId: role.id,
+            departementId: departement?.id ?? null,
+            estActif: true,
+            motDePasseHash,
+          },
+        }),
+      (id) =>
+        getPrisma().utilisateur.update({
+          where: { id },
+          data: {
+            motDePasseHash,
+            nom: u.nom,
+            prenom: u.prenom,
+            roleId: role.id,
+            departementId: departement?.id ?? null,
+            estActif: true,
+          },
+        }),
+    );
   }
 
   // Parcours de référence liés aux départements
   const parcours = await Promise.all([
-    getPrisma().parcours.upsert({
-      where: { code: 'L-INFO' },
-      update: { libelle: 'Licence Informatique' },
-      create: {
-        code: 'L-INFO',
-        libelle: 'Licence Informatique',
-        departementId: deptByCode.get('INFO')!.id,
-      },
-    }),
-    getPrisma().parcours.upsert({
-      where: { code: 'L-MATH' },
-      update: { libelle: 'Licence Mathématiques' },
-      create: {
-        code: 'L-MATH',
-        libelle: 'Licence Mathématiques',
-        departementId: deptByCode.get('MATH')!.id,
-      },
-    }),
+    getOrCreate(
+      () => getPrisma().parcours.findUnique({ where: { code: 'L-INFO' } }),
+      () =>
+        getPrisma().parcours.create({
+          data: {
+            code: 'L-INFO',
+            libelle: 'Licence Informatique',
+            departementId: deptByCode.get('INFO')!.id,
+          },
+        }),
+      (id) =>
+        getPrisma().parcours.update({
+          where: { id },
+          data: { libelle: 'Licence Informatique' },
+        }),
+    ),
+    getOrCreate(
+      () => getPrisma().parcours.findUnique({ where: { code: 'L-MATH' } }),
+      () =>
+        getPrisma().parcours.create({
+          data: {
+            code: 'L-MATH',
+            libelle: 'Licence Mathématiques',
+            departementId: deptByCode.get('MATH')!.id,
+          },
+        }),
+      (id) =>
+        getPrisma().parcours.update({
+          where: { id },
+          data: { libelle: 'Licence Mathématiques' },
+        }),
+    ),
   ]);
 
   // Niveaux de référence
   const niveaux = await Promise.all([
-    getPrisma().niveau.upsert({
-      where: { code: 'L1' },
-      update: { libelle: 'Licence 1ère année' },
-      create: { code: 'L1', libelle: 'Licence 1ère année', parcoursId: parcours[0].id },
-    }),
-    getPrisma().niveau.upsert({
-      where: { code: 'L2' },
-      update: { libelle: 'Licence 2ème année' },
-      create: { code: 'L2', libelle: 'Licence 2ème année', parcoursId: parcours[0].id },
-    }),
-    getPrisma().niveau.upsert({
-      where: { code: 'L3-MATH' },
-      update: { libelle: 'Licence 3ème année Mathématiques' },
-      create: {
-        code: 'L3-MATH',
-        libelle: 'Licence 3ème année Mathématiques',
-        parcoursId: parcours[1].id,
-      },
-    }),
+    getOrCreate(
+      () => getPrisma().niveau.findUnique({ where: { code: 'L1' } }),
+      () =>
+        getPrisma().niveau.create({
+          data: {
+            code: 'L1',
+            libelle: 'Licence 1ère année',
+            parcoursId: parcours[0].id,
+          },
+        }),
+      (id) =>
+        getPrisma().niveau.update({
+          where: { id },
+          data: { libelle: 'Licence 1ère année' },
+        }),
+    ),
+    getOrCreate(
+      () => getPrisma().niveau.findUnique({ where: { code: 'L2' } }),
+      () =>
+        getPrisma().niveau.create({
+          data: {
+            code: 'L2',
+            libelle: 'Licence 2ème année',
+            parcoursId: parcours[0].id,
+          },
+        }),
+      (id) =>
+        getPrisma().niveau.update({
+          where: { id },
+          data: { libelle: 'Licence 2ème année' },
+        }),
+    ),
+    getOrCreate(
+      () => getPrisma().niveau.findUnique({ where: { code: 'L3-MATH' } }),
+      () =>
+        getPrisma().niveau.create({
+          data: {
+            code: 'L3-MATH',
+            libelle: 'Licence 3ème année Mathématiques',
+            parcoursId: parcours[1].id,
+          },
+        }),
+      (id) =>
+        getPrisma().niveau.update({
+          where: { id },
+          data: { libelle: 'Licence 3ème année Mathématiques' },
+        }),
+    ),
   ]);
 
   // Groupes de référence
   await Promise.all([
-    getPrisma().groupe.upsert({
-      where: { code: 'TD1-A' },
-      update: { libelle: 'TD Groupe A L1' },
-      create: { code: 'TD1-A', libelle: 'TD Groupe A L1', niveauId: niveaux[0].id },
-    }),
-    getPrisma().groupe.upsert({
-      where: { code: 'TD1-B' },
-      update: { libelle: 'TD Groupe B L1' },
-      create: { code: 'TD1-B', libelle: 'TD Groupe B L1', niveauId: niveaux[0].id },
-    }),
-    getPrisma().groupe.upsert({
-      where: { code: 'TP1-A' },
-      update: { libelle: 'TP Groupe A L1' },
-      create: { code: 'TP1-A', libelle: 'TP Groupe A L1', niveauId: niveaux[0].id },
-    }),
+    getOrCreate(
+      () => getPrisma().groupe.findUnique({ where: { code: 'TD1-A' } }),
+      () =>
+        getPrisma().groupe.create({
+          data: {
+            code: 'TD1-A',
+            libelle: 'TD Groupe A L1',
+            niveauId: niveaux[0].id,
+          },
+        }),
+      (id) =>
+        getPrisma().groupe.update({
+          where: { id },
+          data: { libelle: 'TD Groupe A L1' },
+        }),
+    ),
+    getOrCreate(
+      () => getPrisma().groupe.findUnique({ where: { code: 'TD1-B' } }),
+      () =>
+        getPrisma().groupe.create({
+          data: {
+            code: 'TD1-B',
+            libelle: 'TD Groupe B L1',
+            niveauId: niveaux[0].id,
+          },
+        }),
+      (id) =>
+        getPrisma().groupe.update({
+          where: { id },
+          data: { libelle: 'TD Groupe B L1' },
+        }),
+    ),
+    getOrCreate(
+      () => getPrisma().groupe.findUnique({ where: { code: 'TP1-A' } }),
+      () =>
+        getPrisma().groupe.create({
+          data: {
+            code: 'TP1-A',
+            libelle: 'TP Groupe A L1',
+            niveauId: niveaux[0].id,
+          },
+        }),
+      (id) =>
+        getPrisma().groupe.update({
+          where: { id },
+          data: { libelle: 'TP Groupe A L1' },
+        }),
+    ),
   ]);
-  // Types d’enseignement de référence\n  const types = await Promise.all([\n    getPrisma().typeEnseignement.upsert({\n      where: { code: 'CM' },\n      update: { libelle: 'Cours magistral', couleur: '#3B82F6' },\n      create: { code: 'CM', libelle: 'Cours magistral', couleur: '#3B82F6' },\n    }),\n    getPrisma().typeEnseignement.upsert({\n      where: { code: 'TD' },\n      update: { libelle: 'Travaux dirigés', couleur: '#10B981' },\n      create: { code: 'TD', libelle: 'Travaux dirigés', couleur: '#10B981' },\n    }),\n    getPrisma().typeEnseignement.upsert({\n      where: { code: 'TP' },\n      update: { libelle: 'Travaux pratiques', couleur: '#F59E0B' },\n      create: { code: 'TP', libelle: 'Travaux pratiques', couleur: '#F59E0B' },\n    }),\n    getPrisma().typeEnseignement.upsert({\n      where: { code: 'PROJET' },\n      update: { libelle: 'Projet tutoré', couleur: '#8B5CF6' },\n      create: { code: 'PROJET', libelle: 'Projet tutoré', couleur: '#8B5CF6' },\n    }),\n  ]);\n\n  // Grades de référence\n  const grades = await Promise.all([\n    getPrisma().grade.upsert({\n      where: { code: 'L1' },\n      update: { libelle: 'Licence 1ère année' },\n      create: { code: 'L1', libelle: 'Licence 1ère année' },\n    }),\n    getPrisma().grade.upsert({\n      where: { code: 'L2' },\n      update: { libelle: 'Licence 2ème année' },\n      create: { code: 'L2', libelle: 'Licence 2ème année' },\n    }),\n    getPrisma().grade.upsert({\n      where: { code: 'L3' },\n      update: { libelle: 'Licence 3ème année' },\n      create: { code: 'L3', libelle: 'Licence 3ème année' },\n    }),\n    getPrisma().grade.upsert({\n      where: { code: 'M1' },\n      update: { libelle: 'Master 1ère année' },\n      create: { code: 'M1', libelle: 'Master 1ère année' },\n    }),\n    getPrisma().grade.upsert({\n      where: { code: 'M2' },\n      update: { libelle: 'Master 2ème année' },\n      create: { code: 'M2', libelle: 'Master 2ème année' },\n    }),\n  ]);\n\n  // Matrice Grade × Type (4 types × 5 grades = 20 couples)\n  for (const grade of grades) {\n    for (const type of types) {\n      await getPrisma().gradeTypeEnseignement.upsert({\n        where: {\n          gradeId_typeEnseignementId: {\n            gradeId: grade.id,\n            typeEnseignementId: type.id,\n          },\n        },\n        update: {},\n        create: {\n          gradeId: grade.id,\n          typeEnseignementId: type.id,\n        },\n      });\n    }\n  }\n\n
 
   // ============================================================================
   // Référentiel salles (TAKT-L04-04) — Sites, Types de salle, Équipements, Salles
@@ -268,7 +398,11 @@ async function main(): Promise<void> {
     { code: 'SITE-ETG2', libelle: 'Bâtiment principal – Étage 2' },
   ]) {
     sites.push(
-      await getPrisma().site.upsert({ where: { code }, update: { libelle }, create: { code, libelle } }),
+      await getOrCreate(
+        () => getPrisma().site.findUnique({ where: { code } }),
+        () => getPrisma().site.create({ data: { code, libelle } }),
+        (id) => getPrisma().site.update({ where: { id }, data: { libelle } }),
+      ),
     );
   }
 
@@ -281,7 +415,11 @@ async function main(): Promise<void> {
     { code: 'INFO', libelle: 'Salle informatique' },
   ]) {
     typesSalle.push(
-      await getPrisma().typeSalle.upsert({ where: { code }, update: { libelle }, create: { code, libelle } }),
+      await getOrCreate(
+        () => getPrisma().typeSalle.findUnique({ where: { code } }),
+        () => getPrisma().typeSalle.create({ data: { code, libelle } }),
+        (id) => getPrisma().typeSalle.update({ where: { id }, data: { libelle } }),
+      ),
     );
   }
 
@@ -295,7 +433,11 @@ async function main(): Promise<void> {
     { code: 'TABLEAU_NUM', libelle: 'Tableau numérique interactif' },
   ]) {
     equipements.push(
-      await getPrisma().equipement.upsert({ where: { code }, update: { libelle }, create: { code, libelle } }),
+      await getOrCreate(
+        () => getPrisma().equipement.findUnique({ where: { code } }),
+        () => getPrisma().equipement.create({ data: { code, libelle } }),
+        (id) => getPrisma().equipement.update({ where: { id }, data: { libelle } }),
+      ),
     );
   }
 
@@ -356,38 +498,62 @@ async function main(): Promise<void> {
   }
 
   // ConfigSysteme (singleton) — paramètres par défaut (L04-05)
-  await getPrisma().configSysteme.upsert({
-    where: { id: '00000000-0000-0000-0000-000000000920' },
-    update: {},
-    create: {
-      id: '00000000-0000-0000-0000-000000000920',
-      pasDeTempsMinutes: 30,
-      joursOuvres: '1,2,3,4,5,6',
-      creneauxParJour: 24,
-    },
-  });
+  await getOrCreate(
+    () =>
+      getPrisma().configSysteme.findUnique({
+        where: { id: '00000000-0000-0000-0000-000000000920' },
+      }),
+    () =>
+      getPrisma().configSysteme.create({
+        data: {
+          id: '00000000-0000-0000-0000-000000000920',
+          pasDeTempsMinutes: 30,
+          joursOuvres: '1,2,3,4,5,6',
+          creneauxParJour: 24,
+        },
+      }),
+    () =>
+      getPrisma().configSysteme.update({
+        where: { id: '00000000-0000-0000-0000-000000000920' },
+        data: {},
+      }),
+  );
 
   // CreneauAffichage — variantes NORMAL et RAMADAN (L04-05)
-  await getPrisma().creneauAffichage.upsert({
-    where: { variante: 'NORMAL' },
-    update: {},
-    create: {
-      variante: 'NORMAL',
-      decalageMinutes: 0,
-      plageReduiteMinutes: null,
-      libelle: 'Grille horaire normale',
-    },
-  });
-  await getPrisma().creneauAffichage.upsert({
-    where: { variante: 'RAMADAN' },
-    update: {},
-    create: {
-      variante: 'RAMADAN',
-      decalageMinutes: 60,
-      plageReduiteMinutes: 120,
-      libelle: 'Grille horaire Ramadan (décalée +60 min, plage réduite 120 min)',
-    },
-  });
+  await getOrCreate(
+    () => getPrisma().creneauAffichage.findUnique({ where: { variante: 'NORMAL' } }),
+    () =>
+      getPrisma().creneauAffichage.create({
+        data: {
+          variante: 'NORMAL',
+          decalageMinutes: 0,
+          plageReduiteMinutes: null,
+          libelle: 'Grille horaire normale',
+        },
+      }),
+    () =>
+      getPrisma().creneauAffichage.update({
+        where: { variante: 'NORMAL' },
+        data: {},
+      }),
+  );
+  await getOrCreate(
+    () => getPrisma().creneauAffichage.findUnique({ where: { variante: 'RAMADAN' } }),
+    () =>
+      getPrisma().creneauAffichage.create({
+        data: {
+          variante: 'RAMADAN',
+          decalageMinutes: 60,
+          plageReduiteMinutes: 120,
+          libelle: 'Grille horaire Ramadan (décalée +60 min, plage réduite 120 min)',
+        },
+      }),
+    () =>
+      getPrisma().creneauAffichage.update({
+        where: { variante: 'RAMADAN' },
+        data: {},
+      }),
+  );
 
   // Creneau — 144 créneaux (6 jours × 24 créneaux de 30 min, de 08:00 à 20:00) (L04-05)
   const HEURE_DEBUT_JOUR = 8; // 08:00
