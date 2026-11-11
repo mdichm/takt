@@ -446,27 +446,23 @@ async function main(): Promise<void> {
     const code = `SALLE-${String(i).padStart(3, '0')}`;
     const siteRef = sites[(i - 1) % 3];
     const typeSalleRef = typesSalle[(i - 1) % 4];
-    // Relire depuis la base pour garantir des IDs valides (contournement
-    // d'un comportement imprévisible de @prisma/adapter-pg sur upsert en CI).
-    const site = await getPrisma().site.findUnique({ where: { code: siteRef.code } });
-    const typeSalle = await getPrisma().typeSalle.findUnique({ where: { code: typeSalleRef.code } });
     const capacite =
-      typeSalle.code === 'CM'
+      typeSalleRef.code === 'CM'
         ? 120
-        : typeSalle.code === 'TD'
+        : typeSalleRef.code === 'TD'
           ? 30
-          : typeSalle.code === 'TP'
+          : typeSalleRef.code === 'TP'
             ? 24
             : 20;
 
     // Préparer les liens équipements selon le type de salle
     const liensEquipements = [];
-    if (typeSalle.code === 'CM' || typeSalle.code === 'TD') {
+    if (typeSalleRef.code === 'CM' || typeSalleRef.code === 'TD') {
       liensEquipements.push({ equipement: { connect: { id: equipements[0].id } }, quantite: 1 }); // VIDEOPRJ
       liensEquipements.push({ equipement: { connect: { id: equipements[1].id } }, quantite: 1 }); // TABLEAU
       liensEquipements.push({ equipement: { connect: { id: equipements[2].id } }, quantite: 1 }); // ORDI
     }
-    if (typeSalle.code === 'TP' || typeSalle.code === 'INFO') {
+    if (typeSalleRef.code === 'TP' || typeSalleRef.code === 'INFO') {
       liensEquipements.push({ equipement: { connect: { id: equipements[2].id } }, quantite: 10 }); // ORDI x10
     }
 
@@ -476,8 +472,8 @@ async function main(): Promise<void> {
         where: { code },
         data: {
           libelle: `Salle ${code}`,
-          typeSalleId: typeSalle.id,
-          siteId: site.id,
+          typeSalleId: typeSalleRef.id,
+          siteId: siteRef.id,
           capacite,
         },
       });
@@ -486,8 +482,8 @@ async function main(): Promise<void> {
         data: {
           code,
           libelle: `Salle ${code}`,
-          typeSalleId: typeSalle.id,
-          siteId: site.id,
+          typeSalleId: typeSalleRef.id,
+          siteId: siteRef.id,
           capacite,
           ...(liensEquipements.length > 0 && {
             salleEquipements: { create: liensEquipements },
