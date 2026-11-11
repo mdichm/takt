@@ -302,8 +302,12 @@ async function main(): Promise<void> {
   // 150 salles (SALLE-001 à SALLE-150), réparties sur 3 sites et 4 types
   for (let i = 1; i <= 150; i++) {
     const code = `SALLE-${String(i).padStart(3, '0')}`;
-    const site = sites[(i - 1) % 3];
-    const typeSalle = typesSalle[(i - 1) % 4];
+    const siteRef = sites[(i - 1) % 3];
+    const typeSalleRef = typesSalle[(i - 1) % 4];
+    // Relire depuis la base pour garantir des IDs valides (contournement
+    // d'un comportement imprévisible de @prisma/adapter-pg sur upsert en CI).
+    const site = await getPrisma().site.findUnique({ where: { code: siteRef.code } });
+    const typeSalle = await getPrisma().typeSalle.findUnique({ where: { code: typeSalleRef.code } });
     const capacite =
       typeSalle.code === 'CM'
         ? 120
