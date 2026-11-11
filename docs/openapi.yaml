@@ -3344,6 +3344,28 @@ paths:
       summary: Duplique une version archivee
       tags:
         - Versions
+  /api/v1/versions/{id}/transition:
+    post:
+      operationId: VersionsController_transitionner
+      parameters: []
+      responses:
+        '200':
+          description: Transition appliquée
+        '400':
+          description: Motif manquant pour un rejet
+        '401':
+          description: Non authentifié
+        '403':
+          description: Rôle non autorisé pour cette transition
+        '404':
+          description: Version introuvable
+        '409':
+          description: Transition interdite depuis l’état courant (liste des transitions possibles)
+      security:
+        - bearerAuth: []
+      summary: Transition d’état d’une version de planning
+      tags:
+        - Versions
   /audit:
     get:
       description: Retourne les entrées du journal d'audit avec filtres.

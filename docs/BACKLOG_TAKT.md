@@ -164,10 +164,10 @@ L00 → L01 → L02 → L03 → L04 → L05 → L06 → L07 → L09 → L10 → 
 
 #### TAKT-L00-01 — Trancher les transitions de rejet (divergences D1 / D5)
 
-- **Objectif :** Établir une version unique et non contradictoire de la machine à 19 transitions avant toute implémentation du workflow.
+- **Objectif :** Établir une version unique et non contradictoire de la machine à 18 transitions avant toute implémentation du workflow.
 - **Exigences :** `EX-WKF-02`, `EX-WKF-03`, `EX-WKF-07`, `EX-WKF-08`, `WORKFLOW_METIER §3`, `ST_TAKT §4.1`.
 - **Périmètre :** `docs/WORKFLOW_METIER.md`, `docs/SF_TAKT.md`, `docs/ST_TAKT.md`, `docs/SUIVI_VELOCITE_TAKT.md`. **Hors périmètre :** tout code applicatif.
-- **Livrables :** Matrice des 19 transitions de `WORKFLOW_METIER §3` corrigée (rejet `valid_pedag` → `edition` ; rejet `valid_dir` → `rep_pedag` motif pédagogique **ou** `edition` motif planning ; aucun rejet vers `brouillon`), §4.1 de `ST_TAKT` aligné, Decision Log entries `DL-WF-05`/`DL-WF-06`.
+- **Livrables :** Matrice des 18 transitions de `WORKFLOW_METIER §3` corrigée (rejet `valid_pedag` → `edition` ; rejet `valid_dir` → `rep_pedag` motif pédagogique **ou** `edition` motif planning ; aucun rejet vers `brouillon`), §4.1 de `ST_TAKT` aligné, Decision Log entries `DL-WF-05`/`DL-WF-06`.
 - **Critères :** _Given_ une version en `valid_pedag`, _When_ le `rdep` rejette avec motif, _Then_ la version passe en `edition` et non en `brouillon`. _Given_ une version en `valid_dir`, _When_ la Direction rejette avec motif pédagogique, _Then_ la version repasse en `rep_pedag`. _Given_ un rejet, _When_ la transition est demandée sans motif, _Then_ la requête est refusée (motif obligatoire).
 - **DoD :** Les trois documents portent la même matrice ; aucune cellule ne mentionne `brouillon` comme cible de rejet ; chaque divergence est tracée dans le Decision Log ; le compte rendu liste les documents modifiés.
 - **Tests exigés :** revue documentaire croisée (table des transitions vérifiée ligne à ligne) — aucun test automatisé à ce stade.
@@ -625,15 +625,15 @@ L00 → L01 → L02 → L03 → L04 → L05 → L06 → L07 → L09 → L10 → 
 - **Tests exigés :** tests d'intégration (création, duplication, unicité publication, immuabilité).
 - **SP :** 8 · **Dépend de :** `TAKT-L05-04`, `TAKT-L01-04` · **Bloque :** `TAKT-L06-02`, `TAKT-L06-03`, `TAKT-L10-07`.
 
-#### TAKT-L06-02 — Implémenter le moteur de transitions (10 états, 19 transitions, gardes)
+#### TAKT-L06-02 — Implémenter le moteur de transitions (10 états, 18 transitions, gardes)
 
 - **Objectif :** Centraliser l'unique machine à états autorisant les transitions, avec contrôle du rôle et des conditions de garde.
 - **Exigences :** `EX-WKF-01` à `EX-WKF-09`, `TE-API-03`, `TE-MET-07`, `TE-MET-08`, `WORKFLOW_METIER §3`, `ST_TAKT §4.1`, `TAKT-L00-01`.
 - **Périmètre :** `apps/backend/src/modules/versions/workflow/**` (matrice, machine, service de transition), `apps/backend/src/modules/versions/versions.controller.ts` (`POST /api/v1/versions/:id/transition`). **Hors périmètre :** les garde-fous métier spécifiques (L06-05, L06-08, L06-09).
-- **Livrables :** Matrice déclarative des 19 transitions (`from`, `to`, `action`, `rôles autorisés`, `condition de garde`, `motif obligatoire`) issue de `WORKFLOW_METIER §3` **arbitrée** ; moteur générique `canTransition(etat, action, role, contexte)` ; endpoint unique de transition renvoyant 409 `WORKFLOW_INVALID_TRANSITION` avec la liste des transitions autorisées depuis l'état courant ; rejet sans motif → 400 ; **100 % des branches testées** (service critique) ; journalisation de chaque transition (état source/cible/action).
-- **Critères :** _Given_ une version `valid_dir` et le rôle `dir`, _When_ la transition `valider` est demandée, _Then_ la version passe en `valide`. _Given_ une version `publie`, _When_ une transition autre que `archiver` est demandée, _Then_ 409. _Given_ un rejet sans motif, _Then_ 400. _Given_ un `rdep` tentant une transition réservée au `gest`, _Then_ 403. _Given_ la matrice complète, _Then_ les 19 transitions de la matrice canonique sont acceptées et les autres rejetées.
-- **DoD :** Matrice des 19 transitions implémentée à l'identique du corpus arbitré ; 100 % des branches couvertes ; motif obligatoire enforced ; audit écrit ; 409 accompagné des transitions possibles.
-- **Tests exigés :** tests unitaires exhaustifs (matrice 19 transitions × 4 rôles) + tests d'intégration de l'endpoint.
+- **Livrables :** Matrice déclarative des 18 transitions (`from`, `to`, `action`, `rôles autorisés`, `condition de garde`, `motif obligatoire`) issue de `WORKFLOW_METIER §3` **arbitrée** ; moteur générique `canTransition(etat, action, role, contexte)` ; endpoint unique de transition renvoyant 409 `WORKFLOW_INVALID_TRANSITION` avec la liste des transitions autorisées depuis l'état courant ; rejet sans motif → 400 ; **100 % des branches testées** (service critique) ; journalisation de chaque transition (état source/cible/action).
+- **Critères :** _Given_ une version `valid_dir` et le rôle `dir`, _When_ la transition `valider` est demandée, _Then_ la version passe en `valide`. _Given_ une version `publie`, _When_ une transition autre que `archiver` est demandée, _Then_ 409. _Given_ un rejet sans motif, _Then_ 400. _Given_ un `rdep` tentant une transition réservée au `gest`, _Then_ 403. _Given_ la matrice complète, _Then_ les 18 transitions de la matrice canonique sont acceptées et les autres rejetées.
+- **DoD :** Matrice des 18 transitions implémentée à l'identique du corpus arbitré ; 100 % des branches couvertes ; motif obligatoire enforced ; audit écrit ; 409 accompagné des transitions possibles.
+- **Tests exigés :** tests unitaires exhaustifs (matrice 18 transitions × 4 rôles) + tests d'intégration de l'endpoint.
 - **SP :** 8 · **Dépend de :** `TAKT-L06-01`, `TAKT-L03-05`, `TAKT-L00-01` · **Bloque :** `TAKT-L05-05`, `TAKT-L06-03`, `TAKT-L07-07`, `TAKT-L10-07`.
 
 #### TAKT-L06-03 — Implémenter le CRUD des séances sur la grille hebdomadaire

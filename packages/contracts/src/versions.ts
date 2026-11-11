@@ -34,10 +34,70 @@ export const zVersionList = zPaginationQuery
     semestreId: zUuid.optional(),
   });
 
+/** Action de transition autorisée par la matrice workflow (18 transitions arbitrées). */
+export const zActionTransition = z.enum([
+  'creerRepartition',
+  'annulerRepartition',
+  'validerRepartition',
+  'lancerGeneration',
+  'editer',
+  'selectionnerScenario',
+  'annulerGeneration',
+  'soumettreValidation',
+  'regenerer',
+  'transmettreDirection',
+  'rejeterPedagogique',
+  'validerDefinitivement',
+  'rejeterDirectionPedagogique',
+  'rejeterDirectionPlanning',
+  'publier',
+  'archiverSansPublier',
+  'archiver',
+  'nouvelleVersionArchive',
+]);
+
+export type ActionTransition = z.infer<typeof zActionTransition>;
+
+/** Type de motif de rejet, obligatoire pour les actions de rejet. */
+export const zTypeMotif = z.enum(['pedagogique', 'planning', 'autre']);
+
+export type TypeMotif = z.infer<typeof zTypeMotif>;
+
 /** Transition d’état demandée. */
-export const zTransition = z.object({
-  transition: z.string().trim().min(1, 'La transition est requise'),
-});
+export const zTransition = z
+  .object({
+    action: zActionTransition,
+    motif: z.string().trim().optional(),
+    typeMotif: zTypeMotif.optional(),
+  })
+  .refine(
+    (valeurs) => {
+      const estRejet =
+        valeurs.action === 'rejeterPedagogique' ||
+        valeurs.action === 'rejeterDirectionPedagogique' ||
+        valeurs.action === 'rejeterDirectionPlanning';
+      return !estRejet || (valeurs.motif && valeurs.motif.length > 0);
+    },
+    {
+      message: 'Un motif est obligatoire pour une action de rejet',
+      path: ['motif'],
+    },
+  )
+  .refine(
+    (valeurs) => {
+      const estRejet =
+        valeurs.action === 'rejeterPedagogique' ||
+        valeurs.action === 'rejeterDirectionPedagogique' ||
+        valeurs.action === 'rejeterDirectionPlanning';
+      return !estRejet || valeurs.typeMotif !== undefined;
+    },
+    {
+      message: 'Un type de motif est obligatoire pour une action de rejet',
+      path: ['typeMotif'],
+    },
+  );
+
+export type TransitionInput = z.infer<typeof zTransition>;
 
 /** Lancement d’une génération CP-SAT. */
 export const zGeneration = z.object({
@@ -95,7 +155,6 @@ export const zAudit = z
 export type VersionInput = z.infer<typeof zVersion>;
 export type VersionParams = z.infer<typeof zVersionParams>;
 export type VersionListFilters = z.infer<typeof zVersionList>;
-export type TransitionInput = z.infer<typeof zTransition>;
 export type GenerationInput = z.infer<typeof zGeneration>;
 export type Scenario = z.infer<typeof zScenario>;
 export type ScenarioSelectInput = z.infer<typeof zScenarioSelect>;

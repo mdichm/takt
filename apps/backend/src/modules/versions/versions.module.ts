@@ -7,12 +7,13 @@ import { CommonModule } from '../common/common.module';
 import { ReferentielsModule } from '../referentiels/referentiels.module';
 import { VersionsController } from './versions.controller';
 import { VersionsService } from './versions.service';
+import { WorkflowService } from './workflow/workflow.service';
 
 /** Module du cycle de vie des versions de planning. */
 @Module({
   imports: [CommonModule, ReferentielsModule, AuditModule],
   controllers: [VersionsController],
-  providers: [VersionsService],
-  exports: [VersionsService],
+  providers: [VersionsService, WorkflowService],
+  exports: [VersionsService, WorkflowService],
 })
 export class VersionsModule {}

@@ -18,12 +18,17 @@ import {
   zVersion,
   zVersionList,
   zVersionParams,
+  zTransition,
   type VersionInput,
   type VersionListFilters,
   type VersionParams,
+  type TransitionInput,
+  type ActionTransition,
+  type RoleCode,
 } from '@takt/contracts';
 import { ZodValidation } from '../common/pipes/zod-validation.decorator';
 import { VersionsService } from './versions.service';
+import { WorkflowService } from './workflow/workflow.service';
 import { JwtAuthGuard, UtilisateurConnecte } from '../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { DepartmentScopeGuard } from '../common/guards/department-scope.guard';
@@ -40,7 +45,10 @@ interface RequeteAvecUtilisateur {
 @ApiBearerAuth()
 @Controller('versions')
 export class VersionsController {
-  constructor(@Inject(VersionsService) private readonly versionsService: VersionsService) {}
+  constructor(
+    @Inject(VersionsService) private readonly versionsService: VersionsService,
+    @Inject(WorkflowService) private readonly workflowService: WorkflowService,
+  ) {}
 
   /** Liste paginée des versions (GET /api/v1/versions). */
   @Get()
@@ -109,5 +117,39 @@ export class VersionsController {
     @Req() req: RequeteAvecUtilisateur,
   ): Promise<unknown> {
     return this.versionsService.dupliquer(params.id, req.user!.sub);
+  }
+
+  /** Transition d’état d’une version (POST /api/v1/versions/:id/transition). */
+  @Post(':id/transition')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin', 'gest', 'rdep', 'dir')
+  @HttpCode(HttpStatus.OK)
+  @ZodValidation({ params: zVersionParams, body: zTransition })
+  @ApiOperation({ summary: 'Transition d’état d’une version de planning' })
+  @ApiResponse({ status: 200, description: 'Transition appliquée' })
+  @ApiResponse({ status: 400, description: 'Motif manquant pour un rejet' })
+  @ApiResponse({ status: 401, description: 'Non authentifié' })
+  @ApiResponse({ status: 403, description: 'Rôle non autorisé pour cette transition' })
+  @ApiResponse({ status: 404, description: 'Version introuvable' })
+  @ApiResponse({
+    status: 409,
+    description: 'Transition interdite depuis l’état courant (liste des transitions possibles)',
+  })
+  async transitionner(
+    @Param() params: VersionParams,
+    @Body() corps: TransitionInput,
+    @Req() req: RequeteAvecUtilisateur,
+  ): Promise<unknown> {
+    const utilisateur = req.user!;
+    return this.workflowService.transitionner(
+      params.id,
+      corps.action as ActionTransition,
+      utilisateur.role as RoleCode,
+      {
+        motif: corps.motif,
+        typeMotif: corps.typeMotif,
+      },
+      utilisateur.sub,
+    );
   }
 }

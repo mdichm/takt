@@ -46,7 +46,7 @@ Il constitue le **E0.2** de la Phase 0 du PLAN MACRO. Il conditionne le modèle 
 | `edition`     | `valid_pedag` | Soumettre validation Département    | Gestionnaire          | Verrous résolus, aucun conflit dur non résolu                      |
 | `edition`     | `generation`  | Régénérer                           | Gestionnaire          | Nouveau snapshot des données pédagogiques                          |
 | `valid_pedag` | `valid_dir`   | Transmettre à la Direction          | Resp. Département     | Validation départementale effectuée pour son périmètre             |
-| `valid_pedag` | `brouillon`   | Rejet Département                   | Resp. Département     | Motif de rejet fourni                                              |
+| `valid_pedag` | `edition`     | Rejet Département                   | Resp. Département     | Motif de rejet fourni                                              |
 | `valid_dir`   | `valide`      | Valider définitivement              | Direction             | Tous départements concernés validés ; charge horaire OK            |
 | `valid_dir`   | `rep_pedag`   | Rejet Direction (motif pédagogique) | Direction             | Motif de rejet lié à la répartition pédagogique                    |
 | `valid_dir`   | `edition`     | Rejet Direction (motif planning)    | Direction             | Motif de rejet lié au planning seul                                |
@@ -61,21 +61,7 @@ Il constitue le **E0.2** de la Phase 0 du PLAN MACRO. Il conditionne le modèle 
 - `archive` → `publie` (une version archivée ne peut pas être republiée directement)
 - `valide` → `edition` (doit passer par `archive` puis nouvelle version depuis `initial`)
 - `valid_dir` → `brouillon` (le rejet doit retourner à `rep_pedag` ou `edition`)
-
---- `ÉDITION` ou `GÉNÉRATION` |
-| `REJETÉ` | `ÉDITION` | Corriger après rejet | Gestionnaire | Motif de rejet pris en compte |
-| `REJETÉ` | `GÉNÉRATION` | Régénérer après rejet | Gestionnaire | Nouveau snapshot des données pédagogiques |
-| `VALIDÉ` | `PUBLIÉ` | Publier | Direction ou Gestionnaire (délégation) | Version immuable à partir de cet instant |
-| `VALIDÉ` | `ARCHIVÉ` | Archiver sans publier | Direction | Aucune diffusion |
-| `PUBLIÉ` | `ARCHIVÉ` | Archiver | Admin ou Gestionnaire | L'ancienne version reste consultable |
-| `ARCHIVÉ` | `BROUILLON` | Réouvrir comme nouveau brouillon | Gestionnaire | Crée une nouvelle version basée sur l'archivée ; l'originale reste archivée |
-
-**Transitions interdites (toute autre combinaison) :**
-
-- `PUBLIÉ` → tout état autre que `ARCHIVÉ` (immutabilité)
-- `ARCHIVÉ` → `PUBLIÉ` (une version archivée ne peut pas être republiée directement)
-- `EN_VALIDATION` → `PUBLIÉ` (doit passer par `VALIDÉ`)
-- `BROUILLON` → `PRÊT_POUR_VALIDATION` (doit passer par `ÉDITION`)
+- `valid_pedag` → `brouillon` (le rejet départemental retourne vers `edition`)
 
 ## 4. Règles de garde détaillées
 
@@ -97,11 +83,11 @@ La sélection finale d'un scénario généré est toujours manuelle. Le système
 
 ### Règle RB-WF-05 — Immutabilité publiée
 
-Une version `PUBLIÉ` est immuable. Toute modification crée une nouvelle version de travail (état `BROUILLON`) à partir de la précédente. L'ancienne version reste consultable en `ARCHIVÉ`.
+Une version `publie` est immuable. Toute modification crée une nouvelle version de travail (état `initial`) via `archive → initial`. L'ancienne version reste consultable en `archive`.
 
 ### Règle RB-WF-06 — Verrouillage des séances
 
-Pendant les états `ÉDITION`, `PRÊT_POUR_VALIDATION` et `EN_VALIDATION`, les séances peuvent être verrouillées (créneau, salle, enseignant, activité). Une séance verrouillée ne peut pas être déplacée par le solver lors d'une régénération.
+Pendant les états `edition`, `valid_pedag` et `valid_dir`, les séances peuvent être verrouillées (créneau, salle, enseignant, activité). Une séance verrouillée ne peut pas être déplacée par le solver lors d'une régénération.
 
 ### Règle RB-WF-07 — Résultats partiels
 
@@ -109,7 +95,7 @@ Une génération peut aboutir à des séances `NON_PLACÉE`. Elles sont marquée
 
 ### Règle RB-WF-08 — Rejet Direction
 
-Un rejet par la Direction (`EN_VALIDATION` → `REJETÉ`) doit systématiquement retourner la version vers `ÉDITION` (correction manuelle) ou `GÉNÉRATION` (régénération). Un rejet ne peut pas aboutir directement à `BROUILLON`.
+Un rejet depuis `valid_dir` doit systématiquement retourner la version vers `rep_pedag` (motif pédagogique) ou `edition` (motif planning). Un rejet ne peut pas aboutir directement à `brouillon`.
 
 ---
 
@@ -117,16 +103,15 @@ Un rejet par la Direction (`EN_VALIDATION` → `REJETÉ`) doit systématiquement
 
 | État         | Admin        | Gestionnaire             | Resp. Département              | Direction    |
 | ------------ | ------------ | ------------------------ | ------------------------------ | ------------ |
-| `BROUILLON`  | Consultation | CRUD complet             | Affectation de son département | Consultation |
-| `GÉNÉRATION` | Consultation | Lancer/suivre génération | Consultation                   | Consultation |
-| `ÉDITION`    | Consultation | Drag&drop, verrous       | Affectation de son département | Consultation |
+| `brouillon`  | Consultation | CRUD complet             | Affectation de son département | Consultation |
+| `generation` | Consultation | Lancer/suivre génération | Consultation                   | Consultation |
+| `edition`    | Consultation | Drag&drop, verrous       | Affectation de son département | Consultation |
 
-| `PRÊT_POUR_VALIDATION` | Consultation | Soumission | Validation de son périmètre | Consultation |
-| `EN_VALIDATION` | Consultation | Consultation | Revalidation ciblée si impacté | Validation ou rejet |
-| `REJETÉ` | Consultation | Correction | Correction de son périmètre | Motif de rejet |
-| `VALIDÉ` | Consultation | Consultation | Consultation | Validation finale |
-| `PUBLIÉ` | Consultation + Export | Export | Consultation | Consultation + Export officiel |
-| `ARCHIVÉ` | Consultation + Audit | Consultation | Consultation | Consultation |
+| `valid_pedag` | Consultation | Soumission | Validation de son périmètre | Consultation |
+| `valid_dir` | Consultation | Consultation | Revalidation ciblée si impacté | Validation ou rejet |
+| `valide` | Consultation | Consultation | Consultation | Validation finale |
+| `publie` | Consultation + Export | Export | Consultation | Consultation + Export officiel |
+| `archive` | Consultation + Audit | Consultation | Consultation | Consultation |
 
 ## 6. Relation entre répartition pédagogique et planning
 
@@ -136,10 +121,10 @@ Un rejet par la Direction (`EN_VALIDATION` → `REJETÉ`) doit systématiquement
 | Préparation planification | Gestionnaire             | Contraintes, vœux, exigences de salle | `BROUILLON` ou `ÉDITION`                       |
 | Génération                | Gestionnaire + Solver    | Scénarios d'EDT                       | `GÉNÉRATION`                                   |
 | Sélection et édition      | Gestionnaire             | Scénario adopté, séances placées      | `ÉDITION`                                      |
-| Validation département    | Resp. Département        | Validation de son périmètre           | `PRÊT_POUR_VALIDATION`                         |
-| Validation Direction      | Direction                | Validation finale de l'EDT            | `EN_VALIDATION` → `VALIDÉ`                     |
-| Publication               | Direction / Gestionnaire | EDT diffusé                           | `PUBLIÉ`                                       |
-| Modification              | Gestionnaire             | Nouvelle version de travail           | `BROUILLON` (nouvelle version)                 |
+| Validation département    | Resp. Département        | Validation de son périmètre           | `valid_pedag`                                  |
+| Validation Direction      | Direction                | Validation finale de l'EDT            | `valid_dir` → `valide`                         |
+| Publication               | Gestionnaire             | EDT diffusé                           | `publie`                                       |
+| Modification              | Gestionnaire             | Nouvelle version de travail           | `initial` (nouvelle version depuis archive)    |
 
 **Règle clé :** Une validation pédagogique (répartition) ne débloque pas automatiquement la génération. Le Gestionnaire décide du moment de lancer la génération sur la base des répartitions validées.
 
@@ -147,7 +132,7 @@ Un rejet par la Direction (`EN_VALIDATION` → `REJETÉ`) doit systématiquement
 
 ## 7. Verrous de séance pendant le workflow
 
-| Type de verrou | Objet verrouillé       | Effet pendant `ÉDITION`                    | Effet pendant génération                      |
+| Type de verrou | Objet verrouillé       | Effet pendant `edition`                    | Effet pendant génération                      |
 | -------------- | ---------------------- | ------------------------------------------ | --------------------------------------------- |
 | `CRÉNEAU`      | Jour + créneau horaire | La séance ne peut pas changer de créneau   | Le solver respecte le créneau (poids 100 %)   |
 | `SALLE`        | Salle physique         | La séance ne peut pas changer de salle     | Le solver respecte la salle (poids 100 %)     |
@@ -162,13 +147,14 @@ Un rejet par la Direction (`EN_VALIDATION` → `REJETÉ`) doit systématiquement
 
 | Transition                               | Destinataire                     | Canal                 | Contenu                              |
 | ---------------------------------------- | -------------------------------- | --------------------- | ------------------------------------ |
-| `BROUILLON` → `GÉNÉRATION`               | Gestionnaire                     | In-app + Email        | Génération lancée / terminée         |
-| `ÉDITION` → `PRÊT_POUR_VALIDATION`       | Resp. Département                | In-app + Email        | Version soumise pour validation      |
-| `PRÊT_POUR_VALIDATION` → `EN_VALIDATION` | Direction                        | In-app + Email        | Version en validation finale         |
-| `EN_VALIDATION` → `VALIDÉ`               | Gestionnaire + Resp. Département | In-app + Email        | Version validée                      |
-| `EN_VALIDATION` → `REJETÉ`               | Gestionnaire                     | In-app + Email        | Version rejetée avec motif           |
-| `VALIDÉ` → `PUBLIÉ`                      | Tous les utilisateurs concernés  | In-app + Email + .ics | Version publiée, exports disponibles |
-| `PUBLIÉ` → `ARCHIVÉ`                     | Admin                            | In-app                | Version archivée                     |
+| `brouillon` → `generation`               | Gestionnaire                     | In-app + Email        | Génération lancée / terminée         |
+| `edition` → `valid_pedag`               | Resp. Département                | In-app + Email        | Version soumise pour validation      |
+| `valid_pedag` → `valid_dir` | Direction                        | In-app + Email        | Version en validation Direction      |
+| `valid_dir` → `valide`               | Gestionnaire + Resp. Département | In-app + Email        | Version validée                      |
+| `valid_dir` → `rep_pedag`               | Resp. Département                | In-app + Email        | Rejet Direction (motif pédagogique)  |
+| `valid_dir` → `edition`               | Gestionnaire                     | In-app + Email        | Rejet Direction (motif planning)     |
+| `valide` → `publie`                      | Tous les utilisateurs concernés  | In-app + Email + .ics | Version publiée, exports disponibles |
+| `publie` → `archive`                     | Admin                            | In-app                | Version archivée                     |
 
 ---
 
@@ -176,14 +162,21 @@ Un rejet par la Direction (`EN_VALIDATION` → `REJETÉ`) doit systématiquement
 
 | #     | Question ouverte                                                                                            | Décision attendue                              | Responsable |
 | ----- | ----------------------------------------------------------------------------------------------------------- | ---------------------------------------------- | ----------- |
-| WF-01 | Un rejet Direction doit-il toujours revenir à `ÉDITION`, ou peut-il revenir à `GÉNÉRATION` selon le motif ? | À valider avec la MOA                          | MOA         |
+| WF-01 | Un rejet Direction doit-il toujours revenir à `edition`, ou peut-il revenir à `generation` selon le motif ? | À valider avec la MOA                          | MOA         |
 | WF-02 | Quel est le seuil de verrouillage maximal avant qu'une génération soit déclarée risquée ?                   | 80 % des séances verrouillées (proposition)    | Architecte  |
-| WF-03 | Une version `PUBLIÉ` peut-elle être dupliquée pour créer un nouveau semestre ?                              | Oui, avec nouveau semestre et état `BROUILLON` | MOA         |
+| WF-03 | Une version `publie` peut-elle être dupliquée pour créer un nouveau semestre ?                              | Oui, avec nouveau semestre et état `initial`   | MOA         |
 | WF-04 | Les notifications en cas de rejet doivent-elles inclure le motif détaillé ?                                 | Oui, texte libre obligatoire                   | MOA         |
 
 ---
 
-_Fin de la première ébauche WORKFLOW_METIER.md — TAKT v0.1_
+## Decision Log Workflow
+
+| ID       | Décision                                                          | Conséquence                                                                 |
+|----------|-------------------------------------------------------------------|-----------------------------------------------------------------------------|
+| DL-WF-05 | Rejet départemental vers `edition`                               | Un rejet depuis `valid_pedag` ne cible jamais `brouillon`.                   |
+| DL-WF-06 | Rejet Direction typé selon le motif                               | Motif pédagogique → `rep_pedag` ; motif planning → `edition`.               |
+
+---
 
 ## 4. Diagramme d'états (Mermaid)
 
