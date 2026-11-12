@@ -4,10 +4,9 @@
 import { Module } from '@nestjs/common';
 import { SeancesController } from './seances.controller';
 import { SeancesService } from './seances.service';
-import { AuditModule } from '../../audit/audit.module';
 
 @Module({
-  imports: [AuditModule],
+  imports: [],
   controllers: [SeancesController],
   providers: [SeancesService],
   exports: [SeancesService],

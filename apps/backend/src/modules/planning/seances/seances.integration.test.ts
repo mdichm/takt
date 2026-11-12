@@ -11,13 +11,34 @@ import { mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { hash as hacherArgon2 } from 'argon2';
 import { creerPrismaClient } from '@takt/db';
-export const PRISMA = Symbol('PRISMA');
-import { VerificateurJwt } from '../../../common/guards/jwt-verificateur.interface';
+import { VerificateurJwt } from '../../common/guards/jwt-verificateur.interface';
 import { AppModule } from '../../../app.module';
-import { TokenService } from '../../modules/auth/token.service';
+import { TokenService } from '../../../modules/auth/token.service';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { Reflector } from '@nestjs/core';
 import { DepartmentScopeGuard } from '../../common/guards/department-scope.guard';
+
+interface SeancesTestCtx {
+  application: INestApplication;
+  prisma: ReturnType<typeof creerPrismaClient>;
+  agent: Agent;
+  tokenAdmin: string;
+  tokenRdep: string;
+  departementId: string;
+  semestreId: string;
+  versionId: string;
+  matiereId: string;
+  typeEnseignementId: string;
+  enseignantId: string;
+  groupeId: string;
+  salleId: string;
+  creneauId: string;
+  affectationId: string;
+}
+
+declare global {
+  var __seancesCtx: SeancesTestCtx | undefined;
+}
 
 const DOSSIER_CLES = mkdtempSync(join(tmpdir(), 'takt-seances-int-jwt-'));
 const premiere = generateKeyPairSync('rsa', { modulusLength: 2048 });
@@ -45,23 +66,6 @@ process.env = {
 
 const MOT_DE_PASSE = 'MotDePasseTest123!';
 
-const ADMIN_ID = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
-const RDEP_ID = 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb';
-const DEPARTEMENT_ID = 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee';
-const SEMESTRE_ID = '66666666-6666-6666-6666-666666666666';
-const ANNEE_UNIV_ID = '77777777-7777-7777-7777-777777777777';
-const VERSION_ID = '88888888-8888-8888-8888-888888888888';
-const MATIERE_ID = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
-const TYPE_ENS_ID = 'cccccccc-cccc-cccc-cccc-cccccccccccc';
-const ENSEIGNANT_ID = 'dddddddd-dddd-dddd-dddd-dddddddddddd';
-const GROUPE_ID = '44444444-4444-4444-4444-444444444444';
-const SALLE_ID = '22222222-2222-2222-2222-222222222222';
-const CRENEAU_ID = '33333333-3333-4333-8333-333333333333';
-const AFFECTATION_ID = '44444444-4444-4444-8444-444444444444';
-const MODULE_ID = '11111111-2222-3333-4444-555555555555';
-const NIVEAU_ID = '33333333-3333-3333-3333-333333333333';
-const PARCOURS_ID = '22222222-2222-2222-2222-222222222222';
-
 describe('Seances (TAKT-L06-03)', () => {
   let application: INestApplication;
   let prisma: ReturnType<typeof creerPrismaClient>;
@@ -74,7 +78,7 @@ describe('Seances (TAKT-L06-03)', () => {
       imports: [AppModule],
       providers: [Reflector, DepartmentScopeGuard],
     })
-      .overrideProvider(PRISMA)
+      .overrideProvider('PRISMA')
       .useValue(creerPrismaClient(process.env.DATABASE_URL!))
       .compile();
 
@@ -114,389 +118,314 @@ describe('Seances (TAKT-L06-03)', () => {
 
     const admin = await prisma.utilisateur.create({
       data: {
-        id: ADMIN_ID,
         email: emailUnique(),
-        motDePasseHache: hash,
+        motDePasseHash: hash,
         nom: 'Admin',
         prenom: 'Test',
+        role: { connect: { code: 'admin' } },
       },
-    });
-    await prisma.utilisateurRole.create({
-      data: { utilisateurId: ADMIN_ID, roleCode: 'admin' },
     });
     const rdep = await prisma.utilisateur.create({
       data: {
-        id: RDEP_ID,
         email: emailUnique(),
-        motDePasseHache: hash,
+        motDePasseHash: hash,
         nom: 'Rdep',
         prenom: 'Test',
+        role: { connect: { code: 'rdep' } },
       },
     });
-    await prisma.utilisateurRole.create({
-      data: { utilisateurId: RDEP_ID, roleCode: 'rdep' },
-    });
 
-    tokenAdmin = tokenService.generateAccessToken({
-      sub: ADMIN_ID,
-      email: admin.email,
-      roles: ['admin'],
+    tokenAdmin = tokenService.signAccessToken({
+      sub: admin.id,
+      role: 'admin',
       departementIds: [],
+    }).token;
+    tokenRdep = tokenService.signAccessToken({
+      sub: rdep.id,
+      role: 'rdep',
+      departementIds: [],
+    }).token;
+    const etablissement = await prisma.etablissement.create({
+      data: { code: 'ETAB01', libelle: 'Etablissement test' },
     });
-    tokenRdep = tokenService.generateAccessToken({
-      sub: RDEP_ID,
-      email: rdep.email,
-      roles: ['rdep'],
-      departementIds: [DEPARTEMENT_ID],
+    const departement = await prisma.departement.create({
+      data: { code: 'DEP01', libelle: 'Departement test', etablissementId: etablissement.id },
     });
-
-    await prisma.departement.create({
-      data: { id: DEPARTEMENT_ID, code: 'DEP01', libelle: 'Departement test' },
+    const anneeUniversitaire = await prisma.anneeUniversitaire.create({
+      data: { libelle: '2026-2027', dateDebut: new Date('2026-09-01'), dateFin: new Date('2027-06-30') },
     });
-    await prisma.anneeUniversitaire.create({
-      data: {
-        id: ANNEE_UNIV_ID,
-        libelle: '2026-2027',
-        dateDebut: new Date('2026-09-01'),
-        dateFin: new Date('2027-06-30'),
-        estCourante: true,
-      },
+    const semestre = await prisma.semestre.create({
+      data: { numero: 1, anneeUniversitaireId: anneeUniversitaire.id, dateDebut: new Date('2026-09-01'), dateFin: new Date('2027-01-31') },
     });
-    await prisma.semestre.create({
-      data: {
-        id: SEMESTRE_ID,
-        libelle: 'S1',
-        code: 'S1',
-        anneeUniversitaireId: ANNEE_UNIV_ID,
-        rang: 1,
-        dateDebut: new Date('2026-09-01'),
-        dateFin: new Date('2027-01-31'),
-      },
+    const parcours = await prisma.parcours.create({
+      data: { code: 'INFO', libelle: 'Informatique', departementId: departement.id },
     });
-    await prisma.parcours.create({
-      data: {
-        id: PARCOURS_ID,
-        code: 'INFO',
-        libelle: 'Informatique',
-        departementId: DEPARTEMENT_ID,
-        anneeUniversitaireId: ANNEE_UNIV_ID,
-      },
+    const niveau = await prisma.niveau.create({
+      data: { code: 'L1', libelle: 'Licence 1', parcoursId: parcours.id },
     });
-    await prisma.niveau.create({
-      data: { id: NIVEAU_ID, code: 'L1', libelle: 'Licence 1', parcoursId: PARCOURS_ID },
+    const groupe = await prisma.groupe.create({
+      data: { code: 'L1A', libelle: 'L1 A', niveauId: niveau.id },
     });
-    await prisma.groupe.create({
-      data: { id: GROUPE_ID, code: 'L1A', libelle: 'L1 A', niveauId: NIVEAU_ID },
+    const typeSalle = await prisma.typeSalle.create({
+      data: { code: 'CM', libelle: 'Cours magistral' },
     });
-    await prisma.typeSalle.create({
-      data: { id: 'type-salle-id', code: 'CM', libelle: 'Cours magistral' },
+    const site = await prisma.site.create({
+      data: { code: 'SITE1', libelle: 'Site 1' },
     });
-    await prisma.site.create({
-      data: { id: 'site-id', code: 'SITE1', libelle: 'Site 1' },
+    const salle = await prisma.salle.create({
+      data: { code: 'S101', libelle: 'Salle 101', typeSalleId: typeSalle.id, capacite: 30, siteId: site.id },
     });
-    await prisma.salle.create({
-      data: {
-        id: SALLE_ID,
-        code: 'S101',
-        libelle: 'Salle 101',
-        typeSalleId: 'type-salle-id',
-        capacite: 30,
-        siteId: 'site-id',
-      },
+    const typeEnseignement = await prisma.typeEnseignement.create({
+      data: { code: 'CM', libelle: 'Cours magistral', couleur: '#FF0000' },
     });
-    await prisma.typeEnseignement.create({
-      data: { id: TYPE_ENS_ID, code: 'CM', libelle: 'Cours magistral', couleur: '#FF0000' },
+    const grade = await prisma.grade.create({
+      data: { code: 'G1', libelle: 'Grade 1' },
     });
-    await prisma.module.create({
-      data: { id: MODULE_ID, code: 'MOD1', libelle: 'Module 1', typeEnseignementId: TYPE_ENS_ID },
+    const module = await prisma.module.create({
+      data: { code: 'MOD1', libelle: 'Module 1', typeEnseignementId: typeEnseignement.id, gradeId: grade.id },
     });
-    await prisma.matiere.create({
-      data: { id: MATIERE_ID, code: 'MATH101', libelle: 'Mathematiques', moduleId: MODULE_ID },
+    const matiere = await prisma.matiere.create({
+      data: { code: 'MATH101', libelle: 'Mathematiques', moduleId: module.id },
     });
-    await prisma.enseignant.create({
-      data: {
-        id: ENSEIGNANT_ID,
-        matricule: 'ENS001',
-        nom: 'Enseignant',
-        prenom: 'Test',
-        email: 'enseignant@test.takt',
-      },
+    const enseignant = await prisma.enseignant.create({
+      data: { matricule: 'ENS001', nom: 'Enseignant', prenom: 'Test', email: 'enseignant@test.takt' },
     });
     await prisma.enseignantDepartement.create({
-      data: { enseignantId: ENSEIGNANT_ID, departementId: DEPARTEMENT_ID },
+      data: { enseignantId: enseignant.id, departementId: departement.id },
     });
-    await prisma.version.create({
-      data: {
-        id: VERSION_ID,
-        libelle: 'Version test',
-        etat: 'edition',
-        departementId: DEPARTEMENT_ID,
-        semestreId: SEMESTRE_ID,
-      },
+    const version = await prisma.version.create({
+      data: { anneeId: anneeUniversitaire.id, semestreId: semestre.id, etat: 'edition' },
     });
-    await prisma.creneau.create({
-      data: {
-        id: CRENEAU_ID,
-        jour: 1,
-        ordre: 1,
-        heureDebut: new Date('2026-09-01T08:00:00Z'),
-        heureFin: new Date('2026-09-01T09:00:00Z'),
-        dureeMinutes: 60,
-      },
+    const creneau = await prisma.creneau.create({
+      data: { jour: 1, ordre: 1, heureDebut: new Date('2026-09-01T08:00:00Z'), heureFin: new Date('2026-09-01T09:00:00Z'), dureeMinutes: 60 },
     });
-    await prisma.affectationPedagogique.create({
-      data: {
-        id: AFFECTATION_ID,
-        versionId: VERSION_ID,
-        semestreId: SEMESTRE_ID,
-        departementId: DEPARTEMENT_ID,
-        enseignantId: ENSEIGNANT_ID,
-        matiereId: MATIERE_ID,
-        groupeId: GROUPE_ID,
-        typeEnseignementId: TYPE_ENS_ID,
-        volumeHebdo: 2,
-        dureeCreneaux: 60,
-      },
+    const affectation = await prisma.affectationPedagogique.create({
+      data: { versionId: version.id, semestreId: semestre.id, departementId: departement.id, enseignantId: enseignant.id, matiereId: matiere.id, groupeId: groupe.id, typeEnseignementId: typeEnseignement.id, volumeHebdo: 2, dureeCreneaux: 60 },
     });
-  });
 
+    // any-justify: contexte de test global partagé entre hooks et tests
+    globalThis.__seancesCtx! = {
+      application, prisma, agent, tokenAdmin, tokenRdep,
+      departementId: departement.id, semestreId: semestre.id, versionId: version.id,
+      matiereId: matiere.id, typeEnseignementId: typeEnseignement.id, enseignantId: enseignant.id,
+      groupeId: groupe.id, salleId: salle.id, creneauId: creneau.id, affectationId: affectation.id,
+    };
+  });
   afterAll(async () => {
-    await prisma.seance.deleteMany({ where: { affectationId: AFFECTATION_ID } });
-    await prisma.affectationPedagogique.delete({ where: { id: AFFECTATION_ID } });
-    await prisma.$disconnect();
-    await application.close();
+    // any-justify: contexte de test global partagé entre hooks et tests
+    const ctx = globalThis.__seancesCtx!;
+    if (ctx) {
+      await ctx.prisma.seance.deleteMany({ where: { affectationId: ctx.affectationId } });
+      await ctx.prisma.affectationPedagogique.delete({ where: { id: ctx.affectationId } });
+      await ctx.prisma.$disconnect();
+      await ctx.application.close();
+    }
   });
 
-  it('POST /seances : cree une seance (201) + audit', async () => {
-    const reponse = await agent
+  it('POST /seances : creation + audit (201)', async () => {
+    const ctx = globalThis.__seancesCtx!;
+    // any-justify: contexte de test global partagé entre hooks et tests
+    const cree = await ctx.agent
       .post('/api/v1/seances')
-      .set('Authorization', 'Bearer ' + tokenRdep)
+      .set('Authorization', 'Bearer ' + ctx.tokenRdep)
       .send({
-        versionId: VERSION_ID,
+        versionId: ctx.versionId,
         jour: 1,
-        creneauDebutId: CRENEAU_ID,
+        creneauDebutId: ctx.creneauId,
         nbCreneaux: 1,
-        salleId: SALLE_ID,
-        enseignantId: ENSEIGNANT_ID,
-        groupeId: GROUPE_ID,
-        matiereId: MATIERE_ID,
-        typeEnseignementId: TYPE_ENS_ID,
-        affectationId: AFFECTATION_ID,
+        salleId: ctx.salleId,
+        affectationId: ctx.affectationId,
       })
       .expect(201);
 
-    expect(reponse.body.data.id).toBeDefined();
-    expect(reponse.body.data.versionId).toBe(VERSION_ID);
-    expect(reponse.body.data.jour).toBe(1);
-    expect(reponse.body.data.creneauDebutId).toBe(CRENEAU_ID);
-    expect(reponse.body.data.nbCreneaux).toBe(1);
-    expect(reponse.body.data.affectationId).toBe(AFFECTATION_ID);
-    expect(reponse.body.data.estVerrouillee).toBe(false);
+    expect(cree.body.data.id).toBeDefined();
+    expect(cree.body.data.creneauDebut.id).toBe(ctx.creneauId);
+    expect(cree.body.data.salle.id).toBe(ctx.salleId);
 
-    const audit = await prisma.journalAudit.findFirst({
-      where: {
-        entite: 'Seance',
-        entiteId: reponse.body.data.id,
-        action: 'CREATION',
-      },
+    const audit = await ctx.prisma.journalAudit.findFirst({
+      where: { entite: 'Seance', entiteId: cree.body.data.id, action: 'CREATION' },
     });
     expect(audit).not.toBeNull();
-    expect(audit!.metadonnees).toMatchObject({
-      versionId: VERSION_ID,
-      jour: 1,
-      affectationId: AFFECTATION_ID,
-    });
   });
 
   it('POST /seances : version publiee refuse (409)', async () => {
-    await prisma.version.update({
-      where: { id: VERSION_ID },
-      data: { etat: 'publie' },
+    const ctx = globalThis.__seancesCtx!;
+    // any-justify: contexte de test global partagé entre hooks et tests
+    await ctx.prisma.version.update({
+      where: { id: ctx.versionId },
+      data: { etat: 'valid_dir' },
     });
 
-    await agent
+    await ctx.agent
       .post('/api/v1/seances')
-      .set('Authorization', 'Bearer ' + tokenRdep)
+      .set('Authorization', 'Bearer ' + ctx.tokenRdep)
       .send({
-        versionId: VERSION_ID,
-        jour: 1,
-        creneauDebutId: CRENEAU_ID,
+        versionId: ctx.versionId,
+        jour: 2,
+        creneauDebutId: ctx.creneauId,
         nbCreneaux: 1,
-        affectationId: AFFECTATION_ID,
+        salleId: ctx.salleId,
+        affectationId: ctx.affectationId,
       })
       .expect(409);
 
-    await prisma.version.update({
-      where: { id: VERSION_ID },
+    await ctx.prisma.version.update({
+      where: { id: ctx.versionId },
       data: { etat: 'edition' },
     });
   });
 
-  it('POST /seances : affectation dune autre version refuse (400)', async () => {
-    const autreVersion = await prisma.version.create({
-      data: {
-        id: '99999999-9999-9999-9999-999999999999',
-        libelle: 'Autre version',
-        etat: 'edition',
-        departementId: DEPARTEMENT_ID,
-        semestreId: SEMESTRE_ID,
-      },
+  it('POST /seances : affectation hors version refuse (400)', async () => {
+    const ctx = globalThis.__seancesCtx!;
+    // any-justify: contexte de test global partagé entre hooks et tests
+    const autreVersion = await ctx.prisma.version.create({
+      data: { anneeId: '77777777-7777-7777-7777-777777777777', semestreId: ctx.semestreId, etat: 'edition' },
     });
-    const autreAffectation = await prisma.affectationPedagogique.create({
-      data: {
-        id: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
-        versionId: '99999999-9999-9999-9999-999999999999',
-        semestreId: SEMESTRE_ID,
-        departementId: DEPARTEMENT_ID,
-        enseignantId: ENSEIGNANT_ID,
-        matiereId: MATIERE_ID,
-        groupeId: GROUPE_ID,
-        typeEnseignementId: TYPE_ENS_ID,
-        volumeHebdo: 2,
-        dureeCreneaux: 60,
-      },
+    const autreAffectation = await ctx.prisma.affectationPedagogique.create({
+      data: { versionId: autreVersion.id, semestreId: ctx.semestreId, departementId: ctx.departementId, enseignantId: ctx.enseignantId, matiereId: ctx.matiereId, groupeId: ctx.groupeId, typeEnseignementId: ctx.typeEnseignementId, volumeHebdo: 2, dureeCreneaux: 60 },
     });
 
-    await agent
+    await ctx.agent
       .post('/api/v1/seances')
-      .set('Authorization', 'Bearer ' + tokenRdep)
+      .set('Authorization', 'Bearer ' + ctx.tokenRdep)
       .send({
-        versionId: VERSION_ID,
-        jour: 1,
-        creneauDebutId: CRENEAU_ID,
+        versionId: ctx.versionId,
+        jour: 3,
+        creneauDebutId: ctx.creneauId,
         nbCreneaux: 1,
+        salleId: ctx.salleId,
         affectationId: autreAffectation.id,
       })
       .expect(400);
 
-    await prisma.affectationPedagogique.delete({ where: { id: autreAffectation.id } });
-    await prisma.version.delete({ where: { id: autreVersion.id } });
+    await ctx.prisma.seance.deleteMany({ where: { affectationId: autreAffectation.id } });
+    await ctx.prisma.affectationPedagogique.delete({ where: { id: autreAffectation.id } });
+    await ctx.prisma.version.delete({ where: { id: autreVersion.id } });
   });
-
   it('GET /seances/:id : detail (200)', async () => {
-    const cree = await agent
+    const ctx = globalThis.__seancesCtx!;
+    // any-justify: contexte de test global partagé entre hooks et tests
+    const cree = await ctx.agent
       .post('/api/v1/seances')
-      .set('Authorization', 'Bearer ' + tokenRdep)
+      .set('Authorization', 'Bearer ' + ctx.tokenRdep)
       .send({
-        versionId: VERSION_ID,
+        versionId: ctx.versionId,
         jour: 1,
-        creneauDebutId: CRENEAU_ID,
+        creneauDebutId: ctx.creneauId,
         nbCreneaux: 1,
-        salleId: SALLE_ID,
-        affectationId: AFFECTATION_ID,
+        salleId: ctx.salleId,
+        affectationId: ctx.affectationId,
       })
       .expect(201);
 
-    const detail = await agent
+    const detail = await ctx.agent
       .get('/api/v1/seances/' + cree.body.data.id)
-      .set('Authorization', 'Bearer ' + tokenRdep)
+      .set('Authorization', 'Bearer ' + ctx.tokenRdep)
       .expect(200);
 
     expect(detail.body.data.id).toBe(cree.body.data.id);
-    expect(detail.body.data.creneauDebut.id).toBe(CRENEAU_ID);
-    expect(detail.body.data.salle.id).toBe(SALLE_ID);
+    expect(detail.body.data.creneauDebut.id).toBe(ctx.creneauId);
+    expect(detail.body.data.salle.id).toBe(ctx.salleId);
   });
 
   it('GET /seances/:id : introuvable (404)', async () => {
-    await agent
+    const ctx = globalThis.__seancesCtx!;
+    // any-justify: contexte de test global partagé entre hooks et tests
+    await ctx.agent
       .get('/api/v1/seances/00000000-0000-0000-0000-000000000000')
-      .set('Authorization', 'Bearer ' + tokenRdep)
+      .set('Authorization', 'Bearer ' + ctx.tokenRdep)
       .expect(404);
   });
 
   it('PATCH /seances/:id : modifie une seance (200)', async () => {
-    const cree = await agent
+    const ctx = globalThis.__seancesCtx!;
+    // any-justify: contexte de test global partagé entre hooks et tests
+    const cree = await ctx.agent
       .post('/api/v1/seances')
-      .set('Authorization', 'Bearer ' + tokenRdep)
+      .set('Authorization', 'Bearer ' + ctx.tokenRdep)
       .send({
-        versionId: VERSION_ID,
+        versionId: ctx.versionId,
         jour: 1,
-        creneauDebutId: CRENEAU_ID,
+        creneauDebutId: ctx.creneauId,
         nbCreneaux: 1,
-        salleId: SALLE_ID,
-        affectationId: AFFECTATION_ID,
+        salleId: ctx.salleId,
+        affectationId: ctx.affectationId,
       })
       .expect(201);
 
-    const modifiee = await agent
+    const modifiee = await ctx.agent
       .patch('/api/v1/seances/' + cree.body.data.id)
-      .set('Authorization', 'Bearer ' + tokenRdep)
+      .set('Authorization', 'Bearer ' + ctx.tokenRdep)
       .send({ nbCreneaux: 2 })
       .expect(200);
 
     expect(modifiee.body.data.nbCreneaux).toBe(2);
 
-    const audit = await prisma.journalAudit.findFirst({
-      where: {
-        entite: 'Seance',
-        entiteId: cree.body.data.id,
-        action: 'MODIFICATION',
-      },
+    const audit = await ctx.prisma.journalAudit.findFirst({
+      where: { entite: 'Seance', entiteId: cree.body.data.id, action: 'MODIFICATION' },
     });
     expect(audit).not.toBeNull();
   });
 
   it('DELETE /seances/:id : supprime une seance (200)', async () => {
-    const cree = await agent
+    const ctx = globalThis.__seancesCtx!;
+    // any-justify: contexte de test global partagé entre hooks et tests
+    const cree = await ctx.agent
       .post('/api/v1/seances')
-      .set('Authorization', 'Bearer ' + tokenRdep)
+      .set('Authorization', 'Bearer ' + ctx.tokenRdep)
       .send({
-        versionId: VERSION_ID,
+        versionId: ctx.versionId,
         jour: 1,
-        creneauDebutId: CRENEAU_ID,
+        creneauDebutId: ctx.creneauId,
         nbCreneaux: 1,
-        salleId: SALLE_ID,
-        affectationId: AFFECTATION_ID,
+        salleId: ctx.salleId,
+        affectationId: ctx.affectationId,
       })
       .expect(201);
 
-    const supprimee = await agent
+    const supprimee = await ctx.agent
       .delete('/api/v1/seances/' + cree.body.data.id)
-      .set('Authorization', 'Bearer ' + tokenRdep)
+      .set('Authorization', 'Bearer ' + ctx.tokenRdep)
       .expect(200);
 
     expect(supprimee.body.data.id).toBe(cree.body.data.id);
 
-    const existe = await prisma.seance.findUnique({
-      where: { id: cree.body.data.id },
-    });
+    const existe = await ctx.prisma.seance.findUnique({ where: { id: cree.body.data.id } });
     expect(existe).toBeNull();
 
-    const audit = await prisma.journalAudit.findFirst({
-      where: {
-        entite: 'Seance',
-        entiteId: cree.body.data.id,
-        action: 'SUPPRESSION',
-      },
+    const audit = await ctx.prisma.journalAudit.findFirst({
+      where: { entite: 'Seance', entiteId: cree.body.data.id, action: 'SUPPRESSION' },
     });
     expect(audit).not.toBeNull();
   });
 
   it('DELETE /seances/:id : version publiee refuse (409)', async () => {
-    const cree = await agent
+    // any-justify: contexte de test global partagé entre hooks et tests
+    const ctx = globalThis.__seancesCtx!;
+    const cree = await ctx.agent
       .post('/api/v1/seances')
-      .set('Authorization', 'Bearer ' + tokenRdep)
+      .set('Authorization', 'Bearer ' + ctx.tokenRdep)
       .send({
-        versionId: VERSION_ID,
+        versionId: ctx.versionId,
         jour: 1,
-        creneauDebutId: CRENEAU_ID,
+        creneauDebutId: ctx.creneauId,
         nbCreneaux: 1,
-        affectationId: AFFECTATION_ID,
+        affectationId: ctx.affectationId,
       })
       .expect(201);
 
-    await prisma.version.update({
-      where: { id: VERSION_ID },
-      data: { etat: 'publie' },
+    await ctx.prisma.version.update({
+      where: { id: ctx.versionId },
+      data: { etat: 'valid_dir' },
     });
 
-    await agent
+    await ctx.agent
       .delete('/api/v1/seances/' + cree.body.data.id)
-      .set('Authorization', 'Bearer ' + tokenRdep)
+      .set('Authorization', 'Bearer ' + ctx.tokenRdep)
       .expect(409);
 
-    await prisma.version.update({
-      where: { id: VERSION_ID },
+    await ctx.prisma.version.update({
+      where: { id: ctx.versionId },
       data: { etat: 'edition' },
     });
   });

@@ -5,7 +5,6 @@ import { Inject, Injectable, Logger } from '@nestjs/common';
 import { PRISMA } from '../../common/di/prisma.token';
 import { PrismaClient, Prisma } from '@takt/db';
 import { CODES_ERREUR_API, ApiError } from '../../common/http/api-error';
-import { AuditService } from '../../audit/audit.service';
 import { buildPrismaQuery, ConfigurationRequeteListe } from '../../common/pagination/build-prisma-query';
 import { construireDonneesPaginees } from '../../common/pagination/pagination-normalizer';
 import type {
@@ -21,7 +20,6 @@ export class SeancesService {
 
   constructor(
     @Inject(PRISMA) private readonly prisma: PrismaClient,
-    @Inject(AuditService) private readonly auditService: AuditService,
   ) {}
 
   /** Liste paginée des séances d'une version (optimisée pour la grille). */
@@ -431,22 +429,24 @@ export class SeancesService {
     });
 
     // 8. Audit (GG-07)
-    await this.auditService.record({
-      action: 'CREATION',
-      utilisateurId,
-      entite: 'Seance',
-      entiteId: seance.id,
-      metadonnees: {
-        versionId: seance.versionId,
-        jour: seance.jour,
-        creneauDebutId: seance.creneauDebutId,
-        nbCreneaux: seance.nbCreneaux,
-        salleId: seance.salleId,
-        enseignantId: seance.enseignantId,
-        groupeId: seance.groupeId,
-        matiereId: seance.matiereId,
-        typeEnseignementId: seance.typeEnseignementId,
-        affectationId: seance.affectationId,
+    await this.prisma.journalAudit.create({
+      data: {
+        action: 'CREATION',
+        utilisateurId,
+        entite: 'Seance',
+        entiteId: seance.id,
+        metadonnees: {
+          versionId: seance.versionId,
+          jour: seance.jour,
+          creneauDebutId: seance.creneauDebutId,
+          nbCreneaux: seance.nbCreneaux,
+          salleId: seance.salleId,
+          enseignantId: seance.enseignantId,
+          groupeId: seance.groupeId,
+          matiereId: seance.matiereId,
+          typeEnseignementId: seance.typeEnseignementId,
+          affectationId: seance.affectationId,
+        },
       },
     });
 
@@ -572,23 +572,25 @@ export class SeancesService {
     });
 
     // 10. Audit (GG-07)
-    await this.auditService.record({
-      action: 'MODIFICATION',
-      utilisateurId,
-      entite: 'Seance',
-      entiteId: id,
-      metadonnees: {
-        versionId: modifiee.versionId,
-        jour: modifiee.jour,
-        creneauDebutId: modifiee.creneauDebutId,
-        nbCreneaux: modifiee.nbCreneaux,
-        salleId: modifiee.salleId,
-        enseignantId: modifiee.enseignantId,
-        groupeId: modifiee.groupeId,
-        matiereId: modifiee.matiereId,
-        typeEnseignementId: modifiee.typeEnseignementId,
-        affectationId: modifiee.affectationId,
-        champsModifies: Object.keys(updateData),
+    await this.prisma.journalAudit.create({
+      data: {
+        action: 'MODIFICATION',
+        utilisateurId,
+        entite: 'Seance',
+        entiteId: id,
+        metadonnees: {
+          versionId: modifiee.versionId,
+          jour: modifiee.jour,
+          creneauDebutId: modifiee.creneauDebutId,
+          nbCreneaux: modifiee.nbCreneaux,
+          salleId: modifiee.salleId,
+          enseignantId: modifiee.enseignantId,
+          groupeId: modifiee.groupeId,
+          matiereId: modifiee.matiereId,
+          typeEnseignementId: modifiee.typeEnseignementId,
+          affectationId: modifiee.affectationId,
+          champsModifies: Object.keys(updateData),
+        },
       },
     });
 
@@ -621,17 +623,19 @@ export class SeancesService {
     await this.prisma.seance.delete({ where: { id } });
 
     // 4. Audit (GG-07)
-    await this.auditService.record({
-      action: 'SUPPRESSION',
-      utilisateurId,
-      entite: 'Seance',
-      entiteId: id,
-      metadonnees: {
-        versionId: existant.versionId,
-        jour: existant.jour,
-        creneauDebutId: existant.creneauDebutId,
-        nbCreneaux: existant.nbCreneaux,
-        affectationId: existant.affectationId,
+    await this.prisma.journalAudit.create({
+      data: {
+        action: 'SUPPRESSION',
+        utilisateurId,
+        entite: 'Seance',
+        entiteId: id,
+        metadonnees: {
+          versionId: existant.versionId,
+          jour: existant.jour,
+          creneauDebutId: existant.creneauDebutId,
+          nbCreneaux: existant.nbCreneaux,
+          affectationId: existant.affectationId,
+        },
       },
     });
 

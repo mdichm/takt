@@ -111,7 +111,7 @@ export class PilotListsService {
       },
       sortFields: {
         jour: (direction) => ({ jour: direction as Prisma.SortOrder }),
-        creneauDebut: (direction) => ({ creneauDebut: direction as Prisma.SortOrder }),
+        creneauDebut: (direction) => ({ creneauDebut: { heureDebut: direction as Prisma.SortOrder } }),
         createdAt: (direction) => ({ createdAt: direction as Prisma.SortOrder }),
       },
       defaultSort: () => ({ jour: Prisma.SortOrder.asc }),
