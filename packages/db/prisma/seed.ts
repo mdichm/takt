@@ -5,29 +5,23 @@ import { Client } from 'pg';
 import { hash, argon2id } from 'argon2';
 import crypto from 'crypto';
 
-let clientResolve: Client | null = null;
-let connected = false;
-
 function getClient(): Client {
-  if (clientResolve) {
-    return clientResolve;
-  }
   const connectionString = process.env.DATABASE_URL;
   if (!connectionString) {
     throw new Error('DATABASE_URL est requise pour exécuter le seed');
   }
-  clientResolve = new Client({ connectionString });
-  return clientResolve;
+  return new Client({ connectionString });
 }
 
 async function query(sql: string, params: unknown[] = []): Promise<any[]> {
   const client = getClient();
-  if (!connected) {
-    await client.connect();
-    connected = true;
+  await client.connect();
+  try {
+    const res = await client.query(sql, params);
+    return res.rows;
+  } finally {
+    await client.end();
   }
-  const res = await client.query(sql, params);
-  return res.rows;
 }
 
 const ARGON2_OPTIONS = {
@@ -128,12 +122,6 @@ async function getOrCreate(
 }
 
 async function main(): Promise<void> {
-  // Nouvelle connexion pg a chaque appel pour eviter un etat de connexion
-  // degrade entre deux executions consecutives (ex: tests d'integration
-  // qui appellent main() deux fois dans le meme processus).
-  clientResolve = null;
-  connected = false;
-
   if (process.env.NODE_ENV === 'production') {
     throw new Error('Le seed de développement est interdit en production');
   }
@@ -448,6 +436,6 @@ if (require.main === module) {
       process.exitCode = 1;
     })
     .finally(async () => {
-      await clientResolve?.end();
+      // Aucun client pg mis en cache : rien a fermer.
     });
 }
