@@ -128,6 +128,12 @@ async function getOrCreate(
 }
 
 async function main(): Promise<void> {
+  // Nouvelle connexion pg a chaque appel pour eviter un etat de connexion
+  // degrade entre deux executions consecutives (ex: tests d'integration
+  // qui appellent main() deux fois dans le meme processus).
+  clientResolve = null;
+  connected = false;
+
   if (process.env.NODE_ENV === 'production') {
     throw new Error('Le seed de développement est interdit en production');
   }
