@@ -85,10 +85,16 @@ async function getOrCreate(
         );
       }
     }
-    return await queryOne(
+    const result = await queryOne(
       `SELECT * FROM "${table}" WHERE "${whereCol}" = $1 LIMIT 1`,
       [whereValue],
     );
+    if (!result) {
+      throw new Error(
+        `getOrCreate: introuvable après mise à jour dans "${table}" où "${whereCol}" = ${String(whereValue)}`,
+      );
+    }
+    return result;
   }
   const now = new Date();
   const idFromInput = insertCols.id ? String(insertCols.id) : null;
@@ -107,7 +113,13 @@ async function getOrCreate(
     `INSERT INTO "${table}" (${cols.join(', ')}) VALUES (${vals.map((_, i) => `$${i + 1}`).join(', ')})`,
     vals,
   );
-  return await queryOne(`SELECT * FROM "${table}" WHERE "id" = $1 LIMIT 1`, [id]);
+  const result2 = await queryOne(`SELECT * FROM "${table}" WHERE "id" = $1 LIMIT 1`, [id]);
+  if (!result2) {
+    throw new Error(
+      `getOrCreate: introuvable après insertion dans "${table}" avec id ${String(id)}`,
+    );
+  }
+  return result2;
 }
 
 async function main(): Promise<void> {
