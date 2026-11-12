@@ -149,6 +149,7 @@ model Groupe {
   updatedAt DateTime @updatedAt
   niveau    Niveau @relation(fields: [niveauId], references: [id])
   affectations AffectationPedagogique[]
+  seances     Seance[] // séances de ce groupe
 
   @@index([code])
   @@index([niveauId])
@@ -361,6 +362,7 @@ model AffectationPedagogique {
   matiere            Matiere              @relation(fields: [matiereId], references: [id])
   groupe             Groupe               @relation(fields: [groupeId], references: [id])
   typeEnseignement   TypeEnseignement?    @relation(fields: [typeEnseignementId], references: [id])
+  seances            Seance[]             // séances liées à cette affectation (cascade sur suppression)
 
   @@unique([versionId, enseignantId, matiereId, groupeId])
   @@index([versionId])
@@ -379,22 +381,31 @@ model Seance {
   id             String   @id @default(uuid()) @db.Uuid
   versionId      String   @db.Uuid
   jour           Int      // 1=lundi … 6=samedi
-  creneauDebut   Int      // index du créneau (0-based par jour)
-  nbCreneaux     Int      // nombre de créneaux consécutifs
+  creneauDebutId String   @db.Uuid  // FK vers Creneau (créneau de début)
+  nbCreneaux     Int      // nombre de créneaux consécutifs (≥ 1)
   salleId        String?  @db.Uuid
   enseignantId   String?  @db.Uuid
   groupeId       String?  @db.Uuid
-  activiteId     String?  @db.Uuid
+  matiereId      String?  @db.Uuid
+  typeEnseignementId String? @db.Uuid
+  affectationId  String   @db.Uuid // FK obligatoire vers AffectationPedagogique (cascade)
   estVerrouillee Boolean  @default(false)
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
-  version   Version     @relation(fields: [versionId], references: [id])
-  verrous   VerrouSeance[]
+  version         Version             @relation(fields: [versionId], references: [id])
+  affectation     AffectationPedagogique @relation(fields: [affectationId], references: [id], onDelete: Cascade)
+  creneauDebut    Creneau              @relation(fields: [creneauDebutId], references: [id])
+  salle           Salle?               @relation(fields: [salleId], references: [id])
+  enseignant      Enseignant?          @relation(fields: [enseignantId], references: [id])
+  groupe          Groupe?              @relation(fields: [groupeId], references: [id])
+  matiere         Matiere?             @relation(fields: [matiereId], references: [id])
+  typeEnseignement TypeEnseignement?   @relation(fields: [typeEnseignementId], references: [id])
+  verrous         VerrouSeance[]
 
   @@index([versionId])
   @@index([versionId, jour])
-  @@unique([versionId, jour, creneauDebut, nbCreneaux])
+  @@unique([versionId, jour, creneauDebutId])
 }
 
 // ----------------------------------------------------------------------------
@@ -537,6 +548,7 @@ model TypeEnseignement {
   gradeType   GradeTypeEnseignement[]
   planEtudesMatieres PlanEtudesMatiere[]
   affectations AffectationPedagogique[]
+  seances     Seance[] // séances de ce type d'enseignement
 
   @@index([code])
 }
@@ -610,6 +622,7 @@ model Matiere {
   module      Module   @relation(fields: [moduleId], references: [id])
   planEtudesMatieres PlanEtudesMatiere[]
   affectations  AffectationPedagogique[]
+  seances     Seance[] // séances de cette matière
 
   @@index([code])
   @@index([moduleId])
@@ -633,6 +646,7 @@ model Enseignant {
   grade         Grade?                 @relation(fields: [gradeId], references: [id])
   departements  EnseignantDepartement[]
   affectations  AffectationPedagogique[]
+  seances         Seance[]             // séances enseignées par cet enseignant
 
   @@index([matricule])
   @@index([email])
@@ -741,6 +755,7 @@ model Salle {
   typeSalle       TypeSalle       @relation(fields: [typeSalleId], references: [id])
   site            Site            @relation(fields: [siteId], references: [id])
   salleEquipements SalleEquipement[]
+  seances         Seance[]        // séances affectées à cette salle
 
   @@index([code])
   @@index([typeSalleId])
@@ -778,6 +793,7 @@ model Creneau {
   dureeMinutes Int      @default(30)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+  seances      Seance[] // séances commençant à ce créneau
 
   @@unique([jour, ordre])
   @@index([jour])
