@@ -109,11 +109,11 @@ async function getOrCreate(
     if (k === 'id') continue;
     cols.push(`"${k}"`); vals.push(v);
   }
-  await query(
-    `INSERT INTO "${table}" (${cols.join(', ')}) VALUES (${vals.map((_, i) => `$${i + 1}`).join(', ')})`,
+  const res = await query(
+    `INSERT INTO "${table}" (${cols.join(', ')}) VALUES (${vals.map((_, i) => `$${i + 1}`).join(', ')}) RETURNING *`,
     vals,
   );
-  const result2 = await queryOne(`SELECT * FROM "${table}" WHERE "id" = $1 LIMIT 1`, [id]);
+  const result2 = res[0];
   if (!result2) {
     throw new Error(
       `getOrCreate: introuvable après insertion dans "${table}" avec id ${String(id)}`,
