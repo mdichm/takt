@@ -5,23 +5,29 @@ import { Client } from 'pg';
 import { hash, argon2id } from 'argon2';
 import crypto from 'crypto';
 
+let clientResolve: Client | null = null;
+let connected = false;
+
 function getClient(): Client {
+  if (clientResolve) {
+    return clientResolve;
+  }
   const connectionString = process.env.DATABASE_URL;
   if (!connectionString) {
     throw new Error('DATABASE_URL est requise pour exécuter le seed');
   }
-  return new Client({ connectionString });
+  clientResolve = new Client({ connectionString });
+  return clientResolve;
 }
 
 async function query(sql: string, params: unknown[] = []): Promise<any[]> {
   const client = getClient();
-  await client.connect();
-  try {
-    const res = await client.query(sql, params);
-    return res.rows;
-  } finally {
-    await client.end();
+  if (!connected) {
+    await client.connect();
+    connected = true;
   }
+  const res = await client.query(sql, params);
+  return res.rows;
 }
 
 const ARGON2_OPTIONS = {
@@ -61,39 +67,28 @@ async function getOrCreate(
     [whereValue],
   );
   if (existe) {
-    // Pas de mise à jour nécessaire : renvoyer l'enregistrement existant
-    if (Object.keys(updateCols).length === 0) {
-      return existe;
-    }
-    const sets = Object.keys(updateCols)
-      .map((k, i) => `"${k}" = $${i + 2}`)
-      .join(', ');
-    const params: unknown[] = [whereValue, ...Object.values(updateCols)];
-    if (withTimestamps) {
-      params.push(new Date());
-      const res = await query(
-        `UPDATE "${table}" SET ${sets}, "updatedAt" = $${params.length} WHERE "${whereCol}" = $1 RETURNING *`,
-        params,
-      );
-      const result = res[0];
-      if (!result) {
-        throw new Error(
-          `getOrCreate: introuvable après mise à jour dans "${table}" où "${whereCol}" = ${String(whereValue)}`,
+    if (Object.keys(updateCols).length > 0) {
+      const sets = Object.keys(updateCols)
+        .map((k, i) => `"${k}" = $${i + 2}`)
+        .join(', ');
+      const params: unknown[] = [whereValue, ...Object.values(updateCols)];
+      if (withTimestamps) {
+        params.push(new Date());
+        await query(
+          `UPDATE "${table}" SET ${sets}, "updatedAt" = $${params.length} WHERE "${whereCol}" = $1`,
+          params,
+        );
+      } else {
+        await query(
+          `UPDATE "${table}" SET ${sets} WHERE "${whereCol}" = $1`,
+          params,
         );
       }
-      return result;
     }
-    const res = await query(
-      `UPDATE "${table}" SET ${sets} WHERE "${whereCol}" = $1 RETURNING *`,
-      params,
+    return await queryOne(
+      `SELECT * FROM "${table}" WHERE "${whereCol}" = $1 LIMIT 1`,
+      [whereValue],
     );
-    const result = res[0];
-    if (!result) {
-      throw new Error(
-        `getOrCreate: introuvable après mise à jour dans "${table}" où "${whereCol}" = ${String(whereValue)}`,
-      );
-    }
-    return result;
   }
   const now = new Date();
   const idFromInput = insertCols.id ? String(insertCols.id) : null;
@@ -108,17 +103,11 @@ async function getOrCreate(
     if (k === 'id') continue;
     cols.push(`"${k}"`); vals.push(v);
   }
-  const res = await query(
-    `INSERT INTO "${table}" (${cols.join(', ')}) VALUES (${vals.map((_, i) => `$${i + 1}`).join(', ')}) RETURNING *`,
+  await query(
+    `INSERT INTO "${table}" (${cols.join(', ')}) VALUES (${vals.map((_, i) => `$${i + 1}`).join(', ')})`,
     vals,
   );
-  const result2 = res[0];
-  if (!result2) {
-    throw new Error(
-      `getOrCreate: introuvable après insertion dans "${table}" avec id ${String(id)}`,
-    );
-  }
-  return result2;
+  return await queryOne(`SELECT * FROM "${table}" WHERE "id" = $1 LIMIT 1`, [id]);
 }
 
 async function main(): Promise<void> {
@@ -436,6 +425,6 @@ if (require.main === module) {
       process.exitCode = 1;
     })
     .finally(async () => {
-      // Aucun client pg mis en cache : rien a fermer.
+      await clientResolve?.end();
     });
 }
