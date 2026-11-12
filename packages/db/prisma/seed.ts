@@ -67,28 +67,33 @@ async function getOrCreate(
     [whereValue],
   );
   if (existe) {
-    if (Object.keys(updateCols).length > 0) {
-      const sets = Object.keys(updateCols)
-        .map((k, i) => `"${k}" = $${i + 2}`)
-        .join(', ');
-      const params: unknown[] = [whereValue, ...Object.values(updateCols)];
-      if (withTimestamps) {
-        params.push(new Date());
-        await query(
-          `UPDATE "${table}" SET ${sets}, "updatedAt" = $${params.length} WHERE "${whereCol}" = $1`,
-          params,
-        );
-      } else {
-        await query(
-          `UPDATE "${table}" SET ${sets} WHERE "${whereCol}" = $1`,
-          params,
+    // Pas de mise à jour nécessaire : renvoyer l'enregistrement existant
+    if (Object.keys(updateCols).length === 0) {
+      return existe;
+    }
+    const sets = Object.keys(updateCols)
+      .map((k, i) => `"${k}" = $${i + 2}`)
+      .join(', ');
+    const params: unknown[] = [whereValue, ...Object.values(updateCols)];
+    if (withTimestamps) {
+      params.push(new Date());
+      const res = await query(
+        `UPDATE "${table}" SET ${sets}, "updatedAt" = $${params.length} WHERE "${whereCol}" = $1 RETURNING *`,
+        params,
+      );
+      const result = res[0];
+      if (!result) {
+        throw new Error(
+          `getOrCreate: introuvable après mise à jour dans "${table}" où "${whereCol}" = ${String(whereValue)}`,
         );
       }
+      return result;
     }
-    const result = await queryOne(
-      `SELECT * FROM "${table}" WHERE "${whereCol}" = $1 LIMIT 1`,
-      [whereValue],
+    const res = await query(
+      `UPDATE "${table}" SET ${sets} WHERE "${whereCol}" = $1 RETURNING *`,
+      params,
     );
+    const result = res[0];
     if (!result) {
       throw new Error(
         `getOrCreate: introuvable après mise à jour dans "${table}" où "${whereCol}" = ${String(whereValue)}`,
