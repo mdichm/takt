@@ -364,15 +364,26 @@ async function main(): Promise<void> {
       siteId: siteRef.id,
       capacite,
     }, { libelle: `Salle ${code}`, typeSalleId: typeSalleRef.id, siteId: siteRef.id, capacite });
-    await query('DELETE FROM "SalleEquipement" WHERE "salleId" = $1', [salle.id]);
+    // Re-querir la salle par son code pour s'assurer que l'id correspond
+    // à une ligne existante dans la table Salle (gardes contre un état
+    // client pg incohérent entre deux appels à main() en CI).
+    const salleVerify = await queryOne(
+      'SELECT id FROM "Salle" WHERE code = $1 LIMIT 1',
+      [code],
+    );
+    if (!salleVerify) {
+      throw new Error(`Salle ${code} introuvable après getOrCreate`);
+    }
+    const salleId = salleVerify.id;
+    await query('DELETE FROM "SalleEquipement" WHERE "salleId" = $1', [salleId]);
     const liens: { salleId: string; equipementId: string; quantite: number }[] = [];
     if (typeSalleRef.code === 'CM' || typeSalleRef.code === 'TD') {
-      liens.push({ salleId: salle.id, equipementId: equipements[0].id, quantite: 1 });
-      liens.push({ salleId: salle.id, equipementId: equipements[1].id, quantite: 1 });
-      liens.push({ salleId: salle.id, equipementId: equipements[2].id, quantite: 1 });
+      liens.push({ salleId: salleId, equipementId: equipements[0].id, quantite: 1 });
+      liens.push({ salleId: salleId, equipementId: equipements[1].id, quantite: 1 });
+      liens.push({ salleId: salleId, equipementId: equipements[2].id, quantite: 1 });
     }
     if (typeSalleRef.code === 'TP' || typeSalleRef.code === 'INFO') {
-      liens.push({ salleId: salle.id, equipementId: equipements[2].id, quantite: 10 });
+      liens.push({ salleId: salleId, equipementId: equipements[2].id, quantite: 10 });
     }
     for (const lien of liens) {
       await query(
