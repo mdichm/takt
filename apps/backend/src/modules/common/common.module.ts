@@ -19,7 +19,7 @@ import { Reflector } from '@nestjs/core';
     HealthService,
     PrismaService,
     Reflector,
-    { provide: PRISMA, useExisting: PrismaService },
+    { provide: PRISMA, useFactory: (prisma: PrismaService) => prisma.client, inject: [PrismaService] },
   ],
   exports: [PrismaModule, PRISMA, RbacModule, Reflector],
 })

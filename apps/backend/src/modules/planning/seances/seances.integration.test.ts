@@ -1,7 +1,7 @@
 // Copyright (C) 2026 TAKT
 // SPDX-License-Identifier: AGPL-3.0-only
 
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import request, { Agent } from 'supertest';
@@ -12,6 +12,7 @@ import { tmpdir } from 'node:os';
 import { hash as hacherArgon2 } from 'argon2';
 import { creerPrismaClient } from '@takt/db';
 import { VerificateurJwt } from '../../common/guards/jwt-verificateur.interface';
+import { PRISMA } from '../../common/di/prisma.token';
 import { AppModule } from '../../../app.module';
 import { TokenService } from '../../../modules/auth/token.service';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
@@ -26,6 +27,7 @@ interface SeancesTestCtx {
   tokenRdep: string;
   departementId: string;
   semestreId: string;
+  anneeUniversitaireId: string;
   versionId: string;
   matiereId: string;
   typeEnseignementId: string;
@@ -78,7 +80,7 @@ describe('Seances (TAKT-L06-03)', () => {
       imports: [AppModule],
       providers: [Reflector, DepartmentScopeGuard],
     })
-      .overrideProvider('PRISMA')
+      .overrideProvider(PRISMA)
       .useValue(creerPrismaClient(process.env.DATABASE_URL!))
       .compile();
 
@@ -145,59 +147,93 @@ describe('Seances (TAKT-L06-03)', () => {
       role: 'rdep',
       departementIds: [],
     }).token;
-    const etablissement = await prisma.etablissement.create({
-      data: { code: 'ETAB01', libelle: 'Etablissement test' },
+    const etablissement = await prisma.etablissement.upsert({
+      where: { code: 'ETAB01' },
+      update: {},
+      create: { code: 'ETAB01', libelle: 'Etablissement test' },
     });
-    const departement = await prisma.departement.create({
-      data: { code: 'DEP01', libelle: 'Departement test', etablissementId: etablissement.id },
+    const departement = await prisma.departement.upsert({
+      where: { code: 'DEP01' },
+      update: {},
+      create: { code: 'DEP01', libelle: 'Departement test', etablissementId: etablissement.id },
     });
-    const anneeUniversitaire = await prisma.anneeUniversitaire.create({
-      data: { libelle: '2026-2027', dateDebut: new Date('2026-09-01'), dateFin: new Date('2027-06-30') },
+    const anneeUniversitaire = await prisma.anneeUniversitaire.upsert({
+      where: { libelle: '2026-2027' },
+      update: {},
+      create: { libelle: '2026-2027', dateDebut: new Date('2026-09-01'), dateFin: new Date('2027-06-30') },
     });
-    const semestre = await prisma.semestre.create({
-      data: { numero: 1, anneeUniversitaireId: anneeUniversitaire.id, dateDebut: new Date('2026-09-01'), dateFin: new Date('2027-01-31') },
+    const semestre = await prisma.semestre.upsert({
+      where: { anneeUniversitaireId_numero: { anneeUniversitaireId: anneeUniversitaire.id, numero: 1 } },
+      update: {},
+      create: { numero: 1, anneeUniversitaireId: anneeUniversitaire.id, dateDebut: new Date('2026-09-01'), dateFin: new Date('2027-01-31') },
     });
-    const parcours = await prisma.parcours.create({
-      data: { code: 'INFO', libelle: 'Informatique', departementId: departement.id },
+    const parcours = await prisma.parcours.upsert({
+      where: { code: 'INFO' },
+      update: {},
+      create: { code: 'INFO', libelle: 'Informatique', departementId: departement.id },
     });
-    const niveau = await prisma.niveau.create({
-      data: { code: 'L1', libelle: 'Licence 1', parcoursId: parcours.id },
+    const niveau = await prisma.niveau.upsert({
+      where: { code: 'L1' },
+      update: {},
+      create: { code: 'L1', libelle: 'Licence 1', parcoursId: parcours.id },
     });
-    const groupe = await prisma.groupe.create({
-      data: { code: 'L1A', libelle: 'L1 A', niveauId: niveau.id },
+    const groupe = await prisma.groupe.upsert({
+      where: { code: 'L1A' },
+      update: {},
+      create: { code: 'L1A', libelle: 'L1 A', niveauId: niveau.id },
     });
-    const typeSalle = await prisma.typeSalle.create({
-      data: { code: 'CM', libelle: 'Cours magistral' },
+    const typeSalle = await prisma.typeSalle.upsert({
+      where: { code: 'CM' },
+      update: {},
+      create: { code: 'CM', libelle: 'Cours magistral' },
     });
-    const site = await prisma.site.create({
-      data: { code: 'SITE1', libelle: 'Site 1' },
+    const site = await prisma.site.upsert({
+      where: { code: 'SITE1' },
+      update: {},
+      create: { code: 'SITE1', libelle: 'Site 1' },
     });
-    const salle = await prisma.salle.create({
-      data: { code: 'S101', libelle: 'Salle 101', typeSalleId: typeSalle.id, capacite: 30, siteId: site.id },
+    const salle = await prisma.salle.upsert({
+      where: { code: 'S101' },
+      update: {},
+      create: { code: 'S101', libelle: 'Salle 101', typeSalleId: typeSalle.id, capacite: 30, siteId: site.id },
     });
-    const typeEnseignement = await prisma.typeEnseignement.create({
-      data: { code: 'CM', libelle: 'Cours magistral', couleur: '#FF0000' },
+    const typeEnseignement = await prisma.typeEnseignement.upsert({
+      where: { code: 'CM' },
+      update: {},
+      create: { code: 'CM', libelle: 'Cours magistral', couleur: '#FF0000' },
     });
-    const grade = await prisma.grade.create({
-      data: { code: 'G1', libelle: 'Grade 1' },
+    const grade = await prisma.grade.upsert({
+      where: { code: 'G1' },
+      update: {},
+      create: { code: 'G1', libelle: 'Grade 1' },
     });
-    const module = await prisma.module.create({
-      data: { code: 'MOD1', libelle: 'Module 1', typeEnseignementId: typeEnseignement.id, gradeId: grade.id },
+    const module = await prisma.module.upsert({
+      where: { code: 'MOD1' },
+      update: {},
+      create: { code: 'MOD1', libelle: 'Module 1', typeEnseignementId: typeEnseignement.id, gradeId: grade.id },
     });
-    const matiere = await prisma.matiere.create({
-      data: { code: 'MATH101', libelle: 'Mathematiques', moduleId: module.id },
+    const matiere = await prisma.matiere.upsert({
+      where: { code: 'MATH101' },
+      update: {},
+      create: { code: 'MATH101', libelle: 'Mathematiques', moduleId: module.id },
     });
-    const enseignant = await prisma.enseignant.create({
-      data: { matricule: 'ENS001', nom: 'Enseignant', prenom: 'Test', email: 'enseignant@test.takt' },
+    const enseignant = await prisma.enseignant.upsert({
+      where: { matricule: 'ENS001' },
+      update: {},
+      create: { matricule: 'ENS001', nom: 'Enseignant', prenom: 'Test', email: 'enseignant@test.takt' },
     });
-    await prisma.enseignantDepartement.create({
-      data: { enseignantId: enseignant.id, departementId: departement.id },
+    await prisma.enseignantDepartement.upsert({
+      where: { enseignantId_departementId: { enseignantId: enseignant.id, departementId: departement.id } },
+      update: {},
+      create: { enseignantId: enseignant.id, departementId: departement.id },
     });
     const version = await prisma.version.create({
       data: { anneeId: anneeUniversitaire.id, semestreId: semestre.id, etat: 'edition' },
     });
-    const creneau = await prisma.creneau.create({
-      data: { jour: 1, ordre: 1, heureDebut: new Date('2026-09-01T08:00:00Z'), heureFin: new Date('2026-09-01T09:00:00Z'), dureeMinutes: 60 },
+    const creneau = await prisma.creneau.upsert({
+      where: { jour_ordre: { jour: 1, ordre: 1 } },
+      update: {},
+      create: { jour: 1, ordre: 1, heureDebut: new Date('2026-09-01T08:00:00Z'), heureFin: new Date('2026-09-01T09:00:00Z'), dureeMinutes: 60 },
     });
     const affectation = await prisma.affectationPedagogique.create({
       data: { versionId: version.id, semestreId: semestre.id, departementId: departement.id, enseignantId: enseignant.id, matiereId: matiere.id, groupeId: groupe.id, typeEnseignementId: typeEnseignement.id, volumeHebdo: 2, dureeCreneaux: 60 },
@@ -206,11 +242,18 @@ describe('Seances (TAKT-L06-03)', () => {
     // any-justify: contexte de test global partagé entre hooks et tests
     globalThis.__seancesCtx! = {
       application, prisma, agent, tokenAdmin, tokenRdep,
-      departementId: departement.id, semestreId: semestre.id, versionId: version.id,
+      departementId: departement.id, semestreId: semestre.id, anneeUniversitaireId: anneeUniversitaire.id, versionId: version.id,
       matiereId: matiere.id, typeEnseignementId: typeEnseignement.id, enseignantId: enseignant.id,
       groupeId: groupe.id, salleId: salle.id, creneauId: creneau.id, affectationId: affectation.id,
     };
   });
+  beforeEach(async () => {
+    const ctx = globalThis.__seancesCtx!;
+    if (ctx) {
+      await ctx.prisma.seance.deleteMany({ where: { affectationId: ctx.affectationId } });
+    }
+  });
+
   afterAll(async () => {
     // any-justify: contexte de test global partagé entre hooks et tests
     const ctx = globalThis.__seancesCtx!;
@@ -239,8 +282,8 @@ describe('Seances (TAKT-L06-03)', () => {
       .expect(201);
 
     expect(cree.body.data.id).toBeDefined();
-    expect(cree.body.data.creneauDebut.id).toBe(ctx.creneauId);
-    expect(cree.body.data.salle.id).toBe(ctx.salleId);
+    expect(cree.body.data.creneauDebutId).toBe(ctx.creneauId);
+    expect(cree.body.data.salleId).toBe(ctx.salleId);
 
     const audit = await ctx.prisma.journalAudit.findFirst({
       where: { entite: 'Seance', entiteId: cree.body.data.id, action: 'CREATION' },
@@ -253,7 +296,7 @@ describe('Seances (TAKT-L06-03)', () => {
     // any-justify: contexte de test global partagé entre hooks et tests
     await ctx.prisma.version.update({
       where: { id: ctx.versionId },
-      data: { etat: 'valid_dir' },
+      data: { etat: 'publie' },
     });
 
     await ctx.agent
@@ -261,7 +304,7 @@ describe('Seances (TAKT-L06-03)', () => {
       .set('Authorization', 'Bearer ' + ctx.tokenRdep)
       .send({
         versionId: ctx.versionId,
-        jour: 2,
+        jour: 1,
         creneauDebutId: ctx.creneauId,
         nbCreneaux: 1,
         salleId: ctx.salleId,
@@ -278,11 +321,14 @@ describe('Seances (TAKT-L06-03)', () => {
   it('POST /seances : affectation hors version refuse (400)', async () => {
     const ctx = globalThis.__seancesCtx!;
     // any-justify: contexte de test global partagé entre hooks et tests
+    const autreSemestre = await ctx.prisma.semestre.create({
+      data: { numero: 2, anneeUniversitaireId: ctx.anneeUniversitaireId, dateDebut: new Date('2027-02-01'), dateFin: new Date('2027-06-30') },
+    });
     const autreVersion = await ctx.prisma.version.create({
-      data: { anneeId: '77777777-7777-7777-7777-777777777777', semestreId: ctx.semestreId, etat: 'edition' },
+      data: { anneeId: ctx.anneeUniversitaireId, semestreId: autreSemestre.id, etat: 'edition' },
     });
     const autreAffectation = await ctx.prisma.affectationPedagogique.create({
-      data: { versionId: autreVersion.id, semestreId: ctx.semestreId, departementId: ctx.departementId, enseignantId: ctx.enseignantId, matiereId: ctx.matiereId, groupeId: ctx.groupeId, typeEnseignementId: ctx.typeEnseignementId, volumeHebdo: 2, dureeCreneaux: 60 },
+      data: { versionId: autreVersion.id, semestreId: autreSemestre.id, departementId: ctx.departementId, enseignantId: ctx.enseignantId, matiereId: ctx.matiereId, groupeId: ctx.groupeId, typeEnseignementId: ctx.typeEnseignementId, volumeHebdo: 2, dureeCreneaux: 60 },
     });
 
     await ctx.agent
@@ -290,7 +336,7 @@ describe('Seances (TAKT-L06-03)', () => {
       .set('Authorization', 'Bearer ' + ctx.tokenRdep)
       .send({
         versionId: ctx.versionId,
-        jour: 3,
+        jour: 1,
         creneauDebutId: ctx.creneauId,
         nbCreneaux: 1,
         salleId: ctx.salleId,
@@ -301,6 +347,7 @@ describe('Seances (TAKT-L06-03)', () => {
     await ctx.prisma.seance.deleteMany({ where: { affectationId: autreAffectation.id } });
     await ctx.prisma.affectationPedagogique.delete({ where: { id: autreAffectation.id } });
     await ctx.prisma.version.delete({ where: { id: autreVersion.id } });
+    await ctx.prisma.semestre.delete({ where: { id: autreSemestre.id } });
   });
   it('GET /seances/:id : detail (200)', async () => {
     const ctx = globalThis.__seancesCtx!;
@@ -416,7 +463,7 @@ describe('Seances (TAKT-L06-03)', () => {
 
     await ctx.prisma.version.update({
       where: { id: ctx.versionId },
-      data: { etat: 'valid_dir' },
+      data: { etat: 'publie' },
     });
 
     await ctx.agent

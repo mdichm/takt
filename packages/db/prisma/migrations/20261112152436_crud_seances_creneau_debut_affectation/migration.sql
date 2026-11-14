@@ -17,7 +17,8 @@ ALTER TABLE "Seance" ADD COLUMN "typeEnseignementId" UUID;
 -- 2. Suppression de l'ancien index unique
 DROP INDEX IF EXISTS "Seance_versionId_jour_creneauDebut_nbCreneaux_key";
 
--- 3. Suppression de l'ancienne colonne creneauDebut
+-- 3. Suppression des colonnes devenues obsolètes (conformes à schema.prisma : activiteId retiré, creneauDebut remplacé)
+ALTER TABLE "Seance" DROP COLUMN "activiteId";
 ALTER TABLE "Seance" DROP COLUMN "creneauDebut";
 
 -- 4. Création du nouvel index unique (versionId, jour, creneauDebutId)

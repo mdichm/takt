@@ -26,3 +26,6 @@ ALTER TABLE "Seance" DROP COLUMN IF EXISTS "creneauDebutId";
 ALTER TABLE "Seance" DROP COLUMN IF EXISTS "affectationId";
 ALTER TABLE "Seance" DROP COLUMN IF EXISTS "matiereId";
 ALTER TABLE "Seance" DROP COLUMN IF EXISTS "typeEnseignementId";
+
+-- 6. Restauration de l'ancienne colonne activiteId (état antérieur, issue de la migration initiale)
+ALTER TABLE "Seance" ADD COLUMN IF EXISTS "activiteId" UUID;
