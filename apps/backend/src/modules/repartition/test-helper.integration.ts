@@ -521,6 +521,7 @@ export async function creerContexteTestRepartition(): Promise<ContexteTestRepart
 
 export async function nettoyerContexteTestRepartition(ctx: ContexteTestRepartition) {
   for (const id of ctx.idsACleaner) {
+    await ctx.prisma.notification.deleteMany({ where: { utilisateurId: id } });
     await ctx.prisma.journalAudit.deleteMany({ where: { utilisateurId: id } });
     await ctx.prisma.sessionRefresh.deleteMany({ where: { utilisateurId: id } });
     await ctx.prisma.utilisateur.deleteMany({ where: { id } });
