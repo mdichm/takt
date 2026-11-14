@@ -402,7 +402,7 @@ TICKETS: List[Ticket] = [
         lot="L06",
         titre="Implémenter le CRUD des séances sur la grille hebdomadaire",
         sp=5,
-        status="En cours",
+        status="Terminé",
         deps=['TAKT-L06-01', 'TAKT-L06-02', 'TAKT-L04-05'],
         exigences=['EX-EDI-01', 'EX-PER-01', 'B1 (ST_TAKT §0.2)', 'TE-MET-03', 'ST_TAKT §4.1.'],
     ),

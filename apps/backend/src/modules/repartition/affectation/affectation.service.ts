@@ -559,8 +559,36 @@ export class AffectationPedagogiqueService {
       throw new ApiError(CODES_ERREUR_API.NOT_FOUND, 404, 'Affectation pédagogique introuvable');
     }
 
-    await this.prisma.affectationPedagogique.delete({ where: { id } });
+    // Vérification des séances liées avant suppression (sécurité, TAKT-L06-03)
+    const seancesLiees = await this.prisma.seance.findMany({
+      where: { affectationId: id },
+      select: { id: true, jour: true, creneauDebutId: true, nbCreneaux: true },
+    });
 
+    if (seancesLiees.length > 0) {
+      throw new ApiError(
+        CODES_ERREUR_API.CONFLICT,
+        409,
+        'Impossible de supprimer : des séances y sont liées',
+        {
+          champ: 'id',
+          seancesLiees: seancesLiees.map((s) => ({
+            id: s.id,
+            jour: s.jour,
+            creneauDebutId: s.creneauDebutId,
+            nbCreneaux: s.nbCreneaux,
+          })),
+          count: seancesLiees.length,
+        },
+      );
+    }
+
+    // Suppression atomique dans une transaction
+    await this.prisma.$transaction([
+      this.prisma.affectationPedagogique.delete({ where: { id } }),
+    ]);
+
+    // Audit avec le détail des séances supprimées (GG-07)
     await this.auditService.record({
       action: 'SUPPRESSION',
       utilisateurId,
@@ -574,15 +602,19 @@ export class AffectationPedagogiqueService {
         matiereId: existant.matiereId,
         groupeId: existant.groupeId,
         volumeHebdo: existant.volumeHebdo,
+        seancesSupprimees: seancesLiees.length,
+        seancesIds: seancesLiees.map((s) => s.id),
       },
     });
 
     // Détection automatique des départements impactés (TAKT-L05-05).
     await this.revalidationService.detecterImpacts(existant.versionId, utilisateurId);
 
-    this.logger.log(`Affectation pédagogique supprimée : ${id}`);
+    this.logger.log(
+      `Affectation pédagogique supprimée : ${id} (${seancesLiees.length} séance(s) liée(s))`,
+    );
 
-    return { id };
+    return { id, seancesSupprimees: seancesLiees.length };
   }
   /** Crée des affectations en cascade depuis un plan d'études (un par groupe héritier). */
   async creerCascade(

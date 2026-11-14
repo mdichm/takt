@@ -3182,6 +3182,122 @@ paths:
       summary: Valide la répartition pédagogique du département
       tags:
         - Répartition
+  /api/v1/seances:
+    get:
+      operationId: SeancesController_list
+      parameters: []
+      responses:
+        '200':
+          description: Liste des seances
+        '401':
+          description: Non authentifie
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Liste paginee des seances d une version
+      tags:
+        - Seances
+    post:
+      operationId: SeancesController_creer
+      parameters: []
+      responses:
+        '201':
+          description: Seance creee
+        '400':
+          description: Requete invalide
+        '401':
+          description: Non authentifie
+        '403':
+          description: Interdit
+        '404':
+          description: Version ou ressource introuvable
+        '409':
+          description: Conflit (version publiee)
+      security:
+        - bearerAuth: []
+      summary: Cree une seance
+      tags:
+        - Seances
+  /api/v1/seances/{id}:
+    delete:
+      operationId: SeancesController_supprimer
+      parameters: []
+      responses:
+        '200':
+          description: Seance supprimee
+        '401':
+          description: Non authentifie
+        '403':
+          description: Interdit
+        '404':
+          description: Seance introuvable
+        '409':
+          description: Conflit (version publiee)
+      security:
+        - bearerAuth: []
+      summary: Supprime une seance
+      tags:
+        - Seances
+    get:
+      operationId: SeancesController_getOne
+      parameters: []
+      responses:
+        '200':
+          description: Seance trouvee
+        '401':
+          description: Non authentifie
+        '403':
+          description: Interdit ou hors perimetre
+        '404':
+          description: Seance introuvable
+      security:
+        - bearerAuth: []
+      summary: Detail d une seance
+      tags:
+        - Seances
+    patch:
+      operationId: SeancesController_mettreAJour
+      parameters: []
+      responses:
+        '200':
+          description: Seance modifiee
+        '400':
+          description: Requete invalide
+        '401':
+          description: Non authentifie
+        '403':
+          description: Interdit
+        '404':
+          description: Seance introuvable
+        '409':
+          description: Conflit (version publiee)
+      security:
+        - bearerAuth: []
+      summary: Modifie partiellement une seance
+      tags:
+        - Seances
+    put:
+      operationId: SeancesController_remplacer
+      parameters: []
+      responses:
+        '200':
+          description: Seance remplacee
+        '400':
+          description: Requete invalide
+        '401':
+          description: Non authentifie
+        '403':
+          description: Interdit
+        '404':
+          description: Seance introuvable
+        '409':
+          description: Conflit (version publiee)
+      security:
+        - bearerAuth: []
+      summary: Remplace completement une seance
+      tags:
+        - Seances
   /api/v1/users:
     get:
       operationId: UsersController_list
