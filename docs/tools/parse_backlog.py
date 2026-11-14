@@ -9,6 +9,13 @@ from pathlib import Path
 from dataclasses import dataclass
 from typing import List
 
+# Import des statuts existants pour les préserver lors de la régénération
+try:
+    from tickets_data import TICKETS as _EXISTING_TICKETS
+    _EXISTING_STATUS = {t.id: t.status for t in _EXISTING_TICKETS}
+except Exception:
+    _EXISTING_STATUS = {}
+
 @dataclass
 class Ticket:
     id: str
@@ -60,7 +67,7 @@ def parse_backlog(md_text: str) -> List[Ticket]:
                 if p:
                     exigences.append(p)
 
-        status = "À faire"
+        status = _EXISTING_STATUS.get(ticket_id, "À faire")
         tickets.append(Ticket(ticket_id, lot, titre, sp, status, deps, exigences))
     return tickets
 
