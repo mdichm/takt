@@ -13,6 +13,7 @@ import { hash as hacherArgon2 } from 'argon2';
 import { creerPrismaClient } from '@takt/db';
 import { VerificateurJwt } from '../../common/guards/jwt-verificateur.interface';
 import { PRISMA } from '../../common/di/prisma.token';
+import { ConfigService } from '@nestjs/config';
 import { AppModule } from '../../../app.module';
 import { TokenService } from '../../../modules/auth/token.service';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
@@ -82,6 +83,8 @@ describe('Seances (TAKT-L06-03)', () => {
     })
       .overrideProvider(PRISMA)
       .useValue(creerPrismaClient(process.env.DATABASE_URL!))
+      .overrideProvider(ConfigService)
+      .useValue(new ConfigService())
       .compile();
 
     application = moduleRef.createNestApplication();
