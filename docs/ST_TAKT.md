@@ -214,7 +214,9 @@ model Seance {
   verrous        VerrouSeance[]
 
   @@index([versionId])
-  @@unique([versionId, jour, creneauDebut, nbCreneaux])
+  @@unique([versionId, jour, creneauDebut, salleId])
+  @@index([versionId, jour, creneauDebut, enseignantId])
+  @@index([versionId, jour, creneauDebut, groupeId])
 }
 
 model VerrouSeance {
