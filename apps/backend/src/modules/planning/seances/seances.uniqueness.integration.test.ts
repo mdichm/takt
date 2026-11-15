@@ -17,11 +17,10 @@ function uuid(): string {
 describe('Seances — contraintes d unicite SQL (TAKT-L06-04)', () => {
   // Le mode replica desactive les contraintes de cle etrangere : on peut inserer
   // des Seance avec des identifiants de reference fictifs. Seules les colonnes
-  // NOT NULL de la table "Seance" sont respectees (activiteId est presente en
-  // base bien qu absente du schema Prisma courant - decalage preexistant).
+  // NOT NULL de la table "Seance" sont respectees (conformes au schema Prisma
+  // courant ; aucune colonne hors schema n'est requise).
   const versionId = uuid();
   const creneauDebutId = uuid();
-  const activiteId = uuid();
   const affectationId = uuid();
   const salleIdA = uuid();
   const salleIdB = uuid();
@@ -40,14 +39,14 @@ describe('Seances — contraintes d unicite SQL (TAKT-L06-04)', () => {
       `SET session_replication_role = replica;
 INSERT INTO "Seance" (
         "id", "versionId", "jour", "nbCreneaux", "salleId", "enseignantId",
-        "groupeId", "activiteId", "estVerrouillee", "createdAt", "updatedAt",
+        "groupeId", "estVerrouillee", "createdAt", "updatedAt",
         "creneauDebutId", "affectationId", "matiereId", "typeEnseignementId"
       ) VALUES (
         '${id}', '${versionId}', 1, 1,
         ${overrides.salleId ? `'${overrides.salleId}'` : 'NULL'},
         ${overrides.enseignantId ? `'${overrides.enseignantId}'` : 'NULL'},
         ${overrides.groupeId ? `'${overrides.groupeId}'` : 'NULL'},
-        '${activiteId}', false, now(), now(),
+        false, now(), now(),
         '${creneauDebutId}', '${affectationId}', NULL, NULL
       );
 SET session_replication_role = origin;`,
