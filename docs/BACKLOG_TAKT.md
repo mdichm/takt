@@ -160,7 +160,7 @@ L00 → L01 → L02 → L03 → L04 → L05 → L06 → L07 → L09 → L10 → 
 
 > **Format de fiche** : Objectif · Exigences tracées · Périmètre (fichiers autorisés / hors périmètre) · Livrables · Critères d'acceptation Given/When/Then · DoD · Tests exigés · SP · Dépendances · Ticket bloqué par ce ticket.
 
-### Lot L00 — Arbitrage documentaire & registre de décision (5 tickets · 13 SP)
+### Lot L00 — Arbitrage documentaire & registre de décision (6 tickets · 15 SP)
 
 #### TAKT-L00-01 — Trancher les transitions de rejet (divergences D1 / D5)
 
@@ -544,7 +544,7 @@ L00 → L01 → L02 → L03 → L04 → L05 → L06 → L07 → L09 → L10 → 
 - **Tests exigés :** tests d'intégration (import sélectif, idempotence, `originId`, types interdits).
 - **SP :** 4 · **Dépend de :** `TAKT-L04-07` · **Bloque :** `TAKT-L09-08`.
 
-### Lot L05 — Répartition pédagogique & charge horaire (6 tickets · 34 SP)
+### Lot L05 — Répartition pédagogique & charge horaire (6 tickets · 37 SP)
 
 #### TAKT-L05-01 — Implémenter le plan d'études (parcours → niveaux → matières → volumes)
 
@@ -612,7 +612,7 @@ L00 → L01 → L02 → L03 → L04 → L05 → L06 → L07 → L09 → L10 → 
 - **Tests exigés :** tests d'intégration Testing Library (indicateurs, garde-fou, gel) + test E2E Playwright `UF-RDEP-01`.
 - **SP :** 8 · **Dépend de :** `TAKT-L05-04`, `TAKT-L08-04` · **Bloque :** `TAKT-L09-12`.
 
-### Lot L06 — Versions, séances, conflits, bail, verrous (10 tickets · 62 SP)
+### Lot L06 — Versions, séances, conflits, bail, verrous (10 tickets · 63 SP)
 
 #### TAKT-L06-01 — Modéliser la version d'EDT et ses 10 états
 
@@ -882,7 +882,7 @@ L00 → L01 → L02 → L03 → L04 → L05 → L06 → L07 → L09 → L10 → 
 - **Tests exigés :** tests d'intégration (ErrorBoundary, 401, hors-ligne) + test axe-core du layout.
 - **SP :** 3 · **Dépend de :** `TAKT-L08-04`, `TAKT-L08-05` · **Bloque :** `TAKT-L09-01`…`TAKT-L09-12`.
 
-### Lot L09 — Frontend métier : 26 écrans `EC-*` (12 tickets · 88 SP)
+### Lot L09 — Frontend métier : 26 écrans `EC-*` (13 tickets · 112 SP)
 
 #### TAKT-L09-01 — Écran `EC-COM-01` Connexion / Login
 

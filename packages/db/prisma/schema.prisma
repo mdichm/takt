@@ -663,8 +663,8 @@ model EnseignantDepartement {
   departementId String   @db.Uuid
   createdAt     DateTime @default(now())
 
-  enseignant    Enseignant @relation(fields: [enseignantId], references: [id])
-  departement   Departement @relation(fields: [departementId], references: [id])
+  enseignant    Enseignant @relation(fields: [enseignantId], references: [id], onDelete: Cascade)
+  departement   Departement @relation(fields: [departementId], references: [id], onDelete: Cascade)
 
   @@id([enseignantId, departementId])
   @@index([enseignantId])
@@ -836,7 +836,7 @@ model Notification {
   lue           Boolean  @default(false)
   createdAt     DateTime @default(now())
 
-  utilisateur Utilisateur @relation(fields: [utilisateurId], references: [id])
+  utilisateur Utilisateur @relation(fields: [utilisateurId], references: [id], onDelete: Cascade)
 
   @@index([utilisateurId])
   @@index([utilisateurId, lue])

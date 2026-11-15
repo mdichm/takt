@@ -75,27 +75,74 @@ def main() -> int:
     errors = []
     warnings = []
     ids = set()
+    ticket_by_id: dict = {}
     all_exigences = set()
 
-    # 1. Unicité IDs + validations de base
+    # 1. Première passe : unicité IDs + validations de base (collecte tous les IDs avant toute vérification de dep)
     for t in TICKETS:
         if t.id in ids:
             errors.append(f"ID dupliqué : {t.id}")
         ids.add(t.id)
+        ticket_by_id[t.id] = t
 
         if t.sp <= 0:
             errors.append(f"{t.id} : SP doit être > 0")
         if t.status not in ("À faire", "En cours", "Bloqué", "Terminé"):
             warnings.append(f"{t.id} : statut inhabituel '{t.status}'")
 
+        for ex in t.exigences:
+            all_exigences.add(ex)
+
+    # 2. Validation des dépendances (tous les IDs sont maintenant connus → pas de faux « dépendance inconnue » pour les deps en avant)
+    for t in TICKETS:
         for dep in t.deps:
             if dep not in ids:
                 warnings.append(f"{t.id} : dépendance inconnue '{dep}'")
 
-        for ex in t.exigences:
-            all_exigences.add(ex)
+    # 3. Garde-fou B-06 : un ticket « En cours » doit avoir toutes ses dépendances en « Terminé »
+    for t in TICKETS:
+        if t.status == "En cours":
+            non_termine = []
+            for dep in t.deps:
+                dt = ticket_by_id.get(dep)
+                if dt is None or dt.status != "Terminé":
+                    non_termine.append(dep)
+            if non_termine:
+                errors.append(
+                    f"{t.id} : statut 'En cours' mais dépendance(s) non terminée(s) : {non_termine}"
+                )
 
-    # 2. Couverture exigences
+    # 4. Garde-fou cohérence des totaux par lot entre tickets_data.py et BACKLOG_TAKT.md
+    by_lot_count: dict = {}
+    by_lot_sp: dict = {}
+    for t in TICKETS:
+        by_lot_count[t.lot] = by_lot_count.get(t.lot, 0) + 1
+        by_lot_sp[t.lot] = by_lot_sp.get(t.lot, 0) + t.sp
+
+    backlog_path = Path("docs/BACKLOG_TAKT.md")
+    if backlog_path.exists():
+        contenu = backlog_path.read_text(encoding="utf-8")
+        lot_re = re.compile(
+            r"### Lot\s+(L\d+)\s*—.*?\((\d+)\s*tickets\s*·\s*(\d+)\s*SP\)"
+        )
+        for m in lot_re.finditer(contenu):
+            lot = m.group(1)
+            doc_count = int(m.group(2))
+            doc_sp = int(m.group(3))
+            real_count = by_lot_count.get(lot, 0)
+            real_sp = by_lot_sp.get(lot, 0)
+            if real_count != doc_count:
+                errors.append(
+                    f"Lot {lot} : {real_count} tickets dans tickets_data.py, "
+                    f"{doc_count} annoncés dans BACKLOG_TAKT.md"
+                )
+            if real_sp != doc_sp:
+                errors.append(
+                    f"Lot {lot} : {real_sp} SP dans tickets_data.py, "
+                    f"{doc_sp} annoncés dans BACKLOG_TAKT.md"
+                )
+
+    # 5. Couverture exigences
     for ex in all_exigences:
         if not (EX_PATTERN.match(ex) or EC_PATTERN.match(ex)):
             warnings.append(f"Format exigence inhabituel : {ex}")
