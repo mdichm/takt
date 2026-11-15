@@ -281,6 +281,7 @@ model Version {
   validationRepartitions ValidationRepartition[] // état de validation par département (TAKT-L05-05)
 
   @@index([semestreId, etat], name: "Version_semestreId_etat_idx")
+  @@index([etat], name: "Version_etat_idx")
 }
 
 // ----------------------------------------------------------------------------
@@ -405,7 +406,9 @@ model Seance {
 
   @@index([versionId])
   @@index([versionId, jour])
-  @@unique([versionId, jour, creneauDebutId])
+  @@unique([versionId, jour, creneauDebutId, salleId])
+  @@index([versionId, jour, creneauDebutId, enseignantId])
+  @@index([versionId, jour, creneauDebutId, groupeId])
 }
 
 // ----------------------------------------------------------------------------
@@ -458,8 +461,7 @@ model Generation {
   version   Version   @relation(fields: [versionId], references: [id])
   scenarios Scenario[]
 
-  @@index([versionId])
-  @@index([statut])
+  @@index([versionId, statut], name: "Generation_versionId_statut_idx")
 }
 
 // ----------------------------------------------------------------------------
@@ -512,6 +514,7 @@ model JournalAudit {
   @@index([horodatage])
   @@index([action])
   @@index([utilisateurId])
+  @@index([horodatage, action], name: "JournalAudit_horodatage_action_idx")
 }
 
 // ----------------------------------------------------------------------------
