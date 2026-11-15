@@ -411,7 +411,7 @@ TICKETS: List[Ticket] = [
         lot="L06",
         titre="Poser les contraintes SQL d'unicité et les index de performance",
         sp=5,
-        status="En cours",
+        status="Terminé",
         deps=['TAKT-L06-03'],
         exigences=['HC-RES-01', 'HC-RES-02', 'HC-RES-03', 'ST_TAKT §2.3', 'ST_TAKT §2.4', 'PLAN_MACRO risque « conflits non détectés ».'],
     ),
