@@ -18,6 +18,7 @@ COPY packages/contracts/package.json ./packages/contracts/
 COPY packages/db/package.json ./packages/db/
 COPY packages/solver-client/package.json ./packages/solver-client/
 COPY packages/charge-engine/package.json ./packages/charge-engine/
+COPY packages/conflict-engine/package.json ./packages/conflict-engine/
 COPY apps/backend/package.json ./apps/backend/
 
 # Install dependencies
@@ -34,6 +35,8 @@ COPY packages/solver-client ./packages/solver-client
 COPY packages/solver-client/tsconfig*.json ./packages/solver-client/
 COPY packages/charge-engine ./packages/charge-engine
 COPY packages/charge-engine/tsconfig*.json ./packages/charge-engine/
+COPY packages/conflict-engine ./packages/conflict-engine
+COPY packages/conflict-engine/tsconfig*.json ./packages/conflict-engine/
 COPY apps/backend/src ./apps/backend/src
 COPY apps/backend/tsconfig*.json ./apps/backend/
 COPY apps/backend/nest-cli.json ./apps/backend/
@@ -75,6 +78,9 @@ COPY --from=builder --chown=nestjs:nodejs /app/packages/contracts/package.json /
 COPY --from=builder --chown=nestjs:nodejs /app/packages/solver-client/dist /app/packages/solver-client/dist
 COPY --from=builder --chown=nestjs:nodejs /app/packages/solver-client/node_modules /app/packages/solver-client/node_modules
 COPY --from=builder --chown=nestjs:nodejs /app/packages/solver-client/package.json /app/packages/solver-client/package.json
+COPY --from=builder --chown=nestjs:nodejs /app/packages/conflict-engine/dist /app/packages/conflict-engine/dist
+COPY --from=builder --chown=nestjs:nodejs /app/packages/conflict-engine/node_modules /app/packages/conflict-engine/node_modules
+COPY --from=builder --chown=nestjs:nodejs /app/packages/conflict-engine/package.json /app/packages/conflict-engine/package.json
 
 USER nestjs
 

@@ -109,3 +109,42 @@ export type SeanceParams = z.infer<typeof zSeanceParams>;
 export type SeanceListFilters = z.infer<typeof zSeanceList>;
 export type LockInput = z.infer<typeof zLock>;
 export type SeancesBatch = z.infer<typeof zSeancesBatch>;
+
+/** Type de conflit détecté par le moteur de conflits (13 codes). */
+export const zTypeConflit = z.enum([
+  'ENSEIGNANT',
+  'GROUPE',
+  'SALLE',
+  'CAPACITE',
+  'EQUIPEMENT',
+  'COMPATIBILITE',
+  'INDISPONIBILITE',
+  'PAUSE',
+  'REGLE_PEDAGOGIQUE',
+  'VERROU',
+  'COVOITURAGE',
+  'VOEU',
+  'DONNEE_MANQUANTE',
+]);
+
+/** Sévérité d'un conflit. */
+export const zSeveriteConflit = z.enum(['BLOQUANT', 'AVERTISSEMENT', 'INFORMATION']);
+
+/** Un conflit détecté (contrat partagé avec le moteur @takt/conflict-engine). */
+export const zConflit = z.object({
+  type: zTypeConflit,
+  severite: zSeveriteConflit,
+  message: z.string(),
+  details: z.record(z.string(), z.unknown()),
+});
+
+/** Liste de conflits retournée par l'endpoint de lecture. */
+export const zConflitsListe = z.object({
+  conflits: z.array(zConflit),
+  bloquant: z.boolean(),
+});
+
+export type TypeConflit = z.infer<typeof zTypeConflit>;
+export type SeveriteConflit = z.infer<typeof zSeveriteConflit>;
+export type Conflit = z.infer<typeof zConflit>;
+export type ConflitsListe = z.infer<typeof zConflitsListe>;

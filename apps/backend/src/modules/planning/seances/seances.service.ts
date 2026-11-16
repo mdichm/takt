@@ -5,6 +5,7 @@ import { Inject, Injectable, Logger } from '@nestjs/common';
 import { PRISMA } from '../../common/di/prisma.token';
 import { PrismaClient, Prisma } from '@takt/db';
 import { CODES_ERREUR_API, ApiError } from '../../common/http/api-error';
+import { ConflictService } from '../conflict/conflict.service';
 import { buildPrismaQuery, ConfigurationRequeteListe } from '../../common/pagination/build-prisma-query';
 import { construireDonneesPaginees } from '../../common/pagination/pagination-normalizer';
 import type {
@@ -20,6 +21,7 @@ export class SeancesService {
 
   constructor(
     @Inject(PRISMA) private readonly prisma: PrismaClient,
+    @Inject(ConflictService) private readonly conflictService: ConflictService,
   ) {}
 
   /** Liste paginée des séances d'une version (optimisée pour la grille). */
@@ -395,7 +397,27 @@ export class SeancesService {
       : 30;
     await this.verifierCouverture(affectation, donnees.nbCreneaux, dureeCreneauMinutes);
 
-    // 7. Création de la séance
+    // 7. Détection des conflits avant écriture (409 si au moins un conflit bloquant).
+    const resultatConflits = await this.conflictService.detecterConflits({
+      versionId: donnees.versionId,
+      jour: donnees.jour,
+      creneauDebutId: donnees.creneauDebutId,
+      nbCreneaux: donnees.nbCreneaux,
+      salleId: donnees.salleId,
+      enseignantId: donnees.enseignantId,
+      groupeId: donnees.groupeId,
+      typeEnseignementId: donnees.typeEnseignementId,
+    });
+    if (resultatConflits.bloquant) {
+      throw new ApiError(
+        CODES_ERREUR_API.CONFLICT,
+        409,
+        'Conflits de planning détectés',
+        { conflits: resultatConflits.conflits },
+      );
+    }
+
+    // Création de la séance
     const seance = await this.prisma.seance.create({
       data: {
         versionId: donnees.versionId,
@@ -533,6 +555,32 @@ export class SeancesService {
           dureeCreneauMinutes,
         );
       }
+    }
+
+    // Détection des conflits avant écriture (409 si au moins un conflit bloquant).
+    const salleIdFinale = donnees.salleId ?? existant.salleId;
+    const enseignantIdFinale = donnees.enseignantId ?? existant.enseignantId;
+    const groupeIdFinale = donnees.groupeId ?? existant.groupeId;
+    const typeEnseignementIdFinale = donnees.typeEnseignementId ?? existant.typeEnseignementId;
+
+    const resultatConflits = await this.conflictService.detecterConflits({
+      versionId,
+      jour,
+      creneauDebutId,
+      nbCreneaux,
+      salleId: salleIdFinale,
+      enseignantId: enseignantIdFinale,
+      groupeId: groupeIdFinale,
+      typeEnseignementId: typeEnseignementIdFinale,
+      seanceIdExclude: id,
+    });
+    if (resultatConflits.bloquant) {
+      throw new ApiError(
+        CODES_ERREUR_API.CONFLICT,
+        409,
+        'Conflits de planning détectés',
+        { conflits: resultatConflits.conflits },
+      );
     }
 
     // 8. Référentiels optionnels s'ils sont fournis
