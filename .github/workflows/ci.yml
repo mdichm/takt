@@ -101,6 +101,11 @@ jobs:
         env:
           DATABASE_URL: ${{ env.DATABASE_URL }}
 
+      # Construire les packages workspace (dist/) requis à l'exécution par les
+      # tests d'intégration (vitest invoqué directement, hors turbo).
+      - name: Build workspace packages
+        run: pnpm turbo run build
+
       - name: Run Unit Tests
         run: pnpm test:unit
         env:

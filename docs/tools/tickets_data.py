@@ -420,7 +420,7 @@ TICKETS: List[Ticket] = [
         lot="L06",
         titre="Implémenter le moteur de conflits (12 types, 3 sévérités)",
         sp=8,
-        status="À faire",
+        status="Terminé",
         deps=['TAKT-L06-04', 'TAKT-L04-04', 'TAKT-L05-03'],
         exigences=['EX-EDI-02', 'ST_TAKT §4.3', 'HC-RES-01 à HC-RES-03', 'HC-ROOM-01 à HC-ROOM-03', 'SC-LOAD-01', 'SC-LOAD-02', 'TE-TEST-02.'],
     ),

@@ -3440,6 +3440,22 @@ paths:
       summary: Détail d’une version
       tags:
         - Versions
+  /api/v1/versions/{id}/conflits:
+    get:
+      operationId: ConflictController_conflits
+      parameters: []
+      responses:
+        '200':
+          description: Liste des conflits détectés
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Détecte les conflits d'une séance sur une version
+      tags:
+        - Conflits
   /api/v1/versions/{id}/dupliquer:
     post:
       operationId: VersionsController_dupliquer
