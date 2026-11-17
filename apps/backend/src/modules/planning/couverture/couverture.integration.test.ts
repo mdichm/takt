@@ -69,6 +69,7 @@ describe('Couverture pédagogique (integration, TAKT-L06-09)', () => {
   let gradeId: string;
   let moduleId: string;
   let niveauId: string;
+  let utilisateurId: string;
 
   beforeAll(async () => {
     process.env = {
@@ -115,6 +116,7 @@ describe('Couverture pédagogique (integration, TAKT-L06-09)', () => {
     gradeId = randomUUID();
     moduleId = randomUUID();
     niveauId = randomUUID();
+    utilisateurId = randomUUID();
 
     const roleGest = await prisma.role.upsert({
       where: { code: 'gest' },
@@ -199,15 +201,28 @@ describe('Couverture pédagogique (integration, TAKT-L06-09)', () => {
     });
 
     await prisma.utilisateur.upsert({
-      where: { id: enseignantId },
+      where: { id: utilisateurId },
       create: {
-        id: enseignantId,
+        id: utilisateurId,
         email: 'ens.couverture@test.takt',
         motDePasseHash: 'hash',
         nom: 'Ens',
         prenom: 'Test',
         roleId: roleEnseignantId,
         departementId,
+        estActif: true,
+      },
+      update: {},
+    });
+
+    await prisma.enseignant.upsert({
+      where: { id: enseignantId },
+      create: {
+        id: enseignantId,
+        matricule: 'ENS-COUV',
+        nom: 'Ens',
+        prenom: 'Test',
+        email: 'ens.couverture@test.takt',
         estActif: true,
       },
       update: {},
