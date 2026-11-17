@@ -7,6 +7,7 @@ import { PrismaClient, Prisma } from '@takt/db';
 import { CODES_ERREUR_API, ApiError } from '../../common/http/api-error';
 import { ConflictService } from '../conflict/conflict.service';
 import { BailService } from '../bail/bail.service';
+import { VerrouService } from '../verrous/verrous.service';
 import { buildPrismaQuery, ConfigurationRequeteListe } from '../../common/pagination/build-prisma-query';
 import { construireDonneesPaginees } from '../../common/pagination/pagination-normalizer';
 import type {
@@ -24,6 +25,7 @@ export class SeancesService {
     @Inject(PRISMA) private readonly prisma: PrismaClient,
     @Inject(ConflictService) private readonly conflictService: ConflictService,
     @Inject(BailService) private readonly bailService: BailService,
+    @Inject(VerrouService) private readonly verrouService: VerrouService,
   ) {}
 
   /** Liste paginée des séances d'une version (optimisée pour la grille). */
@@ -513,6 +515,8 @@ export class SeancesService {
 
     // 2bis. Bail d'édition exclusif (TE-API-04, ST_TAKT §4.3)
     await this.bailService.verifierBail(existant.versionId, utilisateurId);
+    // 2ter. Verrou de séance (TAKT-L06-08)
+    await this.verrouService.verifierEditionSeance(existant.id, utilisateurId);
 
     // 3. Déterminer les valeurs finales après mise à jour
     const versionId = existant.versionId;
@@ -677,6 +681,8 @@ export class SeancesService {
 
     // 2bis. Bail d'édition exclusif (TE-API-04, ST_TAKT §4.3)
     await this.bailService.verifierBail(existant.versionId, utilisateurId);
+    // 2ter. Verrou de séance (TAKT-L06-08)
+    await this.verrouService.verifierEditionSeance(existant.id, utilisateurId);
 
     // 3. Suppression
     await this.prisma.seance.delete({ where: { id } });

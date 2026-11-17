@@ -220,15 +220,24 @@ model Seance {
 }
 
 model VerrouSeance {
-  id             String      @id @default(uuid()) @db.Uuid
-  seanceId       String      @db.Uuid
-  utilisateurId  String      @db.Uuid
-  type           String      // CRENEAU, SALLE, ENSEIGNANT, ACTIVITE
-  heurePose      DateTime    @default(now())
-  heureExpiration DateTime  // +30 min par défaut
+  id              String   @id @default(uuid()) @db.Uuid
+  versionId       String   @db.Uuid
+  seanceId        String   @db.Uuid
+  utilisateurId   String   @db.Uuid // utilisateur qui a posee le verrou (posePar)
+  type            TypeVerrou // CRENEAU, SALLE, ENSEIGNANT, ACTIVITE
+  valeur          String   @db.Uuid // UUID de la ressource imposee (creneau / salle / enseignant / activite)
+  poids           Int      @default(100)
+  datePose        DateTime @default(now())
 
-  seance         Seance      @relation(fields: [seanceId], references: [id])
-  utilisateur    Utilisateur @relation(fields: [utilisateurId], references: [id])
+  version  Version     @relation(fields: [versionId], references: [id])
+  seance   Seance      @relation(fields: [seanceId], references: [id], onDelete: Cascade)
+  utilisateur Utilisateur @relation(fields: [utilisateurId], references: [id])
+
+  @@unique([seanceId, type])
+  @@index([versionId])
+  @@index([versionId, type])
+  @@index([seanceId])
+  @@index([utilisateurId])
 }
 
 model Generation {
@@ -269,7 +278,7 @@ model JournalAudit {
 | `TE-DB-01` | `email` unique dans `Utilisateur`                                   | Utilisateur                           |
 | `TE-DB-02` | `code` unique dans `Role` et `Departement`                          | Role, Departement                     |
 | `TE-DB-03` | Unicité `(versionId, jour, creneauDebut, nbCreneaux)` dans `Seance` | Seance                                |
-| `TE-DB-04` | `heureExpiration` > `heurePose` dans `VerrouSeance`                 | VerrouSeance                          |
+| `TE-DB-04` | `Unicite (seanceId, type)` dans `VerrouSeance`                 | VerrouSeance                          |
 | `TE-DB-05` | Seule une version `publie` par semestre                             | Version (logique applicative)         |
 | `TE-DB-06` | `etat` de `Version` doit être parmi les 10 états autorisés          | Version (CHECK SQL)                   |
 | `TE-DB-07` | Journal d'audit immuable (pas de DELETE, pas de UPDATE)             | JournalAudit                          |
@@ -281,7 +290,8 @@ model JournalAudit {
 | ------------------------------- | ------------ | ---------------------- | -------------------------------------- |
 | `idx_version_semestre_etat`     | Version      | `(semestreId, etat)`   | Recherche rapide des versions par état |
 | `idx_seance_version_jour`       | Seance       | `(versionId, jour)`    | Affichage de la grille EDT par jour    |
-| `idx_verrou_seance_expiration`  | VerrouSeance | `(heureExpiration)`    | Nettoyage des baux expirés             |
+| `idx_verrou_seance_version`      | VerrouSeance | `(versionId)`          | Verrous d une version                  |
+| `idx_verrou_seance_version_type` | VerrouSeance | `(versionId, type)`   | Filtrer par version et type            |
 | `idx_generation_version_statut` | Generation   | `(versionId, statut)`  | Suivi des générations en cours         |
 | `idx_audit_horodatage_action`   | JournalAudit | `(horodatage, action)` | Filtrage du journal d'audit            |
 
@@ -315,6 +325,7 @@ model JournalAudit {
 | Séances      | `/api/v1/seances`                   | GET              | Liste des séances d'une version             | `zSeanceList`     |
 | Séances      | `/api/v1/seances`                   | POST             | Création d'une séance                       | `zSeance`         |
 | Séances      | `/api/v1/seances/:id`               | PUT/PATCH/DELETE | Modification / suppression d'une séance     | `zSeance`         |
+| Verrous      | ` /api/v1/locks `                   | GET              | Liste paginee des verrous d une version     | ` zLockList `     |
 | Verrous      | `/api/v1/locks`                     | POST             | Pose d'un verrou sur une séance             | `zLock`           |
 | Verrous      | `/api/v1/locks/:id`                 | DELETE           | Levée d'un verrou                           | —                 |
 | Générations  | `/api/v1/generations`               | GET/POST         | Liste / lancement d'une génération          | `zGeneration`     |

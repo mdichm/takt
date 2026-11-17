@@ -230,9 +230,19 @@ export class ConflictService {
     });
     const creneauxOrdonnees = tousCreneaux.map((c) => c.id);
 
-    // Pas de récupération de verrous ici : le bail d'édition (VerrouSeance sans
-    // champ valeur, L06-07) fait l'objet d'un ticket séparé.
-    const verrous: ContexteConflitsLocal['verrous'] = [];
+    // Verrous de séance actifs sur la version (TAKT-L06-08).
+    const verrous: ContexteConflitsLocal['verrous'] = (
+      await this.prisma.verrouSeance.findMany({
+        where: { versionId },
+        select: { id: true, seanceId: true, type: true, valeur: true, poids: true },
+      })
+    ).map((v) => ({
+      id: v.id,
+      seanceId: v.seanceId ?? undefined,
+      type: v.type,
+      valeur: v.valeur,
+      poids: v.poids,
+    }));
 
     const seance: SeanceAAAnalyserLocal = {
       id: seanceIdExclude ?? `nouvelle-${creneauDebutId}`,

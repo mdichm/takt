@@ -447,7 +447,7 @@ TICKETS: List[Ticket] = [
         lot="L06",
         titre="Implémenter les verrous de séance (4 types, pose en masse)",
         sp=6,
-        status="À faire",
+        status="Terminé",
         deps=['TAKT-L06-02', 'TAKT-L06-03'],
         exigences=['EX-VRR-01', 'EX-VRR-02', 'EX-WKF-09', 'WORKFLOW_METIER §8', 'HC-LOCK-01 à HC-LOCK-04', 'IX-GES-08', 'IX-GES-09.'],
     ),

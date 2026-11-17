@@ -24,9 +24,9 @@ const CAS: CasDeParite[] = [
   {
     nom: 'transition vide',
     schema: 'zTransition',
-    charge: { transition: '' },
-    chemin: 'transition',
-    message: 'La transition est requise',
+    charge: {},
+    chemin: 'action',
+    message: 'Required',
   },
   {
     nom: 'séance avec un jour invalide',
