@@ -8,7 +8,6 @@ import {
   Inject,
   Param,
   Post,
-  Req,
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -19,15 +18,11 @@ import {
 } from '@takt/contracts';
 import { ZodValidation } from '../../common/pipes/zod-validation.decorator';
 import { SimulationService } from './simulation.service';
-import { JwtAuthGuard, UtilisateurConnecte } from '../../common/guards/jwt-auth.guard';
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 
 const ROLES_SIMULATION = ['admin', 'gest'] as const;
-
-interface RequeteAvecUtilisateur {
-  user?: UtilisateurConnecte;
-}
 
 @ApiTags('Simulation')
 @ApiBearerAuth()
@@ -56,11 +51,8 @@ export class SimulationController {
   async simuler(
     @Param() params: { id: string },
     @Body() body: SimulationRequete,
-    @Req() req: RequeteAvecUtilisateur,
   ): Promise<{ alternatives: unknown[] }> {
-    const utilisateurId = req.user?.sub ?? 'inconnu';
-
-    const alternatives = await this.service.simuler(params.id, body, utilisateurId);
+    const alternatives = await this.service.simuler(params.id, body);
 
     return { alternatives };
   }

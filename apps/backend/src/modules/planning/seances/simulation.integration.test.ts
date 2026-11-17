@@ -1,7 +1,7 @@
 // Copyright (C) 2026 TAKT
 // SPDX-License-Identifier: AGPL-3.0-only
 
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import request, { Agent } from 'supertest';
@@ -75,7 +75,6 @@ describe('Simulation d alternatives (TAKT-L06-06)', () => {
   let prisma: ReturnType<typeof creerPrismaClient>;
   let agent: Agent;
   let tokenAdmin: string;
-  let tokenRdep: string;
   let seanceId: string;
   let versionId: string;
   let anneeUniversitaireId: string;
@@ -134,24 +133,10 @@ describe('Simulation d alternatives (TAKT-L06-06)', () => {
         role: { connect: { code: 'admin' } },
       },
     });
-    const rdep = await prisma.utilisateur.create({
-      data: {
-        email: emailUnique(),
-        motDePasseHash: hash,
-        nom: 'Rdep',
-        prenom: 'Test',
-        role: { connect: { code: 'rdep' } },
-      },
-    });
 
     tokenAdmin = tokenService.signAccessToken({
       sub: admin.id,
       role: 'admin',
-      departementIds: [],
-    }).token;
-    tokenRdep = tokenService.signAccessToken({
-      sub: rdep.id,
-      role: 'rdep',
       departementIds: [],
     }).token;
 
@@ -235,16 +220,6 @@ describe('Simulation d alternatives (TAKT-L06-06)', () => {
       where: { id: '11111111-1111-1111-1111-111111111001' },
       update: {},
       create: { id: '11111111-1111-1111-1111-111111111001', jour: 1, ordre: 1, heureDebut: new Date('2026-09-07T08:00:00Z'), heureFin: new Date('2026-09-07T09:00:00Z'), dureeMinutes: 60 },
-    });
-    const creneau2 = await prisma.creneau.upsert({
-      where: { id: '11111111-1111-1111-1111-111111111002' },
-      update: {},
-      create: { id: '11111111-1111-1111-1111-111111111002', jour: 1, ordre: 2, heureDebut: new Date('2026-09-07T09:00:00Z'), heureFin: new Date('2026-09-07T10:00:00Z'), dureeMinutes: 60 },
-    });
-    const salle2 = await prisma.salle.upsert({
-      where: { code: 'S102' },
-      update: {},
-      create: { code: 'S102', libelle: 'Salle 102', capacite: 30, typeSalleId: typeSalle.id, siteId: site.id },
     });
 
     const version = await prisma.version.upsert({

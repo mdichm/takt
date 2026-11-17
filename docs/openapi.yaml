@@ -3298,6 +3298,26 @@ paths:
       summary: Remplace completement une seance
       tags:
         - Seances
+  /api/v1/seances/{id}/simuler:
+    post:
+      operationId: SimulationController_simuler
+      parameters: []
+      responses:
+        '200':
+          description: Alternatives classées
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Séance introuvable
+        '409':
+          description: Version non modifiable
+      security:
+        - bearerAuth: []
+      summary: Simule des alternatives de placement pour une séance
+      tags:
+        - Simulation
   /api/v1/users:
     get:
       operationId: UsersController_list

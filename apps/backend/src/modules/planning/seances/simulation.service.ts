@@ -109,7 +109,6 @@ export class SimulationService {
   async simuler(
     seanceId: string,
     requete: SimulationRequete,
-    utilisateurId: string,
   ): Promise<Array<{
     candidat: CandidatPlacementLocal;
     conflitsResiduels: ConflitLocal[];
@@ -144,8 +143,9 @@ export class SimulationService {
         contexte.creneauxOrdonnees,
       ),
     );
-    const candidats: CandidatPlacementLocal[] = candidatsBrut.filter((c: any) =>
-      sallesLibres.has(c.salleId),
+    const candidats: CandidatPlacementLocal[] = candidatsBrut.filter(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- any-justify: candidatsBrut provient du moteur ESM @takt/conflict-engine, type de retour dynamique
+      (c: any) => sallesLibres.has(c.salleId),
     );
     const alternatives: Array<{
       candidat: CandidatPlacementLocal;
@@ -172,6 +172,7 @@ export class SimulationService {
     }
     const classees = engine.classerAlternatives(
       alternatives as Array<{
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- any-justify: type cible attendu par le moteur ESM @takt/conflict-engine
         candidat: any;
         conflitsResiduels: ConflitLocal[];
         score: number;
@@ -239,7 +240,9 @@ export class SimulationService {
     creneauxOrdonnees: string[];
     salles: SalleLocale[];
     seancesOccupees: SeanceOccupeeLocale[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- any-justify: contexte passe au moteur ESM @takt/conflict-engine, structure dynamique
   }): any {
+    // any-justify: contexte passe au moteur ESM @takt/conflict-engine, structure dynamique
     return {
       creneaux: contexte.creneaux,
       creneauxOrdonnees: contexte.creneauxOrdonnees,
@@ -252,6 +255,7 @@ export class SimulationService {
   }
 
   private detecterConflitsCandidat(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- any-justify: engine provient d'import dynamique @takt/conflict-engine (ESM)
     engine: any,
     cible: SeanceAAAnalyserLocal,
     contexte: {
