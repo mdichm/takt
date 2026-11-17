@@ -19,7 +19,7 @@ import { CommonModule } from '../../common/common.module';
 import { BailModule } from './bail.module';
 
 const DOSSIER_CLES = mkdtempSync(join(tmpdir(), 'takt-bail-int-jwt-'));
-const DATABASE_URL_TEST = 'postgresql://takt:takt@localhost:5432/takt_test';
+const DATABASE_URL_TEST = process.env.DATABASE_URL ?? 'postgresql://takt:takt@localhost:5432/takt_test';
 
 const { privateKey: clePrivee, publicKey: clePublique } = generateKeyPairSync('rsa', {
   modulusLength: 2048,
