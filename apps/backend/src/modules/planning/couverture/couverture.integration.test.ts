@@ -56,6 +56,7 @@ describe('Couverture pédagogique (integration, TAKT-L06-09)', () => {
   let agent: Agent;
   let tokenGest: string;
   let versionId: string;
+  let semestreId: string;
 
   beforeAll(async () => {
     process.env = {
@@ -123,6 +124,9 @@ describe('Couverture pédagogique (integration, TAKT-L06-09)', () => {
       create: { numero: 1, anneeUniversitaireId: annee.id, dateDebut: new Date('2026-09-01'), dateFin: new Date('2027-01-31') },
       update: {},
     });
+    semestreId = semestre.id;
+
+    await creerReferentiels();
 
     await prisma.creneau.upsert({
       where: { id: 'creneau-30min' },
@@ -149,6 +153,43 @@ describe('Couverture pédagogique (integration, TAKT-L06-09)', () => {
     await prisma.$disconnect();
   });
 
+  async function creerReferentiels() {
+    await prisma.departement.upsert({
+      where: { id: 'dep-couverture' },
+      create: { id: 'dep-couverture', libelle: 'Département test', code: 'DEP', etablissement: { connect: { id: 'etab-test' } } },
+      update: {},
+    });
+    await prisma.role.upsert({
+      where: { id: 'role-enseignant-couverture' },
+      create: { id: 'role-enseignant-couverture', code: 'ENSEIGNANT', libelle: 'Enseignant' },
+      update: {},
+    });
+    await prisma.utilisateur.upsert({
+      where: { id: 'ens-couverture' },
+      create: {
+        id: 'ens-couverture',
+        email: 'ens.couverture@test.takt',
+        motDePasseHash: 'hash',
+        nom: 'Ens',
+        prenom: 'Test',
+        roleId: 'role-enseignant-couverture',
+        departementId: 'dep-couverture',
+        estActif: true,
+      },
+      update: {},
+    });
+    await prisma.matiere.upsert({
+      where: { id: 'mat-couverture' },
+      create: { id: 'mat-couverture', libelle: 'Matière test', code: 'MAT', module: { connect: { id: 'module-test' } } },
+      update: {},
+    });
+    await prisma.groupe.upsert({
+      where: { id: 'grp-couverture' },
+      create: { id: 'grp-couverture', libelle: 'Groupe test', code: 'GRP', niveau: { connect: { id: 'niveau-test' } } },
+      update: {},
+    });
+  }
+
   async function creerAffectationAvecSeance(
     affectationId: string,
     volumeHebdo: number,
@@ -158,11 +199,11 @@ describe('Couverture pédagogique (integration, TAKT-L06-09)', () => {
       data: {
         id: affectationId,
         versionId,
-        semestreId: 'semestre-placeholder',
-        departementId: 'departement-placeholder',
-        enseignantId: 'enseignant-placeholder',
-        matiereId: 'matiere-placeholder',
-        groupeId: 'groupe-placeholder',
+        semestreId: semestreId,
+        departementId: 'dep-couverture',
+        enseignantId: 'ens-couverture',
+        matiereId: 'mat-couverture',
+        groupeId: 'grp-couverture',
         volumeHebdo,
       },
     });
