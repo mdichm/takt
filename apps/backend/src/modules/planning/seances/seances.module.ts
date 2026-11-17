@@ -5,13 +5,14 @@ import { Module } from '@nestjs/common';
 import { CommonModule } from '../../common/common.module';
 import { ConflictModule } from '../conflict/conflict.module';
 import { BailModule } from '../bail/bail.module';
+import { VerrousModule } from '../verrous/verrous.module';
 import { SeancesController } from './seances.controller';
 import { SeancesService } from './seances.service';
 import { SimulationController } from './simulation.controller';
 import { SimulationService } from './simulation.service';
 
 @Module({
-  imports: [CommonModule, ConflictModule, BailModule],
+  imports: [CommonModule, ConflictModule, BailModule, VerrousModule],
   controllers: [SeancesController, SimulationController],
   providers: [SeancesService, SimulationService],
   exports: [SeancesService, SimulationService],

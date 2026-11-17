@@ -11,6 +11,7 @@ export * from './auth';
 export * from './bail';
 export * from './common';
 export * from './events';
+export * from './locks';
 export * from './referentiels';
 export * from './repartition';
 export * from './seances';

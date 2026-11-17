@@ -281,6 +281,7 @@ model Version {
   affectations      AffectationPedagogique[]
   validationRepartitions ValidationRepartition[] // état de validation par département (TAKT-L05-05)
   bailEdition       BailEdition?            // bail d'édition exclusif (TAKT-L06-07)
+  verrous           VerrouSeance[]          // verrous de seance poss sur cette version (TAKT-L06-08)
 
   @@index([semestreId, etat], name: "Version_semestreId_etat_idx")
   @@index([etat], name: "Version_etat_idx")
@@ -416,20 +417,32 @@ model Seance {
 // ----------------------------------------------------------------------------
 // 10. VerrouSeance — Verrou sur une séance (créneau, salle, enseignant, activité)
 // ----------------------------------------------------------------------------
-model VerrouSeance {
-  id             String   @id @default(uuid()) @db.Uuid
-  seanceId       String   @db.Uuid
-  utilisateurId  String   @db.Uuid
-  type           String   // CRENEAU, SALLE, ENSEIGNANT, ACTIVITE
-  heurePose      DateTime @default(now())
-  heureExpiration DateTime // +30 min par défaut
+enum TypeVerrou {
+  CRENEAU
+  SALLE
+  ENSEIGNANT
+  ACTIVITE
+}
 
-  seance     Seance      @relation(fields: [seanceId], references: [id])
+model VerrouSeance {
+  id              String   @id @default(uuid()) @db.Uuid
+  versionId       String   @db.Uuid
+  seanceId        String   @db.Uuid
+  utilisateurId   String   @db.Uuid // utilisateur qui a posee le verrou (posePar)
+  type            TypeVerrou
+  valeur          String   @db.Uuid // UUID de la ressource imposee (creneau / salle / enseignant / activite)
+  poids           Int      @default(100)
+  datePose        DateTime @default(now())
+
+  version  Version     @relation(fields: [versionId], references: [id])
+  seance   Seance      @relation(fields: [seanceId], references: [id], onDelete: Cascade)
   utilisateur Utilisateur @relation(fields: [utilisateurId], references: [id])
 
+  @@unique([seanceId, type])
+  @@index([versionId])
+  @@index([versionId, type])
   @@index([seanceId])
   @@index([utilisateurId])
-  @@index([heureExpiration])
 }
 
 // ----------------------------------------------------------------------------

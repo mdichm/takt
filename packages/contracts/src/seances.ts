@@ -73,12 +73,6 @@ export const zSeanceList = zPaginationQuery
     estVerrouillee: zBooleanQuery.optional(),
   });
 
-/** Pose d’un verrou sur une séance. */
-export const zLock = z.object({
-  seanceId: zUuid,
-  type: z.enum(['CRENEAU', 'SALLE', 'ENSEIGNANT', 'ACTIVITE']),
-});
-
 /** Lot de séances soumis à la règle d’unicité d’une salle. */
 export const zSeancesBatch = z
   .object({ seances: z.array(zSeanceCreate) })
@@ -107,7 +101,6 @@ export type SeanceUpdateInput = z.infer<typeof zSeanceUpdate>;
 export type SeanceReplaceInput = z.infer<typeof zSeanceReplace>;
 export type SeanceParams = z.infer<typeof zSeanceParams>;
 export type SeanceListFilters = z.infer<typeof zSeanceList>;
-export type LockInput = z.infer<typeof zLock>;
 export type SeancesBatch = z.infer<typeof zSeancesBatch>;
 
 /** Type de conflit détecté par le moteur de conflits (13 codes). */

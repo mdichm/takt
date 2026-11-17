@@ -3,11 +3,11 @@
 
 import { describe, expect, it } from 'vitest';
 import {
-  zLock,
   zSeanceCreate,
   zSeanceList,
   zSeancesBatch,
 } from '../src/seances';
+import { zLockCreate } from '../src/locks';
 
 const UUID = '11111111-1111-4111-8111-111111111111';
 const UUID_SALLE = '22222222-2222-4222-8222-222222222222';
@@ -111,7 +111,10 @@ describe('contrats des séances et des verrous', () => {
   });
 
   it('refuse un type de verrou inconnu', () => {
-    expect(zLock.safeParse({ seanceId: UUID, type: 'INCONNU' }).success).toBe(false);
+    expect(
+      zLockCreate.safeParse({ versionId: UUID, type: 'INCONNU', valeur: UUID, seanceId: UUID })
+        .success,
+    ).toBe(false);
   });
 
   it('refuse deux séances sur le même jour, créneau et salle', () => {
