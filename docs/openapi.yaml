@@ -1231,6 +1231,63 @@ paths:
       security:
         - bearerAuth: []
       summary: S’abonner aux événements temps réel de l’utilisateur
+  /api/v1/locks:
+    get:
+      operationId: VerrousController_lister
+      parameters: []
+      responses:
+        '200':
+          description: Liste des verrous
+        '401':
+          description: Non authentifie
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Liste paginee des verrous de seance
+      tags:
+        - Verrous
+    post:
+      operationId: VerrousController_poser
+      parameters: []
+      responses:
+        '201':
+          description: Verrou pose
+        '400':
+          description: Requete invalide
+        '401':
+          description: Non authentifie
+        '403':
+          description: Interdit
+        '404':
+          description: Version ou seance introuvable
+        '409':
+          description: Version verrouillee (publiee)
+      security:
+        - bearerAuth: []
+      summary: Pose un verrou sur une seance ou une portee
+      tags:
+        - Verrous
+  /api/v1/locks/{id}:
+    delete:
+      operationId: VerrousController_lever
+      parameters: []
+      responses:
+        '200':
+          description: Verrou leve
+        '401':
+          description: Non authentifie
+        '403':
+          description: Interdit
+        '404':
+          description: Verrou introuvable
+        '409':
+          description: Version verrouillee (publiee)
+      security:
+        - bearerAuth: []
+      summary: Leve un verrou de seance
+      tags:
+        - Verrous
   /api/v1/plans-etudes:
     get:
       operationId: PlanEtudesController_list
