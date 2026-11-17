@@ -5,6 +5,7 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { PrismaClient } from '@takt/db';
 import { CODES_ERREUR_API } from '../../common/http/api-error';
 import { AuditService } from '../../audit/audit.service';
+import { IGardeCouverture } from '../../common/di/garde-couverture.token';
 import { WorkflowService } from './workflow.service';
 
 const UTILISATEUR_ID = '11111111-1111-4111-8111-111111111111';
@@ -19,22 +20,43 @@ function creerPrismaMock() {
   } as unknown as PrismaClient;
 }
 
-function creerService(prisma: ReturnType<typeof creerPrismaMock>) {
+function creerGardeCouvertureMock(): IGardeCouverture {
+  return {
+    verifierSoumission: vi.fn().mockResolvedValue(undefined),
+    calculerCouverture: vi.fn().mockResolvedValue({
+      parAffectation: [],
+      parDepartement: [],
+      tauxGlobal: 0,
+      estConforme: true,
+      seancesOrphelines: [],
+    }),
+  } as unknown as IGardeCouverture;
+}
+
+function creerService(
+  prisma: ReturnType<typeof creerPrismaMock>,
+  gardeCouverture: IGardeCouverture = creerGardeCouvertureMock(),
+) {
   const auditService = {
     record: vi.fn().mockResolvedValue({}),
   } as unknown as AuditService;
 
-  return { service: new WorkflowService(prisma, auditService), auditService };
+  return {
+    service: new WorkflowService(prisma, auditService, gardeCouverture),
+    auditService,
+    gardeCouverture,
+  };
 }
 
 describe('WorkflowService (TAKT-L06-02)', () => {
   let prisma: ReturnType<typeof creerPrismaMock>;
   let service: WorkflowService;
   let auditService: AuditService;
+  let gardeCouverture: IGardeCouverture;
 
   beforeEach(() => {
     prisma = creerPrismaMock();
-    ({ service, auditService } = creerService(prisma));
+    ({ service, auditService, gardeCouverture } = creerService(prisma));
   });
 
   it('applique une transition valide et journalise', async () => {
@@ -176,5 +198,86 @@ describe('WorkflowService (TAKT-L06-02)', () => {
         },
       }),
     );
+  });
+
+  /*──────────────────────────────────────────────────────────────────────────
+    Garde de couverture pédagogique (TAKT-L06-09)
+  ───────────────────────────────────────────────────────────────────────────*/
+
+  it('soumettreValidation : garde appelée, transition acceptée si couverture conforme', async () => {
+    (prisma.version.findUnique as ReturnType<typeof vi.fn>).mockResolvedValue({
+      id: VERSION_ID,
+      etat: 'edition',
+      semestreId: 'semestre-1',
+      datePublication: null,
+      publiePar: null,
+    });
+    (prisma.version.update as ReturnType<typeof vi.fn>).mockResolvedValue({
+      id: VERSION_ID,
+      etat: 'valid_pedag',
+      datePublication: null,
+      publiePar: null,
+    });
+    (gardeCouverture.verifierSoumission as ReturnType<typeof vi.fn>).mockResolvedValue(
+      undefined,
+    );
+
+    await service.transitionner(
+      VERSION_ID,
+      'soumettreValidation',
+      'gest',
+      {},
+      UTILISATEUR_ID,
+    );
+
+    expect(gardeCouverture.verifierSoumission).toHaveBeenCalledWith(VERSION_ID);
+    expect(prisma.version.update).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { id: VERSION_ID }, data: { etat: 'valid_pedag' } }),
+    );
+  });
+
+  it('soumettreValidation : couverture < 100 % → 400, aucune écriture', async () => {
+    (prisma.version.findUnique as ReturnType<typeof vi.fn>).mockResolvedValue({
+      id: VERSION_ID,
+      etat: 'edition',
+      semestreId: 'semestre-1',
+      datePublication: null,
+      publiePar: null,
+    });
+    (gardeCouverture.verifierSoumission as ReturnType<typeof vi.fn>).mockRejectedValue(
+      { code: CODES_ERREUR_API.BAD_REQUEST, status: 400 },
+    );
+
+    await expect(
+      service.transitionner(
+        VERSION_ID,
+        'soumettreValidation',
+        'gest',
+        {},
+        UTILISATEUR_ID,
+      ),
+    ).rejects.toMatchObject({ code: CODES_ERREUR_API.BAD_REQUEST });
+
+    expect(prisma.version.update).not.toHaveBeenCalled();
+  });
+
+  it('soumettreValidation : garde non appelée pour les autres transitions', async () => {
+    (prisma.version.findUnique as ReturnType<typeof vi.fn>).mockResolvedValue({
+      id: VERSION_ID,
+      etat: 'brouillon',
+      semestreId: 'semestre-1',
+      datePublication: null,
+      publiePar: null,
+    });
+    (prisma.version.update as ReturnType<typeof vi.fn>).mockResolvedValue({
+      id: VERSION_ID,
+      etat: 'edition',
+      datePublication: null,
+      publiePar: null,
+    });
+
+    await service.transitionner(VERSION_ID, 'editer', 'gest', {}, UTILISATEUR_ID);
+
+    expect(gardeCouverture.verifierSoumission).not.toHaveBeenCalled();
   });
 });
