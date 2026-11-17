@@ -438,7 +438,7 @@ TICKETS: List[Ticket] = [
         lot="L06",
         titre="Implémenter le bail d'édition exclusif (30 min)",
         sp=6,
-        status="À faire",
+        status="En cours",
         deps=['TAKT-L06-01', 'TAKT-L03-05'],
         exigences=['EX-EDI-04', 'TE-ARCH-04', 'ST_TAKT §4.5', 'RB-UI-03', 'IX-GES-16', 'DL-TE-06.'],
     ),
