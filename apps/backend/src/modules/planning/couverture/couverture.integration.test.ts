@@ -282,6 +282,10 @@ describe('Couverture pédagogique (integration, TAKT-L06-09)', () => {
     volumeHebdo: number,
     nbCreneaux: number,
   ) {
+    // Nettoyage des affectations et séances liées à cette version (contrainte d'unicité)
+    await prisma.seance.deleteMany({ where: { versionId } });
+    await prisma.affectationPedagogique.deleteMany({ where: { versionId } });
+
     await prisma.affectationPedagogique.create({
       data: {
         id: affectationId,
@@ -339,15 +343,17 @@ describe('Couverture pédagogique (integration, TAKT-L06-09)', () => {
 
   it('0 pct : aucune seance -> 400 VALIDATION_ERROR', async () => {
     await prisma.version.update({ where: { id: versionId }, data: { etat: 'edition' } });
+    await prisma.seance.deleteMany({ where: { versionId } });
+    await prisma.affectationPedagogique.deleteMany({ where: { versionId } });
     await prisma.affectationPedagogique.create({
       data: {
         id: randomUUID(),
         versionId,
         semestreId: semestreId,
-        departementId: departementId,
-        enseignantId: enseignantId,
-        matiereId: matiereId,
-        groupeId: groupeId,
+        departementId,
+        enseignantId,
+        matiereId,
+        groupeId,
         volumeHebdo: 10,
       },
     });
