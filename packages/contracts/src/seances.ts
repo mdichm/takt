@@ -148,3 +148,61 @@ export type TypeConflit = z.infer<typeof zTypeConflit>;
 export type SeveriteConflit = z.infer<typeof zSeveriteConflit>;
 export type Conflit = z.infer<typeof zConflit>;
 export type ConflitsListe = z.infer<typeof zConflitsListe>;
+
+/**
+ * Contrats de simulation d'alternatives de placement — TAKT-L06-06
+ * ST_TAKT §3.5 (endpoint POST /api/v1/seances/:id/simuler)
+ */
+
+/**
+ * Requête de simulation d'alternatives (corps de POST /simuler).
+ */
+export const zSimulationRequete = z.object({
+  /** Nombre de créneaux consécutifs à simuler (défaut 1). */
+  nbCreneaux: z.number().int().positive().default(1),
+  /** Créneau de début visé (optionnel, filtre les candidats). */
+  cibleCreneauDebutId: zUuid.nullish().optional(),
+  /** Salle visée (optionnel, filtre les candidats). */
+  cibleSalleId: zUuid.nullish().optional(),
+  /** Nombre maximal d'alternatives retournées (défaut 20, max 20). */
+  nbAlternativesMax: z.number().int().positive().max(20).default(20),
+});
+
+/**
+ * Sous-scores de qualité d'une alternative (0-100 chacun).
+ * Aligné sur le modèle de sous-scores du solveur CP-SAT.
+ */
+export const zSousScoresSimulation = z.object({
+  continuite: z.number().min(0).max(100),
+  heuresTardives: z.number().min(0).max(100),
+  preferences: z.number().min(0).max(100),
+});
+
+/**
+ * Une alternative de placement simulée et évaluée.
+ */
+export const zAlternativePlacement = z.object({
+  candidat: z.object({
+    jour: z.number().int().positive(),
+    creneauDebutId: zUuid,
+    nbCreneaux: z.number().int().positive(),
+    salleId: zUuid,
+    enseignantId: zUuid.nullish(),
+  }),
+  score: z.number().min(0).max(100),
+  sousScores: zSousScoresSimulation,
+  conflitsResiduels: z.array(zConflit),
+});
+
+/**
+ * Réponse de simulation (liste d'alternatives classées).
+ */
+export const zSimulationReponse = z.object({
+  alternatives: z.array(zAlternativePlacement),
+  message: z.string().optional(),
+});
+
+export type SimulationRequete = z.infer<typeof zSimulationRequete>;
+export type SousScoresSimulation = z.infer<typeof zSousScoresSimulation>;
+export type AlternativePlacement = z.infer<typeof zAlternativePlacement>;
+export type SimulationReponse = z.infer<typeof zSimulationReponse>;

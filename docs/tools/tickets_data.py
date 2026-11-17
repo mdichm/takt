@@ -429,7 +429,7 @@ TICKETS: List[Ticket] = [
         lot="L06",
         titre="Implémenter la simulation d'alternatives de placement",
         sp=6,
-        status="À faire",
+        status="Terminé",
         deps=['TAKT-L06-05'],
         exigences=['EX-EDI-03', 'RB-UI-05', 'EC-GES-07', 'IX-GES-10.'],
     ),

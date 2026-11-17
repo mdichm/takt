@@ -6,11 +6,13 @@ import { CommonModule } from '../../common/common.module';
 import { ConflictModule } from '../conflict/conflict.module';
 import { SeancesController } from './seances.controller';
 import { SeancesService } from './seances.service';
+import { SimulationController } from './simulation.controller';
+import { SimulationService } from './simulation.service';
 
 @Module({
   imports: [CommonModule, ConflictModule],
-  controllers: [SeancesController],
-  providers: [SeancesService],
-  exports: [SeancesService],
+  controllers: [SeancesController, SimulationController],
+  providers: [SeancesService, SimulationService],
+  exports: [SeancesService, SimulationService],
 })
 export class SeancesModule {}

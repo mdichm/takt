@@ -25,3 +25,19 @@ export {
   LISTE_TYPES_CONFLIT,
   severiteParDefaut,
 } from './detect-conflicts';
+
+export * from './simulation/types';
+export {
+  calculerScore,
+  pondererConflits,
+} from './simulation/score';
+export {
+  evaluerContinuite,
+  evaluerHeuresTardives,
+  evaluerPreferences,
+} from './simulation/criteres';
+export {
+  genererCandidats,
+  filtrerSallesLibres,
+} from './simulation/candidats';
+export { classerAlternatives } from './simulation/classement';
