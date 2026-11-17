@@ -6,6 +6,7 @@ import { PRISMA } from '../../common/di/prisma.token';
 import { PrismaClient, Prisma } from '@takt/db';
 import { CODES_ERREUR_API, ApiError } from '../../common/http/api-error';
 import { ConflictService } from '../conflict/conflict.service';
+import { BailService } from '../bail/bail.service';
 import { buildPrismaQuery, ConfigurationRequeteListe } from '../../common/pagination/build-prisma-query';
 import { construireDonneesPaginees } from '../../common/pagination/pagination-normalizer';
 import type {
@@ -22,6 +23,7 @@ export class SeancesService {
   constructor(
     @Inject(PRISMA) private readonly prisma: PrismaClient,
     @Inject(ConflictService) private readonly conflictService: ConflictService,
+    @Inject(BailService) private readonly bailService: BailService,
   ) {}
 
   /** Liste paginée des séances d'une version (optimisée pour la grille). */
@@ -297,6 +299,9 @@ export class SeancesService {
     // 1. Version modifiable
     await this.verifierVersionModifiable(donnees.versionId);
 
+    // 1bis. Bail d'édition exclusif (TE-API-04, ST_TAKT §4.3)
+    await this.bailService.verifierBail(donnees.versionId, utilisateurId);
+
     // 2. Affectation valide et de la même version
     const affectation = await this.verifierAffectation(
       donnees.affectationId,
@@ -506,6 +511,9 @@ export class SeancesService {
     // 2. Version modifiable
     await this.verifierVersionModifiable(existant.versionId);
 
+    // 2bis. Bail d'édition exclusif (TE-API-04, ST_TAKT §4.3)
+    await this.bailService.verifierBail(existant.versionId, utilisateurId);
+
     // 3. Déterminer les valeurs finales après mise à jour
     const versionId = existant.versionId;
     const jour = donnees.jour ?? existant.jour;
@@ -666,6 +674,9 @@ export class SeancesService {
 
     // 2. Version modifiable
     await this.verifierVersionModifiable(existant.versionId);
+
+    // 2bis. Bail d'édition exclusif (TE-API-04, ST_TAKT §4.3)
+    await this.bailService.verifierBail(existant.versionId, utilisateurId);
 
     // 3. Suppression
     await this.prisma.seance.delete({ where: { id } });

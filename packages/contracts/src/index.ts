@@ -8,6 +8,7 @@
 
 export * from './affectations';
 export * from './auth';
+export * from './bail';
 export * from './common';
 export * from './events';
 export * from './referentiels';

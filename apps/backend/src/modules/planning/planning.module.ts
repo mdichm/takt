@@ -7,9 +7,10 @@ import { ReferentielsModule } from '../referentiels/referentiels.module';
 import { VersionsModule } from '../versions/versions.module';
 import { SeancesModule } from './seances/seances.module';
 import { ConflictModule } from './conflict/conflict.module';
+import { BailModule } from './bail/bail.module';
 
-/** Module des séances, contraintes, verrous et conflits de planning. */
+/** Module des séances, contraintes, verrous, baux d'édition et conflits de planning. */
 @Module({
-  imports: [CommonModule, ReferentielsModule, VersionsModule, SeancesModule, ConflictModule],
+  imports: [CommonModule, ReferentielsModule, VersionsModule, SeancesModule, ConflictModule, BailModule],
 })
 export class PlanningModule {}
