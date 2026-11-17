@@ -320,8 +320,9 @@ describe('Couverture pédagogique (integration, TAKT-L06-09)', () => {
 
   it('100 pct : couverture exacte -> 200, transition vers valid_pedag', async () => {
     await creerAffectationAvecSeance(randomUUID(), 10, 20);
-    const reponse = await soumettreValidation().expect(200);
-    expect(reponse.body.data.etat).toBe('valid_pedag');
+    await soumettreValidation().expect(200);
+    const v = await prisma.version.findUnique({ where: { id: versionId } });
+    expect(v!.etat).toBe('valid_pedag');
   });
 
   it('97 pct : sous-planification -> 400 VALIDATION_ERROR, aucun changement detat', async () => {
