@@ -99,6 +99,7 @@ describe('Couverture pédagogique (integration, TAKT-L06-09)', () => {
       .compile();
 
     application = moduleRef.createNestApplication();
+    application.setGlobalPrefix('api/v1');
     await application.init();
     agent = request.agent(application.getHttpServer());
     prisma = creerPrismaClient(DATABASE_URL_TEST);
