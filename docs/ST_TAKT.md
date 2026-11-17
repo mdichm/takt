@@ -322,6 +322,7 @@ model JournalAudit {
 | Versions     | `/api/v1/versions`                  | GET/POST         | Liste / création de versions                | `zVersion`        |
 | Versions     | `/api/v1/versions/:id`              | GET/PUT/DELETE   | Détail / modification / suppression         | `zVersion`        |
 | Versions     | `/api/v1/versions/:id/transition`   | POST             | Transition d'état (workflow 18 transitions) | `zTransition`     |
+| Versions     | `/api/v1/versions/:id/couverture`   | GET              | Taux de couverture pédagogique d'une version | `zCouverture`     |
 | Séances      | `/api/v1/seances`                   | GET              | Liste des séances d'une version             | `zSeanceList`     |
 | Séances      | `/api/v1/seances`                   | POST             | Création d'une séance                       | `zSeance`         |
 | Séances      | `/api/v1/seances/:id`               | PUT/PATCH/DELETE | Modification / suppression d'une séance     | `zSeance`         |
@@ -426,6 +427,7 @@ La couverture 100 % signifie que chaque séance planifiée correspond à une aff
 | `TE-MET-02` | Avant publication, vérification que le nombre total de séances couvre 100 % des volumes horaires déclarés |
 | `TE-MET-03` | Toute séance créée doit être liée à une affectation existante                                             |
 | `TE-MET-04` | Suppression d'une affectation supprime les séances liées (cascade avec vérification)                      |
+| `TAKT-L06-09` | Blocage de `soumettreValidation` si couverture pédagogique != 100 % (sous, sur ou séance orpheline)        |
 
 ### 4.5 Bail d'édition
 

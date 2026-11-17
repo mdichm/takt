@@ -456,7 +456,7 @@ TICKETS: List[Ticket] = [
         lot="L06",
         titre="Implémenter le contrôle de couverture à 100 %",
         sp=5,
-        status="En cours",
+        status="Terminé",
         deps=['TAKT-L06-05', 'TAKT-L05-03'],
         exigences=['EX-EDI-05', 'RB-UI-06', 'TE-MET-01', 'TE-MET-02', 'SF_TAKT §15 (couverture)', 'SC-LOAD-01.'],
     ),

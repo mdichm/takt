@@ -11,6 +11,7 @@ import {
   type TransitionContexte,
 } from './workflow-machine';
 import { type ActionTransition, type CodeErreurApi, type RoleCode } from '@takt/contracts';
+import { GARDE_COUVERTURE, type IGardeCouverture } from '../../common/di/garde-couverture.token';
 
 /**
  * Service de transition d’état de version.
@@ -18,6 +19,10 @@ import { type ActionTransition, type CodeErreurApi, type RoleCode } from '@takt/
  * Applique la matrice arbitrée (18 transitions), vérifie le rôle et les gardes,
  * met à jour la version et journalise la mutation (GG-07).
  * Les erreurs mappent vers le catalogue HTTP (GG-06) : 400 / 403 / 404 / 409.
+ *
+ * Garde de couverture (TAKT-L06-09) : la transition `soumettreValidation`
+ * est bloquée (400) si la couverture pédagogique de la version n'est pas
+ * exactement de 100 %.
  */
 @Injectable()
 export class WorkflowService {
@@ -26,6 +31,7 @@ export class WorkflowService {
   constructor(
     @Inject(PRISMA) private readonly prisma: PrismaClient,
     @Inject(AuditService) private readonly auditService: AuditService,
+    @Inject(GARDE_COUVERTURE) private readonly gardeCouverture: IGardeCouverture,
   ) {}
 
   /**
@@ -87,7 +93,11 @@ export class WorkflowService {
     }
 
     const { regle } = resultat;
-
+    // Garde de couverture pédagogique pour la soumission à la validation (TAKT-L06-09).
+    // Appelée après canTransition (priorité au 409) et avant toute écriture.
+    if (action === 'soumettreValidation') {
+      await this.gardeCouverture.verifierSoumission(id);
+    }
     // Mise à jour de l’état et, le cas échéant, des champs de publication.
     const data: Record<string, unknown> = { etat: regle.to };
     if (regle.action === 'publier') {

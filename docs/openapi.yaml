@@ -3606,6 +3606,29 @@ paths:
       summary: Détecte les conflits d'une séance sur une version
       tags:
         - Conflits
+  /api/v1/versions/{id}/couverture:
+    get:
+      operationId: CouvertureController_couverture
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Détail de couverture
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Version introuvable
+      security:
+        - bearerAuth: []
+      summary: Couverture pédagogique d'une version
+      tags:
+        - Couverture
   /api/v1/versions/{id}/dupliquer:
     post:
       operationId: VersionsController_dupliquer
