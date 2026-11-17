@@ -1194,6 +1194,24 @@ paths:
       summary: Rafraîchit les jetons (rotation du refresh)
       tags:
         - auth
+  /api/v1/bails/{id}:
+    delete:
+      operationId: BailForceController_forcer
+      parameters: []
+      responses:
+        '200':
+          description: Bail force
+        '401':
+          description: Non authentifie
+        '403':
+          description: Interdit (reserve a l admin)
+        '404':
+          description: Bail introuvable
+      security:
+        - bearerAuth: []
+      summary: Forcer la liberation d un bail d edition (admin)
+      tags:
+        - Bail d'édition - forçage admin
   /api/v1/events:
     get:
       operationId: EventsController_fluxEvenements
@@ -3460,6 +3478,61 @@ paths:
       summary: Détail d’une version
       tags:
         - Versions
+  /api/v1/versions/{id}/bail:
+    delete:
+      operationId: BailController_liberer
+      parameters: []
+      responses:
+        '200':
+          description: Bail libere
+        '401':
+          description: Non authentifie
+        '403':
+          description: Interdit
+        '404':
+          description: Aucun bail actif
+      security:
+        - bearerAuth: []
+      summary: Liberer le bail d edition sur une version
+      tags:
+        - Bail d'édition
+    post:
+      operationId: BailController_acquerir
+      parameters: []
+      responses:
+        '200':
+          description: Bail acquis
+        '401':
+          description: Non authentifie
+        '403':
+          description: Interdit
+        '404':
+          description: Version introuvable
+        '423':
+          description: Version verrouillee par un autre utilisateur
+      security:
+        - bearerAuth: []
+      summary: Acquerir le bail d edition sur une version
+      tags:
+        - Bail d'édition
+  /api/v1/versions/{id}/bail/renouveler:
+    post:
+      operationId: BailController_renouveler
+      parameters: []
+      responses:
+        '200':
+          description: Bail renouvele
+        '401':
+          description: Non authentifie
+        '403':
+          description: Interdit
+        '404':
+          description: Aucun bail actif
+      security:
+        - bearerAuth: []
+      summary: Renouveler le bail d edition sur une version
+      tags:
+        - Bail d'édition
   /api/v1/versions/{id}/conflits:
     get:
       operationId: ConflictController_conflits

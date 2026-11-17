@@ -34,6 +34,7 @@ model Utilisateur {
   departement      Departement?        @relation(fields: [departementId], references: [id])
   sessionsRefresh       SessionRefresh[]    // familles de jetons de rafraîchissement (rotation)
   verrous               VerrouSeance[]
+  bails                 BailEdition[]     // baux d'édition détenus par cet utilisateur (TAKT-L06-07)
   journalAudit          JournalAudit[]
   notifications         Notification[]      // notifications in-app (TAKT-L05-05)
   versionsPubliees      Version[]           // versions dont cet utilisateur est l'auteur de publication
@@ -279,6 +280,7 @@ model Version {
   contraintes       Contrainte[]
   affectations      AffectationPedagogique[]
   validationRepartitions ValidationRepartition[] // état de validation par département (TAKT-L05-05)
+  bailEdition       BailEdition?            // bail d'édition exclusif (TAKT-L06-07)
 
   @@index([semestreId, etat], name: "Version_semestreId_etat_idx")
   @@index([etat], name: "Version_etat_idx")
@@ -428,6 +430,24 @@ model VerrouSeance {
   @@index([seanceId])
   @@index([utilisateurId])
   @@index([heureExpiration])
+}
+
+// ----------------------------------------------------------------------------
+// 11. BailEdition — Bail d'édition exclusif (30 min, renouvelable)
+// ----------------------------------------------------------------------------
+model BailEdition {
+  id              String   @id @default(uuid()) @db.Uuid
+  versionId       String   @unique @db.Uuid        // premier arrivé, premier servi (un seul bail actif par version)
+  utilisateurId   String   @db.Uuid
+  dateDebut       DateTime @default(now())
+  dateFin         DateTime // dateDebut + 30 min
+  derniereActivite DateTime @default(now())         // mise à jour à chaque renouvellement / activité
+
+  version    Version     @relation(fields: [versionId], references: [id])
+  utilisateur Utilisateur @relation(fields: [utilisateurId], references: [id])
+
+  @@index([dateFin])   // purge planifiée des baux expirés
+  @@index([utilisateurId])
 }
 
 // ----------------------------------------------------------------------------
