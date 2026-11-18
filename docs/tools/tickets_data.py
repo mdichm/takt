@@ -474,7 +474,7 @@ TICKETS: List[Ticket] = [
         lot="L07",
         titre="Construire le fichier dérivé d'entrée du solveur",
         sp=8,
-        status="À faire",
+        status="En cours",
         deps=['TAKT-L06-10', 'TAKT-L06-08'],
         exigences=['EX-PRI-01', 'EX-PRE-06', 'EX-DAT-01', 'TE-ARCH-01', 'SPEC_SOLVER_CPSAT §3', 'HC-*', 'SC-*.'],
     ),
