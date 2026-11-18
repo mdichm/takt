@@ -32,15 +32,16 @@ export interface TimeGrid {
 
 export interface Room {
   id: string;
-  name: string;
+  code: string;
   type: 'AMPHI' | 'TD' | 'TP' | 'INFO';
   capacity: number;
   building: string;
-  equipment: string[];
+  equipment?: string[];
 }
 
 export interface Teacher {
   id: string;
+  code: string;
   name: string;
   departmentId: string;
   maxHoursPerWeek: number;
@@ -55,9 +56,9 @@ export interface UnavailableSlot {
 
 export interface Group {
   id: string;
-  name: string;
-  departmentId: string;
+  code: string;
   size: number;
+  departmentId: string;
 }
 
 export interface Subject {
@@ -65,6 +66,8 @@ export interface Subject {
   code: string;
   name: string;
   departmentId: string;
+  teachingType: 'CM' | 'TD' | 'TP' | 'PROJET';
+  chargeCoefficient: number;
 }
 
 export interface Activity {
@@ -113,6 +116,7 @@ export interface Lock {
   activityId: string;
   lockType: 'TIMESLOT' | 'ROOM' | 'TEACHER' | 'ACTIVITY';
   value: string;
+  poids: number;
 }
 
 export interface Scenario {
