@@ -26,9 +26,95 @@ describe('contrats des versions et du workflow', () => {
     expect(zVersion.safeParse({ semestreId: UUID, etat: 'inconnu' }).success).toBe(false);
   });
 
-  it('exige une transition non vide', () => {
-    expect(zTransition.safeParse({ transition: 'valider' }).success).toBe(true);
-    expect(zTransition.safeParse({ transition: '' }).success).toBe(false);
+  it('accepte une action de transition valide sans motif (non-rejet)', () => {
+    expect(zTransition.safeParse({ action: 'creerRepartition' }).success).toBe(true);
+    expect(zTransition.safeParse({ action: 'publier' }).success).toBe(true);
+    expect(zTransition.safeParse({ action: 'archiver' }).success).toBe(true);
+  });
+
+  it('refuse une action de transition inconnue', () => {
+    expect(zTransition.safeParse({ action: 'transitionInexistante' }).success).toBe(false);
+    expect(zTransition.safeParse({ action: '' }).success).toBe(false);
+  });
+
+  it('exige un motif pour les actions de rejet', () => {
+    expect(
+      zTransition.safeParse({ action: 'rejeterPedagogique' }).success,
+    ).toBe(false);
+    expect(
+      zTransition.safeParse({
+        action: 'rejeterPedagogique',
+        motif: '',
+      }).success,
+    ).toBe(false);
+    expect(
+      zTransition.safeParse({
+        action: 'rejeterPedagogique',
+        motif: 'Répartition incohérente',
+        typeMotif: 'pedagogique',
+      }).success,
+    ).toBe(true);
+  });
+
+  it('exige un typeMotif pour les actions de rejet', () => {
+    expect(
+      zTransition.safeParse({
+        action: 'rejeterDirectionPlanning',
+        motif: 'Conflit de créneaux',
+      }).success,
+    ).toBe(false);
+    expect(
+      zTransition.safeParse({
+        action: 'rejeterDirectionPedagogique',
+        motif: 'Charge horaire dépassée',
+        typeMotif: 'pedagogique',
+      }).success,
+    ).toBe(true);
+  });
+
+  it('refuse un typeMotif pour une action non-rejet', () => {
+    expect(
+      zTransition.safeParse({
+        action: 'creerRepartition',
+        typeMotif: 'pedagogique',
+      }).success,
+    ).toBe(true);
+  });
+
+  it('liste les 18 actions canoniques', () => {
+    const actions = [
+      'creerRepartition',
+      'annulerRepartition',
+      'validerRepartition',
+      'lancerGeneration',
+      'editer',
+      'selectionnerScenario',
+      'annulerGeneration',
+      'soumettreValidation',
+      'regenerer',
+      'transmettreDirection',
+      'rejeterPedagogique',
+      'validerDefinitivement',
+      'rejeterDirectionPedagogique',
+      'rejeterDirectionPlanning',
+      'publier',
+      'archiverSansPublier',
+      'archiver',
+      'nouvelleVersionArchive',
+    ];
+    expect(actions).toHaveLength(18);
+    for (const action of actions) {
+      const estRejet = [
+        'rejeterPedagogique',
+        'rejeterDirectionPedagogique',
+        'rejeterDirectionPlanning',
+      ].includes(action);
+      const resultat = zTransition.safeParse({
+        action,
+        ...(estRejet ? { motif: 'motif de test', typeMotif: 'autre' } : {}),
+      });
+      expect(resultat.success, `échec sur l'action ${action}`).toBe(true);
+    }
   });
 
   it('valide une génération', () => {

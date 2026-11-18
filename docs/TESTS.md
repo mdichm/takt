@@ -68,7 +68,7 @@ Les tests unitaires couvrent la logique métier pure et les utilitaires, sans d�
 | ----------------- | --------------------------------------- | -------------------------------------------------------------------------- |
 | Authentification  | Hachage argon2id                        | Mot de passe valide, mot de passe invalide, coût de hachage (~100 ms)      |
 | Authentification  | Génération JWT                          | Access token (15 min), refresh token (7 j rotatif), signature, expiration  |
-| Workflow          | Matrice des 19 transitions              | Toutes les transitions valides, transitions invalides par rôle et état     |
+| Workflow          | Matrice des 18 transitions              | Toutes les transitions valides, transitions invalides par rôle et état     |
 | Workflow          | Contrôle d'accès par état               | Matrice rôle × état (10 états × 4 rôles)                                   |
 | Conflits          | Détection double affectation salle      | Deux séances même jour/créneau/salle                                       |
 | Conflits          | Détection double affectation enseignant | Deux séances même jour/créneau/enseignant                                  |
@@ -97,7 +97,7 @@ packages/
       auth/
         auth.service.test.ts          # hachage, JWT, refresh
       versions/
-        workflow.service.test.ts      # 19 transitions, matrice rôles × états
+        workflow.service.test.ts      # 18 transitions, matrice rôles × états
       planning/
         conflict.service.test.ts      # détection conflits salle/enseignant/groupe
         lock.service.test.ts          # bail d'édition 30 min, renouvellement
@@ -327,7 +327,7 @@ tests/
 ### 7.2 Services critiques (couverture 100 % branches)
 
 1. **Authentification** : hachage argon2id, génération/validation JWT, refresh rotatif
-2. **Workflow** : 19 transitions, matrice rôle × état
+2. **Workflow** : 18 transitions, matrice rôle × état
 3. **Contrôle des conflits** : double affectation salle/enseignant/groupe, verrous
 4. **Génération CP-SAT** : construction du fichier dérivé, parsing des scénarios
 5. **Bail d'édition** : pose, renouvellement, expiration, forçage

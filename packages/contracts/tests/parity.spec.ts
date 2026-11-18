@@ -7,7 +7,7 @@ import * as sourceContracts from '../src/index';
 
 interface CasDeParite {
   nom: string;
-  schema: 'zLogin' | 'zTransition' | 'zSeance';
+  schema: 'zLogin' | 'zTransition' | 'zSeanceCreate';
   charge: Record<string, unknown>;
   chemin: string;
   message: string;
@@ -24,14 +24,20 @@ const CAS: CasDeParite[] = [
   {
     nom: 'transition vide',
     schema: 'zTransition',
-    charge: { transition: '' },
-    chemin: 'transition',
-    message: 'La transition est requise',
+    charge: {},
+    chemin: 'action',
+    message: 'Required',
   },
   {
     nom: 'séance avec un jour invalide',
-    schema: 'zSeance',
-    charge: { versionId: 'invalide', jour: 7, creneauDebut: 0, nbCreneaux: 1 },
+    schema: 'zSeanceCreate',
+    charge: {
+      versionId: 'invalide',
+      jour: 7,
+      creneauDebutId: 'invalide',
+      nbCreneaux: 1,
+      affectationId: 'invalide',
+    },
     chemin: 'versionId',
     message: 'Identifiant UUID invalide',
   },

@@ -135,3 +135,74 @@ export interface ResultatCalculCharge {
   /** Liste des alertes générées. */
   alertes: AlerteCharge[];
 }
+
+/*──────────────────────────────────────────────────────────────────────────────
+  Types du contrôle de couverture pédagogique (TAKT-L06-09)
+  ─────────────────────────────────────────────────────────────────────────────*/
+
+/** Statut de couverture d'une affectation pédagogique. */
+export type StatutCouverture = 'CONFORME' | 'SOUS_PLANIFICATION' | 'SUR_PLANIFICATION';
+
+/** Affectation pédagogique réduite aux champs nécessaires au calcul de couverture. */
+export interface AffectationCouverture {
+  /** Identifiant de l'affectation. */
+  id: string;
+  /** Identifiant du département. */
+  departementId: string;
+  /** Volume horaire hebdomadaire déclaré (heures, strictement positif). */
+  volumeHebdo: number;
+}
+
+/** Séance réduite aux champs nécessaires au calcul de couverture. */
+export interface SeanceCouverture {
+  /** Identifiant de la séance. */
+  id: string;
+  /** Identifiant de l'affectation à laquelle la séance est liée. */
+  affectationId: string;
+  /** Nombre de créneaux consécutifs (≥ 1). */
+  nbCreneaux: number;
+  /** Durée d'un créneau en minutes (défaut 30, source Creneau.dureeMinutes). */
+  dureeCreneauMinutes: number;
+}
+
+/** Résultat de couverture pour une affectation pédagogique. */
+export interface CouvertureAffectation {
+  /** Identifiant de l'affectation. */
+  affectationId: string;
+  /** Identifiant du département. */
+  departementId: string;
+  /** Volume horaire déclaré en minutes (volumeHebdo × 60). */
+  volumeDeclareMinutes: number;
+  /** Volume horaire planifié en minutes (somme nbCreneaux × dureeCreneauMinutes). */
+  volumePlanifieMinutes: number;
+  /** Taux de couverture en pourcentage (0 à 100+). */
+  taux: number;
+  /** Statut de couverture. */
+  statut: StatutCouverture;
+}
+
+/** Résultat de couverture agrégé par département. */
+export interface CouvertureDepartement {
+  /** Identifiant du département. */
+  departementId: string;
+  /** Volume horaire déclaré en minutes. */
+  volumeDeclareMinutes: number;
+  /** Volume horaire planifié en minutes. */
+  volumePlanifieMinutes: number;
+  /** Taux de couverture du département en pourcentage. */
+  taux: number;
+}
+
+/** Résultat global du calcul de couverture pédagogique. */
+export interface ResultatCouverture {
+  /** Détail de couverture par affectation. */
+  parAffectation: CouvertureAffectation[];
+  /** Détail de couverture agrégé par département. */
+  parDepartement: CouvertureDepartement[];
+  /** Taux de couverture global (volume planifié total / volume déclaré total). */
+  tauxGlobal: number;
+  /** Vrai si couverture exactement 100 % sur toutes les affectations et aucune séance orpheline. */
+  estConforme: boolean;
+  /** Identifiants des séances liées à une affectation inconnue (orphelines, bloquant). */
+  seancesOrphelines: string[];
+}

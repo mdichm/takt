@@ -69,7 +69,6 @@ export class PilotListsService {
       where: () => where,
       searchFields: {
         id: (valeur) => ({ id: { contains: valeur, mode: Prisma.QueryMode.insensitive } }),
-        etat: (valeur) => ({ etat: { contains: valeur, mode: Prisma.QueryMode.insensitive } }),
       },
       sortFields: {
         etat: (direction) => ({ etat: direction as Prisma.SortOrder }),
@@ -112,7 +111,7 @@ export class PilotListsService {
       },
       sortFields: {
         jour: (direction) => ({ jour: direction as Prisma.SortOrder }),
-        creneauDebut: (direction) => ({ creneauDebut: direction as Prisma.SortOrder }),
+        creneauDebut: (direction) => ({ creneauDebut: { heureDebut: direction as Prisma.SortOrder } }),
         createdAt: (direction) => ({ createdAt: direction as Prisma.SortOrder }),
       },
       defaultSort: () => ({ jour: Prisma.SortOrder.asc }),

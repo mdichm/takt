@@ -23,6 +23,7 @@
     "@takt/db": "workspace:*",
     "@takt/solver-client": "workspace:*",
     "@takt/charge-engine": "workspace:*",
+    "@takt/conflict-engine": "workspace:*",
     "argon2": "0.41.1",
     "class-transformer": "0.5.1",
     "helmet": "8.3.0",

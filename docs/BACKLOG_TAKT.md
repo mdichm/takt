@@ -160,14 +160,14 @@ L00 → L01 → L02 → L03 → L04 → L05 → L06 → L07 → L09 → L10 → 
 
 > **Format de fiche** : Objectif · Exigences tracées · Périmètre (fichiers autorisés / hors périmètre) · Livrables · Critères d'acceptation Given/When/Then · DoD · Tests exigés · SP · Dépendances · Ticket bloqué par ce ticket.
 
-### Lot L00 — Arbitrage documentaire & registre de décision (5 tickets · 13 SP)
+### Lot L00 — Arbitrage documentaire & registre de décision (6 tickets · 15 SP)
 
 #### TAKT-L00-01 — Trancher les transitions de rejet (divergences D1 / D5)
 
-- **Objectif :** Établir une version unique et non contradictoire de la machine à 19 transitions avant toute implémentation du workflow.
+- **Objectif :** Établir une version unique et non contradictoire de la machine à 18 transitions avant toute implémentation du workflow.
 - **Exigences :** `EX-WKF-02`, `EX-WKF-03`, `EX-WKF-07`, `EX-WKF-08`, `WORKFLOW_METIER §3`, `ST_TAKT §4.1`.
 - **Périmètre :** `docs/WORKFLOW_METIER.md`, `docs/SF_TAKT.md`, `docs/ST_TAKT.md`, `docs/SUIVI_VELOCITE_TAKT.md`. **Hors périmètre :** tout code applicatif.
-- **Livrables :** Matrice des 19 transitions de `WORKFLOW_METIER §3` corrigée (rejet `valid_pedag` → `edition` ; rejet `valid_dir` → `rep_pedag` motif pédagogique **ou** `edition` motif planning ; aucun rejet vers `brouillon`), §4.1 de `ST_TAKT` aligné, Decision Log entries `DL-WF-05`/`DL-WF-06`.
+- **Livrables :** Matrice des 18 transitions de `WORKFLOW_METIER §3` corrigée (rejet `valid_pedag` → `edition` ; rejet `valid_dir` → `rep_pedag` motif pédagogique **ou** `edition` motif planning ; aucun rejet vers `brouillon`), §4.1 de `ST_TAKT` aligné, Decision Log entries `DL-WF-05`/`DL-WF-06`.
 - **Critères :** _Given_ une version en `valid_pedag`, _When_ le `rdep` rejette avec motif, _Then_ la version passe en `edition` et non en `brouillon`. _Given_ une version en `valid_dir`, _When_ la Direction rejette avec motif pédagogique, _Then_ la version repasse en `rep_pedag`. _Given_ un rejet, _When_ la transition est demandée sans motif, _Then_ la requête est refusée (motif obligatoire).
 - **DoD :** Les trois documents portent la même matrice ; aucune cellule ne mentionne `brouillon` comme cible de rejet ; chaque divergence est tracée dans le Decision Log ; le compte rendu liste les documents modifiés.
 - **Tests exigés :** revue documentaire croisée (table des transitions vérifiée ligne à ligne) — aucun test automatisé à ce stade.
@@ -544,7 +544,7 @@ L00 → L01 → L02 → L03 → L04 → L05 → L06 → L07 → L09 → L10 → 
 - **Tests exigés :** tests d'intégration (import sélectif, idempotence, `originId`, types interdits).
 - **SP :** 4 · **Dépend de :** `TAKT-L04-07` · **Bloque :** `TAKT-L09-08`.
 
-### Lot L05 — Répartition pédagogique & charge horaire (6 tickets · 34 SP)
+### Lot L05 — Répartition pédagogique & charge horaire (6 tickets · 37 SP)
 
 #### TAKT-L05-01 — Implémenter le plan d'études (parcours → niveaux → matières → volumes)
 
@@ -612,7 +612,7 @@ L00 → L01 → L02 → L03 → L04 → L05 → L06 → L07 → L09 → L10 → 
 - **Tests exigés :** tests d'intégration Testing Library (indicateurs, garde-fou, gel) + test E2E Playwright `UF-RDEP-01`.
 - **SP :** 8 · **Dépend de :** `TAKT-L05-04`, `TAKT-L08-04` · **Bloque :** `TAKT-L09-12`.
 
-### Lot L06 — Versions, séances, conflits, bail, verrous (10 tickets · 62 SP)
+### Lot L06 — Versions, séances, conflits, bail, verrous (10 tickets · 63 SP)
 
 #### TAKT-L06-01 — Modéliser la version d'EDT et ses 10 états
 
@@ -625,15 +625,15 @@ L00 → L01 → L02 → L03 → L04 → L05 → L06 → L07 → L09 → L10 → 
 - **Tests exigés :** tests d'intégration (création, duplication, unicité publication, immuabilité).
 - **SP :** 8 · **Dépend de :** `TAKT-L05-04`, `TAKT-L01-04` · **Bloque :** `TAKT-L06-02`, `TAKT-L06-03`, `TAKT-L10-07`.
 
-#### TAKT-L06-02 — Implémenter le moteur de transitions (10 états, 19 transitions, gardes)
+#### TAKT-L06-02 — Implémenter le moteur de transitions (10 états, 18 transitions, gardes)
 
 - **Objectif :** Centraliser l'unique machine à états autorisant les transitions, avec contrôle du rôle et des conditions de garde.
 - **Exigences :** `EX-WKF-01` à `EX-WKF-09`, `TE-API-03`, `TE-MET-07`, `TE-MET-08`, `WORKFLOW_METIER §3`, `ST_TAKT §4.1`, `TAKT-L00-01`.
 - **Périmètre :** `apps/backend/src/modules/versions/workflow/**` (matrice, machine, service de transition), `apps/backend/src/modules/versions/versions.controller.ts` (`POST /api/v1/versions/:id/transition`). **Hors périmètre :** les garde-fous métier spécifiques (L06-05, L06-08, L06-09).
-- **Livrables :** Matrice déclarative des 19 transitions (`from`, `to`, `action`, `rôles autorisés`, `condition de garde`, `motif obligatoire`) issue de `WORKFLOW_METIER §3` **arbitrée** ; moteur générique `canTransition(etat, action, role, contexte)` ; endpoint unique de transition renvoyant 409 `WORKFLOW_INVALID_TRANSITION` avec la liste des transitions autorisées depuis l'état courant ; rejet sans motif → 400 ; **100 % des branches testées** (service critique) ; journalisation de chaque transition (état source/cible/action).
-- **Critères :** _Given_ une version `valid_dir` et le rôle `dir`, _When_ la transition `valider` est demandée, _Then_ la version passe en `valide`. _Given_ une version `publie`, _When_ une transition autre que `archiver` est demandée, _Then_ 409. _Given_ un rejet sans motif, _Then_ 400. _Given_ un `rdep` tentant une transition réservée au `gest`, _Then_ 403. _Given_ la matrice complète, _Then_ les 19 transitions de la matrice canonique sont acceptées et les autres rejetées.
-- **DoD :** Matrice des 19 transitions implémentée à l'identique du corpus arbitré ; 100 % des branches couvertes ; motif obligatoire enforced ; audit écrit ; 409 accompagné des transitions possibles.
-- **Tests exigés :** tests unitaires exhaustifs (matrice 19 transitions × 4 rôles) + tests d'intégration de l'endpoint.
+- **Livrables :** Matrice déclarative des 18 transitions (`from`, `to`, `action`, `rôles autorisés`, `condition de garde`, `motif obligatoire`) issue de `WORKFLOW_METIER §3` **arbitrée** ; moteur générique `canTransition(etat, action, role, contexte)` ; endpoint unique de transition renvoyant 409 `WORKFLOW_INVALID_TRANSITION` avec la liste des transitions autorisées depuis l'état courant ; rejet sans motif → 400 ; **100 % des branches testées** (service critique) ; journalisation de chaque transition (état source/cible/action).
+- **Critères :** _Given_ une version `valid_dir` et le rôle `dir`, _When_ la transition `valider` est demandée, _Then_ la version passe en `valide`. _Given_ une version `publie`, _When_ une transition autre que `archiver` est demandée, _Then_ 409. _Given_ un rejet sans motif, _Then_ 400. _Given_ un `rdep` tentant une transition réservée au `gest`, _Then_ 403. _Given_ la matrice complète, _Then_ les 18 transitions de la matrice canonique sont acceptées et les autres rejetées.
+- **DoD :** Matrice des 18 transitions implémentée à l'identique du corpus arbitré ; 100 % des branches couvertes ; motif obligatoire enforced ; audit écrit ; 409 accompagné des transitions possibles.
+- **Tests exigés :** tests unitaires exhaustifs (matrice 18 transitions × 4 rôles) + tests d'intégration de l'endpoint.
 - **SP :** 8 · **Dépend de :** `TAKT-L06-01`, `TAKT-L03-05`, `TAKT-L00-01` · **Bloque :** `TAKT-L05-05`, `TAKT-L06-03`, `TAKT-L07-07`, `TAKT-L10-07`.
 
 #### TAKT-L06-03 — Implémenter le CRUD des séances sur la grille hebdomadaire
@@ -654,7 +654,7 @@ L00 → L01 → L02 → L03 → L04 → L05 → L06 → L07 → L09 → L10 → 
 - **Périmètre :** `packages/db/prisma/schema.prisma`, `packages/db/prisma/migrations/**`, `packages/db/prisma/seed.ts`. **Hors périmètre :** la détection applicative (L06-05).
 - **Livrables :** Contraintes UNIQUE : `(versionId, jour, creneauDebutId, salleId)` pour les salles occupées ; index composites sur `(versionId, jour, creneauDebutId, enseignantId)` et `(versionId, jour, creneauDebutId, groupeId)` ; contrainte d'unicité de publication (L06-01) ; index sur `Version.etat`, `AffectationPedagogique.versionId`, `JournalAudit.horodatage` ; partitionnement non requis en v1 (justifié par la volumétrie : 4 000 séances/semestre).
 - **Critères :** _Given_ deux séances de même jour, créneau et salle, _When_ la seconde est insérée, _Then_ la base rejette l'insertion (violation UNIQUE). _Given_ un plan d'exécution `EXPLAIN` sur la liste des séances d'une version, _Then_ aucun scan séquentiel sur 4 000 lignes. _Given_ une migration appliquée, _When_ le `down.sql` est exécuté, _Then_ les contraintes sont retirées proprement.
-- **DoD :** Contraintes UNIQUE testées par tentative de doublon (3 cas) ; plan d'exécution capturé dans le compte rendu ; `prisma migrate reset` sans erreur ; rollback testé.
+- **DoD :** Contraintes UNIQUE testées par tentative de doublon (3 cas de double affectation : salle → rejet UNIQUE `P2002` ; enseignant → non-rejet, index composite de support ; groupe → non-rejet, index composite de support) ; plan d'exécution capturé dans le compte rendu ; `prisma migrate reset` sans erreur ; rollback `down.sql` testé.
 - **Tests exigés :** tests d'intégration d'intégrité (violations UNIQUE) + script de vérification des index.
 - **SP :** 5 · **Dépend de :** `TAKT-L06-03` · **Bloque :** `TAKT-L06-05`, `TAKT-L07-01`.
 
@@ -882,7 +882,7 @@ L00 → L01 → L02 → L03 → L04 → L05 → L06 → L07 → L09 → L10 → 
 - **Tests exigés :** tests d'intégration (ErrorBoundary, 401, hors-ligne) + test axe-core du layout.
 - **SP :** 3 · **Dépend de :** `TAKT-L08-04`, `TAKT-L08-05` · **Bloque :** `TAKT-L09-01`…`TAKT-L09-12`.
 
-### Lot L09 — Frontend métier : 26 écrans `EC-*` (12 tickets · 88 SP)
+### Lot L09 — Frontend métier : 26 écrans `EC-*` (13 tickets · 112 SP)
 
 #### TAKT-L09-01 — Écran `EC-COM-01` Connexion / Login
 

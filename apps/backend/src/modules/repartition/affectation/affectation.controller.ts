@@ -171,7 +171,7 @@ export class AffectationPedagogiqueController {
     @Body() corps: AffectationPedagogiqueCascade,
     @Req() req: RequeteAvecUtilisateur,
   ): Promise<unknown> {
-    const departementId = req.departementIds?.[0] ?? '';
+    const departementId = req.user?.departementIds?.[0] ?? '';
     return this.service.creerCascade(corps, departementId, req.user!.sub);
   }
 }
