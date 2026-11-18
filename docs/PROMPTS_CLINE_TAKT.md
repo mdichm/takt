@@ -296,7 +296,7 @@ Les marqueurs permettent l'extraction automatisée d'un prompt vers un fichier e
 
 <!-- BEGIN PROMPT : TAKT-L06-02 -->
 
-**Ticket :** `TAKT-L06-02` — Implémenter le moteur de transitions (10 états, 19 transitions, gardes)
+**Ticket :** `TAKT-L06-02` — Implémenter le moteur de transitions (10 états, 18 transitions, gardes)
 **Instruction :** Suivre le modèle canonique avec la fiche `TAKT-L06-02`.
 
 <!-- END PROMPT : TAKT-L06-02 -->

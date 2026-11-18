@@ -45,3 +45,4 @@ export * from './coefficients';
 export * from './seuils';
 export * from './equilibrage';
 export { computeCharge } from './compute-charge';
+export { computeCouverture } from './couverte';

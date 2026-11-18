@@ -83,7 +83,7 @@
 ├─────────────────────────────────────────────────────────────┤
 │  Application   │ NestJS 10+ + TanStack Query client        │
 ├─────────────────────────────────────────────────────────────┤
-│  Domaine       │ Workflow (10 états, 19 transitions)       │
+│  Domaine       │ Workflow (10 états, 18 transitions)       │
 │                │ Règles de planification (solver CP-SAT)   │
 ├─────────────────────────────────────────────────────────────┤
 │  Infrastructure│ PostgreSQL 16 + Prisma + pg-boss          │
@@ -99,7 +99,7 @@
 | Frontend SPA         | React 18 + Vite               | Interface utilisateur (29 écrans `EC-*`, voir UI_WIREFRAMES.md)   |
 | API Gateway          | NestJS 10+                    | Point d'entrée unique, authentification, routage vers les modules |
 | Module Auth          | NestJS + argon2id + JWT       | Authentification locale, RBAC par département, gestion de session |
-| Module Versions      | NestJS + Prisma               | Gestion du cycle de vie des versions (10 états, 19 transitions)   |
+| Module Versions      | NestJS + Prisma               | Gestion du cycle de vie des versions (10 états, 18 transitions)   |
 | Module Répartition   | NestJS + Prisma               | Affectations pédagogiques, snapshot immuable, charges horaires    |
 | Module Planning      | NestJS + Prisma               | Séances, contraintes, verrous, grille EDT, conflits               |
 | Module Génération    | Worker CP-SAT conteneurisé    | Construction du fichier dérivé, appel solver, scénarios           |
@@ -214,19 +214,30 @@ model Seance {
   verrous        VerrouSeance[]
 
   @@index([versionId])
-  @@unique([versionId, jour, creneauDebut, nbCreneaux])
+  @@unique([versionId, jour, creneauDebut, salleId])
+  @@index([versionId, jour, creneauDebut, enseignantId])
+  @@index([versionId, jour, creneauDebut, groupeId])
 }
 
 model VerrouSeance {
-  id             String      @id @default(uuid()) @db.Uuid
-  seanceId       String      @db.Uuid
-  utilisateurId  String      @db.Uuid
-  type           String      // CRENEAU, SALLE, ENSEIGNANT, ACTIVITE
-  heurePose      DateTime    @default(now())
-  heureExpiration DateTime  // +30 min par défaut
+  id              String   @id @default(uuid()) @db.Uuid
+  versionId       String   @db.Uuid
+  seanceId        String   @db.Uuid
+  utilisateurId   String   @db.Uuid // utilisateur qui a posee le verrou (posePar)
+  type            TypeVerrou // CRENEAU, SALLE, ENSEIGNANT, ACTIVITE
+  valeur          String   @db.Uuid // UUID de la ressource imposee (creneau / salle / enseignant / activite)
+  poids           Int      @default(100)
+  datePose        DateTime @default(now())
 
-  seance         Seance      @relation(fields: [seanceId], references: [id])
-  utilisateur    Utilisateur @relation(fields: [utilisateurId], references: [id])
+  version  Version     @relation(fields: [versionId], references: [id])
+  seance   Seance      @relation(fields: [seanceId], references: [id], onDelete: Cascade)
+  utilisateur Utilisateur @relation(fields: [utilisateurId], references: [id])
+
+  @@unique([seanceId, type])
+  @@index([versionId])
+  @@index([versionId, type])
+  @@index([seanceId])
+  @@index([utilisateurId])
 }
 
 model Generation {
@@ -267,7 +278,7 @@ model JournalAudit {
 | `TE-DB-01` | `email` unique dans `Utilisateur`                                   | Utilisateur                           |
 | `TE-DB-02` | `code` unique dans `Role` et `Departement`                          | Role, Departement                     |
 | `TE-DB-03` | Unicité `(versionId, jour, creneauDebut, nbCreneaux)` dans `Seance` | Seance                                |
-| `TE-DB-04` | `heureExpiration` > `heurePose` dans `VerrouSeance`                 | VerrouSeance                          |
+| `TE-DB-04` | `Unicite (seanceId, type)` dans `VerrouSeance`                 | VerrouSeance                          |
 | `TE-DB-05` | Seule une version `publie` par semestre                             | Version (logique applicative)         |
 | `TE-DB-06` | `etat` de `Version` doit être parmi les 10 états autorisés          | Version (CHECK SQL)                   |
 | `TE-DB-07` | Journal d'audit immuable (pas de DELETE, pas de UPDATE)             | JournalAudit                          |
@@ -279,7 +290,8 @@ model JournalAudit {
 | ------------------------------- | ------------ | ---------------------- | -------------------------------------- |
 | `idx_version_semestre_etat`     | Version      | `(semestreId, etat)`   | Recherche rapide des versions par état |
 | `idx_seance_version_jour`       | Seance       | `(versionId, jour)`    | Affichage de la grille EDT par jour    |
-| `idx_verrou_seance_expiration`  | VerrouSeance | `(heureExpiration)`    | Nettoyage des baux expirés             |
+| `idx_verrou_seance_version`      | VerrouSeance | `(versionId)`          | Verrous d une version                  |
+| `idx_verrou_seance_version_type` | VerrouSeance | `(versionId, type)`   | Filtrer par version et type            |
 | `idx_generation_version_statut` | Generation   | `(versionId, statut)`  | Suivi des générations en cours         |
 | `idx_audit_horodatage_action`   | JournalAudit | `(horodatage, action)` | Filtrage du journal d'audit            |
 
@@ -309,10 +321,12 @@ model JournalAudit {
 | Utilisateurs | `/api/v1/users/:id`                 | GET/PUT/DELETE   | CRUD utilisateur                            | `zUser`           |
 | Versions     | `/api/v1/versions`                  | GET/POST         | Liste / création de versions                | `zVersion`        |
 | Versions     | `/api/v1/versions/:id`              | GET/PUT/DELETE   | Détail / modification / suppression         | `zVersion`        |
-| Versions     | `/api/v1/versions/:id/transition`   | POST             | Transition d'état (workflow 19 transitions) | `zTransition`     |
+| Versions     | `/api/v1/versions/:id/transition`   | POST             | Transition d'état (workflow 18 transitions) | `zTransition`     |
+| Versions     | `/api/v1/versions/:id/couverture`   | GET              | Taux de couverture pédagogique d'une version | `zCouverture`     |
 | Séances      | `/api/v1/seances`                   | GET              | Liste des séances d'une version             | `zSeanceList`     |
 | Séances      | `/api/v1/seances`                   | POST             | Création d'une séance                       | `zSeance`         |
 | Séances      | `/api/v1/seances/:id`               | PUT/PATCH/DELETE | Modification / suppression d'une séance     | `zSeance`         |
+| Verrous      | ` /api/v1/locks `                   | GET              | Liste paginee des verrous d une version     | ` zLockList `     |
 | Verrous      | `/api/v1/locks`                     | POST             | Pose d'un verrou sur une séance             | `zLock`           |
 | Verrous      | `/api/v1/locks/:id`                 | DELETE           | Levée d'un verrou                           | —                 |
 | Générations  | `/api/v1/generations`               | GET/POST         | Liste / lancement d'une génération          | `zGeneration`     |
@@ -365,9 +379,9 @@ model JournalAudit {
 
 ## §4. Logique métier et algorithmes
 
-### 4.1 Workflow des versions (19 transitions)
+### 4.1 Workflow des versions (18 transitions)
 
-Les 10 états et 19 transitions sont définis dans `WORKFLOW_METIER.md`. Chaque transition est exposée via l'endpoint `POST /api/v1/versions/:id/transition` et vérifiée par le serveur selon le rôle de l'utilisateur et l'état courant.
+Les 10 états et 18 transitions sont définis dans `WORKFLOW_METIER.md`. Chaque transition est exposée via l'endpoint `POST /api/v1/versions/:id/transition` et vérifiée par le serveur selon le rôle de l'utilisateur et l'état courant.
 
 | État          | Rôles autorisés pour entrer | Transitions sortantes principales                                                      |
 | ------------- | --------------------------- | -------------------------------------------------------------------------------------- |
@@ -376,7 +390,7 @@ Les 10 états et 19 transitions sont définis dans `WORKFLOW_METIER.md`. Chaque 
 | `brouillon`   | admin, gest                 | `lancer_génération` → `generation`                                                     |
 | `generation`  | système (worker)            | `génération_terminée` → `edition` ; `échec` → `brouillon`                              |
 | `edition`     | admin, gest                 | `modifier_séance` → `edition` ; `valider` → `valid_pedag`                              |
-| `valid_pedag` | rdep                        | `valider` → `valid_dir` ; `rejeter` → `brouillon`                                      |
+| `valid_pedag` | rdep                        | `valider` → `valid_dir` ; `rejeter` → `edition`                                        |
 | `valid_dir`   | dir                         | `valider` → `valide` ; `rejeter` → 'rep_pedag' (pédagogique) ou → 'edition' (planning) |
 | `valide`      | admin, gest                 | `publier` → `publie`                                                                   |
 | `publie`      | admin, gest                 | `archiver` → `archive`                                                                 |
@@ -413,6 +427,7 @@ La couverture 100 % signifie que chaque séance planifiée correspond à une aff
 | `TE-MET-02` | Avant publication, vérification que le nombre total de séances couvre 100 % des volumes horaires déclarés |
 | `TE-MET-03` | Toute séance créée doit être liée à une affectation existante                                             |
 | `TE-MET-04` | Suppression d'une affectation supprime les séances liées (cascade avec vérification)                      |
+| `TAKT-L06-09` | Blocage de `soumettreValidation` si couverture pédagogique != 100 % (sous, sur ou séance orpheline)        |
 
 ### 4.5 Bail d'édition
 
@@ -535,7 +550,7 @@ La couverture 100 % signifie que chaque séance planifiée correspond à une aff
 | ----- | ------------------------------- | -------------------------------------------- | -------- |
 | E0.4  | Spécification technique figée   | `ST_TAKT.md`                                 | Oct 2026 |
 | E1    | Squelette backend + auth        | NestJS, Prisma, authentification JWT         | Nov 2026 |
-| E2    | Workflow versions + RBAC        | 10 états, 19 transitions, contrôle d'accès   | Déc 2026 |
+| E2    | Workflow versions + RBAC        | 10 états, 18 transitions, contrôle d'accès   | Déc 2026 |
 | E3    | Gestion des séances et conflits | CRUD séances, détection conflits, verrous    | Jan 2027 |
 | E4    | Génération CP-SAT               | Worker, fichier dérivé, scénarios, sélection | Fév 2027 |
 | E5    | Frontend complet                | 29 écrans `EC-*`, drag&drop, thème Ramadan   | Mar 2027 |
@@ -563,6 +578,8 @@ La couverture 100 % signifie que chaque séance planifiée correspond à une aff
 | DL-TE-06 | Bail d'édition : 30 min, renouvelable, forçage admin      | Oct 2026 | Figé   | DL-04                       |
 | DL-TE-07 | Auth : argon2id + JWT (15 min + refresh 7 j rotatif)      | Oct 2026 | Figé   | Sécurité                    |
 | DL-TE-08 | Journal d'audit immuable, rétention 3 ans                 | Oct 2026 | Figé   | Conformité                  |
+| DL-TE-09 | Matrice workflow de 18 transitions après arbitrage des rejets | Oct 2026 | Figé   | EX-WKF-02, EX-WKF-03, EX-WKF-07 |
+| DL-TE-10 | Le rejet départemental cible `edition`, jamais `brouillon`      | Oct 2026 | Figé   | DL-WF-05, DL-WF-06            |
 
 ---
 

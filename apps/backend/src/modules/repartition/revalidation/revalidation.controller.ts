@@ -95,10 +95,10 @@ export class RevalidationController {
     @Body() corps: { versionId: string; departementId?: string },
     @Req() req: RequeteAvecUtilisateur,
   ): Promise<unknown> {
-    const departementId = corps.departementId ?? (req.departementIds ?? [])[0] ?? '';
+    const departementId = corps.departementId ?? (req.user?.departementIds ?? [])[0] ?? '';
 
     // Un rdep ne peut revalider que son propre département.
-    const departementIds = req.departementIds ?? [];
+    const departementIds = req.user?.departementIds ?? [];
     if (departementIds.length > 0 && departementId && !departementIds.includes(departementId)) {
       throw new ApiError(
         CODES_ERREUR_API.FORBIDDEN,

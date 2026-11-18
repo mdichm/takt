@@ -10,7 +10,7 @@ paths:
 
 ## Source de vérité
 
-- `docs/tools/tickets_data.py` : liste **unique** des 89 tickets avec champs  
+- `docs/tools/tickets_data.py` : liste **unique** des 91 tickets avec champs  
   `id, lot, titre, sp, status (À faire|En cours|Bloqué|Terminé), deps, exigences[]`
 
 ## Scripts fournis (à créer dans `docs/tools/`)
