@@ -8,12 +8,13 @@ import { ReferentielsModule } from '../referentiels/referentiels.module';
 import { VersionsController } from './versions.controller';
 import { VersionsService } from './versions.service';
 import { WorkflowService } from './workflow/workflow.service';
+import { SnapshotModule } from './snapshot/snapshot.module';
 
 /** Module du cycle de vie des versions de planning. */
 @Module({
-  imports: [CommonModule, ReferentielsModule, AuditModule],
+  imports: [CommonModule, ReferentielsModule, AuditModule, SnapshotModule],
   controllers: [VersionsController],
   providers: [VersionsService, WorkflowService],
-  exports: [VersionsService, WorkflowService],
+  exports: [VersionsService, WorkflowService, SnapshotModule],
 })
 export class VersionsModule {}

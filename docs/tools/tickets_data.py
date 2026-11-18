@@ -465,7 +465,7 @@ TICKETS: List[Ticket] = [
         lot="L06",
         titre="Implémenter le snapshot de version et l'immuabilité de la publication",
         sp=6,
-        status="En cours",
+        status="Terminé",
         deps=['TAKT-L06-01', 'TAKT-L06-03'],
         exigences=['EX-PRI-06', 'EX-DAT-01', 'EX-DAT-02', 'EX-DAT-03', 'EX-PRI-02', 'TE-ARCH-03', 'TE-MET-06', 'DL-05.'],
     ),

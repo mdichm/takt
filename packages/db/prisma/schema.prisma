@@ -294,6 +294,7 @@ model Snapshot {
   id            String      @id @default(uuid()) @db.Uuid
   versionId     String      @db.Uuid
   departementId String?     @db.Uuid // snapshot de répartition : un par (versionId, departementId) ; snapshot de publication : NULL
+  type          String      @default("REPARTITION") // 'REPARTITION' (département) ou 'VERSION' (génération)
   revision      Int         @default(1) // numéro de révision du snapshot (historique des revalidations)
   estCourant    Boolean     @default(true) // true = snapshot actuellement en vigueur pour le département
   donnees       Json        // données JSONB du snapshot
@@ -306,6 +307,9 @@ model Snapshot {
   // Historique des revalidations ciblées par département.
   validationRepartitionsCourant  ValidationRepartition[] @relation("SnapshotCourant")
   validationRepartitionsPrecedent ValidationRepartition[] @relation("SnapshotPrecedent")
+
+  // Générations qui référencent ce snapshot (EX-DAT-01, EX-PRI-06).
+  generations Generation[]
 
   @@index([versionId])
   @@index([versionId, departementId])
@@ -487,14 +491,19 @@ model Generation {
   id              String   @id @default(uuid()) @db.Uuid
   versionId       String   @db.Uuid
   statut          String   // EN_COURS, TERMINEE, ECHEC
+  snapshotId      String?  @db.Uuid // snapshot de version référencé (EX-DAT-01, EX-PRI-06)
   fichierDerivesId String? @db.Uuid
   scores          Json     // score_global, sous_scores
+  dureeMs         Int?     // durée de génération en millisecondes
+  nombreScenarios Int      @default(0) // nombre de scénarios produits
   createdAt       DateTime @default(now())
 
-  version   Version   @relation(fields: [versionId], references: [id])
+  version   Version     @relation(fields: [versionId], references: [id])
+  snapshot  Snapshot?   @relation(fields: [snapshotId], references: [id])
   scenarios Scenario[]
 
   @@index([versionId, statut], name: "Generation_versionId_statut_idx")
+  @@index([snapshotId], name: "Generation_snapshotId_idx")
 }
 
 // ----------------------------------------------------------------------------
@@ -505,6 +514,7 @@ model Scenario {
   generationId  String  @db.Uuid
   scoreGlobal   Int     // score global 0-100
   sousScores    Json    // sous-scores détaillés (respect créneaux, salles, enseignants, couverture)
+  placements    Json    @default("{}") // placements des séances (mapping séance → créneau/salle/enseignant/groupe)
   selectionne   Boolean @default(false)
   createdAt     DateTime @default(now())
 
