@@ -483,7 +483,7 @@ TICKETS: List[Ticket] = [
         lot="L07",
         titre="Implémenter le client du solveur (packages/solver-client)",
         sp=6,
-        status="À faire",
+        status="Terminé",
         deps=['TAKT-L07-01'],
         exigences=['SPEC_SOLVER_CPSAT §5', 'SPEC_SOLVER_CPSAT §9', 'TE-ARCH-01', 'GG-10.'],
     ),
