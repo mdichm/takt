@@ -145,3 +145,56 @@ export type DerivedSubject = z.infer<typeof zDerivedSubject>;
 export type DerivedActivity = z.infer<typeof zDerivedActivity>;
 export type DerivedConstraint = z.infer<typeof zDerivedConstraint>;
 export type DerivedLock = z.infer<typeof zDerivedLock>;
+
+
+/** Schéma d'un placement d'activité produit par le solveur. */
+export const zSolverPlacement = z.object({
+  activityId: zUuid,
+  day: z.number().int().min(0).max(6),
+  slot: z.number().int().min(0).max(24),
+  roomId: zUuid,
+  teacherId: zUuid,
+});
+
+/** Sous-scores d'un scénario (chacun noté sur 100). */
+export const zSolverSubScores = z.object({
+  coverage: z.number().int().min(0).max(100),
+  timeslotRespect: z.number().int().min(0).max(100),
+  roomRespect: z.number().int().min(0).max(100),
+  teacherRespect: z.number().int().min(0).max(100),
+  continuity: z.number().int().min(0).max(100),
+  loadBalance: z.number().int().min(0).max(100),
+});
+
+/** Statut d'un scénario issu du solveur CP-SAT. */
+export const zSolverScenarioStatus = z.enum([
+  'OPTIMAL',
+  'FEASIBLE',
+  'PARTIAL',
+  'INFEASIBLE',
+  'TIMEOUT',
+]);
+
+/** Scénario produit par le solveur CP-SAT. */
+export const zSolverScenario = z.object({
+  id: zUuid,
+  generationId: zUuid,
+  score: z.number().int().min(0).max(100),
+  subScores: zSolverSubScores,
+  placements: z.array(zSolverPlacement),
+  unplacedActivities: z.array(zUuid),
+  status: zSolverScenarioStatus,
+  createdAt: zDateIso,
+});
+
+/** Sortie brute du worker solveur (fichier de résultats). */
+export const zSolverOutput = z.object({
+  scenarios: z.array(zSolverScenario).max(3),
+  metrics: z.object({ peakRssMb: z.number().nonnegative() }).optional(),
+});
+
+export type SolverPlacement = z.infer<typeof zSolverPlacement>;
+export type SolverSubScores = z.infer<typeof zSolverSubScores>;
+export type SolverScenarioStatus = z.infer<typeof zSolverScenarioStatus>;
+export type SolverScenario = z.infer<typeof zSolverScenario>;
+export type SolverOutput = z.infer<typeof zSolverOutput>;
