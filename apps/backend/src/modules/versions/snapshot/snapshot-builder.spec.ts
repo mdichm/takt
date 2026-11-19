@@ -27,6 +27,7 @@ function entreeMinimale(overrides: Record<string, any> = {}): any {
     salles: [],
     creneaux: [],
     departements: [],
+    matieres: [],
     ...overrides,
   };
 }
@@ -64,6 +65,7 @@ describe('construireDonneesSnapshot (TAKT-L06-10, EX-PRI-06)', () => {
     expect(donnees).toHaveProperty('contraintes');
     expect(donnees).toHaveProperty('verrous');
     expect(donnees).toHaveProperty('departements');
+    expect(donnees).toHaveProperty('matieres');
     expect(donnees).toHaveProperty('preferences');
     expect(donnees).toHaveProperty('profilGeneration');
 
@@ -125,5 +127,73 @@ describe('construireDonneesSnapshot (TAKT-L06-10, EX-PRI-06)', () => {
     expect((donnees as any).seances).toEqual([]);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- any-justify: payload de test typé unknown, cast nécessaire pour assertions
     expect((donnees as any).seances).toEqual([]);
+  });
+
+  it('applique les enrichissements optionnels (TAKT-L07-01)', () => {
+    const entrees = entreeMinimale({
+      groupes: [
+        { id: 'g1', code: 'L3', libelle: 'Licence 3', niveauId: 'n1' },
+      ],
+      enseignants: [
+        {
+          id: 'e1',
+          nom: 'Nom',
+          prenom: 'Prenom',
+          email: 'a@b.c',
+          departementId: null,
+          departementIds: ['d1'],
+          chargeMaxHebdo: 19,
+        },
+      ],
+      salles: [
+        {
+          id: 's1',
+          code: 'A101',
+          libelle: 'Amphi A101',
+          typeSalleId: 'ts1',
+          siteId: 'site1',
+          capacite: 100,
+          typeSalleCode: 'CM',
+          siteCode: 'SITE-A',
+          siteLibelle: 'Site A',
+          equipements: ['projecteur', 'tableau'],
+        },
+      ],
+      affectations: [
+        {
+          id: 'a1',
+          enseignantId: 'e1',
+          matiereId: 'm1',
+          groupeId: 'g1',
+          typeEnseignementId: 'te1',
+          typeEnseignementCode: 'CM',
+          volumeHebdo: 2,
+          dureeCreneaux: 90,
+        },
+      ],
+      matieres: [
+        { id: 'm1', code: 'ALGO', libelle: 'Algorithmique' },
+      ],
+    });
+
+    const donnees = construireDonneesSnapshot(entrees);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- any-justify: payload de test typé unknown, cast nécessaire pour assertions
+    const d = donnees as any;
+
+    // effectif par défaut = 1
+    expect(d.groupes[0].effectif).toBe(1);
+    // départements + charge de l'enseignant
+    expect(d.enseignants[0].departementIds).toEqual(['d1']);
+    expect(d.enseignants[0].chargeMaxHebdo).toBe(19);
+    // salle enrichie : code type, site, équipements triés
+    expect(d.salles[0].typeSalleCode).toBe('CM');
+    expect(d.salles[0].siteCode).toBe('SITE-A');
+    expect(d.salles[0].siteLibelle).toBe('Site A');
+    expect(d.salles[0].equipements).toEqual(['projecteur', 'tableau']);
+    // activité avec code type enseignement
+    expect(d.activites[0].typeEnseignementCode).toBe('CM');
+    // collection matieres présente
+    expect(d.matieres).toHaveLength(1);
+    expect(d.matieres[0].code).toBe('ALGO');
   });
 });

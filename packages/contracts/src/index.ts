@@ -16,4 +16,5 @@ export * from './locks';
 export * from './referentiels';
 export * from './repartition';
 export * from './seances';
+export * from './solver';
 export * from './versions';
