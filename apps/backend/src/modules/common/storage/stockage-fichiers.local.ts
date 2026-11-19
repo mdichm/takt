@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { promises as fs } from 'fs';
 import * as path from 'path';
 import { StockageFichiers, ContenuFichier } from '../di/stockage-fichiers.token';
@@ -15,8 +14,8 @@ import { StockageFichiers, ContenuFichier } from '../di/stockage-fichiers.token'
 export class StockageFichiersLocal implements StockageFichiers {
   private readonly racine: string;
 
-  constructor(private readonly config: ConfigService) {
-    this.racine = this.config.get('STOCKAGE_FICHIERS_RACINE', 'storage');
+  constructor() {
+    this.racine = process.env.STOCKAGE_FICHIERS_RACINE ?? 'storage';
   }
 
   private cheminComplet(chemin: string): string {
