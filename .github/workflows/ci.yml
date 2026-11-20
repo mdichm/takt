@@ -463,6 +463,10 @@ jobs:
           print(f"OK: instance résolue en {elapsed:.2f}s avec {len(envelope['scenarios'])} scénario(s)")
           PY
 
+      - name: Benchmark de performance (200 séances, non bloquant)
+        continue-on-error: true
+        run: python3 solver/benchmarks/run.py --case 200 --enforce --format json
+
   # ------------------------------------------------------------
   # CHECK REQUIS POUR LA PROTECTION DE develop
   # ------------------------------------------------------------

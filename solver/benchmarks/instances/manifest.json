@@ -1,0 +1,75 @@
+{
+  "version": "1.0",
+  "description": "Jeux de données des benchmarks de performance du solveur CP-SAT (spike SPK-01, TAKT-L07-05)",
+  "generated_by": "solver/benchmarks/generator.py",
+  "generator_version": "1.0",
+  "cases": [
+    {
+      "name": "bench_200_seances",
+      "sessions": 200,
+      "seed": 20261120,
+      "time_limit_sec": 300,
+      "max_scenarios": 3,
+      "threshold_time_sec": 300,
+      "threshold_coverage_pct": 95,
+      "threshold_memory_mb": 4096,
+      "fixture": "bench_200_seances.json",
+      "normatif": true
+    },
+    {
+      "name": "bench_1000_seances",
+      "sessions": 1000,
+      "seed": 20261121,
+      "time_limit_sec": 600,
+      "max_scenarios": 3,
+      "threshold_time_sec": 600,
+      "threshold_coverage_pct": 95,
+      "threshold_memory_mb": 4096,
+      "normatif": true
+    },
+    {
+      "name": "bench_4000_seances",
+      "sessions": 4000,
+      "seed": 20261122,
+      "time_limit_sec": 1800,
+      "max_scenarios": 3,
+      "threshold_time_sec": 1800,
+      "threshold_coverage_pct": 95,
+      "threshold_memory_mb": 4096,
+      "normatif": true
+    },
+    {
+      "name": "bench_realistic_week",
+      "sessions": 286,
+      "seed": 20261123,
+      "time_limit_sec": 300,
+      "max_scenarios": 3,
+      "threshold_time_sec": 300,
+      "threshold_coverage_pct": 95,
+      "threshold_memory_mb": 4096,
+      "normatif": false,
+      "note": "Lecture complémentaire SF_TAKT §2 (≈286 séances/semaine pour 4000 séances/semestre sur 14 semaines). Alimente la stratégie de repli."
+    }
+  ],
+  "volumetrie_sf_takt_section2": {
+    "enseignants": 400,
+    "salles": 150,
+    "departements": 10,
+    "taille_groupe_moyenne": 30,
+    "jours": 6,
+    "creneaux_par_jour": 24,
+    "seances_par_semestre": 4000,
+    "semaines_par_semestre": 14
+  },
+  "seuils_spec_section8": {
+    "temps_cible_200_sec": 300,
+    "temps_alerte_200_sec": 600,
+    "temps_cible_4000_sec": 1800,
+    "temps_alerte_4000_sec": 3600,
+    "couverture_cible_pct": 95,
+    "couverture_alerte_pct": 80,
+    "memoire_cible_mb": 4096,
+    "memoire_alerte_mb": 6144,
+    "scenarios_min": 1
+  }
+}
