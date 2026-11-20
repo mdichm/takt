@@ -27,6 +27,8 @@ function executerBackend(cheminSortie: string): void {
       NODE_ENV: 'test',
       DATABASE_URL:
         process.env.DATABASE_URL ?? 'postgresql://postgres:postgres@localhost:5432/takt_test',
+      PGBOSS_DATABASE_URL:
+        process.env.PGBOSS_DATABASE_URL ?? 'postgresql://postgres:postgres@localhost:5432/takt_test',
       JWT_KEYS_DIRECTORY: process.env.JWT_KEYS_DIRECTORY ?? '/tmp/takt-test-jwt',
       JWT_ACTIVE_KEY_ID: process.env.JWT_ACTIVE_KEY_ID ?? 'active',
       JWT_ISSUER: process.env.JWT_ISSUER ?? 'takt-test',

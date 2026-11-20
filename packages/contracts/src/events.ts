@@ -17,10 +17,12 @@ export const zTypeEvenement = z.enum(TYPES_EVENEMENT);
 
 /** Charge utile d'un événement de génération. */
 export const zEvenementGeneration = z.object({
-  type: z.enum(['generation.progress', 'generation.done']),
+  type: z.enum(['generation.progress', 'generation.done', 'generation.failed']),
   versionId: zUuid,
+  generationId: zUuid.optional(),
   progression: z.number().int().min(0).max(100).optional(),
   message: z.string().min(1).optional(),
+  erreur: z.string().min(1).optional(),
 });
 
 /** Charge utile d'un événement d'export. */

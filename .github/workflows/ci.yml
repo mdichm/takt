@@ -17,6 +17,7 @@ on:
 env:
   NODE_VERSION: '24'
   DATABASE_URL: postgresql://postgres:postgres@localhost:5432/takt_test
+  PGBOSS_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/takt_test
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
@@ -115,6 +116,7 @@ jobs:
         run: pnpm test:integration
         env:
           DATABASE_URL: ${{ env.DATABASE_URL }}
+          PGBOSS_DATABASE_URL: ${{ env.PGBOSS_DATABASE_URL }}
 
       - name: Upload Coverage
         uses: codecov/codecov-action@v4

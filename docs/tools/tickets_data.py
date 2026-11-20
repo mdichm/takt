@@ -492,7 +492,7 @@ TICKETS: List[Ticket] = [
         lot="L07",
         titre="Implémenter le worker de génération (pg-boss + SSE)",
         sp=8,
-        status="À faire",
+        status="En cours",
         deps=['TAKT-L07-02', 'TAKT-L02-05', 'TAKT-L06-10'],
         exigences=['ST_TAKT §1.3', 'TE-ARCH-05', 'EX-PRE-03', 'EX-PRE-05', 'SPEC_SOLVER_CPSAT §6', 'SPK-04.'],
     ),

@@ -10,9 +10,13 @@ async function main(): Promise<void> {
     throw new Error('Chemin de sortie OpenAPI obligatoire');
   }
   await executerGenerateurOpenApi(cheminSortie);
+  // Sortie forcée : aucune connexion persistante ne doit maintenir
+  // la boucle d'événements active après la génération du fichier.
+  process.exit(0);
 }
 
 void main().catch((erreur: unknown) => {
   console.error('Échec de la génération OpenAPI', erreur);
   process.exitCode = 1;
+  process.exit(1);
 });

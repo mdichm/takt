@@ -29,4 +29,7 @@ export async function executerGenerateurOpenApi(cheminSortie: string): Promise<v
   const { writeFile } = await import('node:fs/promises');
   const yaml = await genererDocumentOpenApi();
   await writeFile(cheminSortie, yaml, 'utf8');
+  // Sortie forcée : le script CLI ne doit pas rester bloqué sur des
+  // connexions persistantes (Prisma, timers SSE, etc.) après avoir généré le fichier.
+  process.exit(0);
 }

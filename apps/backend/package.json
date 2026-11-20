@@ -19,6 +19,7 @@
     "@nestjs/core": "10.4.22",
     "@nestjs/platform-express": "10.4.22",
     "@nestjs/swagger": "7.4.2",
+    "pg-boss": "12.38.2",
     "@takt/contracts": "workspace:*",
     "@takt/db": "workspace:*",
     "@takt/solver-client": "workspace:*",

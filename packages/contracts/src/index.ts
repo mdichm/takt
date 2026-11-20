@@ -12,6 +12,7 @@ export * from './bail';
 export * from './common';
 export * from './couverture';
 export * from './events';
+export * from './generation';
 export * from './locks';
 export * from './referentiels';
 export * from './repartition';
