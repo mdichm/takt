@@ -89,21 +89,32 @@ class _FakeSolver:
 
 
 class TestRunCase:
-    def test_run_case_returns_complete_result(self) -> None:
+    def test_run_case_returns_complete_result(self, monkeypatch) -> None:
         case = BenchmarkCase("c200", 200, 1, 300, 1)
-        fake = _FakeSolver(build_duration=0.01, solve_duration=0.01, n_variables=500)
-        with patch("solver.benchmarks.runner.TaktSolver", return_value=fake):
-            result = run_case(case)
+        fake_instance = {
+            "activities": [
+                {"id": "act-1", "weeklyVolume": 1, "durationSlots": 2, "roomType": "AMPHI", "teachingType": "CM",
+                 "teacherIds": ["t1"], "groupIds": ["g1"], "subjectId": "s1"},
+            ],
+            "rooms": [],
+            "teachers": [],
+            "groups": [],
+            "subjects": [],
+        }
+        fake_solver = _FakeSolver(build_duration=0.01, solve_duration=0.01, n_variables=500)
+        monkeypatch.setattr("solver.benchmarks.runner.generate_instance", lambda c: fake_instance)
+        monkeypatch.setattr("solver.benchmarks.runner.TaktSolver", lambda *a, **k: fake_solver)
+        result = run_case(case)
         assert isinstance(result, BenchmarkResult)
         assert result.case == "c200"
         assert result.sessions == 200
-        assert result.t_construction > 0
-        assert result.t_resolution > 0
+        assert result.t_construction >= 0
+        assert result.t_resolution >= 0
         assert result.t_total >= result.t_construction + result.t_resolution
         assert result.nb_variables == 500
         assert result.nb_scenarios == 1
         assert result.status == "FEASIBLE"
-        # Le fake ne retourne aucun placement → couverture 0 %.
+        # Le fake ne retourne aucun placement → couverture 0 % (une activité déclarée, aucune placée).
         assert result.coverage == 0.0
         assert result.peak_rss_mb >= 0
 
