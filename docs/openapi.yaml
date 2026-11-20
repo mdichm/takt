@@ -1277,7 +1277,7 @@ paths:
         - générations
   /api/v1/generations/{id}/select:
     post:
-      operationId: GenerationsController_selectionnerScenario
+      operationId: SelectionController_selectionnerScenario
       parameters:
         - in: path
           name: id
@@ -1286,14 +1286,18 @@ paths:
             type: string
       responses:
         '200':
-          description: Scénario sélectionné
+          description: Scénario adopté
+        '400':
+          description: Placements invalides
+        '404':
+          description: Génération ou scénario introuvable
         '409':
-          description: Conflit
+          description: Conflit (déjà adopté, génération non terminée, version pas en génération)
       security:
         - bearerAuth: []
-      summary: Sélectionne un scénario et crée une version en édition
+      summary: Adopte un scénario et passe la version en édition
       tags:
-        - générations
+        - sélection
   /api/v1/locks:
     get:
       operationId: VerrousController_lister

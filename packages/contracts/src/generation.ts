@@ -3,6 +3,7 @@
 
 import { z } from 'zod';
 import { zUuid, zDateIso, zPaginationMeta } from './common';
+import { zSolverPlacement } from './solver';
 
 /** Statut d'un job de génération CP-SAT. */
 export const zGenerationStatut = z.enum(['EN_COURS', 'TERMINEE', 'ECHEC']);
@@ -46,3 +47,29 @@ export type GenerationListFilters = z.infer<typeof zGenerationListFilters>;
 export type GenerationList = z.infer<typeof zGenerationList>;
 export type GenerationAnnulerInput = z.infer<typeof zGenerationAnnuler>;
 export type ScenarioSelectRequest = z.infer<typeof zScenarioSelectRequest>;
+
+/** Placement d'activité tel qu'il est stocké dans `Scenario.placements` (DB).
+ *  Forme du solveur (`zSolverPlacement`) avec nbCreneaux en option
+ *  (dérivé de l'affectation si absent). Validé par Zod à la lecture (GG-05). */
+export const zPlacementPersistee = zSolverPlacement.extend({
+  nbCreneaux: z.number().int().min(1).optional(),
+});
+export type PlacementPersistee = z.infer<typeof zPlacementPersistee>;
+
+/** Réponse de l'adoption d'un scénario (POST /generations/:id/select). */
+export const zScenarioSelectReponse = z.object({
+  versionId: zUuid,
+  scenarioId: zUuid,
+  nbSeances: z.number().int().nonnegative(),
+  nbActivitesNonPlacees: z.number().int().nonnegative(),
+  couverture: z.number().int().min(0).max(100),
+  conflitsResiduels: z.array(
+    z.object({
+      type: z.string(),
+      seanceId: zUuid.nullable(),
+      description: z.string(),
+    }),
+  ),
+  avertissements: z.array(z.string()),
+});
+export type ScenarioSelectReponse = z.infer<typeof zScenarioSelectReponse>;

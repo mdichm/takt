@@ -14,6 +14,7 @@ import { GenerationsService } from './generations.service';
 import { BossQueueService } from './worker/boss-queue.service';
 import { GenerationWorkerService } from './worker/generation-worker.service';
 import { SOLVEUR, type ScenarioSolveur } from '../common/di/solveur.token';
+import { SelectionModule } from './selection/selection.module';
 
 /** Double du solveur CP-SAT pour les environnements où le solveur n'est pas encore connecté (TAKT-L07-02). */
 class SolveurDouble {
@@ -24,7 +25,16 @@ class SolveurDouble {
 
 /** Module de préparation et d’exécution des générations de scénarios. */
 @Module({
-  imports: [CommonModule, ReferentielsModule, VersionsModule, PlanningModule, DerivedFileModule, EventsModule, AuditModule],
+  imports: [
+    CommonModule,
+    ReferentielsModule,
+    VersionsModule,
+    PlanningModule,
+    DerivedFileModule,
+    EventsModule,
+    AuditModule,
+    SelectionModule,
+  ],
   providers: [
     BossQueueService,
     GenerationWorkerService,

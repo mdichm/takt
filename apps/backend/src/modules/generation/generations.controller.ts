@@ -25,7 +25,6 @@ import {
   GenerationList,
   GenerationStatut,
 } from '@takt/contracts';
-import { zScenarioSelectRequest } from '@takt/contracts';
 import { GenerationsService } from './generations.service';
 
 interface RequeteAvecUtilisateur {
@@ -38,7 +37,7 @@ interface RequeteAvecUtilisateur {
  * Endpoints conformes à docs/openapi.yaml :
  * - `GET/POST /api/v1/generations` — liste et création de générations
  * - `GET /api/v1/generations/:id/scenarios` — scénarios d'une génération
- * - `POST /api/v1/generations/:id/select` — sélection d'un scénario
+ * - La sélection d'un scénario est gérée par `SelectionController`
  *
  * Toutes les réponses suivent l'enveloppe `{ data, error, meta }` appliquée
  * par l'intercepteur global (ST_TAKT §3.3).
@@ -131,37 +130,4 @@ export class GenerationsController {
     };
   }
 
-  /**
-   * Sélectionne un scénario (POST /api/v1/generations/:id/select).
-   */
-  @Post(':id/select')
-  @Roles('gest')
-  @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Sélectionne un scénario et crée une version en édition' })
-  @ApiResponse({ status: 200, description: 'Scénario sélectionné' })
-  @ApiResponse({ status: 409, description: 'Conflit' })
-  @ZodValidation({ body: zScenarioSelectRequest })
-  async selectionnerScenario(
-    @Param('id') id: string,
-    @Body() corps: unknown,
-    @Req() req: RequeteAvecUtilisateur,
-  ): Promise<{ data: { id: string; statut: string }; error: null; meta: { timestamp: string } }> {
-    const utilisateurId = req.user?.sub;
-    if (!utilisateurId) {
-      throw new Error('Utilisateur non authentifié');
-    }
-
-    const { scenarioId } = corps as { scenarioId: string };
-    await this.generationsService.selectionnerScenario(
-      id,
-      scenarioId,
-      utilisateurId,
-    );
-
-    return {
-      data: { id, statut: 'sélectionné' },
-      error: null,
-      meta: { timestamp: new Date().toISOString() },
-    };
-  }
 }

@@ -3,7 +3,7 @@
 
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { PRISMA } from '../../common/di/prisma.token';
-import { PrismaClient } from '@takt/db';
+import { Prisma, PrismaClient } from '@takt/db';
 import { CODES_ERREUR_API, ApiError } from '../../common/http/api-error';
 import { AuditService } from '../../audit/audit.service';
 import { EventsHubService } from '../../events/events-hub.service';
@@ -101,6 +101,12 @@ export class GenerationWorkerService {
       // Vérifie les prérequis métier (départements validés, couverture, verrous)
       await this.verifierPrerequisGeneration(version.id);
 
+      // Passe la version en état « génération » (le solveur va produire des scénarios)
+      await this.prisma.version.update({
+        where: { id: version.id },
+        data: { etat: 'generation' },
+      });
+
       // Marque la génération comme EN_COURS
       await this.prisma.generation.update({
         where: { id: generationId },
@@ -172,8 +178,8 @@ export class GenerationWorkerService {
           data: {
             generationId,
             scoreGlobal: scenario.score,
-            sousScores: {},
-            placements: {},
+            sousScores: scenario.subScores as unknown as Prisma.InputJsonValue,
+            placements: scenario.placements as unknown as Prisma.InputJsonValue,
             selectionne: false,
           },
         });
@@ -193,13 +199,8 @@ export class GenerationWorkerService {
         },
       });
 
-      // Transition de version : generation → edition
-      await this.prisma.version.update({
-        where: { id: version.id },
-        data: { etat: 'edition' },
-      });
-
-      // Audit de la génération réussie
+      // Audit de la génération réussie (la version reste en 'generation' en attendant
+      // la sélection manuelle du scénario — RB-WF-04, pas de sélection automatique)
       await this.auditService.record({
         action: 'CREATION',
         utilisateurId,
@@ -210,7 +211,6 @@ export class GenerationWorkerService {
           statut: 'TERMINEE',
           nombreScenarios: scenariosAA.length,
           dureeMs,
-          transitionVersion: 'generation -> edition',
         },
       });
 
