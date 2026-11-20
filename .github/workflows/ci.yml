@@ -17,6 +17,7 @@ on:
 env:
   NODE_VERSION: '24'
   DATABASE_URL: postgresql://postgres:postgres@localhost:5432/takt_test
+  PGBOSS_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/takt_test
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
