@@ -40,6 +40,9 @@ export const EnvSchema = z.object({
   // -- Fichiers --------------------------------------------------------------
   DERIVED_DIR: z.string().min(1).default('/tmp/derived'),
   SCENARIOS_DIR: z.string().min(1).default('/tmp/scenarios'),
+
+  // -- pg-boss (file de jobs PostgreSQL) --------------------------------------
+  PGBOSS_DATABASE_URL: z.string().min(1, 'URL de connexion pg-boss absente'),
 });
 
 /** Configuration applicative validée, telle qu'exposée par `ConfigService`. */
