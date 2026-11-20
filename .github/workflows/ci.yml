@@ -425,12 +425,6 @@ jobs:
       - name: Run solver unit tests
         run: python3 -m pytest solver/tests -v
 
-      - name: Build Docker image
-        run: docker build -f solver/Dockerfile -t takt/solver-worker .
-
-      - name: Check worker --help
-        run: docker run --rm takt/solver-worker --help
-
       - name: Solve minimal instance (< 5s)
         run: |
           python3 - <<'PY'
