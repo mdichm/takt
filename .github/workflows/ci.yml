@@ -116,6 +116,7 @@ jobs:
         run: pnpm test:integration
         env:
           DATABASE_URL: ${{ env.DATABASE_URL }}
+          PGBOSS_DATABASE_URL: ${{ env.PGBOSS_DATABASE_URL }}
 
       - name: Upload Coverage
         uses: codecov/codecov-action@v4
