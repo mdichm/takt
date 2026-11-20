@@ -30,6 +30,12 @@ export class EventsHubService implements OnModuleDestroy {
   private readonly heartbeat = setInterval(() => this.envoyerHeartbeat(), INTERVALLE_HEARTBEAT_MS);
   private compteur = 0;
 
+  constructor() {
+    // .unref() permet à Node.js de quitter même si le timer est encore actif
+    // (évite de bloquer la génération OpenAPI et l'arrêt du processus).
+    this.heartbeat.unref();
+  }
+
   /** Enregistre un client et retourne son flux d'événements. */
   connecter(utilisateurId: string): Observable<MessageEvent> {
     this.evicterAnciensClientsSiNecessaire(utilisateurId);

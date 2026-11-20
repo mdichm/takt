@@ -38,7 +38,6 @@ export class BossQueueService implements OnModuleInit, OnModuleDestroy {
     // En environnement de test (génération OpenAPI, tests unitaires),
     // pg-boss n'est pas initialisé : pas de base de données disponible.
     if (process.env.NODE_ENV === 'test') {
-      this.logger.log('pg-boss non initialisé en environnement de test');
       return;
     }
 
