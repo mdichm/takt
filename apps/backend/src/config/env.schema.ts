@@ -85,6 +85,11 @@ function classerAnomalies(issues: z.ZodIssue[]): AnomalieEnvironnement {
  *   explicite listant les variables manquantes »).
  */
 export function validateEnv(config: Record<string, unknown>): EnvConfig {
+  // Fallback : PGBOSS_DATABASE_URL réutilise DATABASE_URL si absent,
+  // cohérent avec le fallback déjà appliqué dans boss-queue.service.ts.
+  if (!config.PGBOSS_DATABASE_URL && config.DATABASE_URL) {
+    config = { ...config, PGBOSS_DATABASE_URL: config.DATABASE_URL };
+  }
   const resultat = EnvSchema.safeParse(config);
 
   if (!resultat.success) {
