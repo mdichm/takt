@@ -1,0 +1,3 @@
+# Dépendance runtime unique du worker CP-SAT (imposée par SPEC_SOLVER_CPSAT §7
+# et le garde-fou « solver-worker »). Aucune autre dépendance n'est ajoutée.
+ortools>=9.14,<10
