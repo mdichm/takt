@@ -501,7 +501,7 @@ TICKETS: List[Ticket] = [
         lot="L07",
         titre="Implémenter le modèle CP-SAT (OR-Tools, Python)",
         sp=8,
-        status="En cours",
+        status="Terminé",
         deps=['TAKT-L07-03'],
         exigences=['SPEC_SOLVER_CPSAT §7', 'HC-*', 'SC-*', 'EX-PRE-03', 'EX-PRE-04', 'ST_TAKT §4.2.'],
     ),
