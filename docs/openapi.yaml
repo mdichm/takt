@@ -1277,23 +1277,45 @@ paths:
         - générations
   /api/v1/generations/{id}/select:
     post:
-      operationId: GenerationsController_selectionnerScenario
+      operationId: SelectionController_selectionnerScenario
       parameters:
         - in: path
           name: id
           required: true
           schema:
             type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScenarioSelectRequest'
+        required: true
       responses:
         '200':
-          description: Scénario sélectionné
+          description: Scénario adopté
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Placements invalides
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Génération ou scénario introuvable
         '409':
-          description: Conflit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurRFC9457'
+          description: Conflit (déjà adopté, génération non terminée, version pas en génération)
       security:
         - bearerAuth: []
-      summary: Sélectionne un scénario et crée une version en édition
+      summary: Adopte un scénario et passe la version en édition
       tags:
-        - générations
+        - sélection
   /api/v1/locks:
     get:
       operationId: VerrousController_lister
