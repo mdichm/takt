@@ -422,6 +422,9 @@ jobs:
       - name: Install OR-Tools
         run: pip install -r solver/requirements.txt
 
+      - name: Install pytest
+        run: pip install pytest
+
       - name: Run solver unit tests
         run: python3 -m pytest solver/tests -v
 
