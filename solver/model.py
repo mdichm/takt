@@ -175,6 +175,12 @@ class TaktSolver:
         # --- Contraintes souples + objectif ------------------------------------
         self._add_soft_objective()
 
+    def Proto(self) -> Any:
+        """Retourne le proto du modèle CP-SAT (après ``build_model()``)."""
+        if self.model is None:
+            raise RuntimeError("Le modèle n'a pas encore été construit (appeler build_model() d'abord).")
+        return self.model.Proto()
+
     def _add_hard_volume(self) -> None:
         """HC-STR-04 : volume hebdomadaire exact, une occurrence max par jour."""
         for a_idx in range(len(self.activities)):
@@ -392,10 +398,7 @@ class TaktSolver:
             elif status == cp_model.INFEASIBLE:
                 self._status = "INFEASIBLE"
                 break
-            elif status == cp_model.TIMEOUT:
-                self._status = "TIMEOUT"
-                break
-            else:  # MODEL_INVALID ou UNKNOWN
+            else:  # MODEL_INVALID ou UNKNOWN (timeout inclus)
                 self._status = "UNKNOWN"
                 break
 
