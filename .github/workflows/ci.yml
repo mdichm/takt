@@ -345,6 +345,12 @@ jobs:
       - name: Prisma Generate
         run: pnpm --filter @takt/db db:generate
 
+      # Déployer les migrations pour que le backend NestJS puisse démarrer (pg-boss, Prisma, etc.)
+      - name: Apply Prisma Migrations (test DB)
+        run: pnpm --filter @takt/db db:migrate
+        env:
+          DATABASE_URL: ${{ env.DATABASE_URL }}
+
       - name: Vérifier le contrat OpenAPI
         run: pnpm check-openapi
 
