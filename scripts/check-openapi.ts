@@ -10,7 +10,7 @@
  */
 
 import { spawnSync } from 'node:child_process';
-import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 
@@ -19,6 +19,12 @@ const SPEC_COMMITTEE = join(RACINE, 'docs/openapi.yaml');
 const CLI_BACKEND = join(RACINE, 'apps/backend/dist/modules/common/openapi/openapi-cli.js');
 
 function executerBackend(cheminSortie: string): void {
+  // Le backend NestJS a besoin d'un répertoire pour les clés JWT (HS256/RS256).
+  const jwtDir = process.env.JWT_KEYS_DIRECTORY ?? '/tmp/takt-test-jwt';
+  if (!existsSync(jwtDir)) {
+    mkdirSync(jwtDir, { recursive: true });
+  }
+
   const resultat = spawnSync(process.execPath, [CLI_BACKEND, cheminSortie], {
     cwd: RACINE,
     encoding: 'utf8',
@@ -29,7 +35,7 @@ function executerBackend(cheminSortie: string): void {
         process.env.DATABASE_URL ?? 'postgresql://postgres:postgres@localhost:5432/takt_test',
       PGBOSS_DATABASE_URL:
         process.env.PGBOSS_DATABASE_URL ?? 'postgresql://postgres:postgres@localhost:5432/takt_test',
-      JWT_KEYS_DIRECTORY: process.env.JWT_KEYS_DIRECTORY ?? '/tmp/takt-test-jwt',
+      JWT_KEYS_DIRECTORY: jwtDir,
       JWT_ACTIVE_KEY_ID: process.env.JWT_ACTIVE_KEY_ID ?? 'active',
       JWT_ISSUER: process.env.JWT_ISSUER ?? 'takt-test',
       JWT_AUDIENCE: process.env.JWT_AUDIENCE ?? 'takt-api',
@@ -37,8 +43,15 @@ function executerBackend(cheminSortie: string): void {
   });
 
   if (resultat.status !== 0) {
-    process.stderr.write(resultat.stdout);
-    process.stderr.write(resultat.stderr);
+    process.stderr.write(`\n=== Échec du spawn OpenAPI CLI ===\n`);
+    process.stderr.write(`statut: ${resultat.status}\n`);
+    process.stderr.write(`signal: ${resultat.signal ?? 'aucun'}\n`);
+    if (resultat.error) {
+      process.stderr.write(`erreur: ${resultat.error.message}\n`);
+    }
+    process.stderr.write(`\n--- stdout ---\n${resultat.stdout ?? '(vide)'}\n`);
+    process.stderr.write(`\n--- stderr ---\n${resultat.stderr ?? '(vide)'}\n`);
+    process.stderr.write(`====================================\n\n`);
     throw new Error('La génération du document OpenAPI a échoué');
   }
 }
