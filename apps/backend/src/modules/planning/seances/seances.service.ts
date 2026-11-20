@@ -15,6 +15,7 @@ import type {
   SeanceUpdateInput,
   SeanceListFilters,
   SeanceParams,
+  PlacementPersistee,
 } from '@takt/contracts';
 
 @Injectable()
@@ -481,6 +482,151 @@ export class SeancesService {
 
     this.logger.log(`Séance créée : ${seance.id} (version ${donnees.versionId})`);
     return seance;
+  }
+
+  /**
+   * Crée les séances d'une version depuis les placements d'un scénario adopté.
+   * Bypass le bail d'édition (inadapté à une adoption en bloc) mais conserve
+   * toutes les validations métier : affectation, créneau du jour, créneaux
+   * consécutifs, couverture. Les conflits sont détectés mais ne bloquent pas
+   * (résiduels consignés en retour).
+   *
+   * @param versionId Identifiant de la version cible
+   * @param placements Placements validés par Zod (zPlacementPersistee[])
+   * @param utilisateurId Identifiant de l'utilisateur qui adopte le scénario
+   * @returns Séances créées, conflits résiduels et avertissements
+   */
+  async creerDepuisPlacements(
+    versionId: string,
+    placements: PlacementPersistee[],
+  ): Promise<{
+    seances: Prisma.SeanceGetPayload<object>[];
+    conflitsResiduels: Array<{
+      type: string;
+      seanceId: string | null;
+      description: string;
+    }>;
+    avertissements: string[];
+  }> {
+    // Version modifiable (non publiée)
+    await this.verifierVersionModifiable(versionId);
+
+    const seancesCrees: Prisma.SeanceGetPayload<object>[] = [];
+    const conflitsResiduels: Array<{
+      type: string;
+      seanceId: string | null;
+      description: string;
+    }> = [];
+    const avertissements: string[] = [];
+
+    for (const placement of placements) {
+      // 1. Affectation : activityId du placement = AffectationPedagogique.id
+      const affectation = await this.verifierAffectation(
+        placement.activityId,
+        versionId,
+      );
+
+      // 2. Jour (solver 0..5 → 1..6) et créneau de début (ordre = slot + 1)
+      const jour = placement.day + 1;
+      const creneauDebut = await this.prisma.creneau.findFirst({
+        where: { jour, ordre: placement.slot + 1 },
+      });
+      if (!creneauDebut) {
+        throw new ApiError(
+          CODES_ERREUR_API.BAD_REQUEST,
+          400,
+          `Aucun créneau d'ordre ${placement.slot + 1} pour le jour ${jour}`,
+          { champ: 'creneauDebutId', jour },
+        );
+      }
+
+      // 3. nbCreneaux depuis la durée de l'affectation et du créneau
+      const dureeCreneauMinutes = creneauDebut.heureFin
+        ? Math.round(
+            (creneauDebut.heureFin.getTime() - creneauDebut.heureDebut.getTime()) /
+              (1000 * 60),
+          )
+        : 30;
+      const nbCreneaux = Math.ceil(
+        (affectation.dureeCreneaux ?? 30) / dureeCreneauMinutes,
+      );
+
+      // 4. Créneaux consécutifs
+      await this.verifierCreneauxConsecutifs(
+        jour,
+        creneauDebut.ordre,
+        nbCreneaux,
+      );
+
+      // 5. Règle de couverture
+      await this.verifierCouverture(
+        affectation,
+        nbCreneaux,
+        dureeCreneauMinutes,
+      );
+
+      // 6. Détection des conflits (non bloquants ici : on collecte les résiduels)
+      const resultatConflits = await this.conflictService.detecterConflits({
+        versionId,
+        jour,
+        creneauDebutId: creneauDebut.id,
+        nbCreneaux,
+        salleId: placement.roomId,
+        enseignantId: placement.teacherId,
+        groupeId: affectation.groupeId,
+        typeEnseignementId: affectation.typeEnseignementId,
+      });
+
+      // 7. Création de la séance (unicité SQL garantie par Prisma/DB)
+      const seance = await this.prisma.seance.create({
+        data: {
+          versionId,
+          jour,
+          creneauDebutId: creneauDebut.id,
+          nbCreneaux,
+          salleId: placement.roomId ?? null,
+          enseignantId: placement.teacherId ?? null,
+          groupeId: affectation.groupeId,
+          matiereId: affectation.matiereId,
+          typeEnseignementId: affectation.typeEnseignementId,
+          affectationId: affectation.id,
+          estVerrouillee: false,
+        },
+        select: {
+          id: true,
+          versionId: true,
+          jour: true,
+          creneauDebutId: true,
+          nbCreneaux: true,
+          salleId: true,
+          enseignantId: true,
+          groupeId: true,
+          matiereId: true,
+          typeEnseignementId: true,
+          affectationId: true,
+          estVerrouillee: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      });
+
+      // 8. Conflits résiduels (consignés mais ne bloquent pas l'adoption)
+      for (const c of resultatConflits.conflits) {
+        conflitsResiduels.push({
+          type: c.type,
+          seanceId: seance.id,
+          description: c.message,
+        });
+      }
+
+      seancesCrees.push(seance);
+    }
+
+    this.logger.log(
+      `${seancesCrees.length} séance(s) créée(s) depuis les placements (version ${versionId})`,
+    );
+
+    return { seances: seancesCrees, conflitsResiduels, avertissements };
   }
 
   /** Met à jour une séance (PUT/PATCH /api/v1/seances/:id). */

@@ -519,7 +519,7 @@ TICKETS: List[Ticket] = [
         lot="L07",
         titre="Implémenter la sélection manuelle de scénario",
         sp=5,
-        status="À faire",
+        status="Terminé",
         deps=['TAKT-L07-03'],
         exigences=['EX-PRI-03', 'EX-PRE-04', 'EX-PRE-05', 'ST_TAKT §1.3 (étape 8)', 'IX-GES-06', 'EC-GES-05.'],
     ),

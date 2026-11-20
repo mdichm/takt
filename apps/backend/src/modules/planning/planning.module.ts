@@ -10,6 +10,9 @@ import { ConflictModule } from './conflict/conflict.module';
 import { BailModule } from './bail/bail.module';
 import { VerrousModule } from './verrous/verrous.module';
 import { CouvertureModule } from './couverture/couverture.module';
+import { SeancesService } from './seances/seances.service';
+import { VerrouService } from './verrous/verrous.service';
+import { ConflictService } from './conflict/conflict.service';
 
 /** Module des séances, contraintes, verrous, baux d'édition, conflits et couverture de planning. */
 @Module({
@@ -23,5 +26,6 @@ import { CouvertureModule } from './couverture/couverture.module';
     VerrousModule,
     CouvertureModule,
   ],
+  exports: [SeancesService, VerrouService, ConflictService],
 })
 export class PlanningModule {}
