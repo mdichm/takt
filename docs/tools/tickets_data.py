@@ -510,7 +510,7 @@ TICKETS: List[Ticket] = [
         lot="L07",
         titre="Valider la performance du solveur (spike SPK-01)",
         sp=5,
-        status="À faire",
+        status="En cours",
         deps=['TAKT-L07-04'],
         exigences=['SPEC_SOLVER_CPSAT §8', 'ST_TAKT §6.3 (SPK-01)', 'PLAN_MACRO risque « solver trop lent »', 'SF_TAKT §2 (4 000 séances).'],
     ),
