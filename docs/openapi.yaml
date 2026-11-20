@@ -1284,32 +1284,14 @@ paths:
           required: true
           schema:
             type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ScenarioSelectRequest'
-        required: true
       responses:
         '200':
           description: Scénario adopté
         '400':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
           description: Placements invalides
         '404':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
           description: Génération ou scénario introuvable
         '409':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErreurRFC9457'
           description: Conflit (déjà adopté, génération non terminée, version pas en génération)
       security:
         - bearerAuth: []
