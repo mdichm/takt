@@ -14,6 +14,7 @@ export * from './couverture';
 export * from './events';
 export * from './generation';
 export * from './locks';
+export * from './profil';
 export * from './referentiels';
 export * from './repartition';
 export * from './seances';

@@ -77,7 +77,6 @@ import EC_RDEP_02 from './EC-RDEP-02';
 
 const PAGES_PLACEHOLDER = [
 
-  EC_COM_03,
   EC_ADM_01,
   EC_ADM_02,
   EC_ADM_03,
@@ -115,7 +114,7 @@ describe('pages EC-* (placeholders, lot L09)', () => {
   });
 
   it('existe exactement 25 fichiers de page placeholder (EC-COM-01 et EC-COM-02 sont des pages réelles)', () => {
-    expect(PAGES_PLACEHOLDER).toHaveLength(25);
+    expect(PAGES_PLACEHOLDER).toHaveLength(24);
   });
 
   it('chaque page affiche son code EC-*', () => {
@@ -126,7 +125,7 @@ describe('pages EC-* (placeholders, lot L09)', () => {
       codesRendus.add(texte.textContent!);
       cleanup();
     }
-    expect(codesRendus.size).toBe(25);
+    expect(codesRendus.size).toBe(24);
     for (const code of ['EC-GES-06', 'EC-DIR-05']) {
       expect(codesRendus.has(`Écran ${code}`)).toBe(true);
     }
@@ -288,4 +287,25 @@ describe('page EC-COM-02 (réelle, lot L09-02)', () => {
     );
     cleanup();
   });
+
+
+/**
+ * EC-COM-03 est une page réale (lot L09-03) qui délègue à ProfilePage.
+ * Ce test vérifie qu'elle se charge dans un router et rend le titre du profil.
+ */
+describe('page EC-COM-03 (réelle, lot L09-03)', () => {
+  afterEach(() => {
+    cleanup();
+    vi.clearAllMocks();
+  });
+
+  it('EC-COM-03 se charge et affiche le titre du profil utilisateur', async () => {
+    renderWithQuery(<EC_COM_03 />);
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument(),
+    );
+    expect(screen.getByText(/Profil utilisateur/i)).toBeInTheDocument();
+    cleanup();
+  });
+});
 });

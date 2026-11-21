@@ -258,6 +258,65 @@ export const DICTIONNAIRE_FR = {
     erreurTropDeTentatives: 'Trop de tentatives, réessayez plus tard.',
     erreurGenerique: 'Une erreur est survenue lors de la connexion.',
   },
+  // Profil utilisateur (EC-COM-03, lot L09-03)
+  profil: {
+    titre: 'Profil utilisateur',
+    sousTitre: "Gérez vos informations personnelles, vos préférences et votre mot de passe.",
+    chargement: 'Chargement du profil…',
+    erreurChargement: 'Impossible de charger le profil.',
+    profilIntrouvable: 'Profil introuvable.',
+    role: 'Connecté en tant que',
+    bouton: {
+      deconnexion: 'Déconnexion',
+      enregistrer: 'Enregistrer les modifications',
+      annuler: 'Annuler',
+    },
+    informations: {
+      titre: 'Informations personnelles',
+      departementAffiche: 'Département :',
+    },
+    champ: {
+      nom: 'Nom',
+      prenom: 'Prénom',
+      email: 'E-mail',
+      departement: 'Département',
+      role: 'Rôle',
+      roleLectureSeule: 'Le rôle ne peut pas être modifié depuis cet écran.',
+      placeholderNom: 'Dupont',
+      placeholderPrenom: 'Marie',
+      placeholderEmail: 'marie.dupont@academie.fr',
+      selectionnerDepartement: 'Sélectionner un département…',
+      aucunDepartement: 'Aucun département',
+    },
+    emailDejaUtilise: 'Cet e-mail est déjà utilisé par un autre compte.',
+    erreurGenerique: 'Une erreur est survenue.',
+    profilModifie: 'Profil modifié avec succès.',
+    theme: {
+      titre: 'Thème',
+      description: "Choisissez l'apparence de l'interface.",
+      normal: 'Normal',
+      ramadan: 'Ramadan',
+      ramadanActive: 'Le thème Ramadan est activé.',
+    },
+    preferences: {
+      titre: 'Notifications',
+      description: 'Choisissez les canaux par lesquels vous souhaitez être notifié.',
+      email: 'E-mail',
+      inApp: 'In-app',
+      notePersistance: 'Les préférences sont enregistrées dans votre navigateur.',
+    },
+    motDePasse: {
+      titre: 'Changement de mot de passe',
+      description: 'Saisissez votre mot de passe actuel et définissez un nouveau mot de passe.',
+      actuel: 'Mot de passe actuel',
+      nouveau: 'Nouveau mot de passe',
+      placeholderActuel: '••••••••',
+      placeholderNouveau: '••••••••',
+      bouton: 'Changer le mot de passe',
+      consequence: 'Toutes vos sessions actives seront révoquées : vous devrez vous reconnecter.',
+      actuelInvalide: 'Le mot de passe actuel est incorrect.',
+      modifie: 'Mot de passe modifié avec succès.',
+    }}
 } as const;
 
 export type CleDictionnaire = keyof typeof DICTIONNAIRE_FR;

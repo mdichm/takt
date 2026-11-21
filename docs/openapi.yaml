@@ -3514,6 +3514,51 @@ paths:
       summary: Crée un utilisateur
       tags:
         - Utilisateurs
+  /api/v1/users/me:
+    get:
+      operationId: UsersController_me
+      parameters: []
+      responses:
+        '200':
+          description: Profil utilisateur
+        '401':
+          description: Non authentifié
+      security:
+        - bearerAuth: []
+      summary: Profil de l’utilisateur connecté
+      tags:
+        - Utilisateurs
+    patch:
+      operationId: UsersController_updateMe
+      parameters: []
+      responses:
+        '200':
+          description: Profil modifié
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+      security:
+        - bearerAuth: []
+      summary: Modifie le profil de l’utilisateur connecté
+      tags:
+        - Utilisateurs
+  /api/v1/users/me/mot-de-passe:
+    post:
+      operationId: UsersController_changePassword
+      parameters: []
+      responses:
+        '200':
+          description: Mot de passe modifié
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+      security:
+        - bearerAuth: []
+      summary: Change le mot de passe de l’utilisateur connecté
+      tags:
+        - Utilisateurs
   /api/v1/users/{id}:
     delete:
       operationId: UsersController_disable
