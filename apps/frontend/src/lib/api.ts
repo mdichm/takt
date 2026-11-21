@@ -20,6 +20,8 @@ export interface OptionsRequete {
   schema?: ZodTypeAny;
   signal?: AbortSignal;
   tentativeRefresh?: boolean;
+  /** Ne pas tenter de renouvellement ni purger la session sur 401 (utile pour le login). */
+  sansRefresh?: boolean;
 }
 
 export interface ConfigurationApi {
@@ -108,7 +110,7 @@ async function requete<T>(
   options: OptionsRequete,
   obtenirJetonOverride?: () => string | null,
 ): Promise<ReponseApi<T>> {
-  const { methode, chemin, corps, schema, signal, tentativeRefresh = false } = options;
+  const { methode, chemin, corps, schema, signal, tentativeRefresh = false, sansRefresh = false } = options;
 
   const enTetes: Record<string, string> = {};
   const jeton = (obtenirJetonOverride ?? configuration.obtenirJeton)();
@@ -150,6 +152,10 @@ async function requete<T>(
     );
 
     if (reponse.status === 401) {
+      // Login sans session rafraîchissable : on ne tente pas de renouvellement ni de purge.
+      if (sansRefresh) {
+        throw erreur;
+      }
       if (tentativeRefresh) {
         // Déjà renouvelé une fois : la session est morte, on ne boucle pas.
         purgerJeton();
@@ -207,7 +213,7 @@ export function get<T>(
 export function post<T>(
   chemin: string,
   corps?: unknown,
-  options: { schema?: ZodTypeAny; signal?: AbortSignal } = {},
+  options: { schema?: ZodTypeAny; signal?: AbortSignal; sansRefresh?: boolean } = {},
 ): Promise<ReponseApi<T>> {
   return requete<T>({ methode: 'POST', chemin, corps, ...options });
 }

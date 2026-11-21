@@ -56,6 +56,8 @@ export const zUtilisateurLogin = z.object({
   nom: z.string().min(1),
   prenom: z.string().min(1),
   role: z.string().min(1),
+  /** Département rattaché (nullable : un utilisateur sans département n'en a pas). */
+  departementId: zUuid.optional(),
 });
 
 export type UtilisateurLogin = z.infer<typeof zUtilisateurLogin>;
@@ -75,8 +77,8 @@ export function raffinerRole(role: string): RoleCode {
 
 /**
  * Construit une SessionUtilisateur depuis la réponse de login valide.
- * departementIds est laissé vide tant que le décodage des claims JWT n'est
- * pas branché (écart E2, rapport L08-03).
+ * departementIds est peuplé depuis le champ departementId de la réponse
+ * (écart E2 résolu : un rdep accède bien à son département après authentification).
  */
 export function construireSession(utilisateur: UtilisateurLogin): SessionUtilisateur {
   return {
@@ -85,7 +87,7 @@ export function construireSession(utilisateur: UtilisateurLogin): SessionUtilisa
     nom: utilisateur.nom,
     prenom: utilisateur.prenom,
     role: raffinerRole(utilisateur.role),
-    departementIds: [],
+    departementIds: utilisateur.departementId ? [utilisateur.departementId] : [],
   };
 }
 
