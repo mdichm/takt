@@ -3,23 +3,22 @@
 
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { QueryClientProvider } from '@tanstack/react-query';
-import { queryClient } from '@/lib/queryClient';
+import { BrowserRouter } from 'react-router-dom';
 import { amorcerApi } from '@/lib/amorcage';
 import { userStore } from '@/stores/userStore';
 import { Router } from '@/app/router';
-import { ThemeProvider } from '@/app/theme/ThemeProvider';
+import { AppProviders } from '@/app/providers';
+import { declencherPurgeSessionGlobale } from '@/app/providers';
 import '@/styles.css';
 
-// Amorçage : le jeton d'accès est obtenu depuis la mémoire (fournisseur
-// d'authentification à brancher). Il n'est jamais dans localStorage (GG-17).
+// Amorçage : le jeton d'accès est obtenu depuis le store Zustand (mémoire).
+// Il n'est jamais dans localStorage (GG-17).
 amorcerApi({
-  obtenirJeton: () => null,
+  obtenirJeton: () => userStore.getState().jetonAcces,
   surSessionExpirée: () => {
-    userStore.getState().deconnecter();
+    declencherPurgeSessionGlobale();
   },
 });
-userStore.getState().configurerQueryClient(queryClient);
 
 const racine = document.getElementById('root');
 
@@ -29,10 +28,10 @@ if (!racine) {
 
 createRoot(racine).render(
   <StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
+    <BrowserRouter>
+      <AppProviders>
         <Router />
-      </ThemeProvider>
-    </QueryClientProvider>
+      </AppProviders>
+    </BrowserRouter>
   </StrictMode>,
 );
