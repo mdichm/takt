@@ -32,7 +32,28 @@ export const zVersionList = zPaginationQuery
   .extend({
     etat: zEtatVersion.optional(),
     semestreId: zUuid.optional(),
+    /** Filtre par périmètre départemental (RB-UI-01 : rdep voit son département). */
+    departementId: zUuid.optional(),
   });
+
+/** Item de version en lecture seule (miroir du select Prisma de l'endpoint liste). */
+export const zVersionItem = z.object({
+  id: zUuid,
+  semestreId: zUuid,
+  anneeId: zUuid,
+  etat: zEtatVersion,
+  snapshotId: zUuid.nullish(),
+  datePublication: zDateIso.nullish(),
+  publiePar: zUuid.nullish(),
+  createdAt: zDateIso,
+  updatedAt: zDateIso,
+});
+
+/** Réponse paginée de l'endpoint liste (contenu de `data` dans l'enveloppe API). */
+export const zVersionListe = z.object({
+  items: z.array(zVersionItem),
+  meta: z.object({ page: z.number().int().positive(), pageSize: z.number().int().positive(), total: z.number().int().nonnegative() }),
+});
 
 /** Action de transition autorisée par la matrice workflow (18 transitions arbitrées). */
 export const zActionTransition = z.enum([
@@ -155,6 +176,8 @@ export const zAudit = z
 export type VersionInput = z.infer<typeof zVersion>;
 export type VersionParams = z.infer<typeof zVersionParams>;
 export type VersionListFilters = z.infer<typeof zVersionList>;
+export type VersionItem = z.infer<typeof zVersionItem>;
+export type VersionListe = z.infer<typeof zVersionListe>;
 export type GenerationInput = z.infer<typeof zGeneration>;
 export type Scenario = z.infer<typeof zScenario>;
 export type ScenarioSelectInput = z.infer<typeof zScenarioSelect>;

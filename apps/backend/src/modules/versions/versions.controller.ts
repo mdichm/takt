@@ -13,7 +13,7 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import {
   zVersion,
   zVersionList,
@@ -39,6 +39,7 @@ interface RequeteAvecUtilisateur {
   headers: Record<string, string | string[] | undefined>;
   query?: Record<string, string | string[] | undefined>;
   user?: UtilisateurConnecte;
+  departementIds?: string[];
 }
 
 @ApiTags('Versions')
@@ -58,12 +59,20 @@ export class VersionsController {
   @HttpCode(HttpStatus.OK)
   @ZodValidation({ query: zVersionList })
   @ApiOperation({ summary: 'Liste paginée des versions de planning' })
+  @ApiQuery({ name: 'page', required: false, type: Number, description: 'Numéro de page (défaut 1)' })
+  @ApiQuery({ name: 'pageSize', required: false, type: Number, description: 'Taille de page (défaut 20)' })
+  @ApiQuery({ name: 'search', required: false, type: String, description: 'Recherche textuelle' })
+  @ApiQuery({ name: 'sort', required: false, type: String, description: 'Champ de tri (etat, createdAt, updatedAt)' })
+  @ApiQuery({ name: 'direction', required: false, enum: ['asc', 'desc'], description: 'Direction de tri' })
+  @ApiQuery({ name: 'etat', required: false, enum: ['initial', 'rep_pedag', 'brouillon', 'generation', 'edition', 'valid_pedag', 'valid_dir', 'valide', 'publie', 'archive'], description: 'Filtre par état de version' })
+  @ApiQuery({ name: 'semestreId', required: false, type: String, description: 'Filtre par semestre' })
+  @ApiQuery({ name: 'departementId', required: false, type: String, description: 'Filtre par département (périmètre rdep)' })
   @ApiResponse({ status: 200, description: 'Liste des versions' })
   @ApiResponse({ status: 401, description: 'Non authentifié' })
   @ApiResponse({ status: 403, description: 'Interdit' })
   async list(@Req() req: RequeteAvecUtilisateur): Promise<unknown> {
     const query = (req.query ?? {}) as unknown as VersionListFilters;
-    return this.versionsService.lister(query);
+    return this.versionsService.lister(query, req.departementIds ?? []);
   }
 
   /** Récupère une version par son ID (GET /api/v1/versions/:id). */

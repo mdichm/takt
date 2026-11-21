@@ -4,7 +4,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen, cleanup, waitFor, fireEvent } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { MemoryRouter } from 'react-router-dom';
+import { BrowserRouter, MemoryRouter } from 'react-router-dom';
 import { versionStore } from '@/stores/versionStore';
 import { repartitionApi } from '@/lib/repartition.api';
 
@@ -21,6 +21,15 @@ vi.mock('@/lib/repartition.api', () => ({
     listerTypesEnseignement: vi.fn().mockResolvedValue({ items: [], meta: { page: 1, pageSize: 50, total: 0 } }),
     listerMatieres: vi.fn().mockResolvedValue({ items: [], meta: { page: 1, pageSize: 50, total: 0 } }),
   },
+  }));
+
+vi.mock('@/lib/api', () => ({
+  api: {
+    get: vi.fn().mockResolvedValue({
+      data: { items: [], meta: { page: 1, pageSize: 20, total: 0 } },
+      meta: { requestId: 'test', timestamp: new Date().toISOString() },
+    }),
+  },
 }));
 
 const queryClient = new QueryClient({
@@ -31,7 +40,9 @@ const queryClient = new QueryClient({
 
 const renderWithQuery = (component: React.ReactElement) =>
   render(
-    <QueryClientProvider client={queryClient}>{component}</QueryClientProvider>,
+    <BrowserRouter>
+      <QueryClientProvider client={queryClient}>{component}</QueryClientProvider>
+    </BrowserRouter>,
   );
 import EC_COM_01 from './EC-COM-01';
 import EC_COM_02 from './EC-COM-02';
@@ -66,7 +77,6 @@ import EC_RDEP_02 from './EC-RDEP-02';
 
 const PAGES_PLACEHOLDER = [
 
-  EC_COM_02,
   EC_COM_03,
   EC_ADM_01,
   EC_ADM_02,
@@ -104,8 +114,8 @@ describe('pages EC-* (placeholders, lot L09)', () => {
     cleanup();
   });
 
-  it('existe exactement 26 fichiers de page placeholder (EC-COM-01 est une page réelle)', () => {
-    expect(PAGES_PLACEHOLDER).toHaveLength(26);
+  it('existe exactement 25 fichiers de page placeholder (EC-COM-01 et EC-COM-02 sont des pages réelles)', () => {
+    expect(PAGES_PLACEHOLDER).toHaveLength(25);
   });
 
   it('chaque page affiche son code EC-*', () => {
@@ -116,7 +126,7 @@ describe('pages EC-* (placeholders, lot L09)', () => {
       codesRendus.add(texte.textContent!);
       cleanup();
     }
-    expect(codesRendus.size).toBe(26);
+    expect(codesRendus.size).toBe(25);
     for (const code of ['EC-GES-06', 'EC-DIR-05']) {
       expect(codesRendus.has(`Écran ${code}`)).toBe(true);
     }
@@ -251,6 +261,30 @@ describe('pages EC-RDEP-01 / EC-RDEP-02 (réelles, lot L05-06)', () => {
     );
     await waitFor(() =>
       expect(screen.getByText(/Répartition annulée/)).toBeInTheDocument(),
+    );
+    cleanup();
+  });
+});
+
+describe('page EC-COM-02 (réelle, lot L09-02)', () => {
+  afterEach(() => {
+    cleanup();
+    vi.clearAllMocks();
+  });
+
+  it('EC-COM-02 se charge et affiche le titre du tableau de bord', async () => {
+    renderWithQuery(<EC_COM_02 />);
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument(),
+    );
+    expect(screen.getByText(/Tableau de bord/i)).toBeInTheDocument();
+    cleanup();
+  });
+
+  it('EC-COM-02 affiche l’état vide quand aucune version', async () => {
+    renderWithQuery(<EC_COM_02 />);
+    await waitFor(() =>
+      expect(screen.getByText(/Aucune version disponible/i)).toBeInTheDocument(),
     );
     cleanup();
   });
