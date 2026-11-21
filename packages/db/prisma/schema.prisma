@@ -862,12 +862,16 @@ model CreneauAffichage {
 // 30. ConfigSysteme — Paramètres système (singleton) (L04-05)
 // ----------------------------------------------------------------------------
 model ConfigSysteme {
-  id                String   @id @default(uuid()) @db.Uuid
-  pasDeTempsMinutes Int      @default(30)
-  joursOuvres       String   // ex: "1,2,3,4,5,6"
-  creneauxParJour   Int      @default(24)
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id                            String   @id @default(uuid()) @db.Uuid
+  pasDeTempsMinutes             Int      @default(30)
+  joursOuvres                   String   // ex: "1,2,3,4,5,6"
+  creneauxParJour               Int      @default(24)
+  // Seuils garde-fous de génération (L07-07, EX-OUV-01).
+  // Valeur canonique 75% arbitrée en L00-02 ; alias SPEC_CONTRAINTES_GENERATION §8.2 : seuil_verrouillage_risque_pct.
+  seuilVerrouillageGeneration   Int      @default(75) // % max de séances verrouillées avant avertissement (borné 1-100)
+  avertissementVerrouillageBloquant Boolean @default(true) // l'avertissement de taux élevé bloque-t-il le lancement ?
+  createdAt                     DateTime @default(now())
+  updatedAt                     DateTime @updatedAt
 }
 
 // ----------------------------------------------------------------------------

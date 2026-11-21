@@ -528,7 +528,7 @@ TICKETS: List[Ticket] = [
         lot="L07",
         titre="Implémenter les garde-fous de lancement de génération",
         sp=7,
-        status="À faire",
+        status="Terminé",
         deps=['TAKT-L06-02', 'TAKT-L06-08', 'TAKT-L00-02'],
         exigences=['EX-PRE-01', 'EX-REP-06', 'EX-VRR-02', 'EX-OUV-01', 'RB-UI-07', 'TE-MET-08', 'TAKT-L00-02.'],
     ),

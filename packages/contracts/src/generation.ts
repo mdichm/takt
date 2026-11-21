@@ -73,3 +73,55 @@ export const zScenarioSelectReponse = z.object({
   avertissements: z.array(z.string()),
 });
 export type ScenarioSelectReponse = z.infer<typeof zScenarioSelectReponse>;
+
+/** ------------------------------------------------------------------ */
+/** Contrats préconditions de génération (TAKT-L07-07).               */
+/** ------------------------------------------------------------------ */
+
+/** Code d'une violation de précondition (bloquante). */
+export const zPreconditionViolationCode = z.enum([
+  'ETAT_VERSION_INVALIDE',
+  'DEPARTEMENT_NON_VALIDE',
+  'VERROU_INCOMPATIBLE',
+  'COUVERTURE_NON_CONFORME',
+]);
+
+/** Violation de précondition retournée par checkGenerationPreconditions. */
+export const zPreconditionViolation = z.object({
+  code: zPreconditionViolationCode,
+  message: z.string().min(1),
+  details: z.record(z.string(), z.unknown()).optional(),
+});
+
+export type PreconditionViolationCode = z.infer<typeof zPreconditionViolationCode>;
+export type PreconditionViolation = z.infer<typeof zPreconditionViolation>;
+
+/** Code d'un avertissement de précondition (non bloquant par défaut). */
+export const zPreconditionAvertissementCode = z.enum(['TAUX_VERROUILLAGE_ELEVE']);
+
+/** Avertissement de précondition retourné par checkGenerationPreconditions. */
+export const zPreconditionAvertissement = z.object({
+  code: zPreconditionAvertissementCode,
+  message: z.string().min(1),
+  details: z.record(z.string(), z.unknown()).optional(),
+  bloquant: z.boolean().default(true),
+});
+
+export type PreconditionAvertissementCode = z.infer<typeof zPreconditionAvertissementCode>;
+export type PreconditionAvertissement = z.infer<typeof zPreconditionAvertissement>;
+
+/** Résultat structuré de checkGenerationPreconditions(versionId). */
+export const zResultatPreconditions = z.object({
+  satisfaites: z.boolean(),
+  violations: z.array(zPreconditionViolation),
+  avertissements: z.array(zPreconditionAvertissement),
+});
+
+export type ResultatPreconditions = z.infer<typeof zResultatPreconditions>;
+
+/** Paramètres de l'endpoint de préconditions (versionId en query). */
+export const zPreconditionsParams = z.object({
+  versionId: zUuid,
+});
+
+export type PreconditionsParams = z.infer<typeof zPreconditionsParams>;
