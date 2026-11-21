@@ -4,7 +4,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen, cleanup, waitFor, fireEvent } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { BrowserRouter } from 'react-router-dom';
+import { BrowserRouter, MemoryRouter } from 'react-router-dom';
 import { versionStore } from '@/stores/versionStore';
 import { repartitionApi } from '@/lib/repartition.api';
 
@@ -114,8 +114,8 @@ describe('pages EC-* (placeholders, lot L09)', () => {
     cleanup();
   });
 
-  it('existe exactement 26 fichiers de page placeholder (EC-COM-01 est une page réelle)', () => {
-    expect(PAGES_PLACEHOLDER).toHaveLength(26);
+  it('existe exactement 25 fichiers de page placeholder (EC-COM-01 et EC-COM-02 sont des pages réelles)', () => {
+    expect(PAGES_PLACEHOLDER).toHaveLength(25);
   });
 
   it('chaque page affiche son code EC-*', () => {
@@ -126,7 +126,7 @@ describe('pages EC-* (placeholders, lot L09)', () => {
       codesRendus.add(texte.textContent!);
       cleanup();
     }
-    expect(codesRendus.size).toBe(26);
+    expect(codesRendus.size).toBe(25);
     for (const code of ['EC-GES-06', 'EC-DIR-05']) {
       expect(codesRendus.has(`Écran ${code}`)).toBe(true);
     }
