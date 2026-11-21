@@ -125,7 +125,7 @@ export class VersionsService {
   }
 
   /** Liste paginée des versions, filtre optionnel sur semestre et etat. */
-  async lister(filtres: VersionListFilters) {
+  async lister(filtres: VersionListFilters, departementIds: string[] = []) {
     const page = filtres.page ?? 1;
     const pageSize = filtres.pageSize ?? 20;
 
@@ -135,6 +135,13 @@ export class VersionsService {
     }
     if (filtres.etat) {
       where.etat = filtres.etat;
+    }
+    // Filtrage par périmètre départemental (RB-UI-01) : un rdep ne voit que
+    // les versions de son département via la jointure AffectationPedagogique.
+    if (departementIds.length > 0) {
+      where.affectations = {
+        some: { departementId: { in: departementIds } },
+      };
     }
 
     const [items, total] = await this.prisma.$transaction([

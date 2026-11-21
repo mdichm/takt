@@ -3573,7 +3573,69 @@ paths:
   /api/v1/versions:
     get:
       operationId: VersionsController_list
-      parameters: []
+      parameters:
+        - description: Filtre par département (périmètre rdep)
+          in: query
+          name: departementId
+          required: false
+          schema:
+            type: string
+        - description: Filtre par semestre
+          in: query
+          name: semestreId
+          required: false
+          schema:
+            type: string
+        - description: Filtre par état de version
+          in: query
+          name: etat
+          required: false
+          schema:
+            enum:
+              - initial
+              - rep_pedag
+              - brouillon
+              - generation
+              - edition
+              - valid_pedag
+              - valid_dir
+              - valide
+              - publie
+              - archive
+            type: string
+        - description: Direction de tri
+          in: query
+          name: direction
+          required: false
+          schema:
+            enum:
+              - asc
+              - desc
+            type: string
+        - description: Champ de tri (etat, createdAt, updatedAt)
+          in: query
+          name: sort
+          required: false
+          schema:
+            type: string
+        - description: Recherche textuelle
+          in: query
+          name: search
+          required: false
+          schema:
+            type: string
+        - description: Taille de page (défaut 20)
+          in: query
+          name: pageSize
+          required: false
+          schema:
+            type: number
+        - description: Numéro de page (défaut 1)
+          in: query
+          name: page
+          required: false
+          schema:
+            type: number
       responses:
         '200':
           description: Liste des versions

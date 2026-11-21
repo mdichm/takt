@@ -214,6 +214,31 @@ export const DICTIONNAIRE_FR = {
     enseignantsCharge: 'Enseignants en charge',
     tauxDepassement: 'Taux de dépassement',
   },
+  // Tableau de bord centralisé (EC-COM-02, lot L09-02)
+  tableauDeBord: {
+    titre: 'Tableau de bord',
+    sousTitre: "Vue d'ensemble des versions de planning et des notifications",
+    versions: 'Versions',
+    totalVersions: 'Version(s) au total',
+    etat: 'État',
+    filtreEtat: 'Filtrer par état',
+    filtreDepartement: 'Filtrer par département',
+    tousDepartements: 'Tous les départements',
+    aucunDepartement: 'Aucun département',
+    aucuneVersion: 'Aucune version disponible.',
+    aucuneVersionFiltree: 'Aucune version ne correspond aux filtres sélectionnés.',
+    actualiser: 'Actualiser',
+    rafraichissementAuto: 'Rafraîchissement automatique',
+    delai30s: '30 secondes',
+    delai60s: '60 secondes',
+    delai5min: '5 minutes',
+    notifications: 'Notifications',
+    badgeNotifications: 'Notification(s) non lue(s)',
+    erreurChargement: 'Impossible de charger les versions.',
+    reessayer: 'Réessayer',
+    miseAJour: 'Mis à jour à',
+    erreur: 'Une erreur est survenue.',
+  },
 } as const;
 
 export type CleDictionnaire = keyof typeof DICTIONNAIRE_FR;

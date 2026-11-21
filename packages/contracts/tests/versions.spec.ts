@@ -9,6 +9,9 @@ import {
   zScenarioSelect,
   zTransition,
   zVersion,
+  zVersionItem,
+  zVersionListe,
+  zVersionList,
 } from '../src/versions';
 
 const UUID = '11111111-1111-4111-8111-111111111111';
@@ -153,5 +156,66 @@ describe('contrats des versions et du workflow', () => {
         'La date de début doit être antérieure ou égale à la date de fin',
       );
     }
+  });
+});
+
+describe('contrats des versions — liste et filtres département', () => {
+  const UUID = '11111111-1111-4111-8111-111111111111';
+
+  it('zVersionItem accepte un item de version valide', () => {
+    const item = {
+      id: UUID,
+      semestreId: UUID,
+      anneeId: UUID,
+      etat: 'publie',
+      snapshotId: null,
+      datePublication: '2026-01-15T09:00:00.000Z',
+      publiePar: UUID,
+      createdAt: '2026-01-10T08:00:00.000Z',
+      updatedAt: '2026-01-15T09:00:00.000Z',
+    };
+    expect(zVersionItem.parse(item)).toEqual(item);
+  });
+
+  it('zVersionItem refuse un état invalide', () => {
+    expect(
+      zVersionItem.safeParse({
+        id: UUID,
+        semestreId: UUID,
+        anneeId: UUID,
+        etat: 'inconnu',
+        createdAt: '2026-01-10T08:00:00.000Z',
+        updatedAt: '2026-01-10T08:00:00.000Z',
+      }).success,
+    ).toBe(false);
+  });
+
+  it('zVersionListe accepte une réponse paginée', () => {
+    const liste = {
+      items: [
+        { id: UUID, semestreId: UUID, anneeId: UUID, etat: 'brouillon', createdAt: '2026-01-10T08:00:00.000Z', updatedAt: '2026-01-10T08:00:00.000Z' },
+      ],
+      meta: { page: 1, pageSize: 20, total: 1 },
+    };
+    expect(zVersionListe.parse(liste)).toEqual(liste);
+  });
+
+  it('zVersionListe refuse une méta invalide', () => {
+    expect(
+      zVersionListe.safeParse({
+        items: [],
+        meta: { page: 0, pageSize: 20, total: 0 },
+      }).success,
+    ).toBe(false);
+  });
+
+  it('zVersionList accepte le filtre departementId', () => {
+    expect(
+      zVersionList.safeParse({ page: 1, pageSize: 20, departementId: UUID }).success,
+    ).toBe(true);
+  });
+
+  it('zVersionList refuse un departementId invalide', () => {
+    expect(zVersionList.safeParse({ departementId: 'non-un-uuid' }).success).toBe(false);
   });
 });
