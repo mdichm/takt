@@ -77,8 +77,6 @@ import EC_RDEP_02 from './EC-RDEP-02';
 
 const PAGES_PLACEHOLDER = [
 
-  EC_COM_01,
-
   EC_COM_03,
   EC_ADM_01,
   EC_ADM_02,
@@ -116,7 +114,7 @@ describe('pages EC-* (placeholders, lot L09)', () => {
     cleanup();
   });
 
-  it('existe exactement 29 fichiers de page', () => {
+  it('existe exactement 26 fichiers de page placeholder (EC-COM-01 est une page réelle)', () => {
     expect(PAGES_PLACEHOLDER).toHaveLength(26);
   });
 
@@ -129,9 +127,30 @@ describe('pages EC-* (placeholders, lot L09)', () => {
       cleanup();
     }
     expect(codesRendus.size).toBe(26);
-    for (const code of ['EC-COM-01', 'EC-GES-06', 'EC-DIR-05']) {
+    for (const code of ['EC-GES-06', 'EC-DIR-05']) {
       expect(codesRendus.has(`Écran ${code}`)).toBe(true);
     }
+  });
+});
+
+/**
+ * EC-COM-01 est une page réelle (lot L09-01) qui délègue à LoginPage.
+ * Ce test vérifie qu’elle se charge dans un router et rend le formulaire de connexion.
+ */
+describe('page EC-COM-01 (réelle, lot L09-01)', () => {
+  afterEach(() => {
+    cleanup();
+  });
+
+  it('EC-COM-01 se charge et rend le formulaire de connexion', () => {
+    render(
+      <MemoryRouter initialEntries={['/login']}>
+        <EC_COM_01 />
+      </MemoryRouter>,
+    );
+    expect(screen.getByLabelText(/adresse e-mail/i, { selector: 'input' })).toBeInTheDocument();
+    expect(screen.getByLabelText(/mot de passe/i, { selector: 'input' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /se connecter/i })).toBeInTheDocument();
   });
 });
 

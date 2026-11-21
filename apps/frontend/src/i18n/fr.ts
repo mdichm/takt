@@ -239,6 +239,25 @@ export const DICTIONNAIRE_FR = {
     miseAJour: 'Mis à jour à',
     erreur: 'Une erreur est survenue.',
   },
+  // Connexion (EC-COM-01, L09-01)
+  connexion: {
+    titre: 'Connexion',
+    sousTitre: 'Identifiez-vous pour accéder à TAKT.',
+    email: 'Adresse e-mail',
+    emailPlaceholder: 'nom@exemple.fr',
+    motDePasse: 'Mot de passe',
+    motDePassePlaceholder: '••••••••',
+    afficherMotDePasse: 'Afficher le mot de passe',
+    masquerMotDePasse: 'Masquer le mot de passe',
+    boutonConnexion: 'Se connecter',
+    lienMotDePasseOublie: 'Mot de passe oublié ?',
+    lienPremièreConnexion: 'Première connexion ?',
+    piedVersion: 'TAKT v0.1',
+    piedRgpd: 'Mentions RGPD',
+    erreurIdentifiants: 'Identifiants incorrects.',
+    erreurTropDeTentatives: 'Trop de tentatives, réessayez plus tard.',
+    erreurGenerique: 'Une erreur est survenue lors de la connexion.',
+  },
 } as const;
 
 export type CleDictionnaire = keyof typeof DICTIONNAIRE_FR;

@@ -600,7 +600,7 @@ TICKETS: List[Ticket] = [
         lot="L09",
         titre="Écran `EC-COM-01` Connexion / Login",
         sp=5,
-        status="À faire",
+        status="Terminé",
         deps=['TAKT-L08-02', 'TAKT-L08-04', 'TAKT-L08-07'],
         exigences=['EC-COM-01', 'IX-COM-01', 'UF-* auth', 'TAKT-L03-03.'],
     ),
