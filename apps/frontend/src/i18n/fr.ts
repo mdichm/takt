@@ -48,6 +48,16 @@ export const DICTIONNAIRE_FR = {
     erreur: 'Une erreur est survenue. Veuillez réessayer.',
     succès: 'Opération réussie.',
   },
+  // Gestion d'erreur applicative (L08-07)
+  erreur: {
+    rendu: 'Une erreur est survenue lors du rendu de cet écran.',
+    diagnostic: 'Identifiant de diagnostic :',
+    reessayer: 'Réessayer',
+    pageIntrouvable: 'Page introuvable (404)',
+    pageIntrouvableMessage:
+      'L écran demandé n existe pas ou a été déplacé.',
+    retourTableauDeBord: 'Retour au tableau de bord',
+  },
   // Navigation
   navigation: {
     menu: 'Menu',
