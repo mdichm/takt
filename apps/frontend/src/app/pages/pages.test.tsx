@@ -4,6 +4,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen, cleanup, waitFor, fireEvent } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { MemoryRouter } from 'react-router-dom';
 import { versionStore } from '@/stores/versionStore';
 import { repartitionApi } from '@/lib/repartition.api';
 
@@ -65,7 +66,6 @@ import EC_RDEP_02 from './EC-RDEP-02';
 
 const PAGES_PLACEHOLDER = [
 
-  EC_COM_01,
   EC_COM_02,
   EC_COM_03,
   EC_ADM_01,
@@ -104,8 +104,8 @@ describe('pages EC-* (placeholders, lot L09)', () => {
     cleanup();
   });
 
-  it('existe exactement 29 fichiers de page', () => {
-    expect(PAGES_PLACEHOLDER).toHaveLength(27);
+  it('existe exactement 26 fichiers de page placeholder (EC-COM-01 est une page réelle)', () => {
+    expect(PAGES_PLACEHOLDER).toHaveLength(26);
   });
 
   it('chaque page affiche son code EC-*', () => {
@@ -116,10 +116,31 @@ describe('pages EC-* (placeholders, lot L09)', () => {
       codesRendus.add(texte.textContent!);
       cleanup();
     }
-    expect(codesRendus.size).toBe(27);
-    for (const code of ['EC-COM-01', 'EC-GES-06', 'EC-DIR-05']) {
+    expect(codesRendus.size).toBe(26);
+    for (const code of ['EC-GES-06', 'EC-DIR-05']) {
       expect(codesRendus.has(`Écran ${code}`)).toBe(true);
     }
+  });
+});
+
+/**
+ * EC-COM-01 est une page réelle (lot L09-01) qui délègue à LoginPage.
+ * Ce test vérifie qu’elle se charge dans un router et rend le formulaire de connexion.
+ */
+describe('page EC-COM-01 (réelle, lot L09-01)', () => {
+  afterEach(() => {
+    cleanup();
+  });
+
+  it('EC-COM-01 se charge et rend le formulaire de connexion', () => {
+    render(
+      <MemoryRouter initialEntries={['/login']}>
+        <EC_COM_01 />
+      </MemoryRouter>,
+    );
+    expect(screen.getByLabelText(/adresse e-mail/i, { selector: 'input' })).toBeInTheDocument();
+    expect(screen.getByLabelText(/mot de passe/i, { selector: 'input' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /se connecter/i })).toBeInTheDocument();
   });
 });
 

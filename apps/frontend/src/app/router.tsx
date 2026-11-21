@@ -38,16 +38,10 @@ export function Router(): JSX.Element {
   return (
     <Suspense fallback={<Skeleton />}>
       <Routes>
+        {/* /login est hors Layout (pas de sidebar ni header applicatif : écran pré-authentification) */}
+        <Route path="/login" element={<GuestGuard><PageLogin /></GuestGuard>} />
         <Route element={<Layout />}>
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
-          <Route
-            path="/login"
-            element={
-              <GuestGuard>
-                <PageLogin />
-              </GuestGuard>
-            }
-          />
           {ROUTES.filter((r) => r.chemin !== '/login').map((route) => (
             <Route
               key={route.code}
