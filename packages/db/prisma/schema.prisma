@@ -16,6 +16,25 @@ datasource db {
 }
 
 // ----------------------------------------------------------------------------
+// 17. SecurityEvent — Événements de sécurité (L11-01)
+// ----------------------------------------------------------------------------
+model SecurityEvent {
+  id          String   @id @default(uuid()) @db.Uuid
+  type        String   // ex: LOGIN_ECHEC, ACCES_INTERDIT, TENTATIVE_INTRUSION
+  utilisateurId String? @db.Uuid
+  ip          String?
+  userAgent   String?
+  details     Json?
+  createdAt   DateTime @default(now())
+
+  utilisateur Utilisateur? @relation(fields: [utilisateurId], references: [id])
+
+  @@index([createdAt])
+  @@index([type])
+  @@index([utilisateurId])
+}
+
+// ----------------------------------------------------------------------------
 // 1. Utilisateur — Comptes applicatifs (admin, gest, rdep, dir)
 // ----------------------------------------------------------------------------
 model Utilisateur {
@@ -36,6 +55,7 @@ model Utilisateur {
   verrous               VerrouSeance[]
   bails                 BailEdition[]     // baux d'édition détenus par cet utilisateur (TAKT-L06-07)
   journalAudit          JournalAudit[]
+  securityEvents        SecurityEvent[]    // événements de sécurité liés (L11-01)
   notifications         Notification[]      // notifications in-app (TAKT-L05-05)
   versionsPubliees      Version[]           // versions dont cet utilisateur est l'auteur de publication
 
