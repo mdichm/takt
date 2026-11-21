@@ -591,7 +591,7 @@ TICKETS: List[Ticket] = [
         lot="L08",
         titre="Implémenter le layout applicatif et la gestion des erreurs",
         sp=3,
-        status="À faire",
+        status="En cours",
         deps=['TAKT-L08-04', 'TAKT-L08-05'],
         exigences=['UI_ARBORESCENCE §8', 'UI_WIREFRAMES §2', 'TE-API-06', 'EX-NOT-01.'],
     ),
