@@ -8,6 +8,7 @@ import { CODES_ERREUR_API, ApiError } from '../../common/http/api-error';
 import { AuditService } from '../../audit/audit.service';
 import { EventsHubService } from '../../events/events-hub.service';
 import { DerivedFileService } from '../derived-file/derived-file.service';
+import { PreconditionsService } from '../preconditions/preconditions.service';
 import { SOLVEUR, type ScenarioSolveur } from '../../common/di/solveur.token';
 
 /** Nombre maximal de scénarios à persister par génération. */
@@ -44,6 +45,7 @@ export class GenerationWorkerService {
     @Inject(AuditService) private readonly auditService: AuditService,
     @Inject(SOLVEUR) private readonly solveur: Solveur,
     private readonly derivedFileService: DerivedFileService,
+    private readonly preconditionsService: PreconditionsService,
     private readonly eventsHub: EventsHubService,
   ) {}
 
@@ -291,52 +293,22 @@ export class GenerationWorkerService {
   /**
    * Vérifie que la génération peut être lancée sur cette version.
    *
-   * @throws ApiError 409 avec le nom du département manquant si un département n'est pas validé
+   * Délègue au contrôle des 5 préconditions (TAKT-L07-07). Lance une
+   * ApiError 409 si des violations bloquantes sont présentes.
+   *
+   * @throws ApiError 409 avec le détail des violations/avertissements bloquants
    */
   private async verifierPrerequisGeneration(versionId: string): Promise<void> {
-    // Récupère les validations de répartition par département
-    const validations = await this.prisma.validationRepartition.findMany({
-      where: { versionId },
-      select: { departementId: true, etat: true },
-    });
-
-    if (validations.length === 0) {
+    const { satisfaites, violations, avertissements } =
+      await this.preconditionsService.checkGenerationPreconditions(versionId);
+    if (!satisfaites) {
       throw new ApiError(
         CODES_ERREUR_API.CONFLICT,
         409,
-        'Aucun département n’a validé sa répartition pédagogique pour cette version',
-        { versionId },
+        'Préconditions de génération non satisfaites',
+        { versionId, violations, avertissements },
       );
     }
-
-    const nonValides = validations.filter((v) => v.etat !== 'VALIDE');
-    if (nonValides.length > 0) {
-      const noms = nonValides.map((v) => v.departementId).join(', ');
-      throw new ApiError(
-        CODES_ERREUR_API.CONFLICT,
-        409,
-        `Département(s) non validé(s) : ${noms}`,
-        { versionId, departementsNonValides: nonValides.map((v) => v.departementId) },
-      );
-    }
-
-    // Vérifie l'absence de verrou bloquant (garde métier TAKT-L06-08)
-    const verrousBloquants = await this.prisma.verrouSeance.findMany({
-      where: { versionId },
-      select: { id: true, type: true },
-      take: 1,
-    });
-    if (verrousBloquants.length > 0) {
-      throw new ApiError(
-        CODES_ERREUR_API.CONFLICT,
-        409,
-        'La génération est bloquée par un ou plusieurs verrous de séance',
-        { versionId, verrousBloquants: verrousBloquants.length },
-      );
-    }
-
-    // TODO TAKT-L07-07 : vérification de couverture pédagogique via GARDE_COUVERTURE
-    // (garde-fous de lancement de génération, ticket séparé)
   }
 
   /**

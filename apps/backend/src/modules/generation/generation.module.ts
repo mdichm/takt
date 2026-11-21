@@ -11,6 +11,7 @@ import { VersionsModule } from '../versions/versions.module';
 import { DerivedFileModule } from './derived-file/derived-file.module';
 import { GenerationsController } from './generations.controller';
 import { GenerationsService } from './generations.service';
+import { PreconditionsModule } from './preconditions/preconditions.module';
 import { BossQueueService } from './worker/boss-queue.service';
 import { GenerationWorkerService } from './worker/generation-worker.service';
 import { SOLVEUR, type ScenarioSolveur } from '../common/di/solveur.token';
@@ -30,6 +31,7 @@ class SolveurDouble {
     ReferentielsModule,
     VersionsModule,
     PlanningModule,
+    PreconditionsModule,
     DerivedFileModule,
     EventsModule,
     AuditModule,

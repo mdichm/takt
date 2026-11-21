@@ -7,7 +7,9 @@ import { PrismaClient } from '@takt/db';
 import { CODES_ERREUR_API, ApiError } from '../common/http/api-error';
 import { AuditService } from '../audit/audit.service';
 import { BossQueueService } from './worker/boss-queue.service';
+import { PreconditionsService } from './preconditions/preconditions.service';
 import { type GenerationJobData } from '../common/di/boss.token';
+import type { ResultatPreconditions } from '@takt/contracts';
 
 /**
  * Service métier des générations CP-SAT.
@@ -26,6 +28,7 @@ export class GenerationsService {
     @Inject(PRISMA) private readonly prisma: PrismaClient,
     @Inject(AuditService) private readonly auditService: AuditService,
     private readonly bossQueue: BossQueueService,
+    private readonly preconditionsService: PreconditionsService,
   ) {}
 
   /**
@@ -54,6 +57,22 @@ export class GenerationsService {
         409,
         `La version doit être à l'état « brouillon » pour lancer une génération (état actuel : ${version.etat})`,
         { versionId, etat: version.etat },
+      );
+    }
+
+    // Contrôle des préconditions avant création du job pg-boss (TAKT-L07-07)
+    const preconditions: ResultatPreconditions =
+      await this.preconditionsService.checkGenerationPreconditions(versionId);
+    if (!preconditions.satisfaites) {
+      throw new ApiError(
+        CODES_ERREUR_API.CONFLICT,
+        409,
+        'Préconditions de génération non satisfaites',
+        {
+          versionId,
+          violations: preconditions.violations,
+          avertissements: preconditions.avertissements,
+        },
       );
     }
 
