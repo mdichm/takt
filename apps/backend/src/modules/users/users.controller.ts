@@ -21,10 +21,14 @@ import {
   zUserList,
   zUserParams,
   zUserUpdate,
+  zProfilUpdate,
+  zMotDePasseChange,
   type UserCreate,
   type UserListFilters,
   type UserParams,
   type UserUpdate,
+  type ProfilUpdate,
+  type MotDePasseChange,
 } from '@takt/contracts';
 import { ZodValidation } from '../common/pipes/zod-validation.decorator';
 import { UsersService } from './users.service';
@@ -134,6 +138,61 @@ export class UsersController {
       estActif: corps.estActif ?? true,
       utilisateurIdCreePar: req.user!.sub,
     });
+    return resultat;
+  }
+
+  /** Récupère le profil de l'utilisateur connecté (GET /api/v1/users/me). */
+  @Get('me')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin', 'gest', 'rdep', 'dir')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Profil de l’utilisateur connecté' })
+  @ApiResponse({ status: 200, description: 'Profil utilisateur' })
+  @ApiResponse({ status: 401, description: 'Non authentifié' })
+  async me(@Req() req: RequeteAvecUtilisateur): Promise<unknown> {
+    const profil = await this.usersService.getProfile(req.user!.sub);
+    return profil;
+  }
+
+  /** Met à jour le profil de l'utilisateur connecté (PATCH /api/v1/users/me). */
+  @Patch('me')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin', 'gest', 'rdep', 'dir')
+  @HttpCode(HttpStatus.OK)
+  @ZodValidation({ body: zProfilUpdate })
+  @ApiOperation({ summary: 'Modifie le profil de l’utilisateur connecté' })
+  @ApiResponse({ status: 200, description: 'Profil modifié' })
+  @ApiResponse({ status: 400, description: 'Requête invalide' })
+  @ApiResponse({ status: 401, description: 'Non authentifié' })
+  async updateMe(
+    @Body() corps: ProfilUpdate,
+    @Req() req: RequeteAvecUtilisateur,
+  ): Promise<unknown> {
+    const resultat = await this.usersService.updateProfile(req.user!.sub, corps, {
+      utilisateurIdDemandeur: req.user!.sub,
+    });
+    return resultat;
+  }
+
+  /** Change le mot de passe de l'utilisateur connecté (POST /api/v1/users/me/mot-de-passe). */
+  @Post('me/mot-de-passe')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin', 'gest', 'rdep', 'dir')
+  @HttpCode(HttpStatus.OK)
+  @ZodValidation({ body: zMotDePasseChange })
+  @ApiOperation({ summary: 'Change le mot de passe de l’utilisateur connecté' })
+  @ApiResponse({ status: 200, description: 'Mot de passe modifié' })
+  @ApiResponse({ status: 400, description: 'Requête invalide' })
+  @ApiResponse({ status: 401, description: 'Non authentifié' })
+  async changePassword(
+    @Body() corps: MotDePasseChange,
+    @Req() req: RequeteAvecUtilisateur,
+  ): Promise<unknown> {
+    const resultat = await this.usersService.changePassword(
+      req.user!.sub,
+      corps.motDePasseActuel,
+      corps.nouveauMotDePasse,
+    );
     return resultat;
   }
 
