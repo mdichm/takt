@@ -11,6 +11,7 @@ import { BailModule } from './bail/bail.module';
 import { VerrousModule } from './verrous/verrous.module';
 import { CouvertureModule } from './couverture/couverture.module';
 
+
 /** Module des séances, contraintes, verrous, baux d'édition, conflits et couverture de planning. */
 @Module({
   imports: [
@@ -23,5 +24,6 @@ import { CouvertureModule } from './couverture/couverture.module';
     VerrousModule,
     CouvertureModule,
   ],
+  exports: [],
 })
 export class PlanningModule {}

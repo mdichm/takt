@@ -9,6 +9,7 @@ import { validateEnv, EnvSchema } from './env.schema';
 
 const ENV_VALIDE = {
   DATABASE_URL: 'postgresql://takt:takt@localhost:5432/takt_dev',
+  PGBOSS_DATABASE_URL: 'postgresql://takt:takt@localhost:5432/takt_dev',
 };
 
 describe('validateEnv', () => {

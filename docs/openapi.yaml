@@ -1231,6 +1231,94 @@ paths:
       security:
         - bearerAuth: []
       summary: S’abonner aux événements temps réel de l’utilisateur
+  /api/v1/generations:
+    get:
+      operationId: GenerationsController_lister
+      parameters: []
+      responses:
+        '200':
+          description: Liste des générations
+      security:
+        - bearerAuth: []
+      summary: Liste des générations
+      tags:
+        - générations
+    post:
+      operationId: GenerationsController_creer
+      parameters: []
+      responses:
+        '202':
+          description: Génération lancée (job en file d'attente)
+        '409':
+          description: Conflit (génération déjà en cours)
+      security:
+        - bearerAuth: []
+      summary: Lancer une génération CP-SAT
+      tags:
+        - générations
+  /api/v1/generations/preconditions:
+    get:
+      description: >-
+        Contrôle les 5 garde-fous (état version, départements validés, verrous, couverture, taux de verrouillage) avant
+        création du job pg-boss.
+      operationId: PreconditionsController_preconditions
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+          description: Résultat des préconditions
+        '404':
+          description: Version introuvable
+      security:
+        - bearerAuth: []
+      summary: Vérifie les préconditions de lancement de génération
+      tags:
+        - génération — préconditions
+  /api/v1/generations/{id}/scenarios:
+    get:
+      operationId: GenerationsController_scenarios
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Liste des scénarios
+        '404':
+          description: Génération non trouvée
+      security:
+        - bearerAuth: []
+      summary: Scénarios d'une génération
+      tags:
+        - générations
+  /api/v1/generations/{id}/select:
+    post:
+      operationId: SelectionController_selectionnerScenario
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Scénario adopté
+        '400':
+          description: Placements invalides
+        '404':
+          description: Génération ou scénario introuvable
+        '409':
+          description: Conflit (déjà adopté, génération non terminée, version pas en génération)
+      security:
+        - bearerAuth: []
+      summary: Adopte un scénario et passe la version en édition
+      tags:
+        - sélection
   /api/v1/locks:
     get:
       operationId: VerrousController_lister

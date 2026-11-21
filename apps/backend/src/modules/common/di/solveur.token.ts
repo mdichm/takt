@@ -1,10 +1,14 @@
 // Copyright (C) 2026 TAKT
 // SPDX-License-Identifier: AGPL-3.0-only
 
-/** Scénario minimal retourné par le collaborateur solveur. */
+/** Scénario retourné par le collaborateur solveur (y compris placements et sous-scores). */
 export interface ScenarioSolveur {
   readonly id: string;
   readonly score: number;
+  readonly subScores: Record<string, unknown>;
+  readonly placements: Array<Record<string, unknown>>;
+  readonly unplacedActivities: string[];
+  readonly status: string;
 }
 
 /** Contrat minimal du collaborateur chargé d’exécuter le solveur. */

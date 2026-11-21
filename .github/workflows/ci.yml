@@ -17,6 +17,7 @@ on:
 env:
   NODE_VERSION: '24'
   DATABASE_URL: postgresql://postgres:postgres@localhost:5432/takt_test
+  PGBOSS_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/takt_test
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
@@ -115,6 +116,7 @@ jobs:
         run: pnpm test:integration
         env:
           DATABASE_URL: ${{ env.DATABASE_URL }}
+          PGBOSS_DATABASE_URL: ${{ env.PGBOSS_DATABASE_URL }}
 
       - name: Upload Coverage
         uses: codecov/codecov-action@v4
@@ -311,6 +313,19 @@ jobs:
     name: Check OpenAPI
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: takt_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -329,6 +344,12 @@ jobs:
 
       - name: Prisma Generate
         run: pnpm --filter @takt/db db:generate
+
+      # Déployer les migrations pour que le backend NestJS puisse démarrer (pg-boss, Prisma, etc.)
+      - name: Apply Prisma Migrations (test DB)
+        run: pnpm --filter @takt/db db:migrate
+        env:
+          DATABASE_URL: ${{ env.DATABASE_URL }}
 
       - name: Vérifier le contrat OpenAPI
         run: pnpm check-openapi
@@ -399,6 +420,72 @@ jobs:
           path: apps/frontend/axe-results/
           retention-days: 7
 
+
+  # ------------------------------------------------------------
+  # SOLVER CP-SAT
+  # ------------------------------------------------------------
+  solver:
+    name: Solver CP-SAT
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install OR-Tools
+        run: pip install -r solver/requirements.txt
+
+      - name: Install pytest
+        run: pip install pytest
+
+      - name: Run solver unit tests
+        run: python3 -m pytest solver/tests -v
+
+      - name: Solve minimal instance (< 5s)
+        run: |
+          python3 - <<'PY'
+          import json, subprocess, sys, tempfile, time
+          derived = {
+            "metadata": {"generationId":"ci-test","versionId":"v","semestre":"S1","createdAt":"2026-01-01T00:00:00Z","timeSlotMinutes":30,"days":6,"slotsPerDay":24},
+            "timeGrid": {"totalSlots":144,"slotDurationMinutes":30,"dayLabels":["Lun","Mar","Mer","Jeu","Ven","Sam"],"slotLabels":["08:00"]*24},
+            "rooms": [{"id":"room-1","code":"A101","type":"AMPHI","capacity":100,"building":"B1","equipment":[]}],
+            "teachers": [{"id":"teacher-1","code":"T1","name":"Prof 1","departmentId":"d","maxHoursPerWeek":20,"unavailableSlots":[]}],
+            "groups": [{"id":"group-1","code":"G1","size":30,"departmentId":"d"}],
+            "subjects": [{"id":"subject-1","code":"M1","name":"M","departmentId":"d","teachingType":"CM","chargeCoefficient":1.0}],
+            "activities": [{"id":"activity-1","subjectId":"subject-1","teacherIds":["teacher-1"],"groupIds":["group-1"],"roomType":"AMPHI","durationSlots":2,"weeklyVolume":1,"teachingType":"CM"}],
+            "constraints": [],
+            "locks": [],
+          }
+          with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
+              json.dump(derived, f)
+              path = f.name
+          start = time.time()
+          result = subprocess.run([sys.executable, "-m", "solver.cp_sat_model", "--input", path, "--max-scenarios", "1", "--time-limit", "5"], capture_output=True, text=True)
+          elapsed = time.time() - start
+          print(f"Temps de résolution: {elapsed:.2f}s")
+          if result.returncode != 0:
+              print("STDERR:", result.stderr)
+              sys.exit(1)
+          envelope = json.loads(result.stdout)
+          if len(envelope["scenarios"]) == 0:
+              print("Aucun scénario retourné")
+              sys.exit(1)
+          if elapsed > 5:
+              print(f"Trop lent: {elapsed:.2f}s > 5s")
+              sys.exit(1)
+          print(f"OK: instance résolue en {elapsed:.2f}s avec {len(envelope['scenarios'])} scénario(s)")
+          PY
+
+      - name: Benchmark de performance (200 séances, non bloquant)
+        continue-on-error: true
+        run: python3 solver/benchmarks/run.py --case 200 --enforce --format json
+
   # ------------------------------------------------------------
   # CHECK REQUIS POUR LA PROTECTION DE develop
   # ------------------------------------------------------------
@@ -415,6 +502,7 @@ jobs:
         check-openapi,
         check-module-dependencies,
         accessibility,
+        solver,
       ]
     if: always()
     steps:
@@ -427,7 +515,8 @@ jobs:
              [[ "${{ needs.e2e.result }}" != "success" ]] || \
              [[ "${{ needs.check-openapi.result }}" != "success" ]] || \
              [[ "${{ needs.check-module-dependencies.result }}" != "success" ]] || \
-             [[ "${{ needs.accessibility.result }}" != "success" ]]; then
+             [[ "${{ needs.accessibility.result }}" != "success" ]] || \
+             [[ "${{ needs.solver.result }}" != "success" ]]; then
             echo "La CI comporte au moins un job en échec."
             exit 1
           fi

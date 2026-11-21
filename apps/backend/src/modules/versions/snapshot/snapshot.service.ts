@@ -86,6 +86,13 @@ export class SnapshotService {
       salles,
       creneaux,
       departements,
+      matieres,
+      typesSalle,
+      sites,
+      salleEquipements,
+      equipements,
+      enseignantDepartements,
+      typesEnseignement,
     ] = await Promise.all([
       this.prisma.semestre.findUnique({
         where: { id: version.semestreId },
@@ -148,25 +155,102 @@ export class SnapshotService {
         orderBy: { id: 'asc' },
         select: { id: true, code: true, libelle: true },
       }),
+      this.prisma.matiere.findMany({
+        orderBy: { id: 'asc' },
+        select: { id: true, code: true, libelle: true },
+      }),
+      this.prisma.typeSalle.findMany({
+        orderBy: { id: 'asc' },
+        select: { id: true, code: true, libelle: true },
+      }),
+      this.prisma.site.findMany({
+        orderBy: { id: 'asc' },
+        select: { id: true, code: true, libelle: true },
+      }),
+      this.prisma.salleEquipement.findMany({
+        orderBy: { salleId: 'asc' },
+        select: { salleId: true, equipementId: true },
+      }),
+      this.prisma.equipement.findMany({
+        orderBy: { id: 'asc' },
+        select: { id: true, code: true },
+      }),
+      this.prisma.enseignantDepartement.findMany({
+        orderBy: { enseignantId: 'asc' },
+        select: { enseignantId: true, departementId: true },
+      }),
+      this.prisma.typeEnseignement.findMany({
+        orderBy: { id: 'asc' },
+        select: { id: true, code: true },
+      }),
     ]);
 
     if (!semestre) {
       throw new ApiError(CODES_ERREUR_API.NOT_FOUND, 404, 'Semestre introuvable');
     }
 
+    // Enrichissement par référentiel (pas d'accès DB dans le builder)
+    const typeSalleParId = new Map(typesSalle.map((t) => [t.id, t.code]));
+    const siteParId = new Map(sites.map((s) => [s.id, { code: s.code, libelle: s.libelle }]));
+    const equipementCodeParId = new Map(equipements.map((e) => [e.id, e.code]));
+    const equipementsParSalle = new Map<string, string[]>();
+    for (const se of salleEquipements) {
+      const liste = equipementsParSalle.get(se.salleId) ?? [];
+      const code = equipementCodeParId.get(se.equipementId);
+      if (code) liste.push(code);
+      equipementsParSalle.set(se.salleId, liste);
+    }
+    const departementsParEnseignant = new Map<string, string[]>();
+    for (const ed of enseignantDepartements) {
+      const liste = departementsParEnseignant.get(ed.enseignantId) ?? [];
+      liste.push(ed.departementId);
+      departementsParEnseignant.set(ed.enseignantId, liste);
+    }
+    const typeEnseignementCodeParId = new Map(typesEnseignement.map((t) => [t.id, t.code]));
+
+    // Charge horaire cible par enseignant (règle active s'il existe)
+    const chargeRule = await this.prisma.chargeRuleSet.findFirst({
+      where: { estActive: true },
+      select: { plafondHebdomadaire: true },
+    });
+    const chargeCibleParEnseignant = new Map<string, number>();
+    if (chargeRule) {
+      for (const e of enseignants) {
+        chargeCibleParEnseignant.set(e.id, chargeRule.plafondHebdomadaire);
+      }
+    }
+
     // 3. Construit les données déterministes du snapshot
     const entrees: DonneesEntreeSnapshot = {
       versionId,
       semestre,
-      affectations: affectations as never[],
+      affectations: affectations.map((a) => ({
+        ...a,
+        typeEnseignementCode:
+          typeEnseignementCodeParId.get(a.typeEnseignementId ?? '') ?? null,
+      })) as never[],
       seances: seances as never[],
       verrous: verrous as never[],
       contraintes: contraintes as never[],
       groupes: groupes as never[],
-      enseignants: enseignants as never[],
-      salles: salles as never[],
+      enseignants: enseignants.map((e) => ({
+        ...e,
+        departementIds: departementsParEnseignant.get(e.id) ?? [],
+        chargeMaxHebdo: chargeCibleParEnseignant.get(e.id) ?? null,
+      })) as never[],
+      salles: salles.map((s) => {
+        const site = siteParId.get(s.siteId);
+        return {
+          ...s,
+          typeSalleCode: typeSalleParId.get(s.typeSalleId) ?? null,
+          siteCode: site?.code ?? null,
+          siteLibelle: site?.libelle ?? null,
+          equipements: equipementsParSalle.get(s.id) ?? [],
+        };
+      }) as never[],
       creneaux: creneaux as never[],
       departements: departements as never[],
+      matieres: matieres as never[],
     };
 
     const donnees: Prisma.InputJsonValue = construireDonneesSnapshot(entrees) as Prisma.InputJsonValue;

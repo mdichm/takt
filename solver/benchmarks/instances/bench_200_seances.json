@@ -1,0 +1,3150 @@
+{
+  "metadata": {
+    "generationId": "4c2d7268-fe84-5a9f-aec8-15b7451d925f",
+    "versionId": "40713e9f-fd5d-54d4-99b6-8be16e39a760",
+    "semestre": "S1",
+    "createdAt": "2026-11-20T00:00:00Z",
+    "timeSlotMinutes": 30,
+    "days": 6,
+    "slotsPerDay": 24
+  },
+  "timeGrid": {
+    "totalSlots": 144,
+    "slotDurationMinutes": 30,
+    "dayLabels": [
+      "Lun",
+      "Mar",
+      "Mer",
+      "Jeu",
+      "Ven",
+      "Sam"
+    ],
+    "slotLabels": [
+      "08:00",
+      "08:30",
+      "09:00",
+      "09:30",
+      "10:00",
+      "10:30",
+      "11:00",
+      "11:30",
+      "12:00",
+      "12:30",
+      "13:00",
+      "13:30",
+      "14:00",
+      "14:30",
+      "15:00",
+      "15:30",
+      "16:00",
+      "16:30",
+      "17:00",
+      "17:30",
+      "18:00",
+      "18:30",
+      "19:00",
+      "19:30"
+    ]
+  },
+  "rooms": [
+    {
+      "id": "eac6f695-f385-5900-9f37-b9867e8880ac",
+      "code": "S001",
+      "type": "AMPHI",
+      "capacity": 250,
+      "building": "B1",
+      "equipment": [
+        "tableau",
+        "wifi",
+        "video"
+      ]
+    },
+    {
+      "id": "7ac4d54f-7189-5e64-953e-9d62400bb3c7",
+      "code": "S002",
+      "type": "TD",
+      "capacity": 50,
+      "building": "B2",
+      "equipment": [
+        "wifi"
+      ]
+    },
+    {
+      "id": "a86489ca-5451-51bd-8701-7dcf5042f7cf",
+      "code": "S003",
+      "type": "TP",
+      "capacity": 20,
+      "building": "B3",
+      "equipment": [
+        "son",
+        "video",
+        "wifi"
+      ]
+    },
+    {
+      "id": "1e309dbd-a7ad-570c-b8f5-79816ebcba95",
+      "code": "S004",
+      "type": "INFO",
+      "capacity": 25,
+      "building": "B4",
+      "equipment": [
+        "tableau",
+        "son",
+        "video"
+      ]
+    },
+    {
+      "id": "7b819f19-4234-5d1d-90d7-0232fc9a4cf0",
+      "code": "S005",
+      "type": "AMPHI",
+      "capacity": 200,
+      "building": "B5",
+      "equipment": []
+    },
+    {
+      "id": "82e4c14c-fdd5-5803-b190-13c4e9b3388b",
+      "code": "S006",
+      "type": "TD",
+      "capacity": 40,
+      "building": "B1",
+      "equipment": []
+    },
+    {
+      "id": "e47c6e11-0f24-5f3f-b04e-201899732fdc",
+      "code": "S007",
+      "type": "TP",
+      "capacity": 20,
+      "building": "B2",
+      "equipment": [
+        "wifi",
+        "son"
+      ]
+    },
+    {
+      "id": "4d75af51-b9b5-5cfc-b522-2484cba9fa58",
+      "code": "S008",
+      "type": "INFO",
+      "capacity": 30,
+      "building": "B3",
+      "equipment": [
+        "tableau",
+        "son",
+        "video"
+      ]
+    },
+    {
+      "id": "87230640-190b-54ac-bc83-b26759611e3e",
+      "code": "S009",
+      "type": "AMPHI",
+      "capacity": 150,
+      "building": "B4",
+      "equipment": [
+        "son",
+        "wifi"
+      ]
+    },
+    {
+      "id": "9af3e1ca-3393-56ee-a1bf-974cee7f8f7d",
+      "code": "S010",
+      "type": "TD",
+      "capacity": 40,
+      "building": "B5",
+      "equipment": []
+    },
+    {
+      "id": "717a886d-4507-5597-8cac-0158b0c1db79",
+      "code": "S011",
+      "type": "TP",
+      "capacity": 30,
+      "building": "B1",
+      "equipment": [
+        "tableau",
+        "video",
+        "son"
+      ]
+    },
+    {
+      "id": "d9c7426a-b343-5a03-b8d1-f4f326dbc41d",
+      "code": "S012",
+      "type": "INFO",
+      "capacity": 30,
+      "building": "B2",
+      "equipment": [
+        "wifi",
+        "son",
+        "tableau"
+      ]
+    },
+    {
+      "id": "00408026-5a97-535b-b96f-e43b4f448983",
+      "code": "S013",
+      "type": "AMPHI",
+      "capacity": 250,
+      "building": "B3",
+      "equipment": [
+        "video",
+        "tableau"
+      ]
+    },
+    {
+      "id": "3f3b08c0-8c6d-5135-9a44-25ac3edae47c",
+      "code": "S014",
+      "type": "TD",
+      "capacity": 50,
+      "building": "B4",
+      "equipment": [
+        "video",
+        "tableau",
+        "son"
+      ]
+    },
+    {
+      "id": "9ddad3e3-0383-526c-8dba-8e0f149d81ba",
+      "code": "S015",
+      "type": "TP",
+      "capacity": 30,
+      "building": "B5",
+      "equipment": []
+    },
+    {
+      "id": "e13badb9-3859-5ac9-b096-b13747bcf16d",
+      "code": "S016",
+      "type": "INFO",
+      "capacity": 25,
+      "building": "B1",
+      "equipment": [
+        "video"
+      ]
+    },
+    {
+      "id": "a537a2e7-f73f-5f6c-8dcb-7ddc8ebf5bd5",
+      "code": "S017",
+      "type": "AMPHI",
+      "capacity": 150,
+      "building": "B2",
+      "equipment": [
+        "tableau",
+        "wifi"
+      ]
+    },
+    {
+      "id": "6c04ba7d-775b-5711-8ec5-38da1d2d206d",
+      "code": "S018",
+      "type": "TD",
+      "capacity": 40,
+      "building": "B3",
+      "equipment": [
+        "son",
+        "video",
+        "tableau"
+      ]
+    },
+    {
+      "id": "730a4ec7-ef94-556f-963d-6ea1b8ed1389",
+      "code": "S019",
+      "type": "TP",
+      "capacity": 25,
+      "building": "B4",
+      "equipment": [
+        "video",
+        "son"
+      ]
+    },
+    {
+      "id": "ead4eeb1-baa0-567d-9e18-8be3451ace02",
+      "code": "S020",
+      "type": "INFO",
+      "capacity": 35,
+      "building": "B5",
+      "equipment": []
+    },
+    {
+      "id": "a452615a-f86a-5534-bd85-925d5e9993f4",
+      "code": "S021",
+      "type": "AMPHI",
+      "capacity": 150,
+      "building": "B1",
+      "equipment": []
+    },
+    {
+      "id": "50f98816-3711-5c8a-afb2-0c04b5521307",
+      "code": "S022",
+      "type": "TD",
+      "capacity": 30,
+      "building": "B2",
+      "equipment": []
+    },
+    {
+      "id": "6acf3f01-d767-5fa1-92cb-3874a95b8f21",
+      "code": "S023",
+      "type": "TP",
+      "capacity": 25,
+      "building": "B3",
+      "equipment": [
+        "son",
+        "tableau",
+        "wifi"
+      ]
+    },
+    {
+      "id": "4b02c170-9cbf-5fc8-a471-48846d07446c",
+      "code": "S024",
+      "type": "INFO",
+      "capacity": 25,
+      "building": "B4",
+      "equipment": [
+        "video",
+        "wifi"
+      ]
+    },
+    {
+      "id": "8d829662-59bd-50e9-a651-f10d6e367e5f",
+      "code": "S025",
+      "type": "AMPHI",
+      "capacity": 100,
+      "building": "B5",
+      "equipment": []
+    },
+    {
+      "id": "24359065-e071-5221-9c79-af0c1ca5d356",
+      "code": "S026",
+      "type": "TD",
+      "capacity": 40,
+      "building": "B1",
+      "equipment": []
+    },
+    {
+      "id": "95afb5a3-1f02-56cc-82f6-9d4fffbdc434",
+      "code": "S027",
+      "type": "TP",
+      "capacity": 20,
+      "building": "B2",
+      "equipment": [
+        "video"
+      ]
+    },
+    {
+      "id": "35bf0784-e6ae-52eb-b936-f180a68ee27c",
+      "code": "S028",
+      "type": "INFO",
+      "capacity": 30,
+      "building": "B3",
+      "equipment": [
+        "tableau",
+        "wifi",
+        "son"
+      ]
+    },
+    {
+      "id": "f08010d5-8090-5dca-96eb-f6fc69f06161",
+      "code": "S029",
+      "type": "AMPHI",
+      "capacity": 200,
+      "building": "B4",
+      "equipment": [
+        "wifi",
+        "video"
+      ]
+    },
+    {
+      "id": "cfa1aa85-bac8-5177-ad39-a19dc335bdfb",
+      "code": "S030",
+      "type": "TD",
+      "capacity": 30,
+      "building": "B5",
+      "equipment": []
+    },
+    {
+      "id": "0f8b208b-cefa-57e7-accf-e621e3809bc5",
+      "code": "S031",
+      "type": "TP",
+      "capacity": 20,
+      "building": "B1",
+      "equipment": [
+        "wifi",
+        "son"
+      ]
+    },
+    {
+      "id": "4967add2-794d-56c5-b426-5bcf2643d0b3",
+      "code": "S032",
+      "type": "INFO",
+      "capacity": 25,
+      "building": "B2",
+      "equipment": [
+        "son",
+        "video"
+      ]
+    },
+    {
+      "id": "397f9ab9-dd02-543d-9873-6d29b3d84402",
+      "code": "S033",
+      "type": "AMPHI",
+      "capacity": 200,
+      "building": "B3",
+      "equipment": [
+        "wifi",
+        "son",
+        "tableau"
+      ]
+    },
+    {
+      "id": "81a2453a-ce88-554e-b362-94683d6dcc12",
+      "code": "S034",
+      "type": "TD",
+      "capacity": 40,
+      "building": "B4",
+      "equipment": [
+        "video",
+        "tableau",
+        "son"
+      ]
+    },
+    {
+      "id": "ace670f3-fd78-5f93-b1d5-700485f502ba",
+      "code": "S035",
+      "type": "TP",
+      "capacity": 25,
+      "building": "B5",
+      "equipment": [
+        "wifi",
+        "video"
+      ]
+    },
+    {
+      "id": "06bcb9e8-61e6-5d3b-b5bc-d7c40914ea04",
+      "code": "S036",
+      "type": "INFO",
+      "capacity": 25,
+      "building": "B1",
+      "equipment": [
+        "video",
+        "tableau"
+      ]
+    },
+    {
+      "id": "187a6c69-9ef6-5e84-a0d8-a76b41feeb2e",
+      "code": "S037",
+      "type": "AMPHI",
+      "capacity": 200,
+      "building": "B2",
+      "equipment": [
+        "video"
+      ]
+    },
+    {
+      "id": "fe396662-1a11-5328-8356-1bba5ff70398",
+      "code": "S038",
+      "type": "TD",
+      "capacity": 30,
+      "building": "B3",
+      "equipment": [
+        "son",
+        "video",
+        "wifi"
+      ]
+    },
+    {
+      "id": "8b66f0a0-e513-59be-96c7-c16d0d13a3e6",
+      "code": "S039",
+      "type": "TP",
+      "capacity": 20,
+      "building": "B4",
+      "equipment": [
+        "video",
+        "tableau",
+        "son"
+      ]
+    },
+    {
+      "id": "444d58eb-0dc9-5a5b-9b5c-a3ad926ea516",
+      "code": "S040",
+      "type": "INFO",
+      "capacity": 35,
+      "building": "B5",
+      "equipment": [
+        "son"
+      ]
+    }
+  ],
+  "teachers": [
+    {
+      "id": "3215a7ec-ffb5-5d89-90c1-e55470b828fe",
+      "code": "T0001",
+      "name": "Enseignant 1",
+      "departmentId": "798c7e73-05f2-51aa-b914-586edb199f51",
+      "maxHoursPerWeek": 13,
+      "unavailableSlots": []
+    },
+    {
+      "id": "dfc8730d-adc2-5a56-a458-4c06abf8f3d5",
+      "code": "T0002",
+      "name": "Enseignant 2",
+      "departmentId": "86e88048-d252-5336-a865-16a449ac56ba",
+      "maxHoursPerWeek": 13,
+      "unavailableSlots": []
+    },
+    {
+      "id": "a5c84e50-6c19-53de-875e-9d194a2431b1",
+      "code": "T0003",
+      "name": "Enseignant 3",
+      "departmentId": "b0d01d53-af31-5f4f-a6fa-3343c3b186f3",
+      "maxHoursPerWeek": 22,
+      "unavailableSlots": []
+    },
+    {
+      "id": "17cd2257-75c4-5695-845d-464c91043679",
+      "code": "T0004",
+      "name": "Enseignant 4",
+      "departmentId": "31d49eb0-64da-5368-b7ff-e218897d2fe2",
+      "maxHoursPerWeek": 18,
+      "unavailableSlots": [
+        {
+          "day": 2,
+          "slots": [
+            15,
+            20
+          ],
+          "allDay": false
+        }
+      ]
+    },
+    {
+      "id": "d22f71df-d2e6-5025-acb7-9f8d37a81f8b",
+      "code": "T0005",
+      "name": "Enseignant 5",
+      "departmentId": "124e17e0-6eca-5cbc-ab91-7dc2d4c56d6a",
+      "maxHoursPerWeek": 22,
+      "unavailableSlots": []
+    },
+    {
+      "id": "b5f87788-07d5-547f-9676-755d3c0ba259",
+      "code": "T0006",
+      "name": "Enseignant 6",
+      "departmentId": "64782e21-d1c6-5e2e-8fce-fb8054f5ec9f",
+      "maxHoursPerWeek": 20,
+      "unavailableSlots": []
+    },
+    {
+      "id": "6bb8a19d-cf1a-5cb9-97d2-4c950cd24730",
+      "code": "T0007",
+      "name": "Enseignant 7",
+      "departmentId": "1b7eadd1-6075-5252-b4c5-a0e979a05d9c",
+      "maxHoursPerWeek": 20,
+      "unavailableSlots": []
+    },
+    {
+      "id": "596ca3ed-83c6-53c2-8ab5-377d2d2c4067",
+      "code": "T0008",
+      "name": "Enseignant 8",
+      "departmentId": "73753ebe-8ede-55bd-92ac-c43532d56290",
+      "maxHoursPerWeek": 13,
+      "unavailableSlots": []
+    },
+    {
+      "id": "42e2726c-2f0d-5259-8d80-dcf8edbdffee",
+      "code": "T0009",
+      "name": "Enseignant 9",
+      "departmentId": "934689d5-4b06-5abc-bf3f-48e312784f4b",
+      "maxHoursPerWeek": 19,
+      "unavailableSlots": []
+    },
+    {
+      "id": "e262a45c-e5bd-5213-aa1d-4154bbe8494f",
+      "code": "T0010",
+      "name": "Enseignant 10",
+      "departmentId": "c7483af9-fad8-5102-966e-68979fd9fa77",
+      "maxHoursPerWeek": 22,
+      "unavailableSlots": []
+    },
+    {
+      "id": "1797eec8-16c7-596f-9736-5c0cc54f95dc",
+      "code": "T0011",
+      "name": "Enseignant 11",
+      "departmentId": "8a298325-18e7-505a-bac5-aa880d1c7650",
+      "maxHoursPerWeek": 19,
+      "unavailableSlots": []
+    },
+    {
+      "id": "bb02ef17-d9f7-59a8-b3b1-20fb6acda79d",
+      "code": "T0012",
+      "name": "Enseignant 12",
+      "departmentId": "d65be5d5-6a50-5783-ade4-75a1942135ea",
+      "maxHoursPerWeek": 13,
+      "unavailableSlots": []
+    },
+    {
+      "id": "efb2b568-94aa-5513-b404-b940a91fcbae",
+      "code": "T0013",
+      "name": "Enseignant 13",
+      "departmentId": "b0d01d53-af31-5f4f-a6fa-3343c3b186f3",
+      "maxHoursPerWeek": 12,
+      "unavailableSlots": []
+    },
+    {
+      "id": "6ecde623-8765-5340-a720-3f6737d1024c",
+      "code": "T0014",
+      "name": "Enseignant 14",
+      "departmentId": "3b723719-6017-52ea-b2d8-1b7abc5614eb",
+      "maxHoursPerWeek": 17,
+      "unavailableSlots": []
+    },
+    {
+      "id": "06447c3a-bcff-5e32-b243-48cbb2070311",
+      "code": "T0015",
+      "name": "Enseignant 15",
+      "departmentId": "99ad3971-1ca1-5ce8-a822-a91a84aacc7d",
+      "maxHoursPerWeek": 22,
+      "unavailableSlots": []
+    },
+    {
+      "id": "09589a46-3489-5689-99eb-31552d572488",
+      "code": "T0016",
+      "name": "Enseignant 16",
+      "departmentId": "0e6c136a-6ec9-56fb-bb1d-d3b8284aafe5",
+      "maxHoursPerWeek": 16,
+      "unavailableSlots": []
+    },
+    {
+      "id": "069ce4a9-22df-5617-8a1c-d6f5747d971e",
+      "code": "T0017",
+      "name": "Enseignant 17",
+      "departmentId": "0f79365c-fe87-57cb-9e6a-cb1560b7337e",
+      "maxHoursPerWeek": 15,
+      "unavailableSlots": []
+    },
+    {
+      "id": "ae5f46da-e1eb-5ed9-bde0-9e571037571d",
+      "code": "T0018",
+      "name": "Enseignant 18",
+      "departmentId": "d38921b0-b517-5804-badd-152476344846",
+      "maxHoursPerWeek": 23,
+      "unavailableSlots": []
+    },
+    {
+      "id": "255f4b96-8649-558d-bd7f-5b98dd1e44df",
+      "code": "T0019",
+      "name": "Enseignant 19",
+      "departmentId": "7d78b404-fb83-5533-9fc8-6d54836badba",
+      "maxHoursPerWeek": 17,
+      "unavailableSlots": []
+    },
+    {
+      "id": "dd9b50ff-cb4f-502b-933a-10eeda2bb646",
+      "code": "T0020",
+      "name": "Enseignant 20",
+      "departmentId": "dd082e0a-7847-5849-85f9-84399e62c48f",
+      "maxHoursPerWeek": 12,
+      "unavailableSlots": []
+    },
+    {
+      "id": "f6f9c2aa-53eb-53d0-8e31-c4ba17d9f181",
+      "code": "T0021",
+      "name": "Enseignant 21",
+      "departmentId": "f572f131-2fa9-5bd2-b36b-d96e9d0b8326",
+      "maxHoursPerWeek": 24,
+      "unavailableSlots": []
+    },
+    {
+      "id": "4b7383df-3823-5859-85cf-4ede89be3b2b",
+      "code": "T0022",
+      "name": "Enseignant 22",
+      "departmentId": "29be4dfe-2a0f-5dfe-b5f6-499f4ee23f43",
+      "maxHoursPerWeek": 16,
+      "unavailableSlots": []
+    },
+    {
+      "id": "cf51c4cf-d7ab-5c42-8d58-1fe761064787",
+      "code": "T0023",
+      "name": "Enseignant 23",
+      "departmentId": "0490b43b-2e7e-5dc7-a938-0eeb7840568b",
+      "maxHoursPerWeek": 12,
+      "unavailableSlots": []
+    },
+    {
+      "id": "817c2e59-e3dc-56ea-b77c-15ba8a318009",
+      "code": "T0024",
+      "name": "Enseignant 24",
+      "departmentId": "94a4d4a7-7025-53ef-b970-e2c0c19654e0",
+      "maxHoursPerWeek": 19,
+      "unavailableSlots": []
+    },
+    {
+      "id": "7399af45-8a32-5f01-996a-0546c6864ef7",
+      "code": "T0025",
+      "name": "Enseignant 25",
+      "departmentId": "b1eea600-dc5a-5b02-b245-ebbe7c3871f2",
+      "maxHoursPerWeek": 13,
+      "unavailableSlots": []
+    },
+    {
+      "id": "8eb11002-3ac7-5b21-bf36-1bfce8895210",
+      "code": "T0026",
+      "name": "Enseignant 26",
+      "departmentId": "b19f83ea-a0bb-5325-873d-643fed6e569c",
+      "maxHoursPerWeek": 13,
+      "unavailableSlots": []
+    },
+    {
+      "id": "4e196d52-9d62-5c3b-9fa2-76e08f03afd6",
+      "code": "T0027",
+      "name": "Enseignant 27",
+      "departmentId": "e615cf9f-fcdd-5d43-9257-8c8878693661",
+      "maxHoursPerWeek": 12,
+      "unavailableSlots": []
+    },
+    {
+      "id": "1dec96f8-0834-57c4-915c-630ee749f5c8",
+      "code": "T0028",
+      "name": "Enseignant 28",
+      "departmentId": "accaa96a-7a7a-54ad-a25d-6d62e581dcb7",
+      "maxHoursPerWeek": 19,
+      "unavailableSlots": []
+    },
+    {
+      "id": "a243354e-fcf4-51ec-9b70-a52cafe2d42d",
+      "code": "T0029",
+      "name": "Enseignant 29",
+      "departmentId": "8ad023ad-29ec-5598-b97a-3f4a0d0c7e20",
+      "maxHoursPerWeek": 23,
+      "unavailableSlots": []
+    },
+    {
+      "id": "d9037c0d-96a5-54d6-a87b-e7c4f785970b",
+      "code": "T0030",
+      "name": "Enseignant 30",
+      "departmentId": "d8f49713-d9b9-5840-bd9e-3d2dccfa1d10",
+      "maxHoursPerWeek": 24,
+      "unavailableSlots": []
+    },
+    {
+      "id": "ced41599-7af9-5344-8a2b-95f3146c7589",
+      "code": "T0031",
+      "name": "Enseignant 31",
+      "departmentId": "8a298325-18e7-505a-bac5-aa880d1c7650",
+      "maxHoursPerWeek": 17,
+      "unavailableSlots": []
+    },
+    {
+      "id": "5cd2b2ca-d0d3-535b-8840-cae6e27b51b4",
+      "code": "T0032",
+      "name": "Enseignant 32",
+      "departmentId": "27f2b17a-9411-5ba6-9562-e756d4db6dc2",
+      "maxHoursPerWeek": 24,
+      "unavailableSlots": []
+    },
+    {
+      "id": "5c5e9bd4-a6d9-5061-863d-9d17e99986df",
+      "code": "T0033",
+      "name": "Enseignant 33",
+      "departmentId": "c01ff8fa-b0f4-5d68-81f5-b24fa9db51b8",
+      "maxHoursPerWeek": 17,
+      "unavailableSlots": [
+        {
+          "day": 2,
+          "slots": [
+            5
+          ],
+          "allDay": false
+        }
+      ]
+    },
+    {
+      "id": "b0dd778b-9537-58d9-aef3-102595498dcd",
+      "code": "T0034",
+      "name": "Enseignant 34",
+      "departmentId": "3b723719-6017-52ea-b2d8-1b7abc5614eb",
+      "maxHoursPerWeek": 22,
+      "unavailableSlots": []
+    },
+    {
+      "id": "8348532e-c42d-51d5-8af7-f47d8fd91d4c",
+      "code": "T0035",
+      "name": "Enseignant 35",
+      "departmentId": "07d585e4-d29c-5501-9c6e-88228c02bb53",
+      "maxHoursPerWeek": 18,
+      "unavailableSlots": []
+    },
+    {
+      "id": "39b52489-5886-5cdc-a308-053ef7fa8afb",
+      "code": "T0036",
+      "name": "Enseignant 36",
+      "departmentId": "1e947cc9-0957-57f3-b35e-b136186edc9f",
+      "maxHoursPerWeek": 18,
+      "unavailableSlots": []
+    },
+    {
+      "id": "329097fd-d41f-51e0-9623-599d0d325f95",
+      "code": "T0037",
+      "name": "Enseignant 37",
+      "departmentId": "38c87d0b-4bc2-5e10-9e87-797863df2b22",
+      "maxHoursPerWeek": 22,
+      "unavailableSlots": []
+    },
+    {
+      "id": "edb8ee25-6f85-5337-af6e-a4fa25fe506b",
+      "code": "T0038",
+      "name": "Enseignant 38",
+      "departmentId": "73753ebe-8ede-55bd-92ac-c43532d56290",
+      "maxHoursPerWeek": 23,
+      "unavailableSlots": []
+    },
+    {
+      "id": "0470d03c-ef94-5b50-b462-486b9f8e19c4",
+      "code": "T0039",
+      "name": "Enseignant 39",
+      "departmentId": "e1054255-a3c8-5ca0-8aae-356a5aaf28e3",
+      "maxHoursPerWeek": 16,
+      "unavailableSlots": []
+    },
+    {
+      "id": "be845167-6e59-549d-95e3-8fc916091a5e",
+      "code": "T0040",
+      "name": "Enseignant 40",
+      "departmentId": "010416e5-f6fb-5604-b120-26790b80d123",
+      "maxHoursPerWeek": 21,
+      "unavailableSlots": [
+        {
+          "day": 5,
+          "slots": [
+            4
+          ],
+          "allDay": false
+        }
+      ]
+    },
+    {
+      "id": "09bee1af-7354-583a-8635-c4864a775081",
+      "code": "T0041",
+      "name": "Enseignant 41",
+      "departmentId": "7635e516-0075-5310-b238-e1e7efbe33e2",
+      "maxHoursPerWeek": 16,
+      "unavailableSlots": []
+    },
+    {
+      "id": "0c6afeae-af37-5f2a-a761-4bf14ff83c9f",
+      "code": "T0042",
+      "name": "Enseignant 42",
+      "departmentId": "2d13b50a-6cd3-5df5-9a49-ce42b5752de5",
+      "maxHoursPerWeek": 18,
+      "unavailableSlots": []
+    },
+    {
+      "id": "ea5a5039-5ae7-5579-831f-ffc1ed1f024f",
+      "code": "T0043",
+      "name": "Enseignant 43",
+      "departmentId": "c01ff8fa-b0f4-5d68-81f5-b24fa9db51b8",
+      "maxHoursPerWeek": 12,
+      "unavailableSlots": []
+    },
+    {
+      "id": "3ab6e45c-6106-5c9c-8c7c-835eda5603f4",
+      "code": "T0044",
+      "name": "Enseignant 44",
+      "departmentId": "46f5ca5a-8358-50f5-8a9b-c6e1676f62d3",
+      "maxHoursPerWeek": 24,
+      "unavailableSlots": []
+    },
+    {
+      "id": "7e7311be-0abf-51d6-8e2c-6d8080656e97",
+      "code": "T0045",
+      "name": "Enseignant 45",
+      "departmentId": "b9bcb403-8e67-55dd-9a06-24c2f753d37f",
+      "maxHoursPerWeek": 21,
+      "unavailableSlots": []
+    },
+    {
+      "id": "9138db67-5035-5198-a59f-b0492fa89f41",
+      "code": "T0046",
+      "name": "Enseignant 46",
+      "departmentId": "64782e21-d1c6-5e2e-8fce-fb8054f5ec9f",
+      "maxHoursPerWeek": 15,
+      "unavailableSlots": [
+        {
+          "day": 4,
+          "slots": [
+            7
+          ],
+          "allDay": false
+        }
+      ]
+    },
+    {
+      "id": "71600669-b937-5c3f-9c4f-3c0630433764",
+      "code": "T0047",
+      "name": "Enseignant 47",
+      "departmentId": "47480979-8311-523c-aced-e7fc03553cd4",
+      "maxHoursPerWeek": 12,
+      "unavailableSlots": []
+    },
+    {
+      "id": "2d82b8e3-5526-5844-97ff-6c91f96a469f",
+      "code": "T0048",
+      "name": "Enseignant 48",
+      "departmentId": "38aac9b6-548a-5feb-977f-c875043bc3a6",
+      "maxHoursPerWeek": 23,
+      "unavailableSlots": []
+    },
+    {
+      "id": "0ac42917-424c-5b49-a87a-ef02a4b2ec9b",
+      "code": "T0049",
+      "name": "Enseignant 49",
+      "departmentId": "9121431c-0433-585b-a6df-6d8c5f8c9fce",
+      "maxHoursPerWeek": 14,
+      "unavailableSlots": []
+    },
+    {
+      "id": "1218df43-699b-505d-9dbf-bc55db24a89b",
+      "code": "T0050",
+      "name": "Enseignant 50",
+      "departmentId": "40fb6055-3b16-5d64-a0a1-477d3ce78506",
+      "maxHoursPerWeek": 21,
+      "unavailableSlots": []
+    },
+    {
+      "id": "0257ed4b-0468-5e55-89d4-5866881f3637",
+      "code": "T0051",
+      "name": "Enseignant 51",
+      "departmentId": "798c7e73-05f2-51aa-b914-586edb199f51",
+      "maxHoursPerWeek": 12,
+      "unavailableSlots": []
+    },
+    {
+      "id": "3953f883-213f-58ca-a5ba-058287ab268f",
+      "code": "T0052",
+      "name": "Enseignant 52",
+      "departmentId": "819374f0-5624-513a-b2b4-5a405959babb",
+      "maxHoursPerWeek": 20,
+      "unavailableSlots": []
+    },
+    {
+      "id": "45130c42-a4f1-52ec-b132-c4e2688e9469",
+      "code": "T0053",
+      "name": "Enseignant 53",
+      "departmentId": "0490b43b-2e7e-5dc7-a938-0eeb7840568b",
+      "maxHoursPerWeek": 12,
+      "unavailableSlots": []
+    },
+    {
+      "id": "34662578-85d7-5a35-8733-0c1ab97f5185",
+      "code": "T0054",
+      "name": "Enseignant 54",
+      "departmentId": "46f5ca5a-8358-50f5-8a9b-c6e1676f62d3",
+      "maxHoursPerWeek": 15,
+      "unavailableSlots": []
+    },
+    {
+      "id": "9458a2d3-f6b5-5898-9537-7c602fc35956",
+      "code": "T0055",
+      "name": "Enseignant 55",
+      "departmentId": "fbf9cfdb-fd8e-5a27-ac64-9619b474852b",
+      "maxHoursPerWeek": 13,
+      "unavailableSlots": [
+        {
+          "day": 4,
+          "slots": [
+            3,
+            15,
+            16
+          ],
+          "allDay": false
+        }
+      ]
+    },
+    {
+      "id": "1a89530e-71b9-5de7-9c40-e920d6bffc59",
+      "code": "T0056",
+      "name": "Enseignant 56",
+      "departmentId": "f0934b88-e068-5735-b580-9e213abdc06e",
+      "maxHoursPerWeek": 14,
+      "unavailableSlots": []
+    },
+    {
+      "id": "97a7a539-5a0b-5a57-a914-1633b46ed2a0",
+      "code": "T0057",
+      "name": "Enseignant 57",
+      "departmentId": "1b7eadd1-6075-5252-b4c5-a0e979a05d9c",
+      "maxHoursPerWeek": 17,
+      "unavailableSlots": []
+    },
+    {
+      "id": "d7eb3ab7-06a3-5649-a793-c36225fc7dd3",
+      "code": "T0058",
+      "name": "Enseignant 58",
+      "departmentId": "d38921b0-b517-5804-badd-152476344846",
+      "maxHoursPerWeek": 12,
+      "unavailableSlots": []
+    },
+    {
+      "id": "90e561d6-d6f7-5cfe-b7e7-4489f4730a0c",
+      "code": "T0059",
+      "name": "Enseignant 59",
+      "departmentId": "934689d5-4b06-5abc-bf3f-48e312784f4b",
+      "maxHoursPerWeek": 21,
+      "unavailableSlots": []
+    },
+    {
+      "id": "8a17e073-7414-5af7-8fe3-35482f842028",
+      "code": "T0060",
+      "name": "Enseignant 60",
+      "departmentId": "010416e5-f6fb-5604-b120-26790b80d123",
+      "maxHoursPerWeek": 17,
+      "unavailableSlots": []
+    },
+    {
+      "id": "04b90f9c-48c2-56c9-aa1b-7ff76b47048c",
+      "code": "T0061",
+      "name": "Enseignant 61",
+      "departmentId": "0158783a-1368-5279-970c-3ca713ddc030",
+      "maxHoursPerWeek": 14,
+      "unavailableSlots": []
+    },
+    {
+      "id": "b0b83c8d-4e2b-5680-a691-87774da9a64e",
+      "code": "T0062",
+      "name": "Enseignant 62",
+      "departmentId": "29be4dfe-2a0f-5dfe-b5f6-499f4ee23f43",
+      "maxHoursPerWeek": 16,
+      "unavailableSlots": []
+    },
+    {
+      "id": "0929fa73-4f97-50d6-b581-9fbc6588c57e",
+      "code": "T0063",
+      "name": "Enseignant 63",
+      "departmentId": "8d2b632f-bb04-5060-b7e9-19f55b30690e",
+      "maxHoursPerWeek": 17,
+      "unavailableSlots": [
+        {
+          "day": 5,
+          "slots": [
+            21
+          ],
+          "allDay": false
+        }
+      ]
+    },
+    {
+      "id": "144a3547-cadf-567d-b8c1-49a635186003",
+      "code": "T0064",
+      "name": "Enseignant 64",
+      "departmentId": "31d49eb0-64da-5368-b7ff-e218897d2fe2",
+      "maxHoursPerWeek": 24,
+      "unavailableSlots": []
+    },
+    {
+      "id": "1fcb5fd8-0206-559f-be6b-cf367d011b4d",
+      "code": "T0065",
+      "name": "Enseignant 65",
+      "departmentId": "6a30afd9-6156-558e-88a5-b53c2cde88fa",
+      "maxHoursPerWeek": 22,
+      "unavailableSlots": []
+    },
+    {
+      "id": "92f5919b-d838-5814-951b-b7d93bacf141",
+      "code": "T0066",
+      "name": "Enseignant 66",
+      "departmentId": "b19f83ea-a0bb-5325-873d-643fed6e569c",
+      "maxHoursPerWeek": 15,
+      "unavailableSlots": []
+    },
+    {
+      "id": "6df1f8e7-ba6a-519e-9848-63f2167ab6ec",
+      "code": "T0067",
+      "name": "Enseignant 67",
+      "departmentId": "1815d712-95df-583c-819b-2ceb4ea14622",
+      "maxHoursPerWeek": 18,
+      "unavailableSlots": []
+    },
+    {
+      "id": "f0b97e36-2e53-50fa-9546-2375b6fd7f2c",
+      "code": "T0068",
+      "name": "Enseignant 68",
+      "departmentId": "73753ebe-8ede-55bd-92ac-c43532d56290",
+      "maxHoursPerWeek": 14,
+      "unavailableSlots": []
+    },
+    {
+      "id": "116e7983-e34d-5326-8f2e-91fdf558cb9e",
+      "code": "T0069",
+      "name": "Enseignant 69",
+      "departmentId": "7d78b404-fb83-5533-9fc8-6d54836badba",
+      "maxHoursPerWeek": 15,
+      "unavailableSlots": []
+    },
+    {
+      "id": "3261aaaa-6188-569d-9cd1-c5afd651e0a8",
+      "code": "T0070",
+      "name": "Enseignant 70",
+      "departmentId": "b0d389ed-35b5-541c-a062-6f49e1eb0eac",
+      "maxHoursPerWeek": 17,
+      "unavailableSlots": [
+        {
+          "day": 4,
+          "slots": [
+            9,
+            14,
+            17
+          ],
+          "allDay": false
+        }
+      ]
+    },
+    {
+      "id": "a695d469-9c3e-5633-bb9a-fd4bfbab417c",
+      "code": "T0071",
+      "name": "Enseignant 71",
+      "departmentId": "798c7e73-05f2-51aa-b914-586edb199f51",
+      "maxHoursPerWeek": 12,
+      "unavailableSlots": [
+        {
+          "day": 0,
+          "slots": [
+            9,
+            15
+          ],
+          "allDay": false
+        }
+      ]
+    },
+    {
+      "id": "db1bb639-63b8-52ef-bafc-ae9033392229",
+      "code": "T0072",
+      "name": "Enseignant 72",
+      "departmentId": "fd64ba04-0241-57e7-b2de-a35e279e0fb9",
+      "maxHoursPerWeek": 19,
+      "unavailableSlots": [
+        {
+          "day": 3,
+          "slots": [
+            6,
+            18,
+            19
+          ],
+          "allDay": false
+        }
+      ]
+    },
+    {
+      "id": "8e8c8111-b266-592b-805d-320f633e1b47",
+      "code": "T0073",
+      "name": "Enseignant 73",
+      "departmentId": "c01ff8fa-b0f4-5d68-81f5-b24fa9db51b8",
+      "maxHoursPerWeek": 19,
+      "unavailableSlots": []
+    },
+    {
+      "id": "bbc98f57-460f-5765-bead-ba808174851a",
+      "code": "T0074",
+      "name": "Enseignant 74",
+      "departmentId": "e59743f5-dfff-56d6-a822-b21237ce36d7",
+      "maxHoursPerWeek": 17,
+      "unavailableSlots": [
+        {
+          "day": 2,
+          "slots": [
+            9
+          ],
+          "allDay": false
+        }
+      ]
+    },
+    {
+      "id": "59e6a5ca-bf61-58a2-8f64-c9bd7662ee82",
+      "code": "T0075",
+      "name": "Enseignant 75",
+      "departmentId": "b9bcb403-8e67-55dd-9a06-24c2f753d37f",
+      "maxHoursPerWeek": 22,
+      "unavailableSlots": []
+    },
+    {
+      "id": "3e154148-2576-5979-beda-ca53971ad657",
+      "code": "T0076",
+      "name": "Enseignant 76",
+      "departmentId": "49e24481-392c-5c9e-b4c6-b0dc3042be04",
+      "maxHoursPerWeek": 17,
+      "unavailableSlots": []
+    },
+    {
+      "id": "f00203c7-8f07-5f89-bffe-ccf0b2c840b7",
+      "code": "T0077",
+      "name": "Enseignant 77",
+      "departmentId": "0f79365c-fe87-57cb-9e6a-cb1560b7337e",
+      "maxHoursPerWeek": 18,
+      "unavailableSlots": []
+    },
+    {
+      "id": "6f4a7c25-2cb0-55de-9207-d47be5231185",
+      "code": "T0078",
+      "name": "Enseignant 78",
+      "departmentId": "3070c637-86d0-5d67-81d4-79e34c1e7547",
+      "maxHoursPerWeek": 13,
+      "unavailableSlots": []
+    },
+    {
+      "id": "36b7fe1f-42bb-50ac-9edc-aa5b9b202f46",
+      "code": "T0079",
+      "name": "Enseignant 79",
+      "departmentId": "9121431c-0433-585b-a6df-6d8c5f8c9fce",
+      "maxHoursPerWeek": 17,
+      "unavailableSlots": []
+    },
+    {
+      "id": "1a6f5df3-821e-505e-99ca-ccf8d134a338",
+      "code": "T0080",
+      "name": "Enseignant 80",
+      "departmentId": "010416e5-f6fb-5604-b120-26790b80d123",
+      "maxHoursPerWeek": 13,
+      "unavailableSlots": [
+        {
+          "day": 5,
+          "slots": [
+            0,
+            7,
+            9
+          ],
+          "allDay": false
+        }
+      ]
+    },
+    {
+      "id": "103730fd-3ebb-52f8-aca8-8d6fbda72417",
+      "code": "T0081",
+      "name": "Enseignant 81",
+      "departmentId": "0158783a-1368-5279-970c-3ca713ddc030",
+      "maxHoursPerWeek": 19,
+      "unavailableSlots": []
+    },
+    {
+      "id": "fc11f154-4095-562b-b8fa-b2d419a6f1fe",
+      "code": "T0082",
+      "name": "Enseignant 82",
+      "departmentId": "32e6d7d4-a180-564f-9c92-16907ac7c826",
+      "maxHoursPerWeek": 16,
+      "unavailableSlots": []
+    },
+    {
+      "id": "f4df18cf-059d-55f5-be72-14a45fb73cb5",
+      "code": "T0083",
+      "name": "Enseignant 83",
+      "departmentId": "0d8866d1-5180-59b4-82bc-e9867d86d743",
+      "maxHoursPerWeek": 21,
+      "unavailableSlots": []
+    },
+    {
+      "id": "c99690af-9969-54b5-b320-999867904be6",
+      "code": "T0084",
+      "name": "Enseignant 84",
+      "departmentId": "31d49eb0-64da-5368-b7ff-e218897d2fe2",
+      "maxHoursPerWeek": 19,
+      "unavailableSlots": []
+    },
+    {
+      "id": "9e0530ec-9ad1-5ebe-8605-b89198cd0b16",
+      "code": "T0085",
+      "name": "Enseignant 85",
+      "departmentId": "edfe74cf-29d0-55e5-b2e7-60c5d5c03c9e",
+      "maxHoursPerWeek": 16,
+      "unavailableSlots": []
+    },
+    {
+      "id": "a8b87115-49a1-519c-9ec4-1c860aa8cd32",
+      "code": "T0086",
+      "name": "Enseignant 86",
+      "departmentId": "1e947cc9-0957-57f3-b35e-b136186edc9f",
+      "maxHoursPerWeek": 16,
+      "unavailableSlots": []
+    },
+    {
+      "id": "1529421e-2f90-53c9-9da7-35cb4dff0e15",
+      "code": "T0087",
+      "name": "Enseignant 87",
+      "departmentId": "008a29e5-fb0b-5223-82d1-766ebecc8f59",
+      "maxHoursPerWeek": 18,
+      "unavailableSlots": []
+    },
+    {
+      "id": "27b6d0e5-8eb0-59ef-b966-557a8118a4aa",
+      "code": "T0088",
+      "name": "Enseignant 88",
+      "departmentId": "632a323a-0655-5c57-af11-f9210d606602",
+      "maxHoursPerWeek": 20,
+      "unavailableSlots": []
+    },
+    {
+      "id": "21a665fd-0cfa-5aa9-9fb6-ded23fa2d5bc",
+      "code": "T0089",
+      "name": "Enseignant 89",
+      "departmentId": "934689d5-4b06-5abc-bf3f-48e312784f4b",
+      "maxHoursPerWeek": 17,
+      "unavailableSlots": []
+    },
+    {
+      "id": "30e3b8c4-e948-522e-914b-fce7cddada9f",
+      "code": "T0090",
+      "name": "Enseignant 90",
+      "departmentId": "c7483af9-fad8-5102-966e-68979fd9fa77",
+      "maxHoursPerWeek": 22,
+      "unavailableSlots": []
+    },
+    {
+      "id": "a6de61ee-b396-5ec1-a3a2-1e1eb1f035b7",
+      "code": "T0091",
+      "name": "Enseignant 91",
+      "departmentId": "2960651f-d3b6-522c-b2fd-cb1fd085e40f",
+      "maxHoursPerWeek": 23,
+      "unavailableSlots": []
+    },
+    {
+      "id": "f5b51446-5560-51c8-8759-a50df6bf55fb",
+      "code": "T0092",
+      "name": "Enseignant 92",
+      "departmentId": "29be4dfe-2a0f-5dfe-b5f6-499f4ee23f43",
+      "maxHoursPerWeek": 17,
+      "unavailableSlots": []
+    },
+    {
+      "id": "7c0008c1-7738-5cce-9c18-4dd9192b1198",
+      "code": "T0093",
+      "name": "Enseignant 93",
+      "departmentId": "0d8866d1-5180-59b4-82bc-e9867d86d743",
+      "maxHoursPerWeek": 12,
+      "unavailableSlots": []
+    },
+    {
+      "id": "f7420647-1faa-5d91-a911-ee44194083e3",
+      "code": "T0094",
+      "name": "Enseignant 94",
+      "departmentId": "39a5c964-0217-5db3-9ae2-96307c36900c",
+      "maxHoursPerWeek": 17,
+      "unavailableSlots": []
+    },
+    {
+      "id": "bee58d89-71a1-5290-be9d-d0f22936e12d",
+      "code": "T0095",
+      "name": "Enseignant 95",
+      "departmentId": "b9bcb403-8e67-55dd-9a06-24c2f753d37f",
+      "maxHoursPerWeek": 23,
+      "unavailableSlots": []
+    },
+    {
+      "id": "f58ec3f2-3725-5002-a861-5cd10305749a",
+      "code": "T0096",
+      "name": "Enseignant 96",
+      "departmentId": "0e6c136a-6ec9-56fb-bb1d-d3b8284aafe5",
+      "maxHoursPerWeek": 16,
+      "unavailableSlots": []
+    },
+    {
+      "id": "d1791330-c96c-5069-92fc-6f4c2928934c",
+      "code": "T0097",
+      "name": "Enseignant 97",
+      "departmentId": "353516a6-0c07-5073-9d74-3f5204a7b1cb",
+      "maxHoursPerWeek": 23,
+      "unavailableSlots": []
+    },
+    {
+      "id": "de0b4a76-2041-5cec-ae83-63c517211c34",
+      "code": "T0098",
+      "name": "Enseignant 98",
+      "departmentId": "cad97a87-0995-564e-b345-473613e32e78",
+      "maxHoursPerWeek": 23,
+      "unavailableSlots": []
+    },
+    {
+      "id": "c30857a0-f381-514f-8ec3-9477b74cd401",
+      "code": "T0099",
+      "name": "Enseignant 99",
+      "departmentId": "cf0f5f71-70cd-5878-b12a-812776c33df3",
+      "maxHoursPerWeek": 14,
+      "unavailableSlots": []
+    },
+    {
+      "id": "73e1d0e8-d55d-5340-9a43-cd18775522d9",
+      "code": "T0100",
+      "name": "Enseignant 100",
+      "departmentId": "6cd26564-a43e-539b-863e-caa91e171955",
+      "maxHoursPerWeek": 24,
+      "unavailableSlots": []
+    }
+  ],
+  "groups": [
+    {
+      "id": "6f1760fb-3e2e-536a-a373-db5b0b7e356b",
+      "code": "G001",
+      "size": 25,
+      "departmentId": "d0ce4187-e082-57e5-bf5e-dade078d3ba4"
+    },
+    {
+      "id": "e062f3d0-8098-56d0-b741-eb1ee1257844",
+      "code": "G002",
+      "size": 29,
+      "departmentId": "86e88048-d252-5336-a865-16a449ac56ba"
+    },
+    {
+      "id": "0bb26f61-a5a7-5b6d-b770-5b1e9215e7e3",
+      "code": "G003",
+      "size": 33,
+      "departmentId": "478bc104-f8d7-5341-8525-e6ac9cf6f29b"
+    },
+    {
+      "id": "c3097b8d-9173-548a-8ae4-1adcc79e23dd",
+      "code": "G004",
+      "size": 33,
+      "departmentId": "e59743f5-dfff-56d6-a822-b21237ce36d7"
+    },
+    {
+      "id": "d9af08fd-6ea8-5c8f-84df-8bf887a5045c",
+      "code": "G005",
+      "size": 34,
+      "departmentId": "edc73238-965b-5788-9f95-ed0c3d9766ee"
+    },
+    {
+      "id": "8212a40f-f292-55f4-a3d6-5428be18d345",
+      "code": "G006",
+      "size": 28,
+      "departmentId": "ede3e717-8c0f-5c63-ad83-997fd8b85a6a"
+    },
+    {
+      "id": "d7f092bd-6901-54a4-9030-7cb1fe8ae0c5",
+      "code": "G007",
+      "size": 33,
+      "departmentId": "38c87d0b-4bc2-5e10-9e87-797863df2b22"
+    },
+    {
+      "id": "c93929cf-a9dd-556d-8e6e-fee2e836547f",
+      "code": "G008",
+      "size": 33,
+      "departmentId": "cad97a87-0995-564e-b345-473613e32e78"
+    },
+    {
+      "id": "29168c24-04b9-5d6c-a2fb-b761a1aa0a1d",
+      "code": "G009",
+      "size": 32,
+      "departmentId": "85fb2599-055c-5e01-8be6-ea24e5586c0f"
+    },
+    {
+      "id": "0107b0eb-8639-5f7b-b7b9-3a291b15fbe8",
+      "code": "G010",
+      "size": 32,
+      "departmentId": "dd082e0a-7847-5849-85f9-84399e62c48f"
+    },
+    {
+      "id": "70fbc67f-f34c-5cbf-b7f1-a6419a071763",
+      "code": "G011",
+      "size": 32,
+      "departmentId": "012583a3-0c70-5fb6-bc70-2fd701c874b7"
+    },
+    {
+      "id": "724b0950-c32c-5e61-acfb-9f7f8fa9d792",
+      "code": "G012",
+      "size": 28,
+      "departmentId": "27f2b17a-9411-5ba6-9562-e756d4db6dc2"
+    },
+    {
+      "id": "43d9c904-1e4a-534b-b18f-4598071f8c28",
+      "code": "G013",
+      "size": 29,
+      "departmentId": "b0d01d53-af31-5f4f-a6fa-3343c3b186f3"
+    },
+    {
+      "id": "da105a32-7994-5f03-b160-691d0ca331af",
+      "code": "G014",
+      "size": 28,
+      "departmentId": "39a5c964-0217-5db3-9ae2-96307c36900c"
+    },
+    {
+      "id": "bee32d97-20d9-526e-9960-b72fba16d95a",
+      "code": "G015",
+      "size": 33,
+      "departmentId": "124e17e0-6eca-5cbc-ab91-7dc2d4c56d6a"
+    },
+    {
+      "id": "04933442-8942-5fd1-9e21-bfb6e42d3daa",
+      "code": "G016",
+      "size": 28,
+      "departmentId": "f0934b88-e068-5735-b580-9e213abdc06e"
+    },
+    {
+      "id": "39ba112a-6a6d-57a3-bd81-9d67a486fef7",
+      "code": "G017",
+      "size": 34,
+      "departmentId": "1b7eadd1-6075-5252-b4c5-a0e979a05d9c"
+    },
+    {
+      "id": "9f6986a6-042d-54b2-838c-17e3277d40c9",
+      "code": "G018",
+      "size": 32,
+      "departmentId": "accaa96a-7a7a-54ad-a25d-6d62e581dcb7"
+    },
+    {
+      "id": "63c6bdf9-f4e7-5375-8abe-c1eeba27f3c9",
+      "code": "G019",
+      "size": 25,
+      "departmentId": "7da4349a-5ad2-5072-a6b5-84eb85cd2333"
+    },
+    {
+      "id": "b3692fc4-1e43-5f77-9d63-d055cd0246e8",
+      "code": "G020",
+      "size": 26,
+      "departmentId": "6cd26564-a43e-539b-863e-caa91e171955"
+    }
+  ],
+  "subjects": [
+    {
+      "id": "d71de516-1deb-5dc9-838b-71bc0db4f682",
+      "code": "M001",
+      "name": "Matière 1",
+      "departmentId": "0158783a-1368-5279-970c-3ca713ddc030",
+      "teachingType": "CM",
+      "chargeCoefficient": 0.63
+    },
+    {
+      "id": "50fc921a-5307-541c-a3f8-c97bbbedcc9d",
+      "code": "M002",
+      "name": "Matière 2",
+      "departmentId": "d65be5d5-6a50-5783-ade4-75a1942135ea",
+      "teachingType": "TD",
+      "chargeCoefficient": 1.03
+    },
+    {
+      "id": "daf1a51d-4d6e-5d0c-82d1-b41bf8c4cb3f",
+      "code": "M003",
+      "name": "Matière 3",
+      "departmentId": "8d2b632f-bb04-5060-b7e9-19f55b30690e",
+      "teachingType": "TP",
+      "chargeCoefficient": 1.38
+    },
+    {
+      "id": "4668550d-5be0-5fb5-9d80-e825cd5e7ef7",
+      "code": "M004",
+      "name": "Matière 4",
+      "departmentId": "3b723719-6017-52ea-b2d8-1b7abc5614eb",
+      "teachingType": "PROJET",
+      "chargeCoefficient": 1.51
+    },
+    {
+      "id": "3d6794fd-9c1a-51ef-9d55-0f9a05f22465",
+      "code": "M005",
+      "name": "Matière 5",
+      "departmentId": "124e17e0-6eca-5cbc-ab91-7dc2d4c56d6a",
+      "teachingType": "CM",
+      "chargeCoefficient": 0.75
+    },
+    {
+      "id": "d12f238f-3cd9-5325-b6cf-772d69fdd116",
+      "code": "M006",
+      "name": "Matière 6",
+      "departmentId": "d8eca2e8-0a55-532e-aa2c-54126cded2c5",
+      "teachingType": "TD",
+      "chargeCoefficient": 0.95
+    },
+    {
+      "id": "02eccefa-d678-5769-ae53-57ea583f39ee",
+      "code": "M007",
+      "name": "Matière 7",
+      "departmentId": "1b7eadd1-6075-5252-b4c5-a0e979a05d9c",
+      "teachingType": "TP",
+      "chargeCoefficient": 1.62
+    },
+    {
+      "id": "0f4fa242-08b8-581e-9113-55643f43cfb6",
+      "code": "M008",
+      "name": "Matière 8",
+      "departmentId": "632a323a-0655-5c57-af11-f9210d606602",
+      "teachingType": "PROJET",
+      "chargeCoefficient": 1.55
+    },
+    {
+      "id": "5c3bc914-8b14-5b7c-b910-6d591ae9cd5b",
+      "code": "M009",
+      "name": "Matière 9",
+      "departmentId": "934689d5-4b06-5abc-bf3f-48e312784f4b",
+      "teachingType": "CM",
+      "chargeCoefficient": 1.38
+    },
+    {
+      "id": "bb06fe79-4c76-5c8e-9b2e-b8b6bdc7f565",
+      "code": "M010",
+      "name": "Matière 10",
+      "departmentId": "9ddae089-9fbd-5b68-92e4-d7f938a3e073",
+      "teachingType": "TD",
+      "chargeCoefficient": 1.31
+    }
+  ],
+  "activities": [
+    {
+      "id": "aff691df-569f-5ffa-9d5a-776d29f90556",
+      "subjectId": "d71de516-1deb-5dc9-838b-71bc0db4f682",
+      "teacherIds": [
+        "103730fd-3ebb-52f8-aca8-8d6fbda72417"
+      ],
+      "groupIds": [
+        "b3692fc4-1e43-5f77-9d63-d055cd0246e8",
+        "0107b0eb-8639-5f7b-b7b9-3a291b15fbe8"
+      ],
+      "roomType": "AMPHI",
+      "durationSlots": 2,
+      "weeklyVolume": 1,
+      "teachingType": "CM"
+    },
+    {
+      "id": "7c625ba1-54be-5d79-b28a-66388f8489f3",
+      "subjectId": "50fc921a-5307-541c-a3f8-c97bbbedcc9d",
+      "teacherIds": [
+        "bb02ef17-d9f7-59a8-b3b1-20fb6acda79d"
+      ],
+      "groupIds": [
+        "c3097b8d-9173-548a-8ae4-1adcc79e23dd",
+        "e062f3d0-8098-56d0-b741-eb1ee1257844"
+      ],
+      "roomType": "TD",
+      "durationSlots": 4,
+      "weeklyVolume": 3,
+      "teachingType": "TD"
+    },
+    {
+      "id": "0b119068-e268-5023-96b0-79cfe76ed590",
+      "subjectId": "daf1a51d-4d6e-5d0c-82d1-b41bf8c4cb3f",
+      "teacherIds": [
+        "0929fa73-4f97-50d6-b581-9fbc6588c57e"
+      ],
+      "groupIds": [
+        "04933442-8942-5fd1-9e21-bfb6e42d3daa",
+        "0bb26f61-a5a7-5b6d-b770-5b1e9215e7e3"
+      ],
+      "roomType": "TP",
+      "durationSlots": 2,
+      "weeklyVolume": 1,
+      "teachingType": "TP"
+    },
+    {
+      "id": "8470d5b9-5725-5377-b86e-df47df088589",
+      "subjectId": "4668550d-5be0-5fb5-9d80-e825cd5e7ef7",
+      "teacherIds": [
+        "6ecde623-8765-5340-a720-3f6737d1024c"
+      ],
+      "groupIds": [
+        "724b0950-c32c-5e61-acfb-9f7f8fa9d792",
+        "8212a40f-f292-55f4-a3d6-5428be18d345"
+      ],
+      "roomType": "INFO",
+      "durationSlots": 1,
+      "weeklyVolume": 2,
+      "teachingType": "PROJET"
+    },
+    {
+      "id": "bd204e26-11f2-5f5c-afdf-aa41821cb83a",
+      "subjectId": "3d6794fd-9c1a-51ef-9d55-0f9a05f22465",
+      "teacherIds": [
+        "d22f71df-d2e6-5025-acb7-9f8d37a81f8b"
+      ],
+      "groupIds": [
+        "bee32d97-20d9-526e-9960-b72fba16d95a"
+      ],
+      "roomType": "AMPHI",
+      "durationSlots": 3,
+      "weeklyVolume": 3,
+      "teachingType": "CM"
+    },
+    {
+      "id": "ed872fe2-c2c0-57e1-80d5-007fd18cd449",
+      "subjectId": "d12f238f-3cd9-5325-b6cf-772d69fdd116",
+      "teacherIds": [
+        "27b6d0e5-8eb0-59ef-b966-557a8118a4aa"
+      ],
+      "groupIds": [
+        "29168c24-04b9-5d6c-a2fb-b761a1aa0a1d",
+        "0bb26f61-a5a7-5b6d-b770-5b1e9215e7e3"
+      ],
+      "roomType": "TD",
+      "durationSlots": 2,
+      "weeklyVolume": 1,
+      "teachingType": "TD"
+    },
+    {
+      "id": "bdf0a8e0-d8b6-5a1c-8e59-d17c5f54396f",
+      "subjectId": "02eccefa-d678-5769-ae53-57ea583f39ee",
+      "teacherIds": [
+        "6bb8a19d-cf1a-5cb9-97d2-4c950cd24730"
+      ],
+      "groupIds": [
+        "39ba112a-6a6d-57a3-bd81-9d67a486fef7"
+      ],
+      "roomType": "TP",
+      "durationSlots": 1,
+      "weeklyVolume": 2,
+      "teachingType": "TP"
+    },
+    {
+      "id": "de8bc37d-9dd0-5dab-ac6b-4359af588dc8",
+      "subjectId": "0f4fa242-08b8-581e-9113-55643f43cfb6",
+      "teacherIds": [
+        "27b6d0e5-8eb0-59ef-b966-557a8118a4aa"
+      ],
+      "groupIds": [
+        "9f6986a6-042d-54b2-838c-17e3277d40c9",
+        "da105a32-7994-5f03-b160-691d0ca331af"
+      ],
+      "roomType": "INFO",
+      "durationSlots": 2,
+      "weeklyVolume": 3,
+      "teachingType": "PROJET"
+    },
+    {
+      "id": "d90b9235-26b0-58bb-8c49-7bcce13a877a",
+      "subjectId": "5c3bc914-8b14-5b7c-b910-6d591ae9cd5b",
+      "teacherIds": [
+        "90e561d6-d6f7-5cfe-b7e7-4489f4730a0c"
+      ],
+      "groupIds": [
+        "70fbc67f-f34c-5cbf-b7f1-a6419a071763",
+        "8212a40f-f292-55f4-a3d6-5428be18d345"
+      ],
+      "roomType": "AMPHI",
+      "durationSlots": 1,
+      "weeklyVolume": 1,
+      "teachingType": "CM"
+    },
+    {
+      "id": "ea176080-f1fb-55ca-95cc-aa29d54d0a47",
+      "subjectId": "bb06fe79-4c76-5c8e-9b2e-b8b6bdc7f565",
+      "teacherIds": [
+        "a6de61ee-b396-5ec1-a3a2-1e1eb1f035b7"
+      ],
+      "groupIds": [
+        "c3097b8d-9173-548a-8ae4-1adcc79e23dd",
+        "39ba112a-6a6d-57a3-bd81-9d67a486fef7"
+      ],
+      "roomType": "TD",
+      "durationSlots": 3,
+      "weeklyVolume": 2,
+      "teachingType": "TD"
+    },
+    {
+      "id": "5456afc1-e773-582e-a8c1-c5ecafbb53e8",
+      "subjectId": "d71de516-1deb-5dc9-838b-71bc0db4f682",
+      "teacherIds": [
+        "04b90f9c-48c2-56c9-aa1b-7ff76b47048c"
+      ],
+      "groupIds": [
+        "724b0950-c32c-5e61-acfb-9f7f8fa9d792",
+        "c3097b8d-9173-548a-8ae4-1adcc79e23dd"
+      ],
+      "roomType": "AMPHI",
+      "durationSlots": 1,
+      "weeklyVolume": 1,
+      "teachingType": "CM"
+    },
+    {
+      "id": "2005d534-28e9-5808-b7bd-6975a467a433",
+      "subjectId": "50fc921a-5307-541c-a3f8-c97bbbedcc9d",
+      "teacherIds": [
+        "bb02ef17-d9f7-59a8-b3b1-20fb6acda79d"
+      ],
+      "groupIds": [
+        "e062f3d0-8098-56d0-b741-eb1ee1257844",
+        "63c6bdf9-f4e7-5375-8abe-c1eeba27f3c9"
+      ],
+      "roomType": "TD",
+      "durationSlots": 2,
+      "weeklyVolume": 2,
+      "teachingType": "TD"
+    },
+    {
+      "id": "ce36feb1-ee8e-5b4f-9f58-3567ab6208ee",
+      "subjectId": "daf1a51d-4d6e-5d0c-82d1-b41bf8c4cb3f",
+      "teacherIds": [
+        "0929fa73-4f97-50d6-b581-9fbc6588c57e"
+      ],
+      "groupIds": [
+        "c93929cf-a9dd-556d-8e6e-fee2e836547f",
+        "43d9c904-1e4a-534b-b18f-4598071f8c28"
+      ],
+      "roomType": "TP",
+      "durationSlots": 3,
+      "weeklyVolume": 3,
+      "teachingType": "TP"
+    },
+    {
+      "id": "ab431d7c-125d-52a2-9325-8014c4da0966",
+      "subjectId": "4668550d-5be0-5fb5-9d80-e825cd5e7ef7",
+      "teacherIds": [
+        "b0dd778b-9537-58d9-aef3-102595498dcd"
+      ],
+      "groupIds": [
+        "d9af08fd-6ea8-5c8f-84df-8bf887a5045c",
+        "70fbc67f-f34c-5cbf-b7f1-a6419a071763"
+      ],
+      "roomType": "INFO",
+      "durationSlots": 1,
+      "weeklyVolume": 1,
+      "teachingType": "PROJET"
+    },
+    {
+      "id": "48edd68a-bd15-536f-be08-e2a10c3cfc70",
+      "subjectId": "3d6794fd-9c1a-51ef-9d55-0f9a05f22465",
+      "teacherIds": [
+        "d22f71df-d2e6-5025-acb7-9f8d37a81f8b"
+      ],
+      "groupIds": [
+        "bee32d97-20d9-526e-9960-b72fba16d95a"
+      ],
+      "roomType": "AMPHI",
+      "durationSlots": 1,
+      "weeklyVolume": 1,
+      "teachingType": "CM"
+    },
+    {
+      "id": "983bc597-9e54-5b0b-8234-4bca2ca761a2",
+      "subjectId": "d12f238f-3cd9-5325-b6cf-772d69fdd116",
+      "teacherIds": [
+        "329097fd-d41f-51e0-9623-599d0d325f95"
+      ],
+      "groupIds": [
+        "724b0950-c32c-5e61-acfb-9f7f8fa9d792",
+        "6f1760fb-3e2e-536a-a373-db5b0b7e356b"
+      ],
+      "roomType": "TD",
+      "durationSlots": 1,
+      "weeklyVolume": 1,
+      "teachingType": "TD"
+    },
+    {
+      "id": "6d13742f-ae6c-5ac2-9656-bc3146fc3ad5",
+      "subjectId": "02eccefa-d678-5769-ae53-57ea583f39ee",
+      "teacherIds": [
+        "97a7a539-5a0b-5a57-a914-1633b46ed2a0"
+      ],
+      "groupIds": [
+        "39ba112a-6a6d-57a3-bd81-9d67a486fef7"
+      ],
+      "roomType": "TP",
+      "durationSlots": 2,
+      "weeklyVolume": 3,
+      "teachingType": "TP"
+    },
+    {
+      "id": "3af08d24-85dc-5536-b11c-875e57e6ef29",
+      "subjectId": "0f4fa242-08b8-581e-9113-55643f43cfb6",
+      "teacherIds": [
+        "27b6d0e5-8eb0-59ef-b966-557a8118a4aa"
+      ],
+      "groupIds": [
+        "04933442-8942-5fd1-9e21-bfb6e42d3daa",
+        "b3692fc4-1e43-5f77-9d63-d055cd0246e8"
+      ],
+      "roomType": "INFO",
+      "durationSlots": 3,
+      "weeklyVolume": 3,
+      "teachingType": "PROJET"
+    },
+    {
+      "id": "1cbd0b74-a44b-5cec-9ecd-a253e4e4ad60",
+      "subjectId": "5c3bc914-8b14-5b7c-b910-6d591ae9cd5b",
+      "teacherIds": [
+        "90e561d6-d6f7-5cfe-b7e7-4489f4730a0c"
+      ],
+      "groupIds": [
+        "d9af08fd-6ea8-5c8f-84df-8bf887a5045c",
+        "6f1760fb-3e2e-536a-a373-db5b0b7e356b"
+      ],
+      "roomType": "AMPHI",
+      "durationSlots": 3,
+      "weeklyVolume": 1,
+      "teachingType": "CM"
+    },
+    {
+      "id": "9d5a4925-9809-5851-a431-6787b2c4489f",
+      "subjectId": "bb06fe79-4c76-5c8e-9b2e-b8b6bdc7f565",
+      "teacherIds": [
+        "cf51c4cf-d7ab-5c42-8d58-1fe761064787"
+      ],
+      "groupIds": [
+        "c3097b8d-9173-548a-8ae4-1adcc79e23dd",
+        "04933442-8942-5fd1-9e21-bfb6e42d3daa"
+      ],
+      "roomType": "TD",
+      "durationSlots": 2,
+      "weeklyVolume": 2,
+      "teachingType": "TD"
+    },
+    {
+      "id": "759d36f8-d936-5e86-8de1-d61f08fcb687",
+      "subjectId": "d71de516-1deb-5dc9-838b-71bc0db4f682",
+      "teacherIds": [
+        "103730fd-3ebb-52f8-aca8-8d6fbda72417"
+      ],
+      "groupIds": [
+        "d9af08fd-6ea8-5c8f-84df-8bf887a5045c",
+        "04933442-8942-5fd1-9e21-bfb6e42d3daa"
+      ],
+      "roomType": "AMPHI",
+      "durationSlots": 2,
+      "weeklyVolume": 3,
+      "teachingType": "CM"
+    },
+    {
+      "id": "3a5ffb5a-3679-5415-9133-50c28107d2a9",
+      "subjectId": "50fc921a-5307-541c-a3f8-c97bbbedcc9d",
+      "teacherIds": [
+        "bb02ef17-d9f7-59a8-b3b1-20fb6acda79d"
+      ],
+      "groupIds": [
+        "724b0950-c32c-5e61-acfb-9f7f8fa9d792",
+        "0107b0eb-8639-5f7b-b7b9-3a291b15fbe8"
+      ],
+      "roomType": "TD",
+      "durationSlots": 2,
+      "weeklyVolume": 3,
+      "teachingType": "TD"
+    },
+    {
+      "id": "90442272-6f01-5989-882c-7aa461354525",
+      "subjectId": "daf1a51d-4d6e-5d0c-82d1-b41bf8c4cb3f",
+      "teacherIds": [
+        "0929fa73-4f97-50d6-b581-9fbc6588c57e"
+      ],
+      "groupIds": [
+        "d7f092bd-6901-54a4-9030-7cb1fe8ae0c5",
+        "c3097b8d-9173-548a-8ae4-1adcc79e23dd"
+      ],
+      "roomType": "TP",
+      "durationSlots": 2,
+      "weeklyVolume": 2,
+      "teachingType": "TP"
+    },
+    {
+      "id": "c75429f9-9178-557d-83e0-4195d3c3c398",
+      "subjectId": "4668550d-5be0-5fb5-9d80-e825cd5e7ef7",
+      "teacherIds": [
+        "6ecde623-8765-5340-a720-3f6737d1024c"
+      ],
+      "groupIds": [
+        "6f1760fb-3e2e-536a-a373-db5b0b7e356b",
+        "d7f092bd-6901-54a4-9030-7cb1fe8ae0c5"
+      ],
+      "roomType": "INFO",
+      "durationSlots": 1,
+      "weeklyVolume": 2,
+      "teachingType": "PROJET"
+    },
+    {
+      "id": "962c3777-7e3f-5083-a445-740f701a044c",
+      "subjectId": "3d6794fd-9c1a-51ef-9d55-0f9a05f22465",
+      "teacherIds": [
+        "d22f71df-d2e6-5025-acb7-9f8d37a81f8b"
+      ],
+      "groupIds": [
+        "bee32d97-20d9-526e-9960-b72fba16d95a"
+      ],
+      "roomType": "AMPHI",
+      "durationSlots": 2,
+      "weeklyVolume": 3,
+      "teachingType": "CM"
+    },
+    {
+      "id": "e45c8f5c-6ddf-554d-93a1-bb8b0041e2f9",
+      "subjectId": "d12f238f-3cd9-5325-b6cf-772d69fdd116",
+      "teacherIds": [
+        "59e6a5ca-bf61-58a2-8f64-c9bd7662ee82"
+      ],
+      "groupIds": [
+        "29168c24-04b9-5d6c-a2fb-b761a1aa0a1d",
+        "e062f3d0-8098-56d0-b741-eb1ee1257844"
+      ],
+      "roomType": "TD",
+      "durationSlots": 4,
+      "weeklyVolume": 2,
+      "teachingType": "TD"
+    },
+    {
+      "id": "a6b7a4f9-7d56-57ba-ab1a-529dd625fe47",
+      "subjectId": "02eccefa-d678-5769-ae53-57ea583f39ee",
+      "teacherIds": [
+        "6bb8a19d-cf1a-5cb9-97d2-4c950cd24730"
+      ],
+      "groupIds": [
+        "39ba112a-6a6d-57a3-bd81-9d67a486fef7"
+      ],
+      "roomType": "TP",
+      "durationSlots": 1,
+      "weeklyVolume": 3,
+      "teachingType": "TP"
+    },
+    {
+      "id": "9c7069cb-3d7b-5640-858b-12e12eed5b5c",
+      "subjectId": "0f4fa242-08b8-581e-9113-55643f43cfb6",
+      "teacherIds": [
+        "27b6d0e5-8eb0-59ef-b966-557a8118a4aa"
+      ],
+      "groupIds": [
+        "29168c24-04b9-5d6c-a2fb-b761a1aa0a1d",
+        "c3097b8d-9173-548a-8ae4-1adcc79e23dd"
+      ],
+      "roomType": "INFO",
+      "durationSlots": 2,
+      "weeklyVolume": 1,
+      "teachingType": "PROJET"
+    },
+    {
+      "id": "cf8b54fa-120e-5467-95e0-dc6d9a2016f0",
+      "subjectId": "5c3bc914-8b14-5b7c-b910-6d591ae9cd5b",
+      "teacherIds": [
+        "90e561d6-d6f7-5cfe-b7e7-4489f4730a0c"
+      ],
+      "groupIds": [
+        "39ba112a-6a6d-57a3-bd81-9d67a486fef7",
+        "d9af08fd-6ea8-5c8f-84df-8bf887a5045c"
+      ],
+      "roomType": "AMPHI",
+      "durationSlots": 1,
+      "weeklyVolume": 1,
+      "teachingType": "CM"
+    },
+    {
+      "id": "11bc5ee4-df22-536e-bc15-2e907c5fb1be",
+      "subjectId": "bb06fe79-4c76-5c8e-9b2e-b8b6bdc7f565",
+      "teacherIds": [
+        "42e2726c-2f0d-5259-8d80-dcf8edbdffee"
+      ],
+      "groupIds": [
+        "e062f3d0-8098-56d0-b741-eb1ee1257844",
+        "c3097b8d-9173-548a-8ae4-1adcc79e23dd"
+      ],
+      "roomType": "TD",
+      "durationSlots": 1,
+      "weeklyVolume": 1,
+      "teachingType": "TD"
+    },
+    {
+      "id": "aebe9972-441a-5d03-9e87-8dab5e6cc61a",
+      "subjectId": "d71de516-1deb-5dc9-838b-71bc0db4f682",
+      "teacherIds": [
+        "04b90f9c-48c2-56c9-aa1b-7ff76b47048c"
+      ],
+      "groupIds": [
+        "e062f3d0-8098-56d0-b741-eb1ee1257844",
+        "0107b0eb-8639-5f7b-b7b9-3a291b15fbe8"
+      ],
+      "roomType": "AMPHI",
+      "durationSlots": 2,
+      "weeklyVolume": 2,
+      "teachingType": "CM"
+    },
+    {
+      "id": "e67df169-5728-504d-bb5c-e5c32c2214f2",
+      "subjectId": "50fc921a-5307-541c-a3f8-c97bbbedcc9d",
+      "teacherIds": [
+        "bb02ef17-d9f7-59a8-b3b1-20fb6acda79d"
+      ],
+      "groupIds": [
+        "c3097b8d-9173-548a-8ae4-1adcc79e23dd",
+        "bee32d97-20d9-526e-9960-b72fba16d95a"
+      ],
+      "roomType": "TD",
+      "durationSlots": 2,
+      "weeklyVolume": 3,
+      "teachingType": "TD"
+    },
+    {
+      "id": "47fc8289-6670-5cf4-90ee-51c6786e1182",
+      "subjectId": "daf1a51d-4d6e-5d0c-82d1-b41bf8c4cb3f",
+      "teacherIds": [
+        "0929fa73-4f97-50d6-b581-9fbc6588c57e"
+      ],
+      "groupIds": [
+        "9f6986a6-042d-54b2-838c-17e3277d40c9",
+        "d9af08fd-6ea8-5c8f-84df-8bf887a5045c"
+      ],
+      "roomType": "TP",
+      "durationSlots": 3,
+      "weeklyVolume": 3,
+      "teachingType": "TP"
+    },
+    {
+      "id": "e918bf54-9372-504f-9267-6e8fc2e06004",
+      "subjectId": "4668550d-5be0-5fb5-9d80-e825cd5e7ef7",
+      "teacherIds": [
+        "b0dd778b-9537-58d9-aef3-102595498dcd"
+      ],
+      "groupIds": [
+        "d7f092bd-6901-54a4-9030-7cb1fe8ae0c5",
+        "e062f3d0-8098-56d0-b741-eb1ee1257844"
+      ],
+      "roomType": "INFO",
+      "durationSlots": 3,
+      "weeklyVolume": 1,
+      "teachingType": "PROJET"
+    },
+    {
+      "id": "c41647e0-3d9f-5190-ac08-9072e967f153",
+      "subjectId": "3d6794fd-9c1a-51ef-9d55-0f9a05f22465",
+      "teacherIds": [
+        "d22f71df-d2e6-5025-acb7-9f8d37a81f8b"
+      ],
+      "groupIds": [
+        "bee32d97-20d9-526e-9960-b72fba16d95a"
+      ],
+      "roomType": "AMPHI",
+      "durationSlots": 2,
+      "weeklyVolume": 3,
+      "teachingType": "CM"
+    },
+    {
+      "id": "06cb9956-1687-5a36-85d4-75806823ed48",
+      "subjectId": "d12f238f-3cd9-5325-b6cf-772d69fdd116",
+      "teacherIds": [
+        "069ce4a9-22df-5617-8a1c-d6f5747d971e"
+      ],
+      "groupIds": [
+        "04933442-8942-5fd1-9e21-bfb6e42d3daa",
+        "9f6986a6-042d-54b2-838c-17e3277d40c9"
+      ],
+      "roomType": "TD",
+      "durationSlots": 2,
+      "weeklyVolume": 3,
+      "teachingType": "TD"
+    },
+    {
+      "id": "6039ab90-0352-5682-b82a-d219203d1776",
+      "subjectId": "02eccefa-d678-5769-ae53-57ea583f39ee",
+      "teacherIds": [
+        "97a7a539-5a0b-5a57-a914-1633b46ed2a0"
+      ],
+      "groupIds": [
+        "39ba112a-6a6d-57a3-bd81-9d67a486fef7"
+      ],
+      "roomType": "TP",
+      "durationSlots": 2,
+      "weeklyVolume": 2,
+      "teachingType": "TP"
+    },
+    {
+      "id": "9f39dcd7-9fe6-5458-9d78-ba2aaef0b90f",
+      "subjectId": "0f4fa242-08b8-581e-9113-55643f43cfb6",
+      "teacherIds": [
+        "27b6d0e5-8eb0-59ef-b966-557a8118a4aa"
+      ],
+      "groupIds": [
+        "c93929cf-a9dd-556d-8e6e-fee2e836547f",
+        "724b0950-c32c-5e61-acfb-9f7f8fa9d792"
+      ],
+      "roomType": "INFO",
+      "durationSlots": 2,
+      "weeklyVolume": 1,
+      "teachingType": "PROJET"
+    },
+    {
+      "id": "a7f1fb26-d014-5eae-bde2-1b2bd985c0c5",
+      "subjectId": "5c3bc914-8b14-5b7c-b910-6d591ae9cd5b",
+      "teacherIds": [
+        "21a665fd-0cfa-5aa9-9fb6-ded23fa2d5bc"
+      ],
+      "groupIds": [
+        "c93929cf-a9dd-556d-8e6e-fee2e836547f",
+        "9f6986a6-042d-54b2-838c-17e3277d40c9"
+      ],
+      "roomType": "AMPHI",
+      "durationSlots": 3,
+      "weeklyVolume": 2,
+      "teachingType": "CM"
+    },
+    {
+      "id": "b8e4ea31-d4a9-5836-a98b-4a008ebe11a3",
+      "subjectId": "bb06fe79-4c76-5c8e-9b2e-b8b6bdc7f565",
+      "teacherIds": [
+        "f4df18cf-059d-55f5-be72-14a45fb73cb5"
+      ],
+      "groupIds": [
+        "9f6986a6-042d-54b2-838c-17e3277d40c9",
+        "e062f3d0-8098-56d0-b741-eb1ee1257844"
+      ],
+      "roomType": "TD",
+      "durationSlots": 2,
+      "weeklyVolume": 3,
+      "teachingType": "TD"
+    },
+    {
+      "id": "6ca43367-944c-5896-962f-5a3f71076e2e",
+      "subjectId": "d71de516-1deb-5dc9-838b-71bc0db4f682",
+      "teacherIds": [
+        "04b90f9c-48c2-56c9-aa1b-7ff76b47048c"
+      ],
+      "groupIds": [
+        "43d9c904-1e4a-534b-b18f-4598071f8c28",
+        "d7f092bd-6901-54a4-9030-7cb1fe8ae0c5"
+      ],
+      "roomType": "AMPHI",
+      "durationSlots": 1,
+      "weeklyVolume": 2,
+      "teachingType": "CM"
+    },
+    {
+      "id": "2f33fef7-f125-5cef-baca-d1422906fe94",
+      "subjectId": "50fc921a-5307-541c-a3f8-c97bbbedcc9d",
+      "teacherIds": [
+        "bb02ef17-d9f7-59a8-b3b1-20fb6acda79d"
+      ],
+      "groupIds": [
+        "0107b0eb-8639-5f7b-b7b9-3a291b15fbe8",
+        "04933442-8942-5fd1-9e21-bfb6e42d3daa"
+      ],
+      "roomType": "TD",
+      "durationSlots": 1,
+      "weeklyVolume": 1,
+      "teachingType": "TD"
+    },
+    {
+      "id": "05c141cb-a51b-5cc2-b423-9f989b177eb4",
+      "subjectId": "daf1a51d-4d6e-5d0c-82d1-b41bf8c4cb3f",
+      "teacherIds": [
+        "0929fa73-4f97-50d6-b581-9fbc6588c57e"
+      ],
+      "groupIds": [
+        "d9af08fd-6ea8-5c8f-84df-8bf887a5045c",
+        "c93929cf-a9dd-556d-8e6e-fee2e836547f"
+      ],
+      "roomType": "TP",
+      "durationSlots": 1,
+      "weeklyVolume": 3,
+      "teachingType": "TP"
+    },
+    {
+      "id": "cf8f9c8d-d567-5388-a7a6-87b785a40061",
+      "subjectId": "4668550d-5be0-5fb5-9d80-e825cd5e7ef7",
+      "teacherIds": [
+        "6ecde623-8765-5340-a720-3f6737d1024c"
+      ],
+      "groupIds": [
+        "6f1760fb-3e2e-536a-a373-db5b0b7e356b",
+        "d7f092bd-6901-54a4-9030-7cb1fe8ae0c5"
+      ],
+      "roomType": "INFO",
+      "durationSlots": 1,
+      "weeklyVolume": 3,
+      "teachingType": "PROJET"
+    },
+    {
+      "id": "ad8f37ef-6d5c-5d1e-ad3d-1c00f3e9d43e",
+      "subjectId": "3d6794fd-9c1a-51ef-9d55-0f9a05f22465",
+      "teacherIds": [
+        "d22f71df-d2e6-5025-acb7-9f8d37a81f8b"
+      ],
+      "groupIds": [
+        "bee32d97-20d9-526e-9960-b72fba16d95a"
+      ],
+      "roomType": "AMPHI",
+      "durationSlots": 3,
+      "weeklyVolume": 1,
+      "teachingType": "CM"
+    },
+    {
+      "id": "91d0b3c3-0bfa-5008-9e8e-08d2d5e34faf",
+      "subjectId": "d12f238f-3cd9-5325-b6cf-772d69fdd116",
+      "teacherIds": [
+        "1a6f5df3-821e-505e-99ca-ccf8d134a338"
+      ],
+      "groupIds": [
+        "e062f3d0-8098-56d0-b741-eb1ee1257844",
+        "b3692fc4-1e43-5f77-9d63-d055cd0246e8"
+      ],
+      "roomType": "TD",
+      "durationSlots": 2,
+      "weeklyVolume": 2,
+      "teachingType": "TD"
+    },
+    {
+      "id": "0ed1bb5a-96f3-504c-9a5b-6ecac6645942",
+      "subjectId": "02eccefa-d678-5769-ae53-57ea583f39ee",
+      "teacherIds": [
+        "97a7a539-5a0b-5a57-a914-1633b46ed2a0"
+      ],
+      "groupIds": [
+        "39ba112a-6a6d-57a3-bd81-9d67a486fef7"
+      ],
+      "roomType": "TP",
+      "durationSlots": 2,
+      "weeklyVolume": 3,
+      "teachingType": "TP"
+    },
+    {
+      "id": "c09aab3f-2b89-569d-97b3-ff19cbf79c07",
+      "subjectId": "0f4fa242-08b8-581e-9113-55643f43cfb6",
+      "teacherIds": [
+        "27b6d0e5-8eb0-59ef-b966-557a8118a4aa"
+      ],
+      "groupIds": [
+        "43d9c904-1e4a-534b-b18f-4598071f8c28",
+        "29168c24-04b9-5d6c-a2fb-b761a1aa0a1d"
+      ],
+      "roomType": "INFO",
+      "durationSlots": 3,
+      "weeklyVolume": 3,
+      "teachingType": "PROJET"
+    },
+    {
+      "id": "e4d61451-6174-5c38-8f1f-95681b9b7291",
+      "subjectId": "5c3bc914-8b14-5b7c-b910-6d591ae9cd5b",
+      "teacherIds": [
+        "21a665fd-0cfa-5aa9-9fb6-ded23fa2d5bc"
+      ],
+      "groupIds": [
+        "d7f092bd-6901-54a4-9030-7cb1fe8ae0c5",
+        "c93929cf-a9dd-556d-8e6e-fee2e836547f"
+      ],
+      "roomType": "AMPHI",
+      "durationSlots": 2,
+      "weeklyVolume": 2,
+      "teachingType": "CM"
+    },
+    {
+      "id": "faed1156-1c85-501a-9fbe-e20748edd209",
+      "subjectId": "bb06fe79-4c76-5c8e-9b2e-b8b6bdc7f565",
+      "teacherIds": [
+        "9e0530ec-9ad1-5ebe-8605-b89198cd0b16"
+      ],
+      "groupIds": [
+        "0bb26f61-a5a7-5b6d-b770-5b1e9215e7e3",
+        "70fbc67f-f34c-5cbf-b7f1-a6419a071763"
+      ],
+      "roomType": "TD",
+      "durationSlots": 1,
+      "weeklyVolume": 3,
+      "teachingType": "TD"
+    },
+    {
+      "id": "c39c4d89-2317-5dd9-a9f5-3ff56455ea8a",
+      "subjectId": "d71de516-1deb-5dc9-838b-71bc0db4f682",
+      "teacherIds": [
+        "04b90f9c-48c2-56c9-aa1b-7ff76b47048c"
+      ],
+      "groupIds": [
+        "da105a32-7994-5f03-b160-691d0ca331af",
+        "29168c24-04b9-5d6c-a2fb-b761a1aa0a1d"
+      ],
+      "roomType": "AMPHI",
+      "durationSlots": 4,
+      "weeklyVolume": 1,
+      "teachingType": "CM"
+    },
+    {
+      "id": "9a18609a-f313-554b-a0f3-f7db2c702e35",
+      "subjectId": "50fc921a-5307-541c-a3f8-c97bbbedcc9d",
+      "teacherIds": [
+        "bb02ef17-d9f7-59a8-b3b1-20fb6acda79d"
+      ],
+      "groupIds": [
+        "39ba112a-6a6d-57a3-bd81-9d67a486fef7",
+        "9f6986a6-042d-54b2-838c-17e3277d40c9"
+      ],
+      "roomType": "TD",
+      "durationSlots": 2,
+      "weeklyVolume": 1,
+      "teachingType": "TD"
+    },
+    {
+      "id": "bc8aaeb8-c096-5cd6-acad-971697010533",
+      "subjectId": "daf1a51d-4d6e-5d0c-82d1-b41bf8c4cb3f",
+      "teacherIds": [
+        "0929fa73-4f97-50d6-b581-9fbc6588c57e"
+      ],
+      "groupIds": [
+        "d7f092bd-6901-54a4-9030-7cb1fe8ae0c5",
+        "63c6bdf9-f4e7-5375-8abe-c1eeba27f3c9"
+      ],
+      "roomType": "TP",
+      "durationSlots": 1,
+      "weeklyVolume": 2,
+      "teachingType": "TP"
+    },
+    {
+      "id": "be01e4cc-790d-582e-b7ce-70d9f3efbf4d",
+      "subjectId": "4668550d-5be0-5fb5-9d80-e825cd5e7ef7",
+      "teacherIds": [
+        "b0dd778b-9537-58d9-aef3-102595498dcd"
+      ],
+      "groupIds": [
+        "39ba112a-6a6d-57a3-bd81-9d67a486fef7",
+        "8212a40f-f292-55f4-a3d6-5428be18d345"
+      ],
+      "roomType": "INFO",
+      "durationSlots": 2,
+      "weeklyVolume": 3,
+      "teachingType": "PROJET"
+    },
+    {
+      "id": "dae75cec-9500-5f57-9565-cebcd5c7e4f6",
+      "subjectId": "3d6794fd-9c1a-51ef-9d55-0f9a05f22465",
+      "teacherIds": [
+        "d22f71df-d2e6-5025-acb7-9f8d37a81f8b"
+      ],
+      "groupIds": [
+        "bee32d97-20d9-526e-9960-b72fba16d95a"
+      ],
+      "roomType": "AMPHI",
+      "durationSlots": 2,
+      "weeklyVolume": 3,
+      "teachingType": "CM"
+    },
+    {
+      "id": "6008192a-2671-550a-a392-a19563f770ab",
+      "subjectId": "d12f238f-3cd9-5325-b6cf-772d69fdd116",
+      "teacherIds": [
+        "ced41599-7af9-5344-8a2b-95f3146c7589"
+      ],
+      "groupIds": [
+        "63c6bdf9-f4e7-5375-8abe-c1eeba27f3c9",
+        "04933442-8942-5fd1-9e21-bfb6e42d3daa"
+      ],
+      "roomType": "TD",
+      "durationSlots": 2,
+      "weeklyVolume": 1,
+      "teachingType": "TD"
+    },
+    {
+      "id": "7d9b233e-5181-502f-b483-cd5db30e6486",
+      "subjectId": "02eccefa-d678-5769-ae53-57ea583f39ee",
+      "teacherIds": [
+        "97a7a539-5a0b-5a57-a914-1633b46ed2a0"
+      ],
+      "groupIds": [
+        "39ba112a-6a6d-57a3-bd81-9d67a486fef7"
+      ],
+      "roomType": "TP",
+      "durationSlots": 3,
+      "weeklyVolume": 1,
+      "teachingType": "TP"
+    },
+    {
+      "id": "ab29193a-a8e8-51b0-92aa-853fb14cbd19",
+      "subjectId": "0f4fa242-08b8-581e-9113-55643f43cfb6",
+      "teacherIds": [
+        "27b6d0e5-8eb0-59ef-b966-557a8118a4aa"
+      ],
+      "groupIds": [
+        "d9af08fd-6ea8-5c8f-84df-8bf887a5045c",
+        "6f1760fb-3e2e-536a-a373-db5b0b7e356b"
+      ],
+      "roomType": "INFO",
+      "durationSlots": 1,
+      "weeklyVolume": 3,
+      "teachingType": "PROJET"
+    },
+    {
+      "id": "6b2e98b9-471c-5ee4-a8df-3fc0e7dc5dcd",
+      "subjectId": "5c3bc914-8b14-5b7c-b910-6d591ae9cd5b",
+      "teacherIds": [
+        "21a665fd-0cfa-5aa9-9fb6-ded23fa2d5bc"
+      ],
+      "groupIds": [
+        "0107b0eb-8639-5f7b-b7b9-3a291b15fbe8",
+        "d7f092bd-6901-54a4-9030-7cb1fe8ae0c5"
+      ],
+      "roomType": "AMPHI",
+      "durationSlots": 1,
+      "weeklyVolume": 1,
+      "teachingType": "CM"
+    },
+    {
+      "id": "1741b724-5a80-50fd-8160-02b8b20401d1",
+      "subjectId": "bb06fe79-4c76-5c8e-9b2e-b8b6bdc7f565",
+      "teacherIds": [
+        "92f5919b-d838-5814-951b-b7d93bacf141"
+      ],
+      "groupIds": [
+        "c93929cf-a9dd-556d-8e6e-fee2e836547f",
+        "e062f3d0-8098-56d0-b741-eb1ee1257844"
+      ],
+      "roomType": "TD",
+      "durationSlots": 2,
+      "weeklyVolume": 2,
+      "teachingType": "TD"
+    },
+    {
+      "id": "21560574-3399-54e3-8186-b07a9c75be89",
+      "subjectId": "d71de516-1deb-5dc9-838b-71bc0db4f682",
+      "teacherIds": [
+        "04b90f9c-48c2-56c9-aa1b-7ff76b47048c"
+      ],
+      "groupIds": [
+        "0bb26f61-a5a7-5b6d-b770-5b1e9215e7e3",
+        "39ba112a-6a6d-57a3-bd81-9d67a486fef7"
+      ],
+      "roomType": "AMPHI",
+      "durationSlots": 1,
+      "weeklyVolume": 2,
+      "teachingType": "CM"
+    },
+    {
+      "id": "77bc6cdf-b3a3-5859-b4ac-c948b21cba82",
+      "subjectId": "50fc921a-5307-541c-a3f8-c97bbbedcc9d",
+      "teacherIds": [
+        "bb02ef17-d9f7-59a8-b3b1-20fb6acda79d"
+      ],
+      "groupIds": [
+        "c3097b8d-9173-548a-8ae4-1adcc79e23dd",
+        "43d9c904-1e4a-534b-b18f-4598071f8c28"
+      ],
+      "roomType": "TD",
+      "durationSlots": 1,
+      "weeklyVolume": 2,
+      "teachingType": "TD"
+    },
+    {
+      "id": "6df9310f-a074-5b13-8548-fb3e2fb27cc0",
+      "subjectId": "daf1a51d-4d6e-5d0c-82d1-b41bf8c4cb3f",
+      "teacherIds": [
+        "0929fa73-4f97-50d6-b581-9fbc6588c57e"
+      ],
+      "groupIds": [
+        "c3097b8d-9173-548a-8ae4-1adcc79e23dd",
+        "d7f092bd-6901-54a4-9030-7cb1fe8ae0c5"
+      ],
+      "roomType": "TP",
+      "durationSlots": 4,
+      "weeklyVolume": 1,
+      "teachingType": "TP"
+    },
+    {
+      "id": "dc6e4cc4-a8ff-572d-bf53-1df8ea438fd3",
+      "subjectId": "4668550d-5be0-5fb5-9d80-e825cd5e7ef7",
+      "teacherIds": [
+        "b0dd778b-9537-58d9-aef3-102595498dcd"
+      ],
+      "groupIds": [
+        "29168c24-04b9-5d6c-a2fb-b761a1aa0a1d",
+        "6f1760fb-3e2e-536a-a373-db5b0b7e356b"
+      ],
+      "roomType": "INFO",
+      "durationSlots": 2,
+      "weeklyVolume": 2,
+      "teachingType": "PROJET"
+    },
+    {
+      "id": "ccec60c4-ca7a-5bd6-a211-7a67399ca812",
+      "subjectId": "3d6794fd-9c1a-51ef-9d55-0f9a05f22465",
+      "teacherIds": [
+        "d22f71df-d2e6-5025-acb7-9f8d37a81f8b"
+      ],
+      "groupIds": [
+        "bee32d97-20d9-526e-9960-b72fba16d95a"
+      ],
+      "roomType": "AMPHI",
+      "durationSlots": 2,
+      "weeklyVolume": 1,
+      "teachingType": "CM"
+    },
+    {
+      "id": "daa47fd6-d87b-5a2f-9541-ed764817ad5e",
+      "subjectId": "d12f238f-3cd9-5325-b6cf-772d69fdd116",
+      "teacherIds": [
+        "d22f71df-d2e6-5025-acb7-9f8d37a81f8b"
+      ],
+      "groupIds": [
+        "b3692fc4-1e43-5f77-9d63-d055cd0246e8",
+        "da105a32-7994-5f03-b160-691d0ca331af"
+      ],
+      "roomType": "TD",
+      "durationSlots": 3,
+      "weeklyVolume": 3,
+      "teachingType": "TD"
+    },
+    {
+      "id": "b9044b2b-97d8-51b0-8840-8eaa8a8aafc5",
+      "subjectId": "02eccefa-d678-5769-ae53-57ea583f39ee",
+      "teacherIds": [
+        "97a7a539-5a0b-5a57-a914-1633b46ed2a0"
+      ],
+      "groupIds": [
+        "39ba112a-6a6d-57a3-bd81-9d67a486fef7"
+      ],
+      "roomType": "TP",
+      "durationSlots": 3,
+      "weeklyVolume": 2,
+      "teachingType": "TP"
+    },
+    {
+      "id": "2ebf151e-4ebe-589f-8f37-fdd076fcd944",
+      "subjectId": "0f4fa242-08b8-581e-9113-55643f43cfb6",
+      "teacherIds": [
+        "27b6d0e5-8eb0-59ef-b966-557a8118a4aa"
+      ],
+      "groupIds": [
+        "da105a32-7994-5f03-b160-691d0ca331af",
+        "04933442-8942-5fd1-9e21-bfb6e42d3daa"
+      ],
+      "roomType": "INFO",
+      "durationSlots": 2,
+      "weeklyVolume": 1,
+      "teachingType": "PROJET"
+    },
+    {
+      "id": "b61c22e3-4eb2-5d0d-9920-04023fd240aa",
+      "subjectId": "5c3bc914-8b14-5b7c-b910-6d591ae9cd5b",
+      "teacherIds": [
+        "90e561d6-d6f7-5cfe-b7e7-4489f4730a0c"
+      ],
+      "groupIds": [
+        "bee32d97-20d9-526e-9960-b72fba16d95a",
+        "29168c24-04b9-5d6c-a2fb-b761a1aa0a1d"
+      ],
+      "roomType": "AMPHI",
+      "durationSlots": 4,
+      "weeklyVolume": 3,
+      "teachingType": "CM"
+    },
+    {
+      "id": "65b22d34-2338-516e-986c-a1ccf1273e00",
+      "subjectId": "bb06fe79-4c76-5c8e-9b2e-b8b6bdc7f565",
+      "teacherIds": [
+        "144a3547-cadf-567d-b8c1-49a635186003"
+      ],
+      "groupIds": [
+        "c93929cf-a9dd-556d-8e6e-fee2e836547f",
+        "b3692fc4-1e43-5f77-9d63-d055cd0246e8"
+      ],
+      "roomType": "TD",
+      "durationSlots": 4,
+      "weeklyVolume": 2,
+      "teachingType": "TD"
+    },
+    {
+      "id": "ba5853d0-1734-586e-ad09-e636fcfe4fb3",
+      "subjectId": "d71de516-1deb-5dc9-838b-71bc0db4f682",
+      "teacherIds": [
+        "04b90f9c-48c2-56c9-aa1b-7ff76b47048c"
+      ],
+      "groupIds": [
+        "d7f092bd-6901-54a4-9030-7cb1fe8ae0c5",
+        "da105a32-7994-5f03-b160-691d0ca331af"
+      ],
+      "roomType": "AMPHI",
+      "durationSlots": 2,
+      "weeklyVolume": 3,
+      "teachingType": "CM"
+    },
+    {
+      "id": "7e3ac23e-0c4f-5217-8c4c-2b1b2358269c",
+      "subjectId": "50fc921a-5307-541c-a3f8-c97bbbedcc9d",
+      "teacherIds": [
+        "bb02ef17-d9f7-59a8-b3b1-20fb6acda79d"
+      ],
+      "groupIds": [
+        "0bb26f61-a5a7-5b6d-b770-5b1e9215e7e3",
+        "39ba112a-6a6d-57a3-bd81-9d67a486fef7"
+      ],
+      "roomType": "TD",
+      "durationSlots": 2,
+      "weeklyVolume": 2,
+      "teachingType": "TD"
+    },
+    {
+      "id": "cfde1131-9ab0-5a28-a46f-d0440b806445",
+      "subjectId": "daf1a51d-4d6e-5d0c-82d1-b41bf8c4cb3f",
+      "teacherIds": [
+        "0929fa73-4f97-50d6-b581-9fbc6588c57e"
+      ],
+      "groupIds": [
+        "43d9c904-1e4a-534b-b18f-4598071f8c28",
+        "0107b0eb-8639-5f7b-b7b9-3a291b15fbe8"
+      ],
+      "roomType": "TP",
+      "durationSlots": 2,
+      "weeklyVolume": 1,
+      "teachingType": "TP"
+    },
+    {
+      "id": "04933196-3428-54d1-b813-a17cc3e4fa66",
+      "subjectId": "4668550d-5be0-5fb5-9d80-e825cd5e7ef7",
+      "teacherIds": [
+        "b0dd778b-9537-58d9-aef3-102595498dcd"
+      ],
+      "groupIds": [
+        "d9af08fd-6ea8-5c8f-84df-8bf887a5045c",
+        "bee32d97-20d9-526e-9960-b72fba16d95a"
+      ],
+      "roomType": "INFO",
+      "durationSlots": 2,
+      "weeklyVolume": 1,
+      "teachingType": "PROJET"
+    },
+    {
+      "id": "21cfe008-67f1-51ef-b2ab-af0a9e73579b",
+      "subjectId": "3d6794fd-9c1a-51ef-9d55-0f9a05f22465",
+      "teacherIds": [
+        "d22f71df-d2e6-5025-acb7-9f8d37a81f8b"
+      ],
+      "groupIds": [
+        "bee32d97-20d9-526e-9960-b72fba16d95a"
+      ],
+      "roomType": "AMPHI",
+      "durationSlots": 4,
+      "weeklyVolume": 3,
+      "teachingType": "CM"
+    },
+    {
+      "id": "b0cd6466-9a98-5c7e-b68d-be1b95b0e8b0",
+      "subjectId": "d12f238f-3cd9-5325-b6cf-772d69fdd116",
+      "teacherIds": [
+        "90e561d6-d6f7-5cfe-b7e7-4489f4730a0c"
+      ],
+      "groupIds": [
+        "29168c24-04b9-5d6c-a2fb-b761a1aa0a1d",
+        "63c6bdf9-f4e7-5375-8abe-c1eeba27f3c9"
+      ],
+      "roomType": "TD",
+      "durationSlots": 2,
+      "weeklyVolume": 3,
+      "teachingType": "TD"
+    },
+    {
+      "id": "7bb5e224-1ec0-5b86-9c2f-fb7fc0c7103d",
+      "subjectId": "02eccefa-d678-5769-ae53-57ea583f39ee",
+      "teacherIds": [
+        "97a7a539-5a0b-5a57-a914-1633b46ed2a0"
+      ],
+      "groupIds": [
+        "39ba112a-6a6d-57a3-bd81-9d67a486fef7"
+      ],
+      "roomType": "TP",
+      "durationSlots": 4,
+      "weeklyVolume": 2,
+      "teachingType": "TP"
+    },
+    {
+      "id": "c3a299e6-03e6-5c5c-8536-d83c54f3ea06",
+      "subjectId": "0f4fa242-08b8-581e-9113-55643f43cfb6",
+      "teacherIds": [
+        "27b6d0e5-8eb0-59ef-b966-557a8118a4aa"
+      ],
+      "groupIds": [
+        "8212a40f-f292-55f4-a3d6-5428be18d345",
+        "39ba112a-6a6d-57a3-bd81-9d67a486fef7"
+      ],
+      "roomType": "INFO",
+      "durationSlots": 1,
+      "weeklyVolume": 3,
+      "teachingType": "PROJET"
+    },
+    {
+      "id": "701cc36c-0263-5e53-91b2-8de10b02fd7c",
+      "subjectId": "5c3bc914-8b14-5b7c-b910-6d591ae9cd5b",
+      "teacherIds": [
+        "21a665fd-0cfa-5aa9-9fb6-ded23fa2d5bc"
+      ],
+      "groupIds": [
+        "9f6986a6-042d-54b2-838c-17e3277d40c9",
+        "43d9c904-1e4a-534b-b18f-4598071f8c28"
+      ],
+      "roomType": "AMPHI",
+      "durationSlots": 1,
+      "weeklyVolume": 1,
+      "teachingType": "CM"
+    },
+    {
+      "id": "29954974-c49b-5ab0-bea7-4b2a9bbf24e8",
+      "subjectId": "bb06fe79-4c76-5c8e-9b2e-b8b6bdc7f565",
+      "teacherIds": [
+        "59e6a5ca-bf61-58a2-8f64-c9bd7662ee82"
+      ],
+      "groupIds": [
+        "8212a40f-f292-55f4-a3d6-5428be18d345",
+        "0107b0eb-8639-5f7b-b7b9-3a291b15fbe8"
+      ],
+      "roomType": "TD",
+      "durationSlots": 2,
+      "weeklyVolume": 1,
+      "teachingType": "TD"
+    },
+    {
+      "id": "858e3e0d-7744-5db2-ac02-9d57b0551214",
+      "subjectId": "d71de516-1deb-5dc9-838b-71bc0db4f682",
+      "teacherIds": [
+        "04b90f9c-48c2-56c9-aa1b-7ff76b47048c"
+      ],
+      "groupIds": [
+        "9f6986a6-042d-54b2-838c-17e3277d40c9",
+        "6f1760fb-3e2e-536a-a373-db5b0b7e356b"
+      ],
+      "roomType": "AMPHI",
+      "durationSlots": 2,
+      "weeklyVolume": 2,
+      "teachingType": "CM"
+    },
+    {
+      "id": "79d9b53f-4395-5e0b-b8d3-06822c85fa6e",
+      "subjectId": "50fc921a-5307-541c-a3f8-c97bbbedcc9d",
+      "teacherIds": [
+        "bb02ef17-d9f7-59a8-b3b1-20fb6acda79d"
+      ],
+      "groupIds": [
+        "d7f092bd-6901-54a4-9030-7cb1fe8ae0c5",
+        "70fbc67f-f34c-5cbf-b7f1-a6419a071763"
+      ],
+      "roomType": "TD",
+      "durationSlots": 2,
+      "weeklyVolume": 3,
+      "teachingType": "TD"
+    },
+    {
+      "id": "d98fd501-db02-5e1c-8e80-c2940bc6a5ef",
+      "subjectId": "daf1a51d-4d6e-5d0c-82d1-b41bf8c4cb3f",
+      "teacherIds": [
+        "0929fa73-4f97-50d6-b581-9fbc6588c57e"
+      ],
+      "groupIds": [
+        "04933442-8942-5fd1-9e21-bfb6e42d3daa",
+        "d7f092bd-6901-54a4-9030-7cb1fe8ae0c5"
+      ],
+      "roomType": "TP",
+      "durationSlots": 1,
+      "weeklyVolume": 2,
+      "teachingType": "TP"
+    },
+    {
+      "id": "744f3aee-031b-5ef7-a184-1f33735b9121",
+      "subjectId": "4668550d-5be0-5fb5-9d80-e825cd5e7ef7",
+      "teacherIds": [
+        "b0dd778b-9537-58d9-aef3-102595498dcd"
+      ],
+      "groupIds": [
+        "9f6986a6-042d-54b2-838c-17e3277d40c9",
+        "70fbc67f-f34c-5cbf-b7f1-a6419a071763"
+      ],
+      "roomType": "INFO",
+      "durationSlots": 2,
+      "weeklyVolume": 2,
+      "teachingType": "PROJET"
+    },
+    {
+      "id": "418cf572-b7d8-59a6-b490-87e4d133defa",
+      "subjectId": "3d6794fd-9c1a-51ef-9d55-0f9a05f22465",
+      "teacherIds": [
+        "d22f71df-d2e6-5025-acb7-9f8d37a81f8b"
+      ],
+      "groupIds": [
+        "bee32d97-20d9-526e-9960-b72fba16d95a"
+      ],
+      "roomType": "AMPHI",
+      "durationSlots": 1,
+      "weeklyVolume": 2,
+      "teachingType": "CM"
+    },
+    {
+      "id": "7a74f9a8-5540-52ef-94bf-7a70014d5c09",
+      "subjectId": "d12f238f-3cd9-5325-b6cf-772d69fdd116",
+      "teacherIds": [
+        "0257ed4b-0468-5e55-89d4-5866881f3637"
+      ],
+      "groupIds": [
+        "0bb26f61-a5a7-5b6d-b770-5b1e9215e7e3",
+        "724b0950-c32c-5e61-acfb-9f7f8fa9d792"
+      ],
+      "roomType": "TD",
+      "durationSlots": 1,
+      "weeklyVolume": 1,
+      "teachingType": "TD"
+    },
+    {
+      "id": "486fc80b-c0f7-5069-9074-ceaa3c6eda6d",
+      "subjectId": "02eccefa-d678-5769-ae53-57ea583f39ee",
+      "teacherIds": [
+        "97a7a539-5a0b-5a57-a914-1633b46ed2a0"
+      ],
+      "groupIds": [
+        "39ba112a-6a6d-57a3-bd81-9d67a486fef7"
+      ],
+      "roomType": "TP",
+      "durationSlots": 1,
+      "weeklyVolume": 2,
+      "teachingType": "TP"
+    },
+    {
+      "id": "2df35295-43b7-5f15-b539-256eb1132814",
+      "subjectId": "0f4fa242-08b8-581e-9113-55643f43cfb6",
+      "teacherIds": [
+        "27b6d0e5-8eb0-59ef-b966-557a8118a4aa"
+      ],
+      "groupIds": [
+        "e062f3d0-8098-56d0-b741-eb1ee1257844",
+        "b3692fc4-1e43-5f77-9d63-d055cd0246e8"
+      ],
+      "roomType": "INFO",
+      "durationSlots": 1,
+      "weeklyVolume": 2,
+      "teachingType": "PROJET"
+    },
+    {
+      "id": "d484744f-3e82-5b34-8c60-8c9196694af4",
+      "subjectId": "5c3bc914-8b14-5b7c-b910-6d591ae9cd5b",
+      "teacherIds": [
+        "21a665fd-0cfa-5aa9-9fb6-ded23fa2d5bc"
+      ],
+      "groupIds": [
+        "b3692fc4-1e43-5f77-9d63-d055cd0246e8",
+        "e062f3d0-8098-56d0-b741-eb1ee1257844"
+      ],
+      "roomType": "AMPHI",
+      "durationSlots": 2,
+      "weeklyVolume": 2,
+      "teachingType": "CM"
+    },
+    {
+      "id": "7175056a-d327-53c9-af42-58b297702f37",
+      "subjectId": "bb06fe79-4c76-5c8e-9b2e-b8b6bdc7f565",
+      "teacherIds": [
+        "bb02ef17-d9f7-59a8-b3b1-20fb6acda79d"
+      ],
+      "groupIds": [
+        "6f1760fb-3e2e-536a-a373-db5b0b7e356b",
+        "8212a40f-f292-55f4-a3d6-5428be18d345"
+      ],
+      "roomType": "TD",
+      "durationSlots": 3,
+      "weeklyVolume": 1,
+      "teachingType": "TD"
+    },
+    {
+      "id": "15e12f54-9c0e-55f9-b2bc-17af96fc10dd",
+      "subjectId": "d71de516-1deb-5dc9-838b-71bc0db4f682",
+      "teacherIds": [
+        "04b90f9c-48c2-56c9-aa1b-7ff76b47048c"
+      ],
+      "groupIds": [
+        "d9af08fd-6ea8-5c8f-84df-8bf887a5045c",
+        "b3692fc4-1e43-5f77-9d63-d055cd0246e8"
+      ],
+      "roomType": "AMPHI",
+      "durationSlots": 2,
+      "weeklyVolume": 3,
+      "teachingType": "CM"
+    },
+    {
+      "id": "105ddede-ebf4-55fa-b18c-85d0577e50c2",
+      "subjectId": "50fc921a-5307-541c-a3f8-c97bbbedcc9d",
+      "teacherIds": [
+        "bb02ef17-d9f7-59a8-b3b1-20fb6acda79d"
+      ],
+      "groupIds": [
+        "bee32d97-20d9-526e-9960-b72fba16d95a",
+        "70fbc67f-f34c-5cbf-b7f1-a6419a071763"
+      ],
+      "roomType": "TD",
+      "durationSlots": 1,
+      "weeklyVolume": 2,
+      "teachingType": "TD"
+    },
+    {
+      "id": "ed04314b-2d63-5dde-aa6c-ba363d5ce424",
+      "subjectId": "daf1a51d-4d6e-5d0c-82d1-b41bf8c4cb3f",
+      "teacherIds": [
+        "0929fa73-4f97-50d6-b581-9fbc6588c57e"
+      ],
+      "groupIds": [
+        "da105a32-7994-5f03-b160-691d0ca331af",
+        "d7f092bd-6901-54a4-9030-7cb1fe8ae0c5"
+      ],
+      "roomType": "TP",
+      "durationSlots": 2,
+      "weeklyVolume": 2,
+      "teachingType": "TP"
+    },
+    {
+      "id": "54a3fb55-b854-5221-b4bc-9d9e3c31af10",
+      "subjectId": "4668550d-5be0-5fb5-9d80-e825cd5e7ef7",
+      "teacherIds": [
+        "b0dd778b-9537-58d9-aef3-102595498dcd"
+      ],
+      "groupIds": [
+        "8212a40f-f292-55f4-a3d6-5428be18d345",
+        "d9af08fd-6ea8-5c8f-84df-8bf887a5045c"
+      ],
+      "roomType": "INFO",
+      "durationSlots": 1,
+      "weeklyVolume": 3,
+      "teachingType": "PROJET"
+    },
+    {
+      "id": "f28a6997-1b69-5f4b-94e1-e9fc0cd83bd0",
+      "subjectId": "3d6794fd-9c1a-51ef-9d55-0f9a05f22465",
+      "teacherIds": [
+        "d22f71df-d2e6-5025-acb7-9f8d37a81f8b"
+      ],
+      "groupIds": [
+        "bee32d97-20d9-526e-9960-b72fba16d95a"
+      ],
+      "roomType": "AMPHI",
+      "durationSlots": 2,
+      "weeklyVolume": 1,
+      "teachingType": "CM"
+    },
+    {
+      "id": "27d77e6a-1195-562f-a063-bb47a11b9b24",
+      "subjectId": "d12f238f-3cd9-5325-b6cf-772d69fdd116",
+      "teacherIds": [
+        "103730fd-3ebb-52f8-aca8-8d6fbda72417"
+      ],
+      "groupIds": [
+        "70fbc67f-f34c-5cbf-b7f1-a6419a071763",
+        "e062f3d0-8098-56d0-b741-eb1ee1257844"
+      ],
+      "roomType": "TD",
+      "durationSlots": 2,
+      "weeklyVolume": 2,
+      "teachingType": "TD"
+    },
+    {
+      "id": "d1484743-74d3-5424-a5e6-6caed46d8986",
+      "subjectId": "02eccefa-d678-5769-ae53-57ea583f39ee",
+      "teacherIds": [
+        "6bb8a19d-cf1a-5cb9-97d2-4c950cd24730"
+      ],
+      "groupIds": [
+        "39ba112a-6a6d-57a3-bd81-9d67a486fef7"
+      ],
+      "roomType": "TP",
+      "durationSlots": 3,
+      "weeklyVolume": 1,
+      "teachingType": "TP"
+    },
+    {
+      "id": "f0a50839-8274-5d33-859a-e71627f207a6",
+      "subjectId": "0f4fa242-08b8-581e-9113-55643f43cfb6",
+      "teacherIds": [
+        "27b6d0e5-8eb0-59ef-b966-557a8118a4aa"
+      ],
+      "groupIds": [
+        "d9af08fd-6ea8-5c8f-84df-8bf887a5045c",
+        "70fbc67f-f34c-5cbf-b7f1-a6419a071763"
+      ],
+      "roomType": "INFO",
+      "durationSlots": 2,
+      "weeklyVolume": 3,
+      "teachingType": "PROJET"
+    },
+    {
+      "id": "e48612a4-700d-5942-8a43-65dfca8e47e3",
+      "subjectId": "5c3bc914-8b14-5b7c-b910-6d591ae9cd5b",
+      "teacherIds": [
+        "21a665fd-0cfa-5aa9-9fb6-ded23fa2d5bc"
+      ],
+      "groupIds": [
+        "bee32d97-20d9-526e-9960-b72fba16d95a",
+        "c3097b8d-9173-548a-8ae4-1adcc79e23dd"
+      ],
+      "roomType": "AMPHI",
+      "durationSlots": 2,
+      "weeklyVolume": 2,
+      "teachingType": "CM"
+    },
+    {
+      "id": "0922c719-75ab-5fc7-bd5a-098d921483ae",
+      "subjectId": "bb06fe79-4c76-5c8e-9b2e-b8b6bdc7f565",
+      "teacherIds": [
+        "f00203c7-8f07-5f89-bffe-ccf0b2c840b7"
+      ],
+      "groupIds": [
+        "d7f092bd-6901-54a4-9030-7cb1fe8ae0c5",
+        "63c6bdf9-f4e7-5375-8abe-c1eeba27f3c9"
+      ],
+      "roomType": "TD",
+      "durationSlots": 2,
+      "weeklyVolume": 1,
+      "teachingType": "TD"
+    }
+  ],
+  "constraints": [
+    {
+      "id": "a7f7112d-e36b-5851-8310-4020035aa891",
+      "type": "UNAVAILABILITY",
+      "category": "HARD",
+      "scope": "TEACHER",
+      "targetId": "17cd2257-75c4-5695-845d-464c91043679",
+      "value": "{\"day\": 2, \"slots\": [15, 20]}",
+      "weight": 100,
+      "isActive": true,
+      "source": "AUTO",
+      "createdBy": "922d3a67-53f1-532a-bf61-16dd1f47d215",
+      "createdAt": "2026-11-20T00:00:00Z"
+    },
+    {
+      "id": "c2045868-0cfb-5ecf-890b-ed0d693e553a",
+      "type": "UNAVAILABILITY",
+      "category": "HARD",
+      "scope": "TEACHER",
+      "targetId": "9458a2d3-f6b5-5898-9537-7c602fc35956",
+      "value": "{\"day\": 4, \"slots\": [3, 15, 16]}",
+      "weight": 100,
+      "isActive": true,
+      "source": "AUTO",
+      "createdBy": "325fdc68-3b14-5426-88ec-43d3aff1f7ca",
+      "createdAt": "2026-11-20T00:00:00Z"
+    },
+    {
+      "id": "91af26bd-43fc-50ad-9046-af07199a0a9e",
+      "type": "UNAVAILABILITY",
+      "category": "HARD",
+      "scope": "TEACHER",
+      "targetId": "3261aaaa-6188-569d-9cd1-c5afd651e0a8",
+      "value": "{\"day\": 4, \"slots\": [9, 14, 17]}",
+      "weight": 100,
+      "isActive": true,
+      "source": "AUTO",
+      "createdBy": "491cf5f0-b72f-5286-ae56-5c2ad18e3382",
+      "createdAt": "2026-11-20T00:00:00Z"
+    },
+    {
+      "id": "066c9331-2dfb-5147-ab4e-ea58af2d15af",
+      "type": "UNAVAILABILITY",
+      "category": "HARD",
+      "scope": "TEACHER",
+      "targetId": "db1bb639-63b8-52ef-bafc-ae9033392229",
+      "value": "{\"day\": 3, \"slots\": [6, 18, 19]}",
+      "weight": 100,
+      "isActive": true,
+      "source": "AUTO",
+      "createdBy": "4928e58c-ecce-52e8-9df1-c16173c9e484",
+      "createdAt": "2026-11-20T00:00:00Z"
+    },
+    {
+      "id": "66c3a346-96a2-5848-9dcb-c748c2f54273",
+      "type": "UNAVAILABILITY",
+      "category": "HARD",
+      "scope": "TEACHER",
+      "targetId": "bbc98f57-460f-5765-bead-ba808174851a",
+      "value": "{\"day\": 2, \"slots\": [9]}",
+      "weight": 100,
+      "isActive": true,
+      "source": "AUTO",
+      "createdBy": "6b36e66d-27fe-5953-b061-06c63cf707b9",
+      "createdAt": "2026-11-20T00:00:00Z"
+    },
+    {
+      "id": "b453b255-4b2a-5dd9-b34a-7151a9d89d50",
+      "type": "TEACHER_PREFERENCE",
+      "category": "SOFT",
+      "scope": "TEACHER",
+      "targetId": "17cd2257-75c4-5695-845d-464c91043679",
+      "value": "{\"day\": 2, \"slot\": 1}",
+      "weight": 43,
+      "isActive": true,
+      "source": "MANUAL",
+      "createdBy": "03f860f9-8989-51a7-bed0-6d358187b72c",
+      "createdAt": "2026-11-20T00:00:00Z"
+    },
+    {
+      "id": "768ea1c3-e052-5db5-93df-29d9176108e7",
+      "type": "TEACHER_PREFERENCE",
+      "category": "SOFT",
+      "scope": "TEACHER",
+      "targetId": "596ca3ed-83c6-53c2-8ab5-377d2d2c4067",
+      "value": "{\"day\": 5, \"slot\": 11}",
+      "weight": 60,
+      "isActive": true,
+      "source": "MANUAL",
+      "createdBy": "5a2eac2a-ab31-5e84-8431-190d088c96a4",
+      "createdAt": "2026-11-20T00:00:00Z"
+    }
+  ],
+  "locks": []
+}

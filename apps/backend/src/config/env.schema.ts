@@ -40,6 +40,9 @@ export const EnvSchema = z.object({
   // -- Fichiers --------------------------------------------------------------
   DERIVED_DIR: z.string().min(1).default('/tmp/derived'),
   SCENARIOS_DIR: z.string().min(1).default('/tmp/scenarios'),
+
+  // -- pg-boss (file de jobs PostgreSQL) --------------------------------------
+  PGBOSS_DATABASE_URL: z.string().min(1, 'URL de connexion pg-boss absente'),
 });
 
 /** Configuration applicative validée, telle qu'exposée par `ConfigService`. */
@@ -82,6 +85,11 @@ function classerAnomalies(issues: z.ZodIssue[]): AnomalieEnvironnement {
  *   explicite listant les variables manquantes »).
  */
 export function validateEnv(config: Record<string, unknown>): EnvConfig {
+  // Fallback : PGBOSS_DATABASE_URL réutilise DATABASE_URL si absent,
+  // cohérent avec le fallback déjà appliqué dans boss-queue.service.ts.
+  if (!config.PGBOSS_DATABASE_URL && config.DATABASE_URL) {
+    config = { ...config, PGBOSS_DATABASE_URL: config.DATABASE_URL };
+  }
   const resultat = EnvSchema.safeParse(config);
 
   if (!resultat.success) {

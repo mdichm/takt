@@ -875,6 +875,12 @@ export const zConfigSysteme = z.object({
     .number()
     .int()
     .positive('Le nombre de créneaux par jour doit être supérieur à 0'),
+  seuilVerrouillageGeneration: z
+    .number()
+    .int()
+    .min(1, 'Le seuil de verrouillage doit être compris entre 1 et 100')
+    .max(100, 'Le seuil de verrouillage doit être compris entre 1 et 100'),
+  avertissementVerrouillageBloquant: z.boolean(),
   createdAt: zDateIso,
   updatedAt: zDateIso,
 });
@@ -895,6 +901,13 @@ export const zConfigSystemeCreate = z.object({
     .int()
     .positive('Le nombre de créneaux par jour doit être supérieur à 0')
     .default(24),
+  seuilVerrouillageGeneration: z
+    .number()
+    .int()
+    .min(1, 'Le seuil de verrouillage doit être compris entre 1 et 100')
+    .max(100, 'Le seuil de verrouillage doit être compris entre 1 et 100')
+    .default(75),
+  avertissementVerrouillageBloquant: z.boolean().default(true),
 });
 
 /** Données de modification des paramètres système. */
@@ -913,6 +926,13 @@ export const zConfigSystemeUpdate = z.object({
     .int()
     .positive('Le nombre de créneaux par jour doit être supérieur à 0')
     .optional(),
+  seuilVerrouillageGeneration: z
+    .number()
+    .int()
+    .min(1, 'Le seuil de verrouillage doit être compris entre 1 et 100')
+    .max(100, 'Le seuil de verrouillage doit être compris entre 1 et 100')
+    .optional(),
+  avertissementVerrouillageBloquant: z.boolean().optional(),
 });
 
 export type ConfigSysteme = z.infer<typeof zConfigSysteme>;

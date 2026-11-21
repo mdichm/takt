@@ -118,13 +118,25 @@ Définir le contrat d'interface entre l'application TAKT (base métier) et le so
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["id", "code", "name", "departmentId", "maxHoursPerWeek"],
+        "required": ["id", "code", "name", "departmentId", "maxHoursPerWeek", "unavailableSlots"],
         "properties": {
           "id": { "type": "string", "format": "uuid" },
           "code": { "type": "string" },
           "name": { "type": "string" },
           "departmentId": { "type": "string", "format": "uuid" },
-          "maxHoursPerWeek": { "type": "integer", "minimum": 0 }
+          "maxHoursPerWeek": { "type": "integer", "minimum": 0 },
+          "unavailableSlots": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["day", "slots"],
+              "properties": {
+                "day": { "type": "integer", "minimum": 0, "maximum": 6 },
+                "slots": { "type": "array", "items": { "type": "integer" } },
+                "allDay": { "type": "boolean" }
+              }
+            }
+          }
         }
       }
     },
@@ -240,12 +252,13 @@ Définir le contrat d'interface entre l'application TAKT (base métier) et le so
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["id", "activityId", "lockType", "value"],
+        "required": ["id", "activityId", "lockType", "value", "poids"],
         "properties": {
           "id": { "type": "string", "format": "uuid" },
           "activityId": { "type": "string", "format": "uuid" },
           "lockType": { "type": "string", "enum": ["TIMESLOT", "ROOM", "TEACHER", "ACTIVITY"] },
-          "value": { "type": "string" }
+          "value": { "type": "string" },
+          "poids": { "type": "integer", "minimum": 1, "maximum": 100 }
         }
       }
     }
@@ -321,7 +334,8 @@ Définir le contrat d'interface entre l'application TAKT (base métier) et le so
       "id": "l1",
       "activityId": "a1",
       "lockType": "ROOM",
-      "value": "r2"
+      "value": "r2",
+      "poids": 100
     }
   ]
 }
