@@ -8,9 +8,11 @@ import { PreconditionsService } from './preconditions.service';
 import { ConfigSystemeService } from '../../referentiels/config-systeme/config-systeme.service';
 import {
   GARDE_COUVERTURE,
-  IGardeCouverture,
 } from '../../common/di/garde-couverture.token';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import type { IGardeCouverture } from '../../common/di/garde-couverture.token';
 import { CODES_ERREUR_API } from '../../common/http/api-error';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type { PrismaClient } from '@takt/db';
 import { TypeVerrou } from '@takt/db';
 
