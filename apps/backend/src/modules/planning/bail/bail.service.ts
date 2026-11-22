@@ -6,7 +6,6 @@ import { PRISMA } from '../../common/di/prisma.token';
 import { PrismaClient, Prisma } from '@takt/db';
 import { CODES_ERREUR_API, ApiError } from '../../common/http/api-error';
 
-const DUREE_BAIL_MS = 30 * 60 * 1000; // 30 minutes
 const PURGE_INTERVALLE_MS = 5 * 60 * 1000; // 5 minutes
 
 interface Detenteur {
@@ -78,6 +77,7 @@ export class BailService implements OnModuleInit, OnModuleDestroy {
     await this.verifierVersionExiste(versionId);
 
     const maintenant = new Date();
+    const dureeBailMs = await this.getDureeBailMs();
 
     // Purge idempotente des baux expirés sur cette version avant tentative de création.
     await this.prisma.bailEdition.deleteMany({
@@ -90,7 +90,7 @@ export class BailService implements OnModuleInit, OnModuleDestroy {
           versionId,
           utilisateurId,
           dateDebut: maintenant,
-          dateFin: new Date(maintenant.getTime() + DUREE_BAIL_MS),
+          dateFin: new Date(maintenant.getTime() + dureeBailMs),
           derniereActivite: maintenant,
         },
         include: { utilisateur: { select: { nom: true, prenom: true } } },
@@ -160,7 +160,8 @@ export class BailService implements OnModuleInit, OnModuleDestroy {
       );
     }
 
-    const dateFin = new Date(maintenant.getTime() + DUREE_BAIL_MS);
+    const dureeBailMs = await this.getDureeBailMs();
+    const dateFin = new Date(maintenant.getTime() + dureeBailMs);
     const misAJour = await this.prisma.bailEdition.update({
       where: { id: bailAvecDetenteur.id },
       data: { dateFin, derniereActivite: maintenant },
@@ -290,6 +291,12 @@ export class BailService implements OnModuleInit, OnModuleDestroy {
   /* ------------------------------------------------------------------ */
   /* Privés                                                             */
   /* ------------------------------------------------------------------ */
+
+  private async getDureeBailMs(): Promise<number> {
+    const config = await this.prisma.configSysteme.findFirst();
+    const minutes = config?.bailEditionDureeMinutes ?? 30;
+    return minutes * 60 * 1000;
+  }
 
   private async verifierVersionExiste(versionId: string): Promise<void> {
     const version = await this.prisma.version.findUnique({

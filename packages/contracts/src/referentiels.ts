@@ -20,6 +20,8 @@ export const zRole = z.object({
   libelle: z.string().trim().min(1, 'Le libellé est requis'),
 });
 
+export type Role = z.infer<typeof zRole>;
+
 /** Département de rattachement. */
 export const zDepartement = z.object({
   id: zUuid,
@@ -881,6 +883,12 @@ export const zConfigSysteme = z.object({
     .min(1, 'Le seuil de verrouillage doit être compris entre 1 et 100')
     .max(100, 'Le seuil de verrouillage doit être compris entre 1 et 100'),
   avertissementVerrouillageBloquant: z.boolean(),
+  // Durée d’un bail d’édition (minutes) — TAKT-L09-04
+  bailEditionDureeMinutes: z
+    .number()
+    .int()
+    .min(5, 'La durée de bail doit être comprise entre 5 et 240 minutes')
+    .max(240, 'La durée de bail doit être comprise entre 5 et 240 minutes'),
   createdAt: zDateIso,
   updatedAt: zDateIso,
 });
@@ -933,6 +941,13 @@ export const zConfigSystemeUpdate = z.object({
     .max(100, 'Le seuil de verrouillage doit être compris entre 1 et 100')
     .optional(),
   avertissementVerrouillageBloquant: z.boolean().optional(),
+  // Durée d’un bail d’édition (minutes) — TAKT-L09-04 (borné 5-240)
+  bailEditionDureeMinutes: z
+    .number()
+    .int()
+    .min(5, 'La durée de bail doit être comprise entre 5 et 240 minutes')
+    .max(240, 'La durée de bail doit être comprise entre 5 et 240 minutes')
+    .optional(),
 });
 
 export type ConfigSysteme = z.infer<typeof zConfigSysteme>;

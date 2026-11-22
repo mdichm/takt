@@ -890,6 +890,8 @@ model ConfigSysteme {
   // Valeur canonique 75% arbitrée en L00-02 ; alias SPEC_CONTRAINTES_GENERATION §8.2 : seuil_verrouillage_risque_pct.
   seuilVerrouillageGeneration   Int      @default(75) // % max de séances verrouillées avant avertissement (borné 1-100)
   avertissementVerrouillageBloquant Boolean @default(true) // l'avertissement de taux élevé bloque-t-il le lancement ?
+  // Durée par défaut d’un bail d’édition (minutes) — TAKT-L09-04 (borné 5-240 au niveau applicatif)
+  bailEditionDureeMinutes         Int      @default(30)
   createdAt                     DateTime @default(now())
   updatedAt                     DateTime @updatedAt
 }
