@@ -13,26 +13,26 @@ describe('Tabs', () => {
   ];
 
   it('rend le tablist et les onglets', () => {
-    render(<Tabs onglets={onglets} valeur="a" onChange={() => {}} />);
+    render(<Tabs onglets={onglets} valeur="a" onChange={() => {}} panels={[]} />);
     expect(screen.getByRole('tablist')).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: 'Onglet A' })).toBeInTheDocument();
   });
 
   it("marque l'onglet actif avec aria-selected", () => {
-    render(<Tabs onglets={onglets} valeur="b" onChange={() => {}} />);
+    render(<Tabs onglets={onglets} valeur="b" onChange={() => {}} panels={[]} />);
     expect(screen.getByRole('tab', { name: 'Onglet B' })).toHaveAttribute('aria-selected', 'true');
     expect(screen.getByRole('tab', { name: 'Onglet A' })).toHaveAttribute('aria-selected', 'false');
   });
 
   it('appelle onChange quand on clique sur un onglet', () => {
     const onChange = vi.fn();
-    render(<Tabs onglets={onglets} valeur="a" onChange={onChange} />);
+    render(<Tabs onglets={onglets} valeur="a" onChange={onChange} panels={[]} />);
     fireEvent.click(screen.getByRole('tab', { name: 'Onglet C' }));
     expect(onChange).toHaveBeenCalledWith('c');
   });
 
   it("navigue vers l'onglet suivant avec la fleche droite", () => {
-    render(<Tabs onglets={onglets} valeur="a" onChange={() => {}} />);
+    render(<Tabs onglets={onglets} valeur="a" onChange={() => {}} panels={[]} />);
     const tabA = screen.getByRole('tab', { name: 'Onglet A' });
     fireEvent.keyDown(tabA, { key: 'ArrowRight' });
     expect(screen.getByRole('tab', { name: 'Onglet B' })).toHaveAttribute('tabindex', '0');

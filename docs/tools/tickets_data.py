@@ -627,7 +627,7 @@ TICKETS: List[Ticket] = [
         lot="L09",
         titre="Écrans `EC-ADM-01` à `EC-ADM-04` Administration",
         sp=13,
-        status="En cours",
+        status="Terminé",
         deps=['TAKT-L04-06', 'TAKT-L11-01'],
         exigences=['EC-ADM-01…EC-ADM-04', 'IX-ADM-01…IX-ADM-08.'],
     ),

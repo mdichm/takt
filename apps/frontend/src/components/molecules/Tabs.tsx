@@ -16,10 +16,12 @@ interface TabsProps extends PropsBase {
   readonly valeur: string;
   /** Gestionnaire de changement d'onglet. */
   readonly onChange: (id: string) => void;
+  /** Contenu de chaque panneau (dans le même ordre que les onglets). */
+  readonly panels?: readonly React.ReactNode[];
 }
 
 /** Onglets accessibles : roving tabindex, navigation aux flèches gauche/droite. */
-export function Tabs({ onglets, valeur, onChange, className }: TabsProps): JSX.Element {
+export function Tabs({ onglets, valeur, onChange, panels, className }: TabsProps): JSX.Element {
   const [indexActive, setIndexActive] = useState(onglets.findIndex((o) => o.id === valeur));
 
   const activerOnglet = useCallback(
@@ -114,7 +116,9 @@ export function Tabs({ onglets, valeur, onChange, className }: TabsProps): JSX.E
             tabIndex={0}
             hidden={index !== indexActive}
             style={{ display: index === indexActive ? 'block' : 'none' }}
-          />
+          >
+            {panels?.[index]}
+          </div>
         );
       })}
     </div>

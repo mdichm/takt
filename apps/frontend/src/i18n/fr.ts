@@ -316,7 +316,111 @@ export const DICTIONNAIRE_FR = {
       consequence: 'Toutes vos sessions actives seront révoquées : vous devrez vous reconnecter.',
       actuelInvalide: 'Le mot de passe actuel est incorrect.',
       modifie: 'Mot de passe modifié avec succès.',
-    }}
+    },
+  },
+  // Administration (EC-ADM-01 à EC-ADM-04, TAKT-L09-04)
+  admin: {
+    titre: 'Administration',
+    sousTitre: 'Gestion des utilisateurs, référentiels, paramètres et journal d’audit.',
+    bouton: {
+      reactiver: 'Réactiver',
+      desactiver: 'Désactiver',
+      exporter: 'Exporter CSV',
+      rechercher: 'Rechercher',
+      enregistrer: 'Enregistrer',
+    },
+    libelle: {
+      actif: 'Actif',
+      inactif: 'Inactif',
+    },
+    // EC-ADM-01 Utilisateurs
+    utilisateurs: {
+      titre: 'Utilisateurs',
+      sousTitre: 'Créez, modifiez et désactivez les comptes utilisateurs.',
+      champ: {
+        email: 'E-mail',
+        nom: 'Nom',
+        prenom: 'Prénom',
+        role: 'Rôle',
+        departement: 'Département',
+        motDePasse: 'Mot de passe',
+        estActif: 'Compte actif',
+      },
+      bouton: {
+        ajouter: 'Ajouter un utilisateur',
+        modifier: 'Modifier',
+        desactiver: 'Désactiver',
+        reactiver: 'Réactiver',
+      },
+      message: {
+        creationSucces: 'Utilisateur créé avec succès.',
+        modificationSucces: 'Utilisateur modifié avec succès.',
+        desactivationSucces: 'Utilisateur désactivé.',
+        reactivationSucces: 'Utilisateur réactivé.',
+      },
+      confirmation: {
+        desactivation: 'Désactiver ce compte ? L’utilisateur ne pourra plus se connecter.',
+        reactivation: 'Réactiver ce compte ? L’utilisateur pourra de nouveau se connecter.',
+      },
+    },
+    // EC-ADM-02 Référentiels
+    referentiels: {
+      titre: 'Référentiels',
+      sousTitre: 'Gérez les données de référence de l’application.',
+    },
+    // EC-ADM-03 Paramètres
+    parametres: {
+      titre: 'Paramètres système',
+      sousTitre: 'Configurez le fonctionnement global de TAKT.',
+      section: {
+        temps: 'Temps',
+        joursOuvres: 'Jours ouvrés',
+        seuils: 'Seuils',
+        bail: 'Bail d’édition',
+      },
+      champ: {
+        pasDeTempsMinutes: 'Pas de temps (minutes)',
+        joursOuvres: 'Jours ouvrés',
+        creneauxParJour: 'Créneaux par jour',
+        seuilVerrouillageGeneration: 'Seuil de verrouillage de génération (%)',
+        avertissementVerrouillageBloquant: 'Avertissement de verrouillage bloquant',
+        bailEditionDureeMinutes: 'Durée du bail d’édition (minutes)',
+      },
+      bouton: {
+        enregistrer: 'Enregistrer les paramètres',
+      },
+      message: {
+        modificationSucces: 'Paramètres système modifiés avec succès.',
+      },
+    },
+    // EC-ADM-04 Audit
+    audit: {
+      titre: 'Journal d’audit',
+      sousTitre: 'Consultez et exportez l’historique des mutations métier.',
+      champ: {
+        action: 'Action',
+        entite: 'Entité',
+        utilisateur: 'Utilisateur',
+        dateFrom: 'Du',
+        dateTo: 'Au',
+      },
+      bouton: {
+        exporter: 'Exporter CSV',
+        rechercher: 'Rechercher',
+      },
+      colonne: {
+        horodatage: 'Horodatage',
+        action: 'Action',
+        entite: 'Entité',
+        entiteId: 'Identifiant entité',
+        utilisateur: 'Utilisateur',
+        metadonnees: 'Métadonnées',
+      },
+      etat: {
+        vide: 'Aucune entrée d’audit.',
+      },
+    },
+  }
 } as const;
 
 export type CleDictionnaire = keyof typeof DICTIONNAIRE_FR;

@@ -41,6 +41,7 @@ export function ReferentielManager<T>({ configuration }: ReferentielManagerProps
   const dictBouton = traduction('bouton') as (typeof DICTIONNAIRE_FR)['bouton'];
   const dictReferentiel = traduction('referentiel') as (typeof DICTIONNAIRE_FR)['referentiel'];
   const dictAlerte = traduction('alerte') as (typeof DICTIONNAIRE_FR)['alerte'];
+  const dictAdmin = traduction('admin') as (typeof DICTIONNAIRE_FR)['admin'];
 
   const [page, setPage] = useState(1);
   const [pageSize] = useState(20);
@@ -150,6 +151,24 @@ export function ReferentielManager<T>({ configuration }: ReferentielManagerProps
     },
   });
 
+  // Réactivation d’un item inactif (PATCH { estActif: true }) — EC-ADM-01
+  const mutationReactivation = useMutation({
+    mutationFn: async (id: string) => {
+      const reponse = await api.patch(`${configuration.endpoint}/${id}`, { estActif: true }, {
+        schema: configuration.schemaModification,
+      });
+      return reponse.data;
+    },
+    onSuccess: async () => {
+      setMessageSucces('Réactivation effectuée.');
+      await refetchListe();
+      configuration.surReactivation?.();
+    },
+    onError: (erreur: unknown) => {
+      setErreurMetier(messageErreurApi(erreur));
+    },
+  });
+
   // ------------------------------------------------------------------
   // Handlers
   // ------------------------------------------------------------------
@@ -198,7 +217,7 @@ export function ReferentielManager<T>({ configuration }: ReferentielManagerProps
   const defaultValuesFormulaire = useMemo(() => {
     if (mode === 'creation') {
       return Object.fromEntries(
-        configuration.champsFormulaire.map((champ) => [
+        (configuration.champsFormulaire ?? []).map((champ) => [
           champ.cle,
           champ.type === 'boolean' ? false : '',
         ]),
@@ -229,6 +248,8 @@ export function ReferentielManager<T>({ configuration }: ReferentielManagerProps
   const actionsLigne = useCallback(
     (item: T) => {
       const idItem = idDe(item, cleId);
+      const estInactif = (item as Record<string, unknown>).estActif === false;
+      const estSupprimable = configuration.suppressionPossible?.(item) !== false;
       return (
         <>
           <Bouton
@@ -238,17 +259,31 @@ export function ReferentielManager<T>({ configuration }: ReferentielManagerProps
             libelle={dictBouton.modifier}
             onClick={() => ouvrirModification(item)}
           />
-          <Bouton
-            key={`supprimer-${idItem}`}
-            variante="danger"
-            taille="petite"
-            libelle={dictBouton.supprimer}
-            onClick={() => demanderSuppression(item)}
-          />
+          {estSupprimable && (
+            <Bouton
+              key={`supprimer-${idItem}`}
+              variante="danger"
+              taille="petite"
+              libelle={dictBouton.supprimer}
+              onClick={() => demanderSuppression(item)}
+            />
+          )}
+          {configuration.surReactivation && estInactif && (
+            <Bouton
+              key={`reactiver-${idItem}`}
+              variante="contour"
+              taille="petite"
+              libelle={dictAdmin.bouton.reactiver}
+              onClick={() => void mutationReactivation.mutateAsync(idItem)}
+              disabled={mutationReactivation.isPending}
+            />
+          )}
+          {configuration.actionsSupplementaires?.(item)}
         </>
       );
     },
-    [cleId, dictBouton, ouvrirModification, demanderSuppression],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [cleId, dictBouton, ouvrirModification, demanderSuppression, mutationReactivation, configuration.suppressionPossible, configuration.surReactivation, configuration.actionsSupplementaires],
   );
 
   // ------------------------------------------------------------------
@@ -340,7 +375,22 @@ export function ReferentielManager<T>({ configuration }: ReferentielManagerProps
         ariaLabel={`Liste des ${configuration.libelle.toLowerCase()}` as string | undefined}
       />
 
-      {modaleOuverte && (
+      {modaleOuverte && configuration.composantFormulaire ? (
+        <Modal
+          ouvert={true}
+          titre={titreModal}
+          onFermer={fermerModale}
+          onValider={() => void gererSoumission({})}
+        >
+          <configuration.composantFormulaire
+            defaultValues={defaultValuesFormulaire}
+            chargement={mutationCreation.isPending || mutationModification.isPending}
+            mode={mode}
+            erreur={erreurMetier}
+            surSoumettre={gererSoumission}
+          />
+        </Modal>
+      ) : modaleOuverte ? (
         <Modal
           ouvert={true}
           titre={titreModal}
@@ -348,7 +398,7 @@ export function ReferentielManager<T>({ configuration }: ReferentielManagerProps
           onValider={() => void gererSoumission({})}
         >
           <FormulaireReferentiel
-            champs={configuration.champsFormulaire}
+            champs={configuration.champsFormulaire ?? []}
             schema={
               mode === 'creation' ? configuration.schemaCreation : configuration.schemaModification
             }
@@ -359,7 +409,7 @@ export function ReferentielManager<T>({ configuration }: ReferentielManagerProps
             surSoumettre={gererSoumission}
           />
         </Modal>
-      )}
+      ) : null}
 
       {idASupprimer && (
         <ConfirmationSuppression

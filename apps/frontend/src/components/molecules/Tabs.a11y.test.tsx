@@ -16,6 +16,7 @@ describe('Tabs — accessibilité', () => {
         ]}
         valeur="a"
         onChange={() => {}}
+        panels={[]}
       />,
     );
     await expectAccessible(container.firstElementChild as HTMLElement | null);
