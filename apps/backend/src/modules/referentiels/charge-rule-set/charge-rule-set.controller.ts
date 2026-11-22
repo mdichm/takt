@@ -65,6 +65,18 @@ export class ChargeRuleSetController {
     return this.chargeRuleSetService.list(query);
   }
 
+  /** Récupère la règle de charge active. */
+  @Get('actif')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Règle de charge active' })
+  @ApiResponse({ status: 200, description: 'Règle de charge active' })
+  @ApiResponse({ status: 404, description: 'Aucune règle de charge active' })
+  async getActif(): Promise<unknown> {
+    return this.chargeRuleSetService.getActif();
+  }
+
   /** Récupère une règle de charge par son ID. */
   @Get(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -77,18 +89,6 @@ export class ChargeRuleSetController {
   @ApiResponse({ status: 404, description: 'Règle de charge introuvable' })
   async getOne(@Param() params: { id: string }): Promise<unknown> {
     return this.chargeRuleSetService.getOne(params.id);
-  }
-
-  /** Récupère la règle de charge active. */
-  @Get('actif')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('admin')
-  @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Règle de charge active' })
-  @ApiResponse({ status: 200, description: 'Règle de charge active' })
-  @ApiResponse({ status: 404, description: 'Aucune règle de charge active' })
-  async getActif(): Promise<unknown> {
-    return this.chargeRuleSetService.getActif();
   }
 
   /** Crée une règle de charge. */
