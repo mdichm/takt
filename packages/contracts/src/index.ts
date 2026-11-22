@@ -7,6 +7,7 @@
  */
 
 export * from './affectations';
+export * from './audit';
 export * from './auth';
 export * from './bail';
 export * from './common';

@@ -158,9 +158,11 @@ export const zAudit = z
       .default(20),
     action: z.string().trim().min(1).optional(),
     entite: z.string().trim().min(1).optional(),
+    entiteId: z.string().trim().min(1).optional(),
     utilisateurId: zUuid.optional(),
     dateDebut: zDateIso.optional(),
     dateFin: zDateIso.optional(),
+    search: z.string().trim().min(1).optional(),
   })
   .refine(
     (valeurs) =>

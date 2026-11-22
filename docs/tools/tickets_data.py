@@ -780,8 +780,8 @@ TICKETS: List[Ticket] = [
         lot="L11",
         titre="Fournir la consultation et l'export du journal d'audit et de sécurité",
         sp=6,
-        status="À faire",
-        deps=['TAKT-L03-06', 'TAKT-L10-06', 'TAKT-L09-04'],
+        status="Terminé",
+        deps=['TAKT-L03-06', 'TAKT-L10-06'],
         exigences=['EC-ADM-04', 'IX-ADM-07', 'IX-ADM-08', 'EX-DAT-05', 'TE-SEC-05.'],
     ),
     Ticket(
