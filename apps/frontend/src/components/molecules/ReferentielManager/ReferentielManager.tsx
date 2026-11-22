@@ -282,7 +282,6 @@ export function ReferentielManager<T>({ configuration }: ReferentielManagerProps
         </>
       );
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [cleId, dictBouton, ouvrirModification, demanderSuppression, mutationReactivation, configuration.suppressionPossible, configuration.surReactivation, configuration.actionsSupplementaires],
   );
 
