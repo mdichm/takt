@@ -1664,6 +1664,107 @@ paths:
       summary: Hiérarchie complète des référentiels
       tags:
         - Référentiels
+  /api/v1/referentiels/charge-rule-sets:
+    get:
+      operationId: ChargeRuleSetController_list
+      parameters: []
+      responses:
+        '200':
+          description: Liste des règles de charge
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Liste paginée des règles de charge
+      tags:
+        - Référentiels
+    post:
+      operationId: ChargeRuleSetController_create
+      parameters: []
+      responses:
+        '201':
+          description: Règle de charge créée
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Crée une règle de charge
+      tags:
+        - Référentiels
+  /api/v1/referentiels/charge-rule-sets/actif:
+    get:
+      operationId: ChargeRuleSetController_getActif
+      parameters: []
+      responses:
+        '200':
+          description: Règle de charge active
+        '404':
+          description: Aucune règle de charge active
+      security:
+        - bearerAuth: []
+      summary: Règle de charge active
+      tags:
+        - Référentiels
+  /api/v1/referentiels/charge-rule-sets/{id}:
+    delete:
+      operationId: ChargeRuleSetController_delete
+      parameters: []
+      responses:
+        '200':
+          description: Règle de charge supprimée
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Règle de charge introuvable
+      security:
+        - bearerAuth: []
+      summary: Supprime une règle de charge
+      tags:
+        - Référentiels
+    get:
+      operationId: ChargeRuleSetController_getOne
+      parameters: []
+      responses:
+        '200':
+          description: Règle de charge trouvée
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Règle de charge introuvable
+      security:
+        - bearerAuth: []
+      summary: Détail d’une règle de charge
+      tags:
+        - Référentiels
+    patch:
+      operationId: ChargeRuleSetController_update
+      parameters: []
+      responses:
+        '200':
+          description: Règle de charge modifiée
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Règle de charge introuvable
+      security:
+        - bearerAuth: []
+      summary: Modifie une règle de charge
+      tags:
+        - Référentiels
   /api/v1/referentiels/config-systeme:
     get:
       operationId: ConfigSystemeController_getOrCreate
@@ -2939,6 +3040,22 @@ paths:
       security:
         - bearerAuth: []
       summary: Modifie un parcours
+      tags:
+        - Référentiels
+  /api/v1/referentiels/roles:
+    get:
+      operationId: RoleController_list
+      parameters: []
+      responses:
+        '200':
+          description: Liste des rôles
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Liste des rôles
       tags:
         - Référentiels
   /api/v1/referentiels/salles:

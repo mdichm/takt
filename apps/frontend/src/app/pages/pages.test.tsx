@@ -7,6 +7,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, MemoryRouter } from 'react-router-dom';
 import { versionStore } from '@/stores/versionStore';
 import { repartitionApi } from '@/lib/repartition.api';
+import { api } from '@/lib/api';
 
 vi.mock('@/lib/repartition.api', () => ({
   repartitionApi: {
@@ -77,10 +78,6 @@ import EC_RDEP_02 from './EC-RDEP-02';
 
 const PAGES_PLACEHOLDER = [
 
-  EC_ADM_01,
-  EC_ADM_02,
-  EC_ADM_03,
-  EC_ADM_04,
   EC_GES_01,
   EC_GES_02,
   EC_GES_03,
@@ -114,7 +111,7 @@ describe('pages EC-* (placeholders, lot L09)', () => {
   });
 
   it('existe exactement 25 fichiers de page placeholder (EC-COM-01 et EC-COM-02 sont des pages réelles)', () => {
-    expect(PAGES_PLACEHOLDER).toHaveLength(24);
+    expect(PAGES_PLACEHOLDER).toHaveLength(20);
   });
 
   it('chaque page affiche son code EC-*', () => {
@@ -125,7 +122,7 @@ describe('pages EC-* (placeholders, lot L09)', () => {
       codesRendus.add(texte.textContent!);
       cleanup();
     }
-    expect(codesRendus.size).toBe(24);
+    expect(codesRendus.size).toBe(20);
     for (const code of ['EC-GES-06', 'EC-DIR-05']) {
       expect(codesRendus.has(`Écran ${code}`)).toBe(true);
     }
@@ -305,6 +302,98 @@ describe('page EC-COM-03 (réelle, lot L09-03)', () => {
       expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument(),
     );
     expect(screen.getByText(/Profil utilisateur/i)).toBeInTheDocument();
+    cleanup();
+  });
+});
+
+/** EC-ADM-01 est une page réelle (lot L09-04) qui délègue à UsersAdminPage. */
+describe('page EC-ADM-01 (réelle, lot L09-04)', () => {
+  beforeEach(() => {
+    vi.mocked(api.get).mockResolvedValue({
+      data: [],
+      meta: { requestId: 'test', timestamp: new Date().toISOString() },
+    });
+  });
+  afterEach(() => {
+    cleanup();
+    vi.clearAllMocks();
+  });
+
+  it('EC-ADM-01 se charge et affiche le titre Utilisateurs', async () => {
+    renderWithQuery(<EC_ADM_01 />);
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument(),
+    );
+    expect(screen.getAllByText(/Utilisateurs/i).length).toBeGreaterThan(0);
+    cleanup();
+  });
+});
+
+/** EC-ADM-02 est une page réelle (lot L09-04) qui délègue à ReferentielsAdminPage. */
+describe('page EC-ADM-02 (réelle, lot L09-04)', () => {
+  beforeEach(() => {
+    vi.mocked(api.get).mockResolvedValue({
+      data: [],
+      meta: { requestId: 'test', timestamp: new Date().toISOString() },
+    });
+  });
+  afterEach(() => {
+    cleanup();
+    vi.clearAllMocks();
+  });
+
+  it('EC-ADM-02 se charge et affiche le titre Référentiels', async () => {
+    renderWithQuery(<EC_ADM_02 />);
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument(),
+    );
+    expect(screen.getAllByText(/Référentiels/i).length).toBeGreaterThan(0);
+    cleanup();
+  });
+});
+
+/** EC-ADM-03 est une page réelle (lot L09-04) qui délègue à ParametresAdminPage. */
+describe('page EC-ADM-03 (réelle, lot L09-04)', () => {
+  beforeEach(() => {
+    vi.mocked(api.get).mockResolvedValue({
+      data: [],
+      meta: { requestId: 'test', timestamp: new Date().toISOString() },
+    });
+  });
+  afterEach(() => {
+    cleanup();
+    vi.clearAllMocks();
+  });
+
+  it('EC-ADM-03 se charge et affiche le titre Paramètres système', async () => {
+    renderWithQuery(<EC_ADM_03 />);
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument(),
+    );
+    expect(screen.getAllByText(/Paramètres système/i).length).toBeGreaterThan(0);
+    cleanup();
+  });
+});
+
+/** EC-ADM-04 est une page réelle (lot L09-04) qui délègue à AuditAdminPage. */
+describe('page EC-ADM-04 (réelle, lot L09-04)', () => {
+  beforeEach(() => {
+    vi.mocked(api.get).mockResolvedValue({
+      data: [],
+      meta: { requestId: 'test', timestamp: new Date().toISOString() },
+    });
+  });
+  afterEach(() => {
+    cleanup();
+    vi.clearAllMocks();
+  });
+
+  it('EC-ADM-04 se charge et affiche le titre Journal d’audit', async () => {
+    renderWithQuery(<EC_ADM_04 />);
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument(),
+    );
+    expect(screen.getAllByText(/Journal d’audit/i).length).toBeGreaterThan(0);
     cleanup();
   });
 });
