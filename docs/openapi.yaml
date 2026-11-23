@@ -3877,6 +3877,60 @@ paths:
       summary: Crée une version de planning
       tags:
         - Versions
+  /api/v1/versions/initialisation:
+    post:
+      operationId: InitialisationController_initialiser
+      parameters: []
+      responses:
+        '201':
+          description: Version initiale créée
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '409':
+          description: Conflit (version non archivée déjà existante)
+      security:
+        - bearerAuth: []
+      summary: Initialise une année, un semestre et une version initiale
+      tags:
+        - Initialisation
+  /api/v1/versions/initialisation/annees-universitaires:
+    get:
+      operationId: InitialisationController_listerAnneesUniversitaires
+      parameters:
+        - description: Recherche textuelle sur le libellé
+          in: query
+          name: search
+          required: false
+          schema:
+            type: string
+        - description: Taille de page (défaut 20)
+          in: query
+          name: pageSize
+          required: false
+          schema:
+            type: number
+        - description: Numéro de page (défaut 1)
+          in: query
+          name: page
+          required: false
+          schema:
+            type: number
+      responses:
+        '200':
+          description: Liste des années universitaires
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Liste paginée des années universitaires avec semestres et état de version
+      tags:
+        - Initialisation
   /api/v1/versions/{id}:
     get:
       operationId: VersionsController_getOne

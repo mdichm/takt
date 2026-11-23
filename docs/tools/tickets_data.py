@@ -636,7 +636,7 @@ TICKETS: List[Ticket] = [
         lot="L09",
         titre="Écrans `EC-GES-01` Initialisation année/semestre et import archive",
         sp=8,
-        status="À faire",
+        status="Terminé",
         deps=['TAKT-L04-08', 'TAKT-L09-01'],
         exigences=['EC-GES-01', 'IX-GES-01', 'IX-GES-02', 'TAKT-L04-08.'],
     ),

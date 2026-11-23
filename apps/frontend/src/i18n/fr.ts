@@ -420,7 +420,33 @@ export const DICTIONNAIRE_FR = {
         vide: 'Aucune entrée d’audit.',
       },
     },
-  }
+  },
+  // Initialisation de semestre (EC-GES-01, L09-05)
+  ges: {
+    initialisation: {
+      titre: 'Initialiser un nouveau semestre',
+      sousTitre: 'Créez une année universitaire, un semestre et la version initiale associée.',
+      libelleAnnee: 'Libellé de l’année universitaire',
+      libelleAnneeAide: 'Exemple : 2025-2026',
+      numeroSemestre: 'Numéro de semestre',
+      dateDebutAnnee: 'Date de début de l’année',
+      dateFinAnnee: 'Date de fin de l’année',
+      dateDebutSemestre: 'Date de début du semestre',
+      dateFinSemestre: 'Date de fin du semestre',
+      boutonInitialiser: 'Initialiser le semestre',
+      boutonAnnuler: 'Annuler',
+      confirmation: {
+        titre: 'Confirmer l’initialisation',
+        message: 'Cette action créera une année universitaire, un semestre et une version initiale (état “initial”). Les responsables de département seront notifiés pour commencer la saisie de répartition.',
+        verrouillage: 'Le référentiel sera verrouillé pour ce semestre : aucune modification des données de référence ne sera possible tant que la version n’est pas publiée.',
+        confirmer: 'Confirmer',
+        annuler: 'Annuler',
+      },
+      succes: 'Semestre initialisé avec succès. La version initiale est prête pour la saisie de répartition.',
+      erreur: 'Une erreur est survenue lors de l’initialisation.',
+      erreurDejaInitialise: 'Une version non archivée existe déjà pour ce semestre.',
+    },
+  },
 } as const;
 
 export type CleDictionnaire = keyof typeof DICTIONNAIRE_FR;

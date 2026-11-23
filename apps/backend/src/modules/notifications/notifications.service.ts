@@ -10,6 +10,9 @@ import { EventsHubService } from '../events/events-hub.service';
 export const NOTIFICATION_TYPE_REVALIDATION_DEMANDEE = 'REVALIDATION_DEMANDEE';
 export const NOTIFICATION_TYPE_REVALIDATION_VALIDEE = 'REVALIDATION_VALIDEE';
 
+/** Type d’événement de création de version initiale (TAKT-L09-05). */
+export const NOTIFICATION_TYPE_VERSION_INITIALE = 'VERSION_INITIALE';
+
 /**
  * Service des notifications in-app.
  *
@@ -123,5 +126,52 @@ export class NotificationsService {
     });
 
     return notification;
+  }
+
+  /**
+   * Notifie tous les responsables de département (rdep) actifs qu’une nouvelle
+   * version initiale a été créée pour un semestre (TAKT-L09-05).
+   *
+   * Implémente `INotificationInitialisation.notifierCreationVersion`.
+   */
+  async notifierRdepsTousDepartements(
+    versionId: string,
+    semestreId: string,
+    anneeId: string,
+  ): Promise<{ count: number; utilisateurIds: string[] }> {
+    const rdeps = await this.prisma.utilisateur.findMany({
+      where: {
+        estActif: true,
+        role: { code: 'rdep' },
+      },
+      select: { id: true },
+    });
+
+    const utilisateurIds: string[] = [];
+    for (const rdep of rdeps) {
+      const notification = await this.prisma.notification.create({
+        data: {
+          utilisateurId: rdep.id,
+          type: NOTIFICATION_TYPE_VERSION_INITIALE,
+          titre: 'Nouvelle version initiale créée',
+          message: `Une version initiale a été créée pour le semestre ${semestreId} (année ${anneeId}). Saisie de répartition à prévoir.`,
+        },
+      });
+
+      this.eventsHub.publier(rdep.id, {
+        type: 'notification',
+        notificationId: notification.id,
+        titre: 'Nouvelle version initiale créée',
+        message: `Une version initiale a été créée pour le semestre ${semestreId}.`,
+      });
+
+      utilisateurIds.push(rdep.id);
+    }
+
+    this.logger.log(
+      `Notification ${NOTIFICATION_TYPE_VERSION_INITIALE} : ${utilisateurIds.length} utilisateur(s) notifie(s)`,
+    );
+
+    return { count: utilisateurIds.length, utilisateurIds };
   }
 }
