@@ -20,6 +20,14 @@ export const ACTIONS_RAPIDES: readonly ActionRapide[] = [
     icone: 'calendrier',
   },
   {
+    id: 'initialiser-semestre',
+    libelle: 'Initialiser un nouveau semestre',
+    description: 'Créez une année universitaire, un semestre et la version initiale associée.',
+    chemin: '/ges/init',
+    roles: ['gest', 'admin'],
+    icone: 'calendrier',
+  },
+  {
     id: 'saisie-repartition',
     libelle: 'Saisie de répartition',
     description: 'Saisissez les affectations pédagogiques de votre département.',

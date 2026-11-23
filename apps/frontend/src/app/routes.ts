@@ -98,7 +98,7 @@ export const ROUTES: RouteDef[] = [
   {
     code: 'EC-GES-01',
     chemin: '/ges/init',
-    roles: ['gest'],
+    roles: ['gest', 'admin'],
     sidebar: true,
     composant: page('EC-GES-01'),
   },
