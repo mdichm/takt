@@ -645,7 +645,7 @@ TICKETS: List[Ticket] = [
         lot="L09",
         titre="Écrans `EC-GES-02` Préparation plans d'études et `EC-GES-03` Tableau de préparation (contraintes)",
         sp=10,
-        status="À faire",
+        status="En cours",
         deps=['TAKT-L05-01', 'TAKT-L05-06', 'TAKT-L09-05'],
         exigences=['EC-GES-02', 'EC-GES-03', 'IX-GES-03', 'IX-GES-04.'],
     ),
