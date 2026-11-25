@@ -8,6 +8,8 @@ import { zUuid } from './common';
 export const TYPES_EVENEMENT = [
   'generation.progress',
   'generation.done',
+  'generation.failed',
+  'generation.cancelled',
   'export.ready',
   'notification',
 ] as const;
@@ -17,7 +19,7 @@ export const zTypeEvenement = z.enum(TYPES_EVENEMENT);
 
 /** Charge utile d'un événement de génération. */
 export const zEvenementGeneration = z.object({
-  type: z.enum(['generation.progress', 'generation.done', 'generation.failed']),
+  type: z.enum(['generation.progress', 'generation.done', 'generation.failed', 'generation.cancelled']),
   versionId: zUuid,
   generationId: zUuid.optional(),
   progression: z.number().int().min(0).max(100).optional(),

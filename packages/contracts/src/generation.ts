@@ -6,7 +6,7 @@ import { zUuid, zDateIso, zPaginationMeta } from './common';
 import { zSolverPlacement } from './solver';
 
 /** Statut d'un job de génération CP-SAT. */
-export const zGenerationStatut = z.enum(['EN_COURS', 'TERMINEE', 'ECHEC']);
+export const zGenerationStatut = z.enum(['EN_COURS', 'TERMINEE', 'ECHEC', 'ANNULEE']);
 
 /** Représentation d'une génération (job CP-SAT) en base. Conforme au schéma `Generation` de docs/openapi.yaml. */
 export const zGenerationItem = z.object({

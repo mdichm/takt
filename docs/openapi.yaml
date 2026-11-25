@@ -1438,6 +1438,27 @@ paths:
       summary: Scénarios d'une génération
       tags:
         - générations
+  /api/v1/generations/{id}/annuler:
+    post:
+      operationId: GenerationsController_annuler
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Génération annulée, version retournée à brouillon
+        '404':
+          description: Génération introuvable
+        '409':
+          description: Conflit (déjà adoptée ou terminée)
+      security:
+        - bearerAuth: []
+      summary: Annuler une génération
+      tags:
+        - générations
   /api/v1/generations/{id}/select:
     post:
       operationId: SelectionController_selectionnerScenario

@@ -7,6 +7,7 @@ import {
   useCanalEvenements,
   CanalEvenementsProvider,
   type EvenementNotification,
+  type EvenementGeneration,
 } from './useCanalEvenements';
 
 // Mock EventSource (non disponible dans jsdom)
@@ -30,6 +31,15 @@ function ComponentTesteur(): JSX.Element {
   return (
     <div data-testid="canal-evenements">
       {canal.notifications.length > 0 ? 'avec-notifications' : 'sans-notifications'}
+    </div>
+  );
+}
+
+function ComponentTesteurGeneration(): JSX.Element {
+  const canal = useCanalEvenements();
+  return (
+    <div data-testid="canal-generation">
+      {String(canal.evenementsGeneration.length)}
     </div>
   );
 }
@@ -146,5 +156,32 @@ describe('EvenementNotification type', () => {
     expect(n.notificationId).toBe('123e4567-e89b-12d3-a456-426614174000');
     expect(n.titre).toBe('Alerte');
     expect(n.message).toBe('Quelque chose est arrive');
+  });
+});
+
+describe('EvenementGeneration type', () => {
+  it('a la structure attendue pour progression', () => {
+    const e: EvenementGeneration = {
+      type: 'generation.progress',
+      versionId: 'v1',
+      generationId: 'g1',
+      progression: 42,
+      message: 'En cours',
+    };
+    expect(e.type).toBe('generation.progress');
+    expect(e.versionId).toBe('v1');
+    expect(e.progression).toBe(42);
+    expect(e.message).toBe('En cours');
+  });
+
+  it('a la structure attendue pour echec', () => {
+    const e: EvenementGeneration = {
+      type: 'generation.failed',
+      versionId: 'v1',
+      generationId: 'g1',
+      erreur: 'Timeout CP-SAT',
+    };
+    expect(e.type).toBe('generation.failed');
+    expect(e.erreur).toBe('Timeout CP-SAT');
   });
 });
