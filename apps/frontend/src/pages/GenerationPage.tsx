@@ -43,7 +43,7 @@ export function GenerationPage(): JSX.Element {
       retry: 2,
     });
 
-  const { mutate: lancer, isPending: lancementEnCours, error: lancerErreur } = useMutation({
+  const { mutate: lancer, isPending: lancementEnCours } = useMutation({
     mutationFn: (id: string) => generationApi.lancer(id),
     onSuccess: () => {
       setLancementErreur(null);
@@ -61,7 +61,7 @@ export function GenerationPage(): JSX.Element {
       queryKey: ['generations', versionId],
       queryFn: () => generationApi.lister(versionId ?? ''),
       enabled: !!versionId && estEnLigne,
-      refetchInterval: (data) => {
+      refetchInterval: () => {
         const statut = statutGeneration ?? null;
         return statut === 'EN_COURS' ? 3000 : false;
       },

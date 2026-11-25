@@ -35,15 +35,6 @@ function ComponentTesteur(): JSX.Element {
   );
 }
 
-function ComponentTesteurGeneration(): JSX.Element {
-  const canal = useCanalEvenements();
-  return (
-    <div data-testid="canal-generation">
-      {String(canal.evenementsGeneration.length)}
-    </div>
-  );
-}
-
 describe('useCanalEvenements', () => {
   const evenementNotification: EvenementNotification = {
     type: 'notification',
