@@ -10,7 +10,7 @@ test.describe('Generation de scenarios (TAKT-L09-07, EC-GES-04)', () => {
     page,
   }) => {
     const reponse = await page.goto('/ges/generate', { waitUntil: 'networkidle' });
-    await expect(page).toHaveURL(/\\/login/);
+    await expect(page).toHaveURL(/\/login/);
     expect(reponse?.status()).toBe(200);
   });
 
