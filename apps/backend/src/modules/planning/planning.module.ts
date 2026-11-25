@@ -10,6 +10,7 @@ import { ConflictModule } from './conflict/conflict.module';
 import { BailModule } from './bail/bail.module';
 import { VerrousModule } from './verrous/verrous.module';
 import { CouvertureModule } from './couverture/couverture.module';
+import { ContraintesModule } from './contraintes/contraintes.module';
 
 
 /** Module des séances, contraintes, verrous, baux d'édition, conflits et couverture de planning. */
@@ -23,6 +24,7 @@ import { CouvertureModule } from './couverture/couverture.module';
     BailModule,
     VerrousModule,
     CouvertureModule,
+    ContraintesModule,
   ],
   exports: [],
 })

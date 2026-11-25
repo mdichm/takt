@@ -126,7 +126,7 @@ export class SnapshotService {
       this.prisma.contrainte.findMany({
         where: { versionId },
         orderBy: { id: 'asc' },
-        select: { id: true, type: true, cibleId: true, valeur: true },
+        select: { id: true, type: true, cibleId: true, valeur: true, poids: true, estActif: true },
       }),
       this.prisma.groupe.findMany({
         where: {

@@ -131,7 +131,7 @@ describe('buildDerivedFile (TAKT-L07-01)', () => {
     const { fichier } = buildDerivedFile(
       snapshotMinimal({
         contraintes: [
-          { id: '11111111-1111-1111-1111-111111111111', type: 'INDISPONIBILITE', cibleId: 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee', valeur: '{"day":2,"slots":[0,1,2,3]}' },
+          { id: '11111111-1111-1111-1111-111111111111', type: 'INDISPONIBILITE', cibleId: 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee', valeur: '{"day":2,"slots":[0,1,2,3]}', poids: 100, estActif: true },
         ],
       }),
       OPTIONS,
@@ -147,7 +147,7 @@ describe('buildDerivedFile (TAKT-L07-01)', () => {
   it('une contrainte EXIGENCE_SALLE est transcodée en ROOM_REQUIREMENT HARD 100', () => {
     const { fichier } = buildDerivedFile(
       snapshotMinimal({
-        contraintes: [{ id: '22222222-2222-2222-2222-222222222222', type: 'EXIGENCE_SALLE', cibleId: 'ffffffff-ffff-ffff-ffff-ffffffffffff', valeur: '{"type":"AMPHI"}' }],
+        contraintes: [{ id: '22222222-2222-2222-2222-222222222222', type: 'EXIGENCE_SALLE', cibleId: 'ffffffff-ffff-ffff-ffff-ffffffffffff', valeur: '{"type":"AMPHI"}', poids: 100, estActif: true }],
       }),
       OPTIONS,
     );
@@ -160,7 +160,7 @@ describe('buildDerivedFile (TAKT-L07-01)', () => {
   it('une contrainte PREFERENCE_CRENEAU est transcodée en TEACHER_PREFERENCE SOFT 30', () => {
     const { fichier } = buildDerivedFile(
       snapshotMinimal({
-        contraintes: [{ id: '33333333-3333-3333-3333-333333333333', type: 'PREFERENCE_CRENEAU', cibleId: 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee', valeur: '{"jour":1}' }],
+        contraintes: [{ id: '33333333-3333-3333-3333-333333333333', type: 'PREFERENCE_CRENEAU', cibleId: 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee', valeur: '{"jour":1}', poids: 30, estActif: true }],
       }),
       OPTIONS,
     );
@@ -173,7 +173,7 @@ describe('buildDerivedFile (TAKT-L07-01)', () => {
   it('une contrainte CHARGE_MAX_JOUR est transcodée en MAX_HOURS_PER_DAY SOFT 50', () => {
     const { fichier } = buildDerivedFile(
       snapshotMinimal({
-        contraintes: [{ id: '44444444-4444-4444-4444-444444444444', type: 'CHARGE_MAX_JOUR', cibleId: 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee', valeur: '{"heures":6}' }],
+        contraintes: [{ id: '44444444-4444-4444-4444-444444444444', type: 'CHARGE_MAX_JOUR', cibleId: 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee', valeur: '{"heures":6}', poids: 50, estActif: true }],
       }),
       OPTIONS,
     );
@@ -205,7 +205,7 @@ describe('buildDerivedFile (TAKT-L07-01)', () => {
 
   it('rejette un fichier invalide via le schéma Zod (GG-05)', () => {
     const entrees = snapshotMinimal({
-      contraintes: [{ id: '55555555-5555-5555-5555-555555555555', type: 'PREFERENCE_CRENEAU', cibleId: 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee', valeur: '{}' }],
+      contraintes: [{ id: '55555555-5555-5555-5555-555555555555', type: 'PREFERENCE_CRENEAU', cibleId: 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee', valeur: '{}', poids: 30, estActif: true }],
     });
     const { fichier } = buildDerivedFile(entrees, OPTIONS);
     const invalide = { ...fichier, constraints: [{ ...fichier.constraints[0], weight: 999 }] };
