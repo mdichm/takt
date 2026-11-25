@@ -496,6 +496,8 @@ model Contrainte {
   type      String   // ex: INDISPONIBILITE, EXIGENCE_SALLE, CONTRAINTE_ENSEIGNANT
   cibleId   String   // identifiant de la cible (enseignant, salle, groupe, etc.)
   valeur    String   // valeur de la contrainte (JSON ou texte selon le type)
+  poids     Int?     // poids de la contrainte (1-99 pour SOFT, null ⇒ poids canonique du type)
+  estActif  Boolean  @default(true) // contrainte active ou désactivée
   createdAt DateTime @default(now())
 
   version Version @relation(fields: [versionId], references: [id])

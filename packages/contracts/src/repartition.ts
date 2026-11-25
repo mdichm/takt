@@ -12,6 +12,9 @@ export const zPlanEtudes = z.object({
   anneeUniversitaireId: zUuid,
   semestreId: zUuid,
   departementId: zUuid,
+  libelleParcours: z.string().nullable(),
+  libelleNiveau: z.string().nullable(),
+  nombreMatieres: z.number().int().nonnegative().default(0),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
 });
@@ -63,6 +66,8 @@ export const zPlanEtudesMatiere = z.object({
   planEtudesId: zUuid,
   matiereId: zUuid,
   typeEnseignementId: zUuid,
+  matiereLibelle: z.string().nullable(),
+  typeEnseignementLibelle: z.string().nullable(),
   volumeHoraire: z.number().int().positive('Le volume horaire doit être strictement positif'),
   dureeCreneaux: z.number().int().positive('La durée de créneau doit être strictement positive'),
   coefficient: z.number().int().positive('Le coefficient doit être strictement positif'),

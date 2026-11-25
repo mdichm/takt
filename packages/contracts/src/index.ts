@@ -12,6 +12,7 @@ export * from './audit';
 export * from './auth';
 export * from './bail';
 export * from './common';
+export * from './contraintes';
 export * from './couverture';
 export * from './events';
 export * from './generation';
