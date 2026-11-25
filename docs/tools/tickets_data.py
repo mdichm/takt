@@ -654,7 +654,7 @@ TICKETS: List[Ticket] = [
         lot="L09",
         titre="Écran `EC-GES-04` Lancement et suivi des générations",
         sp=8,
-        status="À faire",
+        status="En cours",
         deps=['TAKT-L07-03', 'TAKT-L07-07', 'TAKT-L09-06'],
         exigences=['EC-GES-04', 'IX-GES-05', 'TAKT-L07-03', 'TAKT-L07-07.'],
     ),
