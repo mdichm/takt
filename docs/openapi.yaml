@@ -1260,6 +1260,100 @@ paths:
       summary: Forcer la liberation d un bail d edition (admin)
       tags:
         - Bail d'édition - forçage admin
+  /api/v1/contraintes:
+    get:
+      operationId: ContraintesController_lister
+      parameters: []
+      responses:
+        '200':
+          description: Liste des contraintes
+        '401':
+          description: Non authentifie
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Liste paginée des contraintes d une version
+      tags:
+        - Contraintes
+    post:
+      operationId: ContraintesController_creer
+      parameters: []
+      responses:
+        '201':
+          description: Contrainte créée
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Version introuvable
+        '409':
+          description: Conflit (version publiée ou doublon)
+      security:
+        - bearerAuth: []
+      summary: Crée une contrainte de génération
+      tags:
+        - Contraintes
+  /api/v1/contraintes/conflits:
+    get:
+      operationId: ContraintesController_conflits
+      parameters: []
+      responses:
+        '200':
+          description: Conflits détectés
+        '401':
+          description: Non authentifie
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Détecte les conflits de contraintes d une version
+      tags:
+        - Contraintes
+  /api/v1/contraintes/{id}:
+    delete:
+      operationId: ContraintesController_supprimer
+      parameters: []
+      responses:
+        '200':
+          description: Contrainte supprimée
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Contrainte introuvable
+        '409':
+          description: Conflit (version publiée)
+      security:
+        - bearerAuth: []
+      summary: Supprime une contrainte
+      tags:
+        - Contraintes
+    patch:
+      operationId: ContraintesController_mettreAJour
+      parameters: []
+      responses:
+        '200':
+          description: Contrainte modifiée
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Contrainte introuvable
+        '409':
+          description: Conflit (version publiée ou doublon)
+      security:
+        - bearerAuth: []
+      summary: Modifie partiellement une contrainte
+      tags:
+        - Contraintes
   /api/v1/events:
     get:
       operationId: EventsController_fluxEvenements

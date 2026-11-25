@@ -7,6 +7,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, MemoryRouter } from 'react-router-dom';
 import { versionStore } from '@/stores/versionStore';
 import { repartitionApi } from '@/lib/repartition.api';
+import { contraintesApi } from '@/lib/contraintes.api';
 import { api } from '@/lib/api';
 
 vi.mock('@/lib/repartition.api', () => ({
@@ -30,6 +31,16 @@ vi.mock('@/lib/api', () => ({
       data: { items: [], meta: { page: 1, pageSize: 20, total: 0 } },
       meta: { requestId: 'test', timestamp: new Date().toISOString() },
     }),
+  },
+}));
+
+vi.mock('@/lib/contraintes.api', () => ({
+  contraintesApi: {
+    lister: vi.fn().mockResolvedValue({
+      items: [],
+      meta: { page: 1, pageSize: 50, total: 0, requestId: 'test', timestamp: new Date().toISOString() },
+    }),
+    supprimer: vi.fn().mockResolvedValue(undefined),
   },
 }));
 
@@ -79,8 +90,6 @@ import EC_RDEP_02 from './EC-RDEP-02';
 const PAGES_PLACEHOLDER = [
 
   EC_GES_01,
-  EC_GES_02,
-  EC_GES_03,
   EC_GES_04,
   EC_GES_05,
   EC_GES_06,
@@ -111,7 +120,7 @@ describe('pages EC-* (placeholders, lot L09)', () => {
   });
 
   it('existe exactement 25 fichiers de page placeholder (EC-COM-01 et EC-COM-02 sont des pages réelles)', () => {
-    expect(PAGES_PLACEHOLDER).toHaveLength(20);
+    expect(PAGES_PLACEHOLDER).toHaveLength(18);
   });
 
   it('chaque page affiche son code EC-*', () => {
@@ -122,7 +131,7 @@ describe('pages EC-* (placeholders, lot L09)', () => {
       codesRendus.add(texte.textContent!);
       cleanup();
     }
-    expect(codesRendus.size).toBe(20);
+    expect(codesRendus.size).toBe(18);
     for (const code of ['EC-GES-06', 'EC-DIR-05']) {
       expect(codesRendus.has(`Écran ${code}`)).toBe(true);
     }
@@ -394,6 +403,60 @@ describe('page EC-ADM-04 (réelle, lot L09-04)', () => {
       expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument(),
     );
     expect(screen.getAllByText(/Journal d’audit/i).length).toBeGreaterThan(0);
+    cleanup();
+  });
+});
+
+/** EC-GES-02 est une page réelle (lot L09-06) qui délègue à PlanEtudesPage. */
+describe('page EC-GES-02 (réelle, lot L09-06)', () => {
+  beforeEach(() => {
+    vi.mocked(api.get).mockResolvedValue({
+      data: [],
+      meta: { requestId: 'test', timestamp: new Date().toISOString() },
+    });
+    vi.mocked(contraintesApi.lister).mockResolvedValue({
+      items: [],
+      meta: { page: 1, pageSize: 50, total: 0, requestId: 'test', timestamp: new Date().toISOString() },
+    });
+  });
+  afterEach(() => {
+    cleanup();
+    vi.clearAllMocks();
+  });
+
+  it('EC-GES-02 se charge et affiche le titre Plan d’études', async () => {
+    renderWithQuery(<EC_GES_02 />);
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument(),
+    );
+    expect(screen.getAllByText(/Plan d.études/i).length).toBeGreaterThan(0);
+    cleanup();
+  });
+});
+
+/** EC-GES-03 est une page réelle (lot L09-06) qui délègue à ContraintesPage. */
+describe('page EC-GES-03 (réelle, lot L09-06)', () => {
+  beforeEach(() => {
+    vi.mocked(api.get).mockResolvedValue({
+      data: [],
+      meta: { requestId: 'test', timestamp: new Date().toISOString() },
+    });
+    vi.mocked(contraintesApi.lister).mockResolvedValue({
+      items: [],
+      meta: { page: 1, pageSize: 50, total: 0, requestId: 'test', timestamp: new Date().toISOString() },
+    });
+  });
+  afterEach(() => {
+    cleanup();
+    vi.clearAllMocks();
+  });
+
+  it('EC-GES-03 se charge et affiche le titre Contraintes', async () => {
+    renderWithQuery(<EC_GES_03 />);
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument(),
+    );
+    expect(screen.getAllByText(/Contraintes/i).length).toBeGreaterThan(0);
     cleanup();
   });
 });
