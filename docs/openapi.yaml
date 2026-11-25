@@ -1419,25 +1419,6 @@ paths:
       summary: Vérifie les préconditions de lancement de génération
       tags:
         - génération — préconditions
-  /api/v1/generations/{id}/scenarios:
-    get:
-      operationId: GenerationsController_scenarios
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Liste des scénarios
-        '404':
-          description: Génération non trouvée
-      security:
-        - bearerAuth: []
-      summary: Scénarios d'une génération
-      tags:
-        - générations
   /api/v1/generations/{id}/annuler:
     post:
       operationId: GenerationsController_annuler
@@ -1457,6 +1438,25 @@ paths:
       security:
         - bearerAuth: []
       summary: Annuler une génération
+      tags:
+        - générations
+  /api/v1/generations/{id}/scenarios:
+    get:
+      operationId: GenerationsController_scenarios
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Liste des scénarios
+        '404':
+          description: Génération non trouvée
+      security:
+        - bearerAuth: []
+      summary: Scénarios d'une génération
       tags:
         - générations
   /api/v1/generations/{id}/select:
