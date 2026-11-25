@@ -109,8 +109,8 @@ Date_fin_retenue(S) = max( P50_bySP , P50_byDébit , P80_bySP )
 ### 3.5 Taux d'avancement
 
 ```
-Avancement_SP(S)    = (SP_livrés(S) / 492) × 100 %
-Avancement_tickets(S)= (Tickets terminés(S) / 89) × 100 %
+Avancement_SP(S)    = (SP_livrés(S) / 534) × 100 %
+Avancement_tickets(S)= (Tickets terminés(S) / 91) × 100 %
 Couverture_forecast  = SP_livrés(S) / (SP_total × (S / S_proj))   //Detection du retard
 ```
 
@@ -139,7 +139,7 @@ Le tableau ci‑dessous donne des bornes de vélocité et de débit pour trois p
 
 | Semaine (S) | Date lundi | SP terminés (Σ) | SP cumulés | Tickets terminés | Tickets cumulés | V_moy (formule §3.1) | D_moy (formule §3.2) | SP restants | Tickets restants | Date fin P50 (SP) | Date fin P50 (Débit) | Date fin P80 (SP) | **Date retenue** | Écarts / Actions |
 | ----------- | ---------- | --------------- | ---------- | ---------------- | --------------- | -------------------- | -------------------- | ----------- | ---------------- | ----------------- | -------------------- | ----------------- | ---------------- | ---------------- |
-| 1           | 2026‑11‑02 |                 |            |                  |                 |                      |                      | 504         | 89               |                   |                      |                   |                  |                  |
+| 1           | 2026‑11‑02 |                 |            |                  |                 |                      |                      | 534         | 91               |                   |                      |                   |                  |                  |
 | 2           | 2026‑11‑09 |                 |            |                  |                 |                      |                      |             |                  |                   |                      |                   |                  |                  |
 | 3           | 2026‑11‑16 |                 |            |                  |                 |                      |                      |             |                  |                   |                      |                   |                  |                  |
 | 4           | 2026‑11‑23 |                 |            |                  |                 |                      |                      |             |                  |                   |                      |                   |                  |                  |
@@ -152,97 +152,97 @@ Le tableau ci‑dessous donne des bornes de vélocité et de débit pour trois p
 
 | Ticket      | Lot | SP  | État    | Date début réel | Date fin réel | SP gagnés | Commentaire |
 | ----------- | --- | --- | ------- | --------------- | ------------- | --------- | ----------- |
-| TAKT-L00-01 | L00 | 3   | À faire |                 |               |           |             |
-| TAKT-L00-02 | L00 | 2   | À faire |                 |               |           |             |
-| TAKT-L00-03 | L00 | 3   | À faire |                 |               |           |             |
-| TAKT-L00-04 | L00 | 3   | À faire |                 |               |           |             |
-| TAKT-L00-05 | L00 | 2   | À faire |                 |               |           |             |
-| TAKT-L01-01 | L01 | 2   | À faire |                 |               |           |             |
-| TAKT-L01-02 | L01 | 5   | À faire |                 |               |           |             |
-| TAKT-L01-03 | L01 | 3   | À faire |                 |               |           |             |
-| TAKT-L01-04 | L01 | 5   | À faire |                 |               |           |             |
-| TAKT-L01-05 | L01 | 3   | À faire |                 |               |           |             |
-| TAKT-L01-06 | L01 | 3   | À faire |                 |               |           |             |
-| TAKT-L01-07 | L01 | 3   | À faire |                 |               |           |             |
-| TAKT-L02-01 | L02 | 5   | À faire |                 |               |           |             |
-| TAKT-L02-02 | L02 | 5   | À faire |                 |               |           |             |
-| TAKT-L02-03 | L02 | 5   | À faire |                 |               |           |             |
-| TAKT-L02-04 | L02 | 4   | À faire |                 |               |           |             |
-| TAKT-L02-05 | L02 | 4   | À faire |                 |               |           |             |
-| TAKT-L02-06 | L02 | 4   | À faire |                 |               |           |             |
-| TAKT-L03-01 | L03 | 5   | À faire |                 |               |           |             |
-| TAKT-L03-02 | L03 | 5   | À faire |                 |               |           |             |
-| TAKT-L03-03 | L03 | 5   | À faire |                 |               |           |             |
-| TAKT-L03-04 | L03 | 5   | À faire |                 |               |           |             |
-| TAKT-L03-05 | L03 | 5   | À faire |                 |               |           |             |
-| TAKT-L03-06 | L03 | 5   | À faire |                 |               |           |             |
-| TAKT-L03-07 | L03 | 4   | À faire |                 |               |           |             |
-| TAKT-L04-01 | L04 | 5   | À faire |                 |               |           |             |
-| TAKT-L04-02 | L04 | 6   | À faire |                 |               |           |             |
-| TAKT-L04-03 | L04 | 5   | À faire |                 |               |           |             |
-| TAKT-L04-04 | L04 | 6   | À faire |                 |               |           |             |
-| TAKT-L04-05 | L04 | 5   | À faire |                 |               |           |             |
-| TAKT-L04-06 | L04 | 8   | À faire |                 |               |           |             |
-| TAKT-L04-07 | L04 | 5   | À faire |                 |               |           |             |
-| TAKT-L04-08 | L04 | 4   | À faire |                 |               |           |             |
-| TAKT-L05-01 | L05 | 5   | À faire |                 |               |           |             |
-| TAKT-L05-02 | L05 | 6   | À faire |                 |               |           |             |
-| TAKT-L05-03 | L05 | 8   | À faire |                 |               |           |             |
-| TAKT-L05-04 | L05 | 5   | À faire |                 |               |           |             |
-| TAKT-L05-05 | L05 | 5   | À faire |                 |               |           |             |
-| TAKT-L05-06 | L05 | 8   | À faire |                 |               |           |             |
-| TAKT-L06-01 | L06 | 8   | À faire |                 |               |           |             |
-| TAKT-L06-02 | L06 | 8   | À faire |                 |               |           |             |
-| TAKT-L06-03 | L06 | 5   | À faire |                 |               |           |             |
-| TAKT-L06-04 | L06 | 5   | À faire |                 |               |           |             |
-| TAKT-L06-05 | L06 | 8   | À faire |                 |               |           |             |
-| TAKT-L06-06 | L06 | 6   | À faire |                 |               |           |             |
-| TAKT-L06-07 | L06 | 6   | À faire |                 |               |           |             |
-| TAKT-L06-08 | L06 | 6   | À faire |                 |               |           |             |
-| TAKT-L06-09 | L06 | 5   | À faire |                 |               |           |             |
-| TAKT-L06-10 | L06 | 6   | À faire |                 |               |           |             |
-| TAKT-L07-01 | L07 | 8   | À faire |                 |               |           |             |
-| TAKT-L07-02 | L07 | 6   | À faire |                 |               |           |             |
-| TAKT-L07-03 | L07 | 8   | À faire |                 |               |           |             |
-| TAKT-L07-04 | L07 | 8   | À faire |                 |               |           |             |
-| TAKT-L07-05 | L07 | 5   | À faire |                 |               |           |             |
-| TAKT-L07-06 | L07 | 5   | À faire |                 |               |           |             |
-| TAKT-L07-07 | L07 | 7   | À faire |                 |               |           |             |
-| TAKT-L08-01 | L08 | 8   | À faire |                 |               |           |             |
-| TAKT-L08-02 | L08 | 5   | À faire |                 |               |           |             |
-| TAKT-L08-03 | L08 | 5   | À faire |                 |               |           |             |
-| TAKT-L08-04 | L08 | 6   | À faire |                 |               |           |             |
-| TAKT-L08-05 | L08 | 8   | À faire |                 |               |           |             |
-| TAKT-L08-06 | L08 | 3   | À faire |                 |               |           |             |
-| TAKT-L08-07 | L08 | 3   | À faire |                 |               |           |             |
-| TAKT-L09-01 | L09 | 5   | À faire |                 |               |           |             |
-| TAKT-L09-02 | L09 | 8   | À faire |                 |               |           |             |
-| TAKT-L09-03 | L09 | 5   | À faire |                 |               |           |             |
-| TAKT-L09-04 | L09 | 13  | À faire |                 |               |           |             |
-| TAKT-L09-05 | L09 | 8   | À faire |                 |               |           |             |
-| TAKT-L09-06 | L09 | 10  | À faire |                 |               |           |             |
-| TAKT-L09-07 | L09 | 8   | À faire |                 |               |           |             |
-| TAKT-L09-08 | L09 | 8   | À faire |                 |               |           |             |
-| TAKT-L09-09 | L09 | 13  | À faire |                 |               |           |             |
-| TAKT-L09-10 | L09 | 6   | À faire |                 |               |           |             |
-| TAKT-L09-11 | L09 | 8   | À faire |                 |               |           |             |
-| TAKT-L09-12 | L09 | 10  | À faire |                 |               |           |             |
-| TAKT-L09-13 | L09 | 10  | À faire |                 |               |           |             |
-| TAKT-L10-01 | L10 | 6   | À faire |                 |               |           |             |
-| TAKT-L10-02 | L10 | 6   | À faire |                 |               |           |             |
-| TAKT-L10-03 | L10 | 8   | À faire |                 |               |           |             |
-| TAKT-L10-04 | L10 | 6   | À faire |                 |               |           |             |
-| TAKT-L10-05 | L10 | 8   | À faire |                 |               |           |             |
-| TAKT-L10-06 | L10 | 5   | À faire |                 |               |           |             |
-| TAKT-L10-07 | L10 | 5   | À faire |                 |               |           |             |
-| TAKT-L11-01 | L11 | 6   | À faire |                 |               |           |             |
-| TAKT-L11-02 | L11 | 8   | À faire |                 |               |           |             |
-| TAKT-L11-03 | L11 | 6   | À faire |                 |               |           |             |
-| TAKT-L11-04 | L11 | 10  | À faire |                 |               |           |             |
-| TAKT-L11-05 | L11 | 8   | À faire |                 |               |           |             |
-| TAKT-L11-06 | L11 | 6   | À faire |                 |               |           |             |
-| TAKT-L11-07 | L11 | 5   | À faire |                 |               |           |             |
-
+| TAKT-L00-01  | L00 | 3     | Terminé   |                   |                 | 3           |               |
+| TAKT-L00-02  | L00 | 2     | Terminé   |                   |                 | 2           |               |
+| TAKT-L00-03  | L00 | 3     | Terminé   |                   |                 | 3           |               |
+| TAKT-L00-04  | L00 | 3     | Terminé   |                   |                 | 3           |               |
+| TAKT-L00-05  | L00 | 2     | Terminé   |                   |                 | 2           |               |
+| TAKT-L00-06  | L00 | 2     | Terminé   |                   |                 | 2           |               |
+| TAKT-L01-01  | L01 | 2     | Terminé   |                   | 2026-10-31      | 2           |               |
+| TAKT-L01-02  | L01 | 5     | Terminé   |                   |                 | 5           |               |
+| TAKT-L01-03  | L01 | 3     | Terminé   |                   |                 | 3           |               |
+| TAKT-L01-04  | L01 | 5     | Terminé   |                   |                 | 5           |               |
+| TAKT-L01-05  | L01 | 3     | Terminé   |                   |                 | 3           |               |
+| TAKT-L01-06  | L01 | 3     | Terminé   |                   |                 | 3           |               |
+| TAKT-L01-07  | L01 | 3     | Terminé   |                   |                 | 3           |               |
+| TAKT-L02-01  | L02 | 5     | Terminé   |                   | 2026-11-01      | 5           |               |
+| TAKT-L02-02  | L02 | 5     | Terminé   |                   | 2026-11-01      | 5           |               |
+| TAKT-L02-03  | L02 | 5     | Terminé   |                   | 2026-11-02      | 5           |               |
+| TAKT-L02-04  | L02 | 4     | Terminé   |                   | 2026-11-02      | 4           |               |
+| TAKT-L02-05  | L02 | 4     | Terminé   |                   |                 | 4           |               |
+| TAKT-L02-06  | L02 | 4     | Terminé   |                   |                 | 4           |               |
+| TAKT-L03-01  | L03 | 5     | Terminé   |                   | 2026-11-02      | 5           |               |
+| TAKT-L03-02  | L03 | 5     | Terminé   |                   | 2026-11-02      | 5           |               |
+| TAKT-L03-03  | L03 | 5     | Terminé   |                   | 2026-11-03      | 5           |               |
+| TAKT-L03-04  | L03 | 5     | Terminé   |                   | 2026-11-05      | 5           |               |
+| TAKT-L03-05  | L03 | 5     | Terminé   |                   | 2026-11-05      | 5           |               |
+| TAKT-L03-06  | L03 | 5     | Terminé   |                   | 2026-11-05      | 5           |               |
+| TAKT-L03-07  | L03 | 4     | Terminé   |                   | 2026-11-05      | 4           |               |
+| TAKT-L04-01  | L04 | 5     | Terminé   |                   | 2026-11-05      | 5           |               |
+| TAKT-L04-02  | L04 | 6     | Terminé   |                   | 2026-11-05      | 6           |               |
+| TAKT-L04-03  | L04 | 5     | Terminé   |                   | 2026-11-06      | 5           |               |
+| TAKT-L04-04  | L04 | 6     | Terminé   |                   | 2026-11-06      | 6           |               |
+| TAKT-L04-05  | L04 | 5     | Terminé   |                   | 2026-11-06      | 5           |               |
+| TAKT-L04-06  | L04 | 8     | Terminé   |                   | 2026-11-07      | 8           |               |
+| TAKT-L04-07  | L04 | 5     | Terminé   |                   | 2026-11-07      | 5           |               |
+| TAKT-L04-08  | L04 | 4     | Terminé   |                   | 2026-11-07      | 4           |               |
+| TAKT-L05-01  | L05 | 5     | Terminé   |                   | 2026-11-08      | 5           |               |
+| TAKT-L05-02  | L05 | 6     | Terminé   |                   | 2026-11-08      | 6           |               |
+| TAKT-L05-03  | L05 | 8     | Terminé   |                   | 2026-11-08      | 8           |               |
+| TAKT-L05-04  | L05 | 5     | Terminé   |                   | 2026-11-09      | 5           |               |
+| TAKT-L05-05  | L05 | 5     | Terminé   |                   | 2026-11-09      | 5           |               |
+| TAKT-L05-06  | L05 | 8     | Terminé   |                   | 2026-11-10      | 8           |               |
+| TAKT-L06-01  | L06 | 8     | Terminé   |                   | 2026-11-11      | 8           |               |
+| TAKT-L06-02  | L06 | 8     | Terminé   |                   | 2026-11-11      | 8           |               |
+| TAKT-L06-03  | L06 | 5     | Terminé   |                   | 2026-11-14      | 5           |               |
+| TAKT-L06-04  | L06 | 5     | Terminé   |                   | 2026-11-15      | 5           |               |
+| TAKT-L06-05  | L06 | 8     | Terminé   |                   | 2026-11-16      | 8           |               |
+| TAKT-L06-06  | L06 | 6     | Terminé   |                   | 2026-11-17      | 6           |               |
+| TAKT-L06-07  | L06 | 6     | Terminé   |                   | 2026-11-17      | 6           |               |
+| TAKT-L06-08  | L06 | 6     | Terminé   |                   | 2026-11-17      | 6           |               |
+| TAKT-L06-09  | L06 | 5     | Terminé   |                   | 2026-11-17      | 5           |               |
+| TAKT-L06-10  | L06 | 6     | Terminé   |                   | 2026-11-18      | 6           |               |
+| TAKT-L07-01  | L07 | 8     | Terminé   |                   | 2026-11-19      | 8           |               |
+| TAKT-L07-02  | L07 | 6     | Terminé   |                   | 2026-11-19      | 6           |               |
+| TAKT-L07-03  | L07 | 8     | Terminé   |                   | 2026-11-20      | 8           |               |
+| TAKT-L07-04  | L07 | 8     | Terminé   |                   | 2026-11-20      | 8           |               |
+| TAKT-L07-05  | L07 | 5     | Terminé   |                   | 2026-11-20      | 5           |               |
+| TAKT-L07-06  | L07 | 5     | Terminé   |                   | 2026-11-21      | 5           |               |
+| TAKT-L07-07  | L07 | 7     | Terminé   |                   | 2026-11-21      | 7           |               |
+| TAKT-L08-01  | L08 | 8     | Terminé   |                   | 2026-11-06      | 8           |               |
+| TAKT-L08-02  | L08 | 5     | Terminé   |                   | 2026-11-06      | 5           |               |
+| TAKT-L08-03  | L08 | 5     | Terminé   |                   | 2026-11-06      | 5           |               |
+| TAKT-L08-04  | L08 | 6     | Terminé   |                   | 2026-11-07      | 6           |               |
+| TAKT-L08-05  | L08 | 8     | Terminé   |                   | 2026-11-07      | 8           |               |
+| TAKT-L08-06  | L08 | 3     | Terminé   |                   | 2026-11-06      | 3           |               |
+| TAKT-L08-07  | L08 | 3     | Terminé   |                   | 2026-11-21      | 3           |               |
+| TAKT-L09-01  | L09 | 5     | Terminé   |                   | 2026-11-21      | 5           |               |
+| TAKT-L09-02  | L09 | 8     | Terminé   |                   | 2026-11-21      | 8           |               |
+| TAKT-L09-03  | L09 | 5     | Terminé   |                   | 2026-11-21      | 5           |               |
+| TAKT-L09-04  | L09 | 13    | Terminé   |                   | 2026-11-23      | 13          |               |
+| TAKT-L09-05  | L09 | 8     | Terminé   |                   | 2026-11-25      | 8           |               |
+| TAKT-L09-06  | L09 | 10    | Terminé   |                   | 2026-11-25      | 10          |               |
+| TAKT-L09-07  | L09 | 8     | À faire   |                   |                 |             |               |
+| TAKT-L09-08  | L09 | 8     | À faire   |                   |                 |             |               |
+| TAKT-L09-09  | L09 | 13    | À faire   |                   |                 |             |               |
+| TAKT-L09-10  | L09 | 6     | À faire   |                   |                 |             |               |
+| TAKT-L09-11  | L09 | 8     | À faire   |                   |                 |             |               |
+| TAKT-L09-12  | L09 | 10    | À faire   |                   |                 |             |               |
+| TAKT-L09-13  | L09 | 10    | À faire   |                   |                 |             |               |
+| TAKT-L10-01  | L10 | 6     | À faire   |                   |                 |             |               |
+| TAKT-L10-02  | L10 | 6     | À faire   |                   |                 |             |               |
+| TAKT-L10-03  | L10 | 8     | À faire   |                   |                 |             |               |
+| TAKT-L10-04  | L10 | 6     | À faire   |                   |                 |             |               |
+| TAKT-L10-05  | L10 | 8     | À faire   |                   |                 |             |               |
+| TAKT-L10-06  | L10 | 5     | À faire   |                   |                 |             |               |
+| TAKT-L10-07  | L10 | 5     | À faire   |                   |                 |             |               |
+| TAKT-L11-01  | L11 | 6     | Terminé   |                   | 2026-11-22      | 6           |               |
+| TAKT-L11-02  | L11 | 8     | À faire   |                   |                 |             |               |
+| TAKT-L11-03  | L11 | 6     | À faire   |                   |                 |             |               |
+| TAKT-L11-04  | L11 | 10    | À faire   |                   |                 |             |               |
+| TAKT-L11-05  | L11 | 8     | À faire   |                   |                 |             |               |
+| TAKT-L11-06  | L11 | 6     | À faire   |                   |                 |             |               |
+| TAKT-L11-07  | L11 | 5     | À faire   |                   |                 |             |               |
 > **Mise à jour** : à chaque ticket passé en « Terminé », renseigner _Date fin réel_ et _SP gagnés_ (= SP du ticket). L'état prend les valeurs : `À faire`, `En cours`, `Bloqué`, `Terminé`.
 
 ## §7. Burn‑up et projection de date de fin (graphique descriptif)
@@ -250,10 +250,10 @@ Le tableau ci‑dessous donne des bornes de vélocité et de débit pour trois p
 Le burn‑up se trace avec :
 
 - **Axe X** : semaines (S1, S2, …).
-- **Axe Y** : SP cumulés (0 → 504).
+- **Axe Y** : SP cumulés (0 → 534).
 - **Courbe réalisée** : points `(S, SP_cumulés)` du tableau §5.
-- **Courbe idéale P50** : droite reliant `(S0, 0)` à `(S_fin_P50, 504)` où `S_fin_P50` est la projection courante.
-- **Courbe idéale P80** : droite reliant `(S0, 0)` à `(S_fin_P80, 504)`.
+- **Courbe idéale P50** : droite reliant `(S0, 0)` à `(S_fin_P50, 534)` où `S_fin_P50` est la projection courante.
+- **Courbe idéale P80** : droite reliant `(S0, 0)` à `(S_fin_P80, 534)`.
 
 **Interprétation** :
 
