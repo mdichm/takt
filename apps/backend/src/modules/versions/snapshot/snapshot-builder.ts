@@ -148,6 +148,8 @@ export function construireDonneesSnapshot(entrees: DonneesEntreeSnapshot): unkno
       type: c.type,
       cibleId: c.cibleId,
       valeur: c.valeur,
+      poids: c.poids ?? null,
+      estActif: c.estActif,
     })),
     verrous: verrous.map((v) => ({
       id: v.id,

@@ -204,24 +204,28 @@ export function buildDerivedFile(
     type: string;
     cibleId: string;
     valeur: string;
+    poids: number | null;
+    estActif: boolean;
   }>;
-  const constraints: DerivedConstraint[] = contraintesTriees.flatMap((c) => {
-    const derivee = contrainteTypeVersDerivee(c.type);
-    if (!derivee) return []; // type non reconnu : ignoré (warning dans mapping)
-    return [{
-      id: c.id,
-      type: derivee.type,
-      category: derivee.category,
-      scope: derivee.scope,
-      targetId: c.cibleId ?? null,
-      value: c.valeur,
-      weight: derivee.weight,
-      isActive: true,
-      source: derivee.source,
-      createdBy: UUID_SYSTEME,
-      createdAt: options.createdAt,
-    }];
-  });
+  const constraints: DerivedConstraint[] = contraintesTriees
+    .filter((c) => c.estActif) // contraintes désactivées exclues du fichier dérivé
+    .flatMap((c) => {
+      const derivee = contrainteTypeVersDerivee(c.type);
+      if (!derivee) return []; // type non reconnu : ignoré (warning dans mapping)
+      return [{
+        id: c.id,
+        type: derivee.type,
+        category: derivee.category,
+        scope: derivee.scope,
+        targetId: c.cibleId ?? null,
+        value: c.valeur,
+        weight: c.poids ?? derivee.weight, // poids contrainte ⇒ repli sur le poids canonique du type
+        isActive: c.estActif,
+        source: derivee.source,
+        createdBy: UUID_SYSTEME,
+        createdAt: options.createdAt,
+      }];
+    });
 
   const fichier: DerivedFile = {
     metadata,
