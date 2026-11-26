@@ -8,6 +8,7 @@ import { CODES_ERREUR_API, ApiError } from '../common/http/api-error';
 import { AuditService } from '../audit/audit.service';
 import { BossQueueService } from './worker/boss-queue.service';
 import { PreconditionsService } from './preconditions/preconditions.service';
+import { EventsHubService } from '../events/events-hub.service';
 import { type GenerationJobData } from '../common/di/boss.token';
 import type { ResultatPreconditions } from '@takt/contracts';
 
@@ -29,6 +30,7 @@ export class GenerationsService {
     @Inject(AuditService) private readonly auditService: AuditService,
     private readonly bossQueue: BossQueueService,
     private readonly preconditionsService: PreconditionsService,
+    private readonly eventsHub: EventsHubService,
   ) {}
 
   /**
@@ -113,6 +115,89 @@ export class GenerationsService {
     });
 
     return generation;
+  }
+
+  /**
+   * Annule une génération en cours (retour de la version à « brouillon »).
+   *
+   * Garde : la génération doit être à l'état `EN_COURS` et aucun scénario
+   * ne doit avoir été adopté (sinon 409). Écrit le journal d'audit et
+   * diffuse un événement SSE `generation.cancelled`.
+   *
+   * @param generationId Identifiant de la génération à annuler
+   * @param utilisateurId Identifiant de l'utilisateur demandeur
+   * @returns `{ id, statut }` de l'annulation
+   *
+   * @throws ApiError 404 si la génération n'existe pas
+   * @throws ApiError 409 si la génération n'est pas annulable
+   */
+  async annulerGeneration(generationId: string, utilisateurId: string) {
+    // 1. Récupère la génération et sa version
+    const generation = await this.prisma.generation.findUnique({
+      where: { id: generationId },
+      select: { id: true, versionId: true, statut: true },
+    });
+    if (!generation) {
+      throw new ApiError(CODES_ERREUR_API.NOT_FOUND, 404, 'Génération introuvable');
+    }
+
+    // 2. Garde : statut EN_COURS uniquement
+    if (generation.statut !== 'EN_COURS') {
+      throw new ApiError(
+        CODES_ERREUR_API.CONFLICT,
+        409,
+        `La génération ne peut pas être annulée (statut actuel : ${generation.statut})`,
+        { generationId, statut: generation.statut },
+      );
+    }
+
+    // 3. Garde : aucun scénario adopté (selectionne = true)
+    const scenarioAdopte = await this.prisma.scenario.findFirst({
+      where: { generationId, selectionne: true },
+      select: { id: true },
+    });
+    if (scenarioAdopte) {
+      throw new ApiError(
+        CODES_ERREUR_API.CONFLICT,
+        409,
+        'Une génération ayant un scénario adopté ne peut pas être annulée',
+        { generationId, scenarioId: scenarioAdopte.id },
+      );
+    }
+
+    // 4. Marque la génération comme annulée
+    await this.prisma.generation.update({
+      where: { id: generationId },
+      data: { statut: 'ANNULEE' },
+    });
+
+    // 5. Remet la version à brouillon (transition generation → brouillon)
+    await this.prisma.version.update({
+      where: { id: generation.versionId },
+      data: { etat: 'brouillon' },
+    });
+
+    // 6. Audit de la transition d'état (GG-07)
+    await this.auditService.record({
+      action: 'TRANSITION_ETAT',
+      utilisateurId,
+      entite: 'Generation',
+      entiteId: generationId,
+      metadonnees: {
+        versionId: generation.versionId,
+        statutAvant: 'EN_COURS',
+        statutApres: 'ANNULEE',
+      },
+    });
+
+    // 7. Événement SSE d'annulation
+    await this.eventsHub.publier(utilisateurId, {
+      type: 'generation.cancelled',
+      versionId: generation.versionId,
+      generationId,
+    });
+
+    return { id: generationId, statut: 'ANNULEE' };
   }
 
   /**

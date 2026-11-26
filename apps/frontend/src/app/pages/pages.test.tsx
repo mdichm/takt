@@ -44,6 +44,14 @@ vi.mock('@/lib/contraintes.api', () => ({
   },
 }));
 
+vi.mock('@/app/useCanalEvenements', () => ({
+  useCanalEvenements: vi.fn(() => ({
+    notifications: [],
+    evenementsGeneration: [],
+    fermer: vi.fn(),
+  })),
+}));
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: { retry: false, staleTime: 0 },
@@ -90,7 +98,6 @@ import EC_RDEP_02 from './EC-RDEP-02';
 const PAGES_PLACEHOLDER = [
 
   EC_GES_01,
-  EC_GES_04,
   EC_GES_05,
   EC_GES_06,
   EC_GES_07,
@@ -120,7 +127,7 @@ describe('pages EC-* (placeholders, lot L09)', () => {
   });
 
   it('existe exactement 25 fichiers de page placeholder (EC-COM-01 et EC-COM-02 sont des pages réelles)', () => {
-    expect(PAGES_PLACEHOLDER).toHaveLength(18);
+    expect(PAGES_PLACEHOLDER).toHaveLength(17);
   });
 
   it('chaque page affiche son code EC-*', () => {
@@ -131,7 +138,7 @@ describe('pages EC-* (placeholders, lot L09)', () => {
       codesRendus.add(texte.textContent!);
       cleanup();
     }
-    expect(codesRendus.size).toBe(18);
+    expect(codesRendus.size).toBe(17);
     for (const code of ['EC-GES-06', 'EC-DIR-05']) {
       expect(codesRendus.has(`Écran ${code}`)).toBe(true);
     }
@@ -457,6 +464,33 @@ describe('page EC-GES-03 (réelle, lot L09-06)', () => {
       expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument(),
     );
     expect(screen.getAllByText(/Contraintes/i).length).toBeGreaterThan(0);
+    cleanup();
+  });
+});
+
+/** EC-GES-04 est une page réelle (lot L10-01) qui délègue à GenerationPage. */
+describe('page EC-GES-04 (réelle, lot L10-01)', () => {
+  beforeEach(() => {
+    vi.mocked(api.get).mockResolvedValue({
+      data: [],
+      meta: { requestId: 'test', timestamp: new Date().toISOString() },
+    });
+    vi.mocked(contraintesApi.lister).mockResolvedValue({
+      items: [],
+      meta: { page: 1, pageSize: 50, total: 0, requestId: 'test', timestamp: new Date().toISOString() },
+    });
+  });
+  afterEach(() => {
+    cleanup();
+    vi.clearAllMocks();
+  });
+
+  it('EC-GES-04 se charge et affiche le titre Génération de scénarios', async () => {
+    renderWithQuery(<EC_GES_04 />);
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument(),
+    );
+    expect(screen.getAllByText(/Generation de scenarios/i).length).toBeGreaterThan(0);
     cleanup();
   });
 });

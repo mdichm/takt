@@ -79,6 +79,16 @@ export class GenerationWorkerService {
       );
     }
 
+    // Garde d'annulation : si la génération a été annulée entre le dépôt du
+    // job et son exécution, on abandonne immédiatement (pas d'écrasement
+    // de l'annulation ni d'adoption de scénario).
+    if (generation.statut !== 'EN_COURS') {
+      this.logger.log(
+        `Génération ${generationId} annulée ou terminée (statut ${generation.statut}), abandon du job.`,
+      );
+      return;
+    }
+
     const { version } = generation;
 
     try {
