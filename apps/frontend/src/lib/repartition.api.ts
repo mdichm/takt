@@ -11,6 +11,8 @@ import {
   type AffectationPedagogiqueUpdate,
   zEnseignant,
   type Enseignant,
+  zSalle,
+  type Salle,
   zGroupe,
   type Groupe,
   zMatiere,
@@ -95,6 +97,7 @@ const zEnveloppeRevalidationDetecter = zEnvelope(zRevalidationDetecterReponse);
 const zEnveloppeRevalidationValider = zEnvelope(zRevalidationValiderReponse);
 const zEnveloppePlanEtudes = zEnvelope(zPlanEtudes);
 const zEnveloppeEnseignants = zEnvelope(zEnseignant);
+const zEnveloppeSalles = zEnvelope(zSalle);
 const zEnveloppeGroupes = zEnvelope(zGroupe);
 const zEnveloppeTypesEnseignement = zEnvelope(zTypeEnseignement);
 const zEnveloppeMatieres = zEnvelope(zMatiere);
@@ -201,6 +204,15 @@ export const repartitionApi = {
       { schema: zEnveloppeEnseignants },
     );
     return normaliserListe(reponse, zEnseignant);
+  },
+
+  /** Liste les salles (pagination bornée pour résolution des libellés). */
+  async listerSalles(): Promise<ListeNormalisee<Salle>> {
+    const reponse = await api.get<unknown>(
+      '/referentiels/salles',
+      { schema: zEnveloppeSalles },
+    );
+    return normaliserListe(reponse, zSalle);
   },
 
   /*───── Référentiels — groupes ─────*/
@@ -312,6 +324,7 @@ export type {
   PlanEtudesMatiere,
   RepartitionValiderInput,
   RepartitionAnnulerInput,
+  Salle,
   StatutValidationRepartition,
   TypeEnseignement,
 };

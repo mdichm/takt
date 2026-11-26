@@ -10,6 +10,7 @@ import {
   zSearchFilter,
   zUuid,
 } from './common';
+import { zPlacementPersistee } from './generation';
 
 /** Données de création d’une version de planning. */
 export const zVersion = z.object({
@@ -132,6 +133,8 @@ export const zScenario = z.object({
   scoreGlobal: z.number().int().min(0).max(100),
   sousScores: z.record(z.number().finite()),
   selectionne: z.boolean(),
+  /** Placements des séances (salle / enseignant / jour / créneau) exposés par le solveur. */
+  placements: z.array(zPlacementPersistee).default([]),
   createdAt: zDateIso,
 });
 
