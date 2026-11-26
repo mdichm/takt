@@ -13,6 +13,8 @@ import {
   zGenerationAnnuler,
   zScenario,
   type Scenario,
+  zScenarioSelectReponse,
+  type ScenarioSelectReponse,
 } from '@takt/contracts';
 
 interface ListeNormalisee<T> {
@@ -120,6 +122,28 @@ export const generationApi = {
       schema: zGenerationAnnuler,
     });
   },
+
+  /** Adopte un scénario et passe la version en édition (POST /generations/:id/select). */
+  async adopterScenario(
+    generationId: string,
+    scenarioId: string,
+  ): Promise<ScenarioSelectReponse> {
+    const reponse = await api.post<ScenarioSelectReponse>(
+      `/generations/${encodeURIComponent(generationId)}/select`,
+      { scenarioId },
+      { schema: zScenarioSelectReponse },
+    );
+    if (!reponse.data) {
+      throw new Error('Aucune donnée retournée à l’adoption du scénario.');
+    }
+    return reponse.data as ScenarioSelectReponse;
+  },
 };
 
-export type { GenerationItem, GenerationList, GenerationStatut, Scenario };
+export type {
+  GenerationItem,
+  GenerationList,
+  GenerationStatut,
+  Scenario,
+  ScenarioSelectReponse,
+};

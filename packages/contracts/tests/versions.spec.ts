@@ -17,6 +17,15 @@ import {
 const UUID = '11111111-1111-4111-8111-111111111111';
 
 describe('contrats des versions et du workflow', () => {
+  const scenario = {
+    id: UUID,
+    generationId: UUID,
+    scoreGlobal: 80,
+    sousScores: { couverture: 90 },
+    selectionne: false,
+    createdAt: '2026-10-30T14:30:00.000Z',
+  };
+
   it('accepte une version valide', () => {
     expect(zVersion.parse({ semestreId: UUID })).toEqual({
       semestreId: UUID,
@@ -126,19 +135,81 @@ describe('contrats des versions et du workflow', () => {
   });
 
   it('valide les scores d’un scénario', () => {
-    const scenario = {
-      id: UUID,
-      generationId: UUID,
-      scoreGlobal: 80,
-      sousScores: { couverture: 90 },
-      selectionne: false,
-      createdAt: '2026-10-30T14:30:00.000Z',
-    };
-    expect(zScenario.parse(scenario)).toEqual(scenario);
+    expect(zScenario.parse(scenario)).toEqual({ ...scenario, placements: [] });
     expect(zScenario.safeParse({ ...scenario, scoreGlobal: 101 }).success).toBe(false);
     expect(zScenario.safeParse({ ...scenario, sousScores: { couverture: 'haute' } }).success).toBe(
       false,
     );
+  });
+
+  it('accepte un scénario avec des placements valides', () => {
+    const scenarioAvecPlacements = {
+      ...scenario,
+      placements: [
+        {
+          activityId: UUID,
+          day: 1,
+          slot: 4,
+          roomId: UUID,
+          teacherId: UUID,
+          nbCreneaux: 2,
+        },
+        {
+          activityId: UUID,
+          day: 3,
+          slot: 10,
+          roomId: UUID,
+          teacherId: UUID,
+        },
+      ],
+    };
+    const parseResult = zScenario.parse(scenarioAvecPlacements);
+    expect(parseResult.placements).toHaveLength(2);
+    expect(parseResult.placements[0]).toMatchObject({
+      activityId: UUID,
+      day: 1,
+      slot: 4,
+      roomId: UUID,
+      teacherId: UUID,
+      nbCreneaux: 2,
+    });
+  });
+
+  it('refuse un placement dont le jour est hors bornes', () => {
+    const placementInvalide = {
+      ...scenario,
+      placements: [
+        {
+          activityId: UUID,
+          day: 7,
+          slot: 4,
+          roomId: UUID,
+          teacherId: UUID,
+        },
+      ],
+    };
+    expect(zScenario.safeParse(placementInvalide).success).toBe(false);
+  });
+
+  it('refuse un placement dont le créneau est hors bornes', () => {
+    const placementInvalide = {
+      ...scenario,
+      placements: [
+        {
+          activityId: UUID,
+          day: 1,
+          slot: 25,
+          roomId: UUID,
+          teacherId: UUID,
+        },
+      ],
+    };
+    expect(zScenario.safeParse(placementInvalide).success).toBe(false);
+  });
+
+  it('définit placements à [] par défaut quand absent', () => {
+    const parseResult = zScenario.parse(scenario);
+    expect(parseResult.placements).toEqual([]);
   });
 
   it('valide la sélection d’un scénario', () => {
