@@ -95,9 +95,6 @@ const PAGES_PLACEHOLDER = [
 
   EC_GES_01,
   EC_GES_08,
-  EC_GES_09,
-  EC_GES_10,
-  EC_GES_11,
   EC_RDEP_03,
   EC_RDEP_04,
   EC_RDEP_05,
@@ -118,8 +115,8 @@ describe('pages EC-* (placeholders, lot L09)', () => {
     cleanup();
   });
 
-  it('existe exactement 25 fichiers de page placeholder (EC-COM-01 et EC-COM-02 sont des pages réelles)', () => {
-    expect(PAGES_PLACEHOLDER).toHaveLength(13);
+  it('existe exactement 10 fichiers de page placeholder (EC-COM-01 et EC-COM-02 sont des pages réelles)', () => {
+    expect(PAGES_PLACEHOLDER).toHaveLength(10);
   });
 
   it('chaque page affiche son code EC-*', () => {
@@ -130,7 +127,7 @@ describe('pages EC-* (placeholders, lot L09)', () => {
       codesRendus.add(texte.textContent!);
       cleanup();
     }
-    expect(codesRendus.size).toBe(13);
+    expect(codesRendus.size).toBe(10);
     for (const code of ['EC-DIR-05']) {
       expect(codesRendus.has(`Écran ${code}`)).toBe(true);
     }
@@ -486,4 +483,68 @@ describe('page EC-GES-04 (réelle, lot L10-01)', () => {
     cleanup();
   });
 });
+
+/*───── Tests EC-GES-09 / EC-GES-10 / EC-GES-11 (lot L09-11) ─────*/
+
+vi.mock('@/lib/publication.api', () => ({
+  publicationApi: {
+    listerVersions: vi.fn().mockResolvedValue({
+      items: [],
+      meta: { page: 1, pageSize: 100, total: 0 },
+    }),
+    obtenirVersion: vi.fn().mockResolvedValue(null as any), // eslint-disable-line @typescript-eslint/no-explicit-any -- any-justify: mock de test, retour null pour simplifier
+    transitionnerVersion: vi.fn().mockResolvedValue(null as any), // eslint-disable-line @typescript-eslint/no-explicit-any -- any-justify: mock de test, retour null pour simplifier
+    dupliquerVersionArchivee: vi.fn().mockResolvedValue(null as any), // eslint-disable-line @typescript-eslint/no-explicit-any -- any-justify: mock de test, retour null pour simplifier
+    preparerExport: vi.fn().mockResolvedValue({
+      exportId: 'e-test',
+      url: 'http://test.local/export.xlsx',
+      expiresAt: new Date().toISOString(),
+    }),
+    listerExports: vi.fn().mockResolvedValue({
+      items: [],
+      meta: { page: 1, pageSize: 50, total: 0 },
+    }),
+  },
+}));
+
+describe('pages EC-GES-09 / EC-GES-10 / EC-GES-11 (lot L09-11)', () => {
+  afterEach(() => {
+    cleanup();
+    vi.clearAllMocks();
+  });
+
+  it('EC-GES-09 se charge et affiche le titre Publication', async () => {
+    renderWithQuery(<EC_GES_09 />);
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument(),
+    );
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
+      /Publication/i,
+    );
+    cleanup();
+  });
+
+  it('EC-GES-10 se charge et affiche le titre Archivage', async () => {
+    renderWithQuery(<EC_GES_10 />);
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument(),
+    );
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
+      /Archivage/i,
+    );
+    cleanup();
+  });
+
+  it('EC-GES-11 se charge et affiche le titre Exports', async () => {
+    renderWithQuery(<EC_GES_11 />);
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument(),
+    );
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
+      /Exports/i,
+    );
+    cleanup();
+  });
+});
+
 });
