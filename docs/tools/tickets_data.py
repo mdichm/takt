@@ -681,7 +681,7 @@ TICKETS: List[Ticket] = [
         lot="L09",
         titre="Écran `EC-GES-08` Soumission pour validation Département",
         sp=6,
-        status="En cours",
+        status="Terminé",
         deps=['TAKT-L06-09', 'TAKT-L09-09'],
         exigences=['EC-GES-08', 'IX-GES-11', 'RB-UI-06', 'TAKT-L06-09.'],
     ),

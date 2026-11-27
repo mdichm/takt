@@ -14,9 +14,11 @@ import {
   type LockListFilters,
   zBail,
   type Bail,
+  zErreurApi,
+  zMetaApi,
   zSeance,
   type Seance,
-  zSeanceListe,
+  zEnvelope,
   type SeanceListFilters,
   type SeanceUpdateInput,
   type SimulationRequete,
@@ -68,11 +70,11 @@ function normaliserListe<T>(
   Schémas d'enveloppe de reponse (validation Zod, GG-05)
 ──────────────────────────────────────────────────────────────────────────────*/
 
-const zEnveloppeSeances = zSeanceListe;
-const zEnveloppeCreneaux = z.array(zCreneau);
-const zEnveloppeVerrous = z.array(zLock);
-const zEnveloppeConflits = zConflitsListe;
-const zEnveloppeBail = zBail;
+const zEnveloppeSeances = zEnvelope(z.array(zSeance));
+const zEnveloppeCreneaux = zEnvelope(z.array(zCreneau));
+const zEnveloppeVerrous = zEnvelope(z.array(zLock));
+const zEnveloppeConflits = zEnvelope(zConflitsListe);
+const zEnveloppeBail = zEnvelope(zBail);
 
 /*──────────────────────────────────────────────────────────────────────────────
   Client API typé — Planning / EDT (TAKT-L09-09)
@@ -114,7 +116,7 @@ export const planningApi = {
   async obtenirSeance(id: string): Promise<Seance> {
     const reponse = await api.get<Seance>(
       `/seances/${encodeURIComponent(id)}`,
-      { schema: zSeance },
+      { schema: zEnvelope(zSeance) },
     );
     if (!reponse.data) {
       throw new Error('Aucune seance retournee.');
@@ -130,7 +132,7 @@ export const planningApi = {
     const reponse = await api.patch<Seance>(
       `/seances/${encodeURIComponent(id)}`,
       donnees,
-      { schema: zSeance },
+      { schema: zEnvelope(zSeance) },
     );
     if (!reponse.data) {
       throw new Error('Aucune seance retournee au deplacement.');
@@ -213,8 +215,14 @@ export const planningApi = {
 
   /** Pose un verrou (individuel ou en masse) (POST /api/v1/locks). */
   async poserVerrou(donnees: LockCreateInput): Promise<Lock> {
+
+
     const reponse = await api.post<Lock>('/locks', donnees, {
-      schema: zLock,
+      schema: z.object({
+        data: zLock.nullable(),
+        error: zErreurApi.nullable(),
+        meta: zMetaApi,
+      }),
     });
     if (!reponse.data) {
       throw new Error('Aucun verrou retourne a la pose.');
