@@ -106,14 +106,8 @@ import EC_RDEP_01 from './EC-RDEP-01';
 import EC_RDEP_02 from './EC-RDEP-02';
 
 const PAGES_PLACEHOLDER = [
-
   EC_GES_01,
   EC_GES_08,
-  EC_DIR_01,
-  EC_DIR_02,
-  EC_DIR_03,
-  EC_DIR_04,
-  EC_DIR_05,
 ];
 
 /**
@@ -126,8 +120,8 @@ describe('pages EC-* (placeholders, lot L09)', () => {
     cleanup();
   });
 
-  it('existe exactement 10 fichiers de page placeholder (EC-COM-01 et EC-COM-02 sont des pages réelles)', () => {
-    expect(PAGES_PLACEHOLDER).toHaveLength(7);
+  it('existe exactement 2 fichiers de page placeholder restants', () => {
+    expect(PAGES_PLACEHOLDER).toHaveLength(2);
   });
 
   it('chaque page affiche son code EC-*', () => {
@@ -138,10 +132,7 @@ describe('pages EC-* (placeholders, lot L09)', () => {
       codesRendus.add(texte.textContent!);
       cleanup();
     }
-    expect(codesRendus.size).toBe(7);
-    for (const code of ['EC-DIR-05']) {
-      expect(codesRendus.has(`Écran ${code}`)).toBe(true);
-    }
+    expect(codesRendus.size).toBe(2);
   });
 });
 
@@ -648,6 +639,80 @@ describe('pages EC-GES-09 / EC-GES-10 / EC-GES-11 (lot L09-11)', () => {
     );
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
       /Exports/i,
+    );
+    cleanup();
+  });
+});
+
+
+vi.mock('@/lib/direction.api', () => ({
+  directionApi: {
+    listerVersions: vi.fn().mockResolvedValue({
+      items: [],
+      meta: { page: 1, pageSize: 20, total: 0 },
+    }),
+    listerStatutsValidation: vi.fn().mockResolvedValue([]),
+    transitionnerVersion: vi.fn().mockResolvedValue({}),
+    dupliquerVersionArchivee: vi.fn().mockResolvedValue({}),
+    preparerExport: vi.fn().mockResolvedValue({
+      exportId: 'e-test',
+      url: 'http://test.local/export.xlsx',
+      expiresAt: new Date().toISOString(),
+    }),
+    listerExports: vi.fn().mockResolvedValue({
+      items: [],
+      meta: { page: 1, pageSize: 50, total: 0 },
+    }),
+  },
+}));
+
+/**
+ * EC-DIR-01 à EC-DIR-05 sont des pages réelles (lot L09-13).
+ * Ce test vérifie qu'elles se chargent sans erreur et affichent leur en-tête.
+ */
+describe('pages EC-DIR-01 à EC-DIR-05 (réelles, lot L09-13)', () => {
+  afterEach(() => {
+    cleanup();
+    queryClient.clear();
+    versionStore.setState({ contexteRepartition: null });
+  });
+
+  it('EC-DIR-01 se charge et affiche le titre des scénarios', async () => {
+    renderWithQuery(<EC_DIR_01 />);
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument(),
+    );
+    cleanup();
+  });
+
+  it('EC-DIR-02 se charge et affiche le titre de validation', async () => {
+    renderWithQuery(<EC_DIR_02 />);
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument(),
+    );
+    cleanup();
+  });
+
+  it('EC-DIR-03 se charge et affiche le titre de rejet', async () => {
+    renderWithQuery(<EC_DIR_03 />);
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument(),
+    );
+    cleanup();
+  });
+
+  it('EC-DIR-04 se charge et affiche le titre d’archivage', async () => {
+    renderWithQuery(<EC_DIR_04 />);
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument(),
+    );
+    cleanup();
+  });
+
+  it('EC-DIR-05 se charge et affiche le titre des exports', async () => {
+    renderWithQuery(<EC_DIR_05 />);
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument(),
     );
     cleanup();
   });

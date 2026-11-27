@@ -708,7 +708,7 @@ TICKETS: List[Ticket] = [
         lot="L09",
         titre="Écrans `EC-DIR-01` à `EC-DIR-05` Direction",
         sp=10,
-        status="À faire",
+        status="Terminé",
         deps=['TAKT-L06-02', 'TAKT-L10-01', 'TAKT-L10-02', 'TAKT-L10-03', 'TAKT-L10-04', 'TAKT-L10-05', 'TAKT-L09-10'],
         exigences=['EC-DIR-01…EC-DIR-05', 'IX-DIR-01…IX-DIR-05', 'UF-DIR-01.'],
     ),
