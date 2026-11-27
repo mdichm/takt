@@ -22,6 +22,10 @@ vi.mock('@/lib/repartition.api', () => ({
     listerGroupes: vi.fn().mockResolvedValue({ items: [], meta: { page: 1, pageSize: 50, total: 0 } }),
     listerTypesEnseignement: vi.fn().mockResolvedValue({ items: [], meta: { page: 1, pageSize: 50, total: 0 } }),
     listerMatieres: vi.fn().mockResolvedValue({ items: [], meta: { page: 1, pageSize: 50, total: 0 } }),
+    listerDepartements: vi.fn().mockResolvedValue({
+      items: [],
+      meta: { page: 1, pageSize: 20, total: 0, requestId: 'test', timestamp: new Date().toISOString() },
+    }),
   },
   }));
 
@@ -31,6 +35,16 @@ vi.mock('@/lib/api', () => ({
       data: { items: [], meta: { page: 1, pageSize: 20, total: 0 } },
       meta: { requestId: 'test', timestamp: new Date().toISOString() },
     }),
+    post: vi.fn().mockResolvedValue({
+      data: {},
+      meta: { requestId: 'test', timestamp: new Date().toISOString() },
+    }),
+  },
+}));
+
+vi.mock('@/lib/versions.api', () => ({
+  versionsApi: {
+    transitionner: vi.fn().mockResolvedValue({}),
   },
 }));
 
@@ -95,9 +109,6 @@ const PAGES_PLACEHOLDER = [
 
   EC_GES_01,
   EC_GES_08,
-  EC_RDEP_03,
-  EC_RDEP_04,
-  EC_RDEP_05,
   EC_DIR_01,
   EC_DIR_02,
   EC_DIR_03,
@@ -116,7 +127,7 @@ describe('pages EC-* (placeholders, lot L09)', () => {
   });
 
   it('existe exactement 10 fichiers de page placeholder (EC-COM-01 et EC-COM-02 sont des pages réelles)', () => {
-    expect(PAGES_PLACEHOLDER).toHaveLength(10);
+    expect(PAGES_PLACEHOLDER).toHaveLength(7);
   });
 
   it('chaque page affiche son code EC-*', () => {
@@ -127,7 +138,7 @@ describe('pages EC-* (placeholders, lot L09)', () => {
       codesRendus.add(texte.textContent!);
       cleanup();
     }
-    expect(codesRendus.size).toBe(10);
+    expect(codesRendus.size).toBe(7);
     for (const code of ['EC-DIR-05']) {
       expect(codesRendus.has(`Écran ${code}`)).toBe(true);
     }
@@ -262,6 +273,101 @@ describe('pages EC-RDEP-01 / EC-RDEP-02 (réelles, lot L05-06)', () => {
     );
     await waitFor(() =>
       expect(screen.getByText(/Répartition annulée/)).toBeInTheDocument(),
+    );
+    cleanup();
+  });
+});
+
+/**
+ * EC-RDEP-03 / EC-RDEP-04 / EC-RDEP-05 sont des pages réelles (lot L09-12).
+ * Ce test vérifie qu'elles se chargent sans erreur et affichent leur en-tête.
+ */
+describe('pages EC-RDEP-03 / EC-RDEP-04 / EC-RDEP-05 (réelles, lot L09-12)', () => {
+  beforeEach(() => {
+    versionStore.setState({
+      contexteRepartition: {
+        versionId: 'v-test',
+        semestreId: 's-test',
+        departementId: 'd-test',
+        etatVersion: 'valid_pedag',
+      },
+    });
+  });
+
+  afterEach(() => {
+    cleanup();
+    queryClient.clear();
+    versionStore.setState({ contexteRepartition: null });
+  });
+
+  it('EC-RDEP-03 se charge et affiche le titre de validation', async () => {
+    vi.mocked(repartitionApi.listerStatutsValidation).mockResolvedValue([
+      { departementId: 'd-test', etat: 'VALIDE', revision: 1 },
+    ]);
+    renderWithQuery(<EC_RDEP_03 />);
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument(),
+    );
+    cleanup();
+  });
+
+  it('EC-RDEP-03 : bouton Valider désactivé si département non validé', async () => {
+    vi.mocked(repartitionApi.listerStatutsValidation).mockResolvedValue([
+      { departementId: 'd-test', etat: 'EN_COURS', revision: 1 },
+    ]);
+    renderWithQuery(<EC_RDEP_03 />);
+    await waitFor(() =>
+      expect(
+        screen.getByRole('button', { name: /Valider et transmettre/ }),
+      ).toBeDisabled(),
+    );
+    cleanup();
+  });
+
+  it('EC-RDEP-03 : bouton Rejeter désactivé si motif vide', async () => {
+    vi.mocked(repartitionApi.listerStatutsValidation).mockResolvedValue([
+      { departementId: 'd-test', etat: 'VALIDE', revision: 1 },
+    ]);
+    renderWithQuery(<EC_RDEP_03 />);
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: /Rejeter/ })).toBeDisabled(),
+    );
+    cleanup();
+  });
+
+  it('EC-RDEP-04 se charge et affiche le titre de revalidation', async () => {
+    vi.mocked(repartitionApi.listerStatutsValidation).mockResolvedValue([
+      { departementId: 'd-test', etat: 'REVALIDATION_REQUISE', revision: 1, motif: 'Rejet pédagogique' },
+    ]);
+    renderWithQuery(<EC_RDEP_04 />);
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument(),
+    );
+    cleanup();
+  });
+
+  it('EC-RDEP-04 : bouton Revalider désactivé si aucun REVALIDATION_REQUISE', async () => {
+    vi.mocked(repartitionApi.listerStatutsValidation).mockResolvedValue([
+      { departementId: 'd-test', etat: 'VALIDE', revision: 1 },
+    ]);
+    renderWithQuery(<EC_RDEP_04 />);
+    await waitFor(() =>
+      expect(
+        screen.getByRole('button', { name: /Revalider mon périmètre/ }),
+      ).toBeDisabled(),
+    );
+    cleanup();
+  });
+
+  it('EC-RDEP-05 se charge et affiche le titre de consultation', async () => {
+    vi.mocked(repartitionApi.listerStatutsValidation).mockResolvedValue([]);
+    vi.mocked(repartitionApi.listerDepartements).mockResolvedValue({
+      items: [],
+      meta: { page: 1, pageSize: 20, total: 0, requestId: 'test', timestamp: new Date().toISOString() },
+    });
+    renderWithQuery(<EC_RDEP_05 />);
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument(),
     );
     cleanup();
   });
