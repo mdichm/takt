@@ -1,20 +1,22 @@
 // Copyright (C) 2026 TAKT
 // SPDX-License-Identifier: AGPL-3.0-only
 
-import { type ZodTypeAny } from 'zod';
+import { z, type ZodTypeAny } from 'zod';
 import { api, type ReponseApi } from './api';
 import { validerReponseApi } from './validation';
 import {
-  zGeneration,
+  zEnvelope,
+  zGenerationItem,
   type GenerationItem,
   zGenerationList,
   type GenerationList,
   type GenerationStatut,
-  zGenerationAnnuler,
   zScenario,
   type Scenario,
   zScenarioSelectReponse,
   type ScenarioSelectReponse,
+  zGenerationStatut,
+  zUuid,
 } from '@takt/contracts';
 
 interface ListeNormalisee<T> {
@@ -81,21 +83,21 @@ export const generationApi = {
     const reponse = await api.post<GenerationItem>(
       '/generations',
       { versionId },
-      { schema: zGeneration },
+      { schema: zEnvelope(zGenerationItem) },
     );
     if (!reponse.data) {
       throw new Error('Aucune génération retournée au lancement.');
     }
-    return reponse.data as GenerationItem;
+    return reponse.data;
   },
 
   /** Liste des générations d'une version (GET /generations). */
   async lister(versionId: string): Promise<ListeNormalisee<GenerationItem>> {
     const reponse = await api.get<unknown>(
       `/generations?versionId=${encodeURIComponent(versionId)}`,
-      { schema: zGenerationList },
+      { schema: zEnvelope(zGenerationList) },
     );
-    return normaliserListe(reponse, zGeneration);
+    return normaliserListe(reponse, zGenerationItem);
   },
 
   /** Scénarios d'une génération (GET /generations/:id/scenarios). */
@@ -105,9 +107,17 @@ export const generationApi = {
   }> {
     const reponse = await api.get<unknown>(
       `/generations/${encodeURIComponent(generationId)}/scenarios`,
+      {
+        schema: zEnvelope(
+          z.object({
+            items: z.array(zScenario),
+            statut: zGenerationStatut,
+          }),
+        ),
+      },
     );
     const data = reponse.data as {
-      items: unknown[];
+      items: Scenario[];
       statut: GenerationStatut;
     };
     return {
@@ -118,9 +128,15 @@ export const generationApi = {
 
   /** Annule une génération en cours (POST /generations/:id/annuler). */
   async annuler(generationId: string): Promise<void> {
-    await api.post(`/generations/${encodeURIComponent(generationId)}/annuler`, {}, {
-      schema: zGenerationAnnuler,
-    });
+    await api.post(
+      `/generations/${encodeURIComponent(generationId)}/annuler`,
+      {},
+      {
+        schema: zEnvelope(
+          z.object({ id: zUuid, statut: zGenerationStatut }),
+        ),
+      },
+    );
   },
 
   /** Adopte un scénario et passe la version en édition (POST /generations/:id/select). */
@@ -131,7 +147,7 @@ export const generationApi = {
     const reponse = await api.post<ScenarioSelectReponse>(
       `/generations/${encodeURIComponent(generationId)}/select`,
       { scenarioId },
-      { schema: zScenarioSelectReponse },
+      { schema: zEnvelope(zScenarioSelectReponse) },
     );
     if (!reponse.data) {
       throw new Error('Aucune donnée retournée à l’adoption du scénario.');
