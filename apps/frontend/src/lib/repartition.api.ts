@@ -35,6 +35,8 @@ import {
   type RevalidationValiderReponse,
   zTypeEnseignement,
   type TypeEnseignement,
+  zDepartement,
+  type Departement,
   zEnvelope,
   type MetaApi,
 } from '@takt/contracts';
@@ -95,6 +97,7 @@ const zEnveloppeAnnuler = zEnvelope(zRepartitionAnnuler);
 const zEnveloppeStatutValidation = zEnvelope(zStatutValidationRepartition);
 const zEnveloppeRevalidationDetecter = zEnvelope(zRevalidationDetecterReponse);
 const zEnveloppeRevalidationValider = zEnvelope(zRevalidationValiderReponse);
+const zEnveloppeDepartements = zEnvelope(zDepartement);
 const zEnveloppePlanEtudes = zEnvelope(zPlanEtudes);
 const zEnveloppeEnseignants = zEnvelope(zEnseignant);
 const zEnveloppeSalles = zEnvelope(zSalle);
@@ -310,6 +313,16 @@ export const repartitionApi = {
     }
     return reponse.data as RevalidationValiderReponse;
   },
+
+  /*───── Référentiels — départements ─────*/
+  /** Liste tous les départements (GET /referentiels/departements). */
+  async listerDepartements(): Promise<ListeNormalisee<Departement>> {
+    const reponse = await api.get<unknown>(
+      '/referentiels/departements',
+      { schema: zEnveloppeDepartements },
+    );
+    return normaliserListe(reponse, zDepartement);
+  },
 };
 
 export type { ListeNormalisee };
@@ -317,6 +330,7 @@ export type {
   AffectationPedagogique,
   AffectationPedagogiqueCreate,
   AffectationPedagogiqueUpdate,
+  Departement,
   Enseignant,
   Groupe,
   Matiere,
