@@ -70,3 +70,6 @@ test.describe('Direction — écrans EC-DIR-01 à EC-DIR-05 (TAKT-L09-13)', () =
       // Email/password non saisis : aucun compte seedé en E2E CI
       // Authentification non testée : le seed n'est pas exécuté dans l'environnement E2E CI
       // Redirection et sélecteur de version vérifiés après authentification réelle (nécessite seed)
+    });
+  });
+});
