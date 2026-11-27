@@ -75,13 +75,10 @@ import EC_GES_01 from './EC-GES-01';
 import EC_GES_02 from './EC-GES-02';
 import EC_GES_03 from './EC-GES-03';
 import EC_GES_04 from './EC-GES-04';
-import EC_GES_06 from './EC-GES-06';
-import EC_GES_07 from './EC-GES-07';
 import EC_GES_08 from './EC-GES-08';
 import EC_GES_09 from './EC-GES-09';
 import EC_GES_10 from './EC-GES-10';
 import EC_GES_11 from './EC-GES-11';
-import EC_GES_12 from './EC-GES-12';
 
 import EC_RDEP_03 from './EC-RDEP-03';
 import EC_RDEP_04 from './EC-RDEP-04';
@@ -97,13 +94,10 @@ import EC_RDEP_02 from './EC-RDEP-02';
 const PAGES_PLACEHOLDER = [
 
   EC_GES_01,
-  EC_GES_06,
-  EC_GES_07,
   EC_GES_08,
   EC_GES_09,
   EC_GES_10,
   EC_GES_11,
-  EC_GES_12,
   EC_RDEP_03,
   EC_RDEP_04,
   EC_RDEP_05,
@@ -125,7 +119,7 @@ describe('pages EC-* (placeholders, lot L09)', () => {
   });
 
   it('existe exactement 25 fichiers de page placeholder (EC-COM-01 et EC-COM-02 sont des pages réelles)', () => {
-    expect(PAGES_PLACEHOLDER).toHaveLength(16);
+    expect(PAGES_PLACEHOLDER).toHaveLength(13);
   });
 
   it('chaque page affiche son code EC-*', () => {
@@ -136,8 +130,8 @@ describe('pages EC-* (placeholders, lot L09)', () => {
       codesRendus.add(texte.textContent!);
       cleanup();
     }
-    expect(codesRendus.size).toBe(16);
-    for (const code of ['EC-GES-06', 'EC-DIR-05']) {
+    expect(codesRendus.size).toBe(13);
+    for (const code of ['EC-DIR-05']) {
       expect(codesRendus.has(`Écran ${code}`)).toBe(true);
     }
   });
