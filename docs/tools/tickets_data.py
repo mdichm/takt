@@ -672,7 +672,7 @@ TICKETS: List[Ticket] = [
         lot="L09",
         titre="Écran `EC-GES-06` Grille EDT drag&drop + `EC-GES-07` Simulation conflits + `EC-GES-12` Bail d'édition",
         sp=13,
-        status="À faire",
+        status="Terminé",
         deps=['TAKT-L06-05', 'TAKT-L06-06', 'TAKT-L06-07', 'TAKT-L08-05', 'TAKT-L09-08'],
         exigences=['EC-GES-06', 'EC-GES-07', 'EC-GES-12', 'IX-GES-07', 'IX-GES-08', 'IX-GES-09', 'IX-GES-10', 'IX-GES-16', 'TAKT-L06-05', 'TAKT-L06-06', 'TAKT-L06-07.'],
     ),

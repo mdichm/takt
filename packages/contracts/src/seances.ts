@@ -2,7 +2,16 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import { z } from 'zod';
-import { creerSchemaTri, zBooleanQuery, zPaginationQuery, zUuid } from './common';
+import {
+  creerSchemaTri,
+  zBooleanQuery,
+  zPaginationMeta,
+  zPaginationQuery,
+  zUuid,
+} from './common';
+import { zAffectationPedagogique } from './affectations';
+import { zCreneau, zSalle, zEnseignant, zGroupe, zMatiere, zTypeEnseignement } from './referentiels';
+import { zLock } from './locks';
 
 /** Identifiant UUID avec un message d’erreur personnalisé. */
 function zUuidPersonnalise(message: string) {
@@ -96,6 +105,40 @@ export const zSeancesBatch = z
     }
   });
 
+/** Représentation complète d'une séance avec ses relations (GET /seances, GET /seances/:id). */
+export const zSeance = z.object({
+  id: zUuid,
+  versionId: zUuid,
+  jour: z.number().int().min(1, 'Le jour doit être compris entre 1 et 6').max(6, 'Le jour doit être compris entre 1 et 6'),
+  creneauDebutId: zUuid,
+  nbCreneaux: z.number().int().positive('Le nombre de créneaux doit être supérieur à 0'),
+  salleId: zUuid.nullable(),
+  enseignantId: zUuid.nullable(),
+  groupeId: zUuid.nullable(),
+  matiereId: zUuid.nullable(),
+  typeEnseignementId: zUuid.nullable(),
+  affectationId: zUuid,
+  estVerrouillee: z.boolean(),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
+  creneauDebut: zCreneau,
+  salle: zSalle.nullable(),
+  enseignant: zEnseignant.nullable(),
+  groupe: zGroupe.nullable(),
+  matiere: zMatiere.nullable(),
+  typeEnseignement: zTypeEnseignement.nullable(),
+  affectation: zAffectationPedagogique,
+  verrous: z.array(zLock),
+});
+
+/** Réponse paginée de la liste des séances (GET /seances). */
+export const zSeanceListe = z.object({
+  items: z.array(zSeance),
+  meta: zPaginationMeta,
+});
+
+export type Seance = z.infer<typeof zSeance>;
+export type SeanceListe = z.infer<typeof zSeanceListe>;
 export type SeanceCreateInput = z.infer<typeof zSeanceCreate>;
 export type SeanceUpdateInput = z.infer<typeof zSeanceUpdate>;
 export type SeanceReplaceInput = z.infer<typeof zSeanceReplace>;
