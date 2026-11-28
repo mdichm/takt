@@ -26,7 +26,7 @@ TICKETS: List[Ticket] = [
         sp=3,
         status="Terminé",
         deps=[],
-        exigences=['EX-WKF-02', 'EX-WKF-03', 'EX-WKF-07', 'EX-WKF-08', 'WORKFLOW_METIER §3', 'ST_TAKT §4.1.'],
+        exigences=['EX-WKF-02', 'EX-WKF-03', 'EX-WKF-07', 'EX-WKF-08', 'WORKFLOW_METIER §3', 'ST_TAKT §4.1'],
     ),
     Ticket(
         id="TAKT-L00-02",
@@ -35,7 +35,7 @@ TICKETS: List[Ticket] = [
         sp=2,
         status="Terminé",
         deps=['TAKT-L00-01'],
-        exigences=['EX-OUV-01', 'WF-01', 'RB-UI-07', 'EC-ADM-03.'],
+        exigences=['EX-OUV-01', 'WF-01', 'RB-UI-07', 'EC-ADM-03'],
     ),
     Ticket(
         id="TAKT-L00-03",
@@ -44,7 +44,7 @@ TICKETS: List[Ticket] = [
         sp=3,
         status="Terminé",
         deps=[],
-        exigences=['EX-PER-01', 'EX-REF-06', 'HC-STR-01 à HC-STR-03', 'EX-UI-01', 'UI_ARBORESCENCE §1.'],
+        exigences=['EX-PER-01', 'EX-REF-06', 'HC-STR-01 à HC-STR-03', 'EX-UI-01', 'UI_ARBORESCENCE §1'],
     ),
     Ticket(
         id="TAKT-L00-04",
@@ -53,7 +53,7 @@ TICKETS: List[Ticket] = [
         sp=3,
         status="Terminé",
         deps=[],
-        exigences=['EX-SEC-01', 'TE-API-01', 'TESTS.md §6.1', 'PLAN_MACRO §6.'],
+        exigences=['EX-SEC-01', 'TE-API-01', 'TESTS.md §6.1', 'PLAN_MACRO §6'],
     ),
     Ticket(
         id="TAKT-L00-05",
@@ -62,7 +62,7 @@ TICKETS: List[Ticket] = [
         sp=2,
         status="Terminé",
         deps=['TAKT-L00-01', 'TAKT-L00-02', 'TAKT-L00-03', 'TAKT-L00-04'],
-        exigences=['DL-01 à DL-08', 'DL-TE-01 à DL-TE-08', 'DL-UI-01 à DL-UI-04', 'DL-FS-*.'],
+        exigences=['DL-01 à DL-08', 'DL-TE-01 à DL-TE-08', 'DL-UI-01 à DL-UI-04', 'DL-FS-*'],
     ),
     Ticket(
         id="TAKT-L00-06",
@@ -71,7 +71,7 @@ TICKETS: List[Ticket] = [
         sp=2,
         status="Terminé",
         deps=[],
-        exigences=['DL-09.'],
+        exigences=['DL-09'],
     ),
     Ticket(
         id="TAKT-L01-01",
@@ -80,7 +80,7 @@ TICKETS: List[Ticket] = [
         sp=2,
         status="Terminé",
         deps=['TAKT-L00-04'],
-        exigences=['PLAN_MACRO §6', 'GG-12', 'TAKT-L00-04.'],
+        exigences=['PLAN_MACRO §6', 'GG-12', 'TAKT-L00-04'],
     ),
     Ticket(
         id="TAKT-L01-02",
@@ -89,7 +89,7 @@ TICKETS: List[Ticket] = [
         sp=5,
         status="Terminé",
         deps=['TAKT-L01-01'],
-        exigences=['ST_TAKT §0.1', 'ST_TAKT §1.2', 'PLAN_MACRO E1.1', 'GG-02.'],
+        exigences=['ST_TAKT §0.1', 'ST_TAKT §1.2', 'PLAN_MACRO E1.1', 'GG-02'],
     ),
     Ticket(
         id="TAKT-L01-03",
@@ -98,7 +98,7 @@ TICKETS: List[Ticket] = [
         sp=3,
         status="Terminé",
         deps=['TAKT-L01-02'],
-        exigences=['ST_TAKT §1.2', 'ST_TAKT §3.1', 'PLAN_MACRO E1.3', 'TE-API-06.'],
+        exigences=['ST_TAKT §1.2', 'ST_TAKT §3.1', 'PLAN_MACRO E1.3', 'TE-API-06'],
     ),
     Ticket(
         id="TAKT-L01-04",
@@ -107,7 +107,7 @@ TICKETS: List[Ticket] = [
         sp=5,
         status="Terminé",
         deps=['TAKT-L01-02'],
-        exigences=['PLAN_MACRO E1.2', 'ST_TAKT §2', 'TE-DB-*', 'GG-08', 'docs/DOC_MIGRATION_DB.md.'],
+        exigences=['PLAN_MACRO E1.2', 'ST_TAKT §2', 'TE-DB-*', 'GG-08', 'docs/DOC_MIGRATION_DB.md'],
     ),
     Ticket(
         id="TAKT-L01-05",
@@ -116,7 +116,7 @@ TICKETS: List[Ticket] = [
         sp=3,
         status="Terminé",
         deps=['TAKT-L01-02'],
-        exigences=['ST_TAKT §0.1', 'UI_FRONTEND_SPECS §2', 'GG-03', 'GG-04.'],
+        exigences=['ST_TAKT §0.1', 'UI_FRONTEND_SPECS §2', 'GG-03', 'GG-04'],
     ),
     Ticket(
         id="TAKT-L01-06",
@@ -125,7 +125,7 @@ TICKETS: List[Ticket] = [
         sp=3,
         status="Terminé",
         deps=['TAKT-L01-03', 'TAKT-L01-05'],
-        exigences=['PLAN_MACRO E1.5', 'docs/DEPLOIEMENT.md §4', 'GG-11.'],
+        exigences=['PLAN_MACRO E1.5', 'docs/DEPLOIEMENT.md §4', 'GG-11'],
     ),
     Ticket(
         id="TAKT-L01-07",
@@ -134,7 +134,7 @@ TICKETS: List[Ticket] = [
         sp=3,
         status="Terminé",
         deps=['TAKT-L01-02', 'TAKT-L01-03', 'TAKT-L01-05'],
-        exigences=['PLAN_MACRO E1.6', 'TE-TEST-05', 'TESTS.md §8.1', 'GG-12.'],
+        exigences=['PLAN_MACRO E1.6', 'TE-TEST-05', 'TESTS.md §8.1', 'GG-12'],
     ),
     Ticket(
         id="TAKT-L02-01",
@@ -143,7 +143,7 @@ TICKETS: List[Ticket] = [
         sp=5,
         status="Terminé",
         deps=['TAKT-L01-03'],
-        exigences=['ST_TAKT §3.3', 'ST_TAKT §3.4', 'TE-API-06', 'EX-UI-01.'],
+        exigences=['ST_TAKT §3.3', 'ST_TAKT §3.4', 'TE-API-06', 'EX-UI-01'],
     ),
     Ticket(
         id="TAKT-L02-02",
@@ -152,7 +152,7 @@ TICKETS: List[Ticket] = [
         sp=5,
         status="Terminé",
         deps=['TAKT-L01-02'],
-        exigences=['TE-API-02', 'ST_TAKT §3.1', 'ST_TAKT §6.1 (risque « cohérence frontend/backend »)', 'UI_FRONTEND_SPECS §4.'],
+        exigences=['TE-API-02', 'ST_TAKT §3.1', 'ST_TAKT §6.1 (risque « cohérence frontend/backend »)', 'UI_FRONTEND_SPECS §4'],
     ),
     Ticket(
         id="TAKT-L02-03",
@@ -161,7 +161,7 @@ TICKETS: List[Ticket] = [
         sp=5,
         status="Terminé",
         deps=['TAKT-L02-01', 'TAKT-L02-02'],
-        exigences=['ST_TAKT §3.3 (meta.page', 'meta.pageSize', 'meta.total)', 'ST_TAKT §3.5', 'IX-ADM-07', 'IX-RDEP-05.'],
+        exigences=['ST_TAKT §3.3 (meta.page', 'meta.pageSize', 'meta.total)', 'ST_TAKT §3.5', 'IX-ADM-07', 'IX-RDEP-05'],
     ),
     Ticket(
         id="TAKT-L02-04",
@@ -170,7 +170,7 @@ TICKETS: List[Ticket] = [
         sp=4,
         status="Terminé",
         deps=['TAKT-L02-01'],
-        exigences=['ST_TAKT §3.1', 'PLAN_MACRO E0.6', 'TE-API-01 à TE-API-06.'],
+        exigences=['ST_TAKT §3.1', 'PLAN_MACRO E0.6', 'TE-API-01 à TE-API-06'],
     ),
     Ticket(
         id="TAKT-L02-05",
@@ -179,7 +179,7 @@ TICKETS: List[Ticket] = [
         sp=4,
         status="Terminé",
         deps=['TAKT-L01-06', 'TAKT-L02-01'],
-        exigences=['ST_TAKT §1.2', 'ST_TAKT §1.3 (étape 7)', 'TE-ARCH-05', 'EX-NOT-01', 'SPK-04.'],
+        exigences=['ST_TAKT §1.2', 'ST_TAKT §1.3 (étape 7)', 'TE-ARCH-05', 'EX-NOT-01', 'SPK-04'],
     ),
     Ticket(
         id="TAKT-L02-06",
@@ -188,7 +188,7 @@ TICKETS: List[Ticket] = [
         sp=4,
         status="Terminé",
         deps=['TAKT-L01-03'],
-        exigences=['ST_TAKT §1.2', 'ST_TAKT §1.5', 'TE-ARCH-02', 'TE-ARCH-05.'],
+        exigences=['ST_TAKT §1.2', 'ST_TAKT §1.5', 'TE-ARCH-02', 'TE-ARCH-05'],
     ),
     Ticket(
         id="TAKT-L03-01",
@@ -197,7 +197,7 @@ TICKETS: List[Ticket] = [
         sp=5,
         status="Terminé",
         deps=['TAKT-L01-03'],
-        exigences=['EX-SEC-01', 'ST_TAKT §5.1', 'DL-TE-07', 'TESTS.md §6.1.'],
+        exigences=['EX-SEC-01', 'ST_TAKT §5.1', 'DL-TE-07', 'TESTS.md §6.1'],
     ),
     Ticket(
         id="TAKT-L03-02",
@@ -206,7 +206,7 @@ TICKETS: List[Ticket] = [
         sp=5,
         status="Terminé",
         deps=['TAKT-L03-01'],
-        exigences=['EX-SEC-01', 'ST_TAKT §5.1', 'DL-TE-07', 'TE-API-01', 'TESTS.md §6.1.'],
+        exigences=['EX-SEC-01', 'ST_TAKT §5.1', 'DL-TE-07', 'TE-API-01', 'TESTS.md §6.1'],
     ),
     Ticket(
         id="TAKT-L03-03",
@@ -215,7 +215,7 @@ TICKETS: List[Ticket] = [
         sp=5,
         status="Terminé",
         deps=['TAKT-L02-02', 'TAKT-L03-01', 'TAKT-L03-02', 'TAKT-L00-04'],
-        exigences=['EX-SEC-01', 'TE-API-01', 'ST_TAKT §3.2', 'IX-COM-01', 'IX-COM-02', 'UF-* auth.'],
+        exigences=['EX-SEC-01', 'TE-API-01', 'ST_TAKT §3.2', 'IX-COM-01', 'IX-COM-02', 'UF-* auth'],
     ),
     Ticket(
         id="TAKT-L03-04",
@@ -224,7 +224,7 @@ TICKETS: List[Ticket] = [
         sp=5,
         status="Terminé",
         deps=['TAKT-L03-03', 'TAKT-L04-01'],
-        exigences=['EX-ROL-01', 'EX-ROL-02', 'IX-ADM-01 à IX-ADM-03', 'EC-ADM-01', 'ST_TAKT §3.2.'],
+        exigences=['EX-ROL-01', 'EX-ROL-02', 'IX-ADM-01 à IX-ADM-03', 'EC-ADM-01', 'ST_TAKT §3.2'],
     ),
     Ticket(
         id="TAKT-L03-05",
@@ -233,7 +233,7 @@ TICKETS: List[Ticket] = [
         sp=5,
         status="Terminé",
         deps=['TAKT-L03-03', 'TAKT-L03-04'],
-        exigences=['EX-SEC-02', 'EX-ROL-02', 'RB-UI-01', 'ST_TAKT §5.2', 'ST_TAKT §5.3', 'TE-API-03.'],
+        exigences=['EX-SEC-02', 'EX-ROL-02', 'RB-UI-01', 'ST_TAKT §5.2', 'ST_TAKT §5.3', 'TE-API-03'],
     ),
     Ticket(
         id="TAKT-L03-06",
@@ -242,7 +242,7 @@ TICKETS: List[Ticket] = [
         sp=5,
         status="Terminé",
         deps=['TAKT-L03-05', 'TAKT-L01-04'],
-        exigences=['EX-DAT-05', 'TE-API-05', 'TE-SEC-05', 'ST_TAKT §5.4', 'EC-ADM-04.'],
+        exigences=['EX-DAT-05', 'TE-API-05', 'TE-SEC-05', 'ST_TAKT §5.4', 'EC-ADM-04'],
     ),
     Ticket(
         id="TAKT-L03-07",
@@ -251,7 +251,7 @@ TICKETS: List[Ticket] = [
         sp=4,
         status="Terminé",
         deps=['TAKT-L03-04'],
-        exigences=['PLAN_MACRO E2.5', 'TESTS.md §9.1', 'GG-11', 'GG-03.'],
+        exigences=['PLAN_MACRO E2.5', 'TESTS.md §9.1', 'GG-11', 'GG-03'],
     ),
     Ticket(
         id="TAKT-L04-01",
@@ -260,7 +260,7 @@ TICKETS: List[Ticket] = [
         sp=5,
         status="Terminé",
         deps=['TAKT-L03-04'],
-        exigences=['EX-REF-01', 'EX-REF-04', 'ST_TAKT §2.1', 'PLAN_MACRO E2.1', 'EC-ADM-02.'],
+        exigences=['EX-REF-01', 'EX-REF-04', 'ST_TAKT §2.1', 'PLAN_MACRO E2.1', 'EC-ADM-02'],
     ),
     Ticket(
         id="TAKT-L04-02",
@@ -269,7 +269,7 @@ TICKETS: List[Ticket] = [
         sp=6,
         status="Terminé",
         deps=['TAKT-L04-01'],
-        exigences=['EX-REF-01', 'EX-REF-04', 'PLAN_MACRO E2.2', 'ST_TAKT §2.1', 'EC-ADM-02.'],
+        exigences=['EX-REF-01', 'EX-REF-04', 'PLAN_MACRO E2.2', 'ST_TAKT §2.1', 'EC-ADM-02'],
     ),
     Ticket(
         id="TAKT-L04-03",
@@ -278,7 +278,7 @@ TICKETS: List[Ticket] = [
         sp=5,
         status="Terminé",
         deps=['TAKT-L04-01', 'TAKT-L04-02'],
-        exigences=['EX-REF-02', 'EX-REF-01', 'SF_TAKT §2 (400 enseignants)', 'PLAN_MACRO E2.3.'],
+        exigences=['EX-REF-02', 'EX-REF-01', 'SF_TAKT §2 (400 enseignants)', 'PLAN_MACRO E2.3'],
     ),
     Ticket(
         id="TAKT-L04-04",
@@ -287,7 +287,7 @@ TICKETS: List[Ticket] = [
         sp=6,
         status="Terminé",
         deps=['TAKT-L04-01'],
-        exigences=['EX-REF-03', 'HC-ROOM-01', 'HC-ROOM-02', 'HC-ROOM-03', 'PLAN_MACRO E2.3.'],
+        exigences=['EX-REF-03', 'HC-ROOM-01', 'HC-ROOM-02', 'HC-ROOM-03', 'PLAN_MACRO E2.3'],
     ),
     Ticket(
         id="TAKT-L04-05",
@@ -296,7 +296,7 @@ TICKETS: List[Ticket] = [
         sp=5,
         status="Terminé",
         deps=['TAKT-L00-03', 'TAKT-L04-01'],
-        exigences=['EX-REF-06', 'HC-STR-01 à HC-STR-03', 'PLAN_MACRO E2.4', 'TAKT-L00-03.'],
+        exigences=['EX-REF-06', 'HC-STR-01 à HC-STR-03', 'PLAN_MACRO E2.4', 'TAKT-L00-03'],
     ),
     Ticket(
         id="TAKT-L04-06",
@@ -305,7 +305,7 @@ TICKETS: List[Ticket] = [
         sp=8,
         status="Terminé",
         deps=['TAKT-L02-02', 'TAKT-L02-03', 'TAKT-L08-05'],
-        exigences=['EX-REF-04', 'EC-ADM-02', 'IX-ADM-04', 'IX-ADM-05', 'UI_FRONTEND_SPECS §2', 'UI_INTERACTIONS §2.'],
+        exigences=['EX-REF-04', 'EC-ADM-02', 'IX-ADM-04', 'IX-ADM-05', 'UI_FRONTEND_SPECS §2', 'UI_INTERACTIONS §2'],
     ),
     Ticket(
         id="TAKT-L04-07",
@@ -314,7 +314,7 @@ TICKETS: List[Ticket] = [
         sp=5,
         status="Terminé",
         deps=['TAKT-L04-03', 'TAKT-L04-04', 'TAKT-L02-02'],
-        exigences=['EX-REF-05', 'PLAN_MACRO E2.3', 'IX-GES-02', 'EC-GES-01.'],
+        exigences=['EX-REF-05', 'PLAN_MACRO E2.3', 'IX-GES-02', 'EC-GES-01'],
     ),
     Ticket(
         id="TAKT-L04-08",
@@ -323,7 +323,7 @@ TICKETS: List[Ticket] = [
         sp=4,
         status="Terminé",
         deps=['TAKT-L04-07'],
-        exigences=['EX-REF-05', 'EX-WKF-06', 'TE-MET-10', 'IX-GES-02', 'EX-OUV-02.'],
+        exigences=['EX-REF-05', 'EX-WKF-06', 'TE-MET-10', 'IX-GES-02', 'EX-OUV-02'],
     ),
     Ticket(
         id="TAKT-L05-01",
@@ -332,7 +332,7 @@ TICKETS: List[Ticket] = [
         sp=5,
         status="Terminé",
         deps=['TAKT-L04-01', 'TAKT-L04-02'],
-        exigences=['EX-REP-01', 'EX-DAT-02', 'PLAN_MACRO E2.2', 'EC-GES-02', 'IX-GES-03.'],
+        exigences=['EX-REP-01', 'EX-DAT-02', 'PLAN_MACRO E2.2', 'EC-GES-02', 'IX-GES-03'],
     ),
     Ticket(
         id="TAKT-L05-02",
@@ -341,7 +341,7 @@ TICKETS: List[Ticket] = [
         sp=6,
         status="Terminé",
         deps=['TAKT-L05-01', 'TAKT-L04-03'],
-        exigences=['EX-REP-01', 'EX-REP-02', 'EX-DAT-01', 'TE-MET-03', 'IX-RDEP-01.'],
+        exigences=['EX-REP-01', 'EX-REP-02', 'EX-DAT-01', 'TE-MET-03', 'IX-RDEP-01'],
     ),
     Ticket(
         id="TAKT-L05-03",
@@ -350,7 +350,7 @@ TICKETS: List[Ticket] = [
         sp=8,
         status="Terminé",
         deps=['TAKT-L05-02', 'TAKT-L04-02'],
-        exigences=['EX-PRI-05', 'DL-07', 'ST_TAKT §0.2 B6', 'SC-LOAD-01 à SC-LOAD-03', 'TE-TEST-02.'],
+        exigences=['EX-PRI-05', 'DL-07', 'ST_TAKT §0.2 B6', 'SC-LOAD-01 à SC-LOAD-03', 'TE-TEST-02'],
     ),
     Ticket(
         id="TAKT-L05-04",
@@ -359,7 +359,7 @@ TICKETS: List[Ticket] = [
         sp=5,
         status="Terminé",
         deps=['TAKT-L05-02', 'TAKT-L05-03'],
-        exigences=['EX-REP-02', 'EX-REP-03', 'EX-REP-05', 'EX-DAT-01', 'EX-PRI-02', 'DL-07', 'IX-RDEP-02.'],
+        exigences=['EX-REP-02', 'EX-REP-03', 'EX-REP-05', 'EX-DAT-01', 'EX-PRI-02', 'DL-07', 'IX-RDEP-02'],
     ),
     Ticket(
         id="TAKT-L05-05",
@@ -368,7 +368,7 @@ TICKETS: List[Ticket] = [
         sp=5,
         status="Terminé",
         deps=['TAKT-L05-04', 'TAKT-L06-02'],
-        exigences=['EX-REP-04', 'EX-WKF-09', 'IX-RDEP-04', 'EC-RDEP-04', 'ST_TAKT §1.4.'],
+        exigences=['EX-REP-04', 'EX-WKF-09', 'IX-RDEP-04', 'EC-RDEP-04', 'ST_TAKT §1.4'],
     ),
     Ticket(
         id="TAKT-L05-06",
@@ -377,7 +377,7 @@ TICKETS: List[Ticket] = [
         sp=8,
         status="Terminé",
         deps=['TAKT-L05-04', 'TAKT-L08-04'],
-        exigences=['EX-REP-01', 'EX-REP-02', 'EC-RDEP-01', 'EC-RDEP-02', 'IX-RDEP-01', 'IX-RDEP-02', 'UF-RDEP-01.'],
+        exigences=['EX-REP-01', 'EX-REP-02', 'EC-RDEP-01', 'EC-RDEP-02', 'IX-RDEP-01', 'IX-RDEP-02', 'UF-RDEP-01'],
     ),
     Ticket(
         id="TAKT-L06-01",
@@ -386,7 +386,7 @@ TICKETS: List[Ticket] = [
         sp=8,
         status="Terminé",
         deps=['TAKT-L05-04', 'TAKT-L01-04'],
-        exigences=['EX-WKF-01', 'EX-PRI-02', 'EX-DAT-01', 'DL-02', 'DL-05', 'ST_TAKT §2.1.'],
+        exigences=['EX-WKF-01', 'EX-PRI-02', 'EX-DAT-01', 'DL-02', 'DL-05', 'ST_TAKT §2.1'],
     ),
     Ticket(
         id="TAKT-L06-02",
@@ -395,7 +395,7 @@ TICKETS: List[Ticket] = [
         sp=8,
         status="Terminé",
         deps=['TAKT-L06-01', 'TAKT-L03-05', 'TAKT-L00-01'],
-        exigences=['EX-WKF-01 à EX-WKF-09', 'TE-API-03', 'TE-MET-07', 'TE-MET-08', 'WORKFLOW_METIER §3', 'ST_TAKT §4.1', 'TAKT-L00-01.'],
+        exigences=['EX-WKF-01 à EX-WKF-09', 'TE-API-03', 'TE-MET-07', 'TE-MET-08', 'WORKFLOW_METIER §3', 'ST_TAKT §4.1', 'TAKT-L00-01'],
     ),
     Ticket(
         id="TAKT-L06-03",
@@ -404,7 +404,7 @@ TICKETS: List[Ticket] = [
         sp=5,
         status="Terminé",
         deps=['TAKT-L06-01', 'TAKT-L06-02', 'TAKT-L04-05'],
-        exigences=['EX-EDI-01', 'EX-PER-01', 'B1 (ST_TAKT §0.2)', 'TE-MET-03', 'ST_TAKT §4.1.'],
+        exigences=['EX-EDI-01', 'EX-PER-01', 'B1 (ST_TAKT §0.2)', 'TE-MET-03', 'ST_TAKT §4.1'],
     ),
     Ticket(
         id="TAKT-L06-04",
@@ -413,7 +413,7 @@ TICKETS: List[Ticket] = [
         sp=5,
         status="Terminé",
         deps=['TAKT-L06-03'],
-        exigences=['HC-RES-01', 'HC-RES-02', 'HC-RES-03', 'ST_TAKT §2.3', 'ST_TAKT §2.4', 'PLAN_MACRO risque « conflits non détectés ».'],
+        exigences=['HC-RES-01', 'HC-RES-02', 'HC-RES-03', 'ST_TAKT §2.3', 'ST_TAKT §2.4', 'PLAN_MACRO risque « conflits non détectés »'],
     ),
     Ticket(
         id="TAKT-L06-05",
@@ -422,7 +422,7 @@ TICKETS: List[Ticket] = [
         sp=8,
         status="Terminé",
         deps=['TAKT-L06-04', 'TAKT-L04-04', 'TAKT-L05-03'],
-        exigences=['EX-EDI-02', 'ST_TAKT §4.3', 'HC-RES-01 à HC-RES-03', 'HC-ROOM-01 à HC-ROOM-03', 'SC-LOAD-01', 'SC-LOAD-02', 'TE-TEST-02.'],
+        exigences=['EX-EDI-02', 'ST_TAKT §4.3', 'HC-RES-01 à HC-RES-03', 'HC-ROOM-01 à HC-ROOM-03', 'SC-LOAD-01', 'SC-LOAD-02', 'TE-TEST-02'],
     ),
     Ticket(
         id="TAKT-L06-06",
@@ -431,7 +431,7 @@ TICKETS: List[Ticket] = [
         sp=6,
         status="Terminé",
         deps=['TAKT-L06-05'],
-        exigences=['EX-EDI-03', 'RB-UI-05', 'EC-GES-07', 'IX-GES-10.'],
+        exigences=['EX-EDI-03', 'RB-UI-05', 'EC-GES-07', 'IX-GES-10'],
     ),
     Ticket(
         id="TAKT-L06-07",
@@ -440,7 +440,7 @@ TICKETS: List[Ticket] = [
         sp=6,
         status="Terminé",
         deps=['TAKT-L06-01', 'TAKT-L03-05'],
-        exigences=['EX-EDI-04', 'TE-ARCH-04', 'ST_TAKT §4.5', 'RB-UI-03', 'IX-GES-16', 'DL-TE-06.'],
+        exigences=['EX-EDI-04', 'TE-ARCH-04', 'ST_TAKT §4.5', 'RB-UI-03', 'IX-GES-16', 'DL-TE-06'],
     ),
     Ticket(
         id="TAKT-L06-08",
@@ -449,7 +449,7 @@ TICKETS: List[Ticket] = [
         sp=6,
         status="Terminé",
         deps=['TAKT-L06-02', 'TAKT-L06-03'],
-        exigences=['EX-VRR-01', 'EX-VRR-02', 'EX-WKF-09', 'WORKFLOW_METIER §8', 'HC-LOCK-01 à HC-LOCK-04', 'IX-GES-08', 'IX-GES-09.'],
+        exigences=['EX-VRR-01', 'EX-VRR-02', 'EX-WKF-09', 'WORKFLOW_METIER §8', 'HC-LOCK-01 à HC-LOCK-04', 'IX-GES-08', 'IX-GES-09'],
     ),
     Ticket(
         id="TAKT-L06-09",
@@ -458,7 +458,7 @@ TICKETS: List[Ticket] = [
         sp=5,
         status="Terminé",
         deps=['TAKT-L06-05', 'TAKT-L05-03'],
-        exigences=['EX-EDI-05', 'RB-UI-06', 'TE-MET-01', 'TE-MET-02', 'SF_TAKT §15 (couverture)', 'SC-LOAD-01.'],
+        exigences=['EX-EDI-05', 'RB-UI-06', 'TE-MET-01', 'TE-MET-02', 'SF_TAKT §15 (couverture)', 'SC-LOAD-01'],
     ),
     Ticket(
         id="TAKT-L06-10",
@@ -467,7 +467,7 @@ TICKETS: List[Ticket] = [
         sp=6,
         status="Terminé",
         deps=['TAKT-L06-01', 'TAKT-L06-03'],
-        exigences=['EX-PRI-06', 'EX-DAT-01', 'EX-DAT-02', 'EX-DAT-03', 'EX-PRI-02', 'TE-ARCH-03', 'TE-MET-06', 'DL-05.'],
+        exigences=['EX-PRI-06', 'EX-DAT-01', 'EX-DAT-02', 'EX-DAT-03', 'EX-PRI-02', 'TE-ARCH-03', 'TE-MET-06', 'DL-05'],
     ),
     Ticket(
         id="TAKT-L06-11",
@@ -476,7 +476,7 @@ TICKETS: List[Ticket] = [
         sp=2,
         status="À faire",
         deps=['TAKT-L06-02'],
-        exigences=['EX-WKF-04', 'TE-ARCH-03', 'TE-MET-06', 'GG-05.'],
+        exigences=['EX-WKF-04', 'TE-ARCH-03', 'TE-MET-06', 'GG-05'],
     ),
     Ticket(
         id="TAKT-L07-01",
@@ -485,7 +485,7 @@ TICKETS: List[Ticket] = [
         sp=8,
         status="Terminé",
         deps=['TAKT-L06-10', 'TAKT-L06-08'],
-        exigences=['EX-PRI-01', 'EX-PRE-06', 'EX-DAT-01', 'TE-ARCH-01', 'SPEC_SOLVER_CPSAT §3', 'HC-*', 'SC-*.'],
+        exigences=['EX-PRI-01', 'EX-PRE-06', 'EX-DAT-01', 'TE-ARCH-01', 'SPEC_SOLVER_CPSAT §3', 'HC-*', 'SC-*'],
     ),
     Ticket(
         id="TAKT-L07-02",
@@ -494,7 +494,7 @@ TICKETS: List[Ticket] = [
         sp=6,
         status="Terminé",
         deps=['TAKT-L07-01'],
-        exigences=['SPEC_SOLVER_CPSAT §5', 'SPEC_SOLVER_CPSAT §9', 'TE-ARCH-01', 'GG-10.'],
+        exigences=['SPEC_SOLVER_CPSAT §5', 'SPEC_SOLVER_CPSAT §9', 'TE-ARCH-01', 'GG-10'],
     ),
     Ticket(
         id="TAKT-L07-03",
@@ -503,7 +503,7 @@ TICKETS: List[Ticket] = [
         sp=8,
         status="Terminé",
         deps=['TAKT-L07-02', 'TAKT-L02-05', 'TAKT-L06-10'],
-        exigences=['ST_TAKT §1.3', 'TE-ARCH-05', 'EX-PRE-03', 'EX-PRE-05', 'SPEC_SOLVER_CPSAT §6', 'SPK-04.'],
+        exigences=['ST_TAKT §1.3', 'TE-ARCH-05', 'EX-PRE-03', 'EX-PRE-05', 'SPEC_SOLVER_CPSAT §6', 'SPK-04'],
     ),
     Ticket(
         id="TAKT-L07-04",
@@ -512,7 +512,7 @@ TICKETS: List[Ticket] = [
         sp=8,
         status="Terminé",
         deps=['TAKT-L07-03'],
-        exigences=['SPEC_SOLVER_CPSAT §7', 'HC-*', 'SC-*', 'EX-PRE-03', 'EX-PRE-04', 'ST_TAKT §4.2.'],
+        exigences=['SPEC_SOLVER_CPSAT §7', 'HC-*', 'SC-*', 'EX-PRE-03', 'EX-PRE-04', 'ST_TAKT §4.2'],
     ),
     Ticket(
         id="TAKT-L07-05",
@@ -521,7 +521,7 @@ TICKETS: List[Ticket] = [
         sp=5,
         status="Terminé",
         deps=['TAKT-L07-04'],
-        exigences=['SPEC_SOLVER_CPSAT §8', 'ST_TAKT §6.3 (SPK-01)', 'PLAN_MACRO risque « solver trop lent »', 'SF_TAKT §2 (4 000 séances).'],
+        exigences=['SPEC_SOLVER_CPSAT §8', 'ST_TAKT §6.3 (SPK-01)', 'PLAN_MACRO risque « solver trop lent »', 'SF_TAKT §2 (4 000 séances)'],
     ),
     Ticket(
         id="TAKT-L07-06",
@@ -530,7 +530,7 @@ TICKETS: List[Ticket] = [
         sp=5,
         status="Terminé",
         deps=['TAKT-L07-03'],
-        exigences=['EX-PRI-03', 'EX-PRE-04', 'EX-PRE-05', 'ST_TAKT §1.3 (étape 8)', 'IX-GES-06', 'EC-GES-05.'],
+        exigences=['EX-PRI-03', 'EX-PRE-04', 'EX-PRE-05', 'ST_TAKT §1.3 (étape 8)', 'IX-GES-06', 'EC-GES-05'],
     ),
     Ticket(
         id="TAKT-L07-07",
@@ -539,7 +539,7 @@ TICKETS: List[Ticket] = [
         sp=7,
         status="Terminé",
         deps=['TAKT-L06-02', 'TAKT-L06-08', 'TAKT-L00-02'],
-        exigences=['EX-PRE-01', 'EX-REP-06', 'EX-VRR-02', 'EX-OUV-01', 'RB-UI-07', 'TE-MET-08', 'TAKT-L00-02.'],
+        exigences=['EX-PRE-01', 'EX-REP-06', 'EX-VRR-02', 'EX-OUV-01', 'RB-UI-07', 'TE-MET-08', 'TAKT-L00-02'],
     ),
     Ticket(
         id="TAKT-L08-01",
@@ -548,7 +548,7 @@ TICKETS: List[Ticket] = [
         sp=8,
         status="Terminé",
         deps=['TAKT-L01-05', 'TAKT-L00-03'],
-        exigences=['EX-UI-05', 'DL-UI-03', 'DL-UI-04', 'SPEC_ACCESSIBILITE §4', 'UI_DESIGN_TOKENS', 'GAPS_RESOLUTION_SUMMARY (Warning Normal', 'Lock Normal', 'Accent Ramadan).'],
+        exigences=['EX-UI-05', 'DL-UI-03', 'DL-UI-04', 'SPEC_ACCESSIBILITE §4', 'UI_DESIGN_TOKENS', 'GAPS_RESOLUTION_SUMMARY (Warning Normal', 'Lock Normal', 'Accent Ramadan)'],
     ),
     Ticket(
         id="TAKT-L08-02",
@@ -557,7 +557,7 @@ TICKETS: List[Ticket] = [
         sp=5,
         status="Terminé",
         deps=['TAKT-L02-02', 'TAKT-L02-03', 'TAKT-L03-03'],
-        exigences=['TE-API-01', 'TE-API-06', 'ST_TAKT §3.3', 'UI_FRONTEND_SPECS §4', 'TAKT-L00-04.'],
+        exigences=['TE-API-01', 'TE-API-06', 'ST_TAKT §3.3', 'UI_FRONTEND_SPECS §4', 'TAKT-L00-04'],
     ),
     Ticket(
         id="TAKT-L08-03",
@@ -566,7 +566,7 @@ TICKETS: List[Ticket] = [
         sp=5,
         status="Terminé",
         deps=['TAKT-L08-02'],
-        exigences=['UI_FRONTEND_SPECS §3', 'EX-DAT-01', 'GG-04.'],
+        exigences=['UI_FRONTEND_SPECS §3', 'EX-DAT-01', 'GG-04'],
     ),
     Ticket(
         id="TAKT-L08-04",
@@ -575,7 +575,7 @@ TICKETS: List[Ticket] = [
         sp=6,
         status="Terminé",
         deps=['TAKT-L08-03', 'TAKT-L08-01'],
-        exigences=['RB-UI-01', 'RB-UI-02', 'EX-UI-01', 'UI_ARBORESCENCE §7', 'UI_FRONTEND_SPECS §5.'],
+        exigences=['RB-UI-01', 'RB-UI-02', 'EX-UI-01', 'UI_ARBORESCENCE §7', 'UI_FRONTEND_SPECS §5'],
     ),
     Ticket(
         id="TAKT-L08-05",
@@ -584,7 +584,7 @@ TICKETS: List[Ticket] = [
         sp=8,
         status="Terminé",
         deps=['TAKT-L08-01'],
-        exigences=['UI_FRONTEND_SPECS §2', 'UI_WIREFRAMES §2', 'DL-UI-04', 'EX-UI-05', 'SPEC_ACCESSIBILITE §3.'],
+        exigences=['UI_FRONTEND_SPECS §2', 'UI_WIREFRAMES §2', 'DL-UI-04', 'EX-UI-05', 'SPEC_ACCESSIBILITE §3'],
     ),
     Ticket(
         id="TAKT-L08-06",
@@ -593,7 +593,7 @@ TICKETS: List[Ticket] = [
         sp=3,
         status="Terminé",
         deps=['TAKT-L01-05'],
-        exigences=['TE-TEST-01', 'TE-TEST-02', 'TESTS.md §1.1', 'SPEC_ACCESSIBILITE §5.2.'],
+        exigences=['TE-TEST-01', 'TE-TEST-02', 'TESTS.md §1.1', 'SPEC_ACCESSIBILITE §5.2'],
     ),
     Ticket(
         id="TAKT-L08-07",
@@ -602,7 +602,7 @@ TICKETS: List[Ticket] = [
         sp=3,
         status="Terminé",
         deps=['TAKT-L08-04', 'TAKT-L08-05'],
-        exigences=['UI_ARBORESCENCE §8', 'UI_WIREFRAMES §2', 'TE-API-06', 'EX-NOT-01.'],
+        exigences=['UI_ARBORESCENCE §8', 'UI_WIREFRAMES §2', 'TE-API-06', 'EX-NOT-01'],
     ),
     Ticket(
         id="TAKT-L09-01",
@@ -611,7 +611,7 @@ TICKETS: List[Ticket] = [
         sp=5,
         status="Terminé",
         deps=['TAKT-L08-02', 'TAKT-L08-04', 'TAKT-L08-07'],
-        exigences=['EC-COM-01', 'IX-COM-01', 'UF-* auth', 'TAKT-L03-03.'],
+        exigences=['EC-COM-01', 'IX-COM-01', 'UF-* auth', 'TAKT-L03-03'],
     ),
     Ticket(
         id="TAKT-L09-02",
@@ -620,7 +620,7 @@ TICKETS: List[Ticket] = [
         sp=8,
         status="Terminé",
         deps=['TAKT-L09-01', 'TAKT-L08-03', 'TAKT-L02-05'],
-        exigences=['EC-COM-02', 'UF-GES-01', 'EX-NOT-01.'],
+        exigences=['EC-COM-02', 'UF-GES-01', 'EX-NOT-01'],
     ),
     Ticket(
         id="TAKT-L09-03",
@@ -629,7 +629,7 @@ TICKETS: List[Ticket] = [
         sp=5,
         status="Terminé",
         deps=['TAKT-L09-01', 'TAKT-L08-01'],
-        exigences=['EC-COM-03', 'IX-COM-03.'],
+        exigences=['EC-COM-03', 'IX-COM-03'],
     ),
     Ticket(
         id="TAKT-L09-04",
@@ -637,8 +637,8 @@ TICKETS: List[Ticket] = [
         titre="Écrans `EC-ADM-01` à `EC-ADM-04` Administration",
         sp=13,
         status="Terminé",
-        deps=['TAKT-L04-06', 'TAKT-L11-01 (audit read)'],
-        exigences=['EC-ADM-01…EC-ADM-04', 'IX-ADM-01…IX-ADM-08.'],
+        deps=['TAKT-L04-06', 'TAKT-L11-01'],
+        exigences=['EC-ADM-01…EC-ADM-04', 'IX-ADM-01…IX-ADM-08'],
     ),
     Ticket(
         id="TAKT-L09-05",
@@ -647,7 +647,7 @@ TICKETS: List[Ticket] = [
         sp=8,
         status="Terminé",
         deps=['TAKT-L04-08', 'TAKT-L09-01'],
-        exigences=['EC-GES-01', 'IX-GES-01', 'IX-GES-02', 'TAKT-L04-08.'],
+        exigences=['EC-GES-01', 'IX-GES-01', 'IX-GES-02', 'TAKT-L04-08'],
     ),
     Ticket(
         id="TAKT-L09-06",
@@ -656,7 +656,7 @@ TICKETS: List[Ticket] = [
         sp=10,
         status="Terminé",
         deps=['TAKT-L05-01', 'TAKT-L05-06', 'TAKT-L09-05'],
-        exigences=['EC-GES-02', 'EC-GES-03', 'IX-GES-03', 'IX-GES-04.'],
+        exigences=['EC-GES-02', 'EC-GES-03', 'IX-GES-03', 'IX-GES-04'],
     ),
     Ticket(
         id="TAKT-L09-07",
@@ -665,7 +665,7 @@ TICKETS: List[Ticket] = [
         sp=8,
         status="Terminé",
         deps=['TAKT-L07-03', 'TAKT-L07-07', 'TAKT-L09-06'],
-        exigences=['EC-GES-04', 'IX-GES-05', 'TAKT-L07-03', 'TAKT-L07-07.'],
+        exigences=['EC-GES-04', 'IX-GES-05', 'TAKT-L07-03', 'TAKT-L07-07'],
     ),
     Ticket(
         id="TAKT-L09-08",
@@ -674,7 +674,7 @@ TICKETS: List[Ticket] = [
         sp=8,
         status="Terminé",
         deps=['TAKT-L07-06', 'TAKT-L09-07'],
-        exigences=['EC-GES-05', 'IX-GES-06', 'TAKT-L07-06.'],
+        exigences=['EC-GES-05', 'IX-GES-06', 'TAKT-L07-06'],
     ),
     Ticket(
         id="TAKT-L09-09",
@@ -683,7 +683,7 @@ TICKETS: List[Ticket] = [
         sp=13,
         status="Terminé",
         deps=['TAKT-L06-05', 'TAKT-L06-06', 'TAKT-L06-07', 'TAKT-L08-05', 'TAKT-L09-08'],
-        exigences=['EC-GES-06', 'EC-GES-07', 'EC-GES-12', 'IX-GES-07', 'IX-GES-08', 'IX-GES-09', 'IX-GES-10', 'IX-GES-16', 'TAKT-L06-05', 'TAKT-L06-06', 'TAKT-L06-07.'],
+        exigences=['EC-GES-06', 'EC-GES-07', 'EC-GES-12', 'IX-GES-07', 'IX-GES-08', 'IX-GES-09', 'IX-GES-10', 'IX-GES-16', 'TAKT-L06-05', 'TAKT-L06-06', 'TAKT-L06-07'],
     ),
     Ticket(
         id="TAKT-L09-10",
@@ -692,7 +692,7 @@ TICKETS: List[Ticket] = [
         sp=6,
         status="Terminé",
         deps=['TAKT-L06-09', 'TAKT-L09-09'],
-        exigences=['EC-GES-08', 'IX-GES-11', 'RB-UI-06', 'TAKT-L06-09.'],
+        exigences=['EC-GES-08', 'IX-GES-11', 'RB-UI-06', 'TAKT-L06-09'],
     ),
     Ticket(
         id="TAKT-L09-11",
@@ -701,7 +701,7 @@ TICKETS: List[Ticket] = [
         sp=8,
         status="Terminé",
         deps=['TAKT-L10-01', 'TAKT-L10-02', 'TAKT-L10-03', 'TAKT-L10-04', 'TAKT-L10-05', 'TAKT-L09-10'],
-        exigences=['EC-GES-09', 'EC-GES-10', 'EC-GES-11', 'IX-GES-12', 'IX-GES-13', 'IX-GES-15', 'TAKT-L10-01…TAKT-L10-05.'],
+        exigences=['EC-GES-09', 'EC-GES-10', 'EC-GES-11', 'IX-GES-12', 'IX-GES-13', 'IX-GES-15', 'TAKT-L10-01…TAKT-L10-05'],
     ),
     Ticket(
         id="TAKT-L09-12",
@@ -710,7 +710,7 @@ TICKETS: List[Ticket] = [
         sp=10,
         status="Terminé",
         deps=['TAKT-L05-06', 'TAKT-L05-05', 'TAKT-L09-06'],
-        exigences=['EC-RDEP-01…EC-RDEP-05', 'IX-RDEP-01…IX-RDEP-05', 'UF-RDEP-01', 'UF-RDEP-02', 'TAKT-L05-06', 'TAKT-L05-05.'],
+        exigences=['EC-RDEP-01…EC-RDEP-05', 'IX-RDEP-01…IX-RDEP-05', 'UF-RDEP-01', 'UF-RDEP-02', 'TAKT-L05-06', 'TAKT-L05-05'],
     ),
     Ticket(
         id="TAKT-L09-13",
@@ -719,7 +719,7 @@ TICKETS: List[Ticket] = [
         sp=10,
         status="Terminé",
         deps=['TAKT-L06-02', 'TAKT-L10-01', 'TAKT-L10-02', 'TAKT-L10-03', 'TAKT-L10-04', 'TAKT-L10-05', 'TAKT-L09-10'],
-        exigences=['EC-DIR-01…EC-DIR-05', 'IX-DIR-01…IX-DIR-05', 'UF-DIR-01.'],
+        exigences=['EC-DIR-01…EC-DIR-05', 'IX-DIR-01…IX-DIR-05', 'UF-DIR-01'],
     ),
     Ticket(
         id="TAKT-L10-01",
@@ -728,7 +728,7 @@ TICKETS: List[Ticket] = [
         sp=6,
         status="À faire",
         deps=['TAKT-L06-02', 'TAKT-L06-10'],
-        exigences=['EX-WKF-04', 'EX-PRI-02', 'TE-ARCH-03', 'IX-GES-12', 'EC-GES-09.'],
+        exigences=['EX-WKF-04', 'EX-PRI-02', 'TE-ARCH-03', 'IX-GES-12', 'EC-GES-09'],
     ),
     Ticket(
         id="TAKT-L10-02",
@@ -737,7 +737,7 @@ TICKETS: List[Ticket] = [
         sp=6,
         status="À faire",
         deps=['TAKT-L10-01'],
-        exigences=['EX-EXP-01', 'EX-EXP-04', 'EC-GES-11', 'IX-GES-15.'],
+        exigences=['EX-EXP-01', 'EX-EXP-04', 'EC-GES-11', 'IX-GES-15'],
     ),
     Ticket(
         id="TAKT-L10-03",
@@ -746,7 +746,7 @@ TICKETS: List[Ticket] = [
         sp=8,
         status="À faire",
         deps=['TAKT-L10-01'],
-        exigences=['EX-EXP-02', 'EX-EXP-04', 'SPK-03.'],
+        exigences=['EX-EXP-02', 'EX-EXP-04', 'SPK-03'],
     ),
     Ticket(
         id="TAKT-L10-04",
@@ -755,7 +755,7 @@ TICKETS: List[Ticket] = [
         sp=6,
         status="À faire",
         deps=['TAKT-L10-01'],
-        exigences=['EX-EXP-03', 'EX-EXP-04', 'IX-GES-15.'],
+        exigences=['EX-EXP-03', 'EX-EXP-04', 'IX-GES-15'],
     ),
     Ticket(
         id="TAKT-L10-05",
@@ -764,7 +764,7 @@ TICKETS: List[Ticket] = [
         sp=8,
         status="À faire",
         deps=['TAKT-L02-05', 'TAKT-L03-03'],
-        exigences=['EX-NOT-01', 'EX-NOT-02', 'EX-NOT-03', 'WORKFLOW_METIER §9', 'ST_TAKT §1.2', 'TE-ARCH-05.'],
+        exigences=['EX-NOT-01', 'EX-NOT-02', 'EX-NOT-03', 'WORKFLOW_METIER §9', 'ST_TAKT §1.2', 'TE-ARCH-05'],
     ),
     Ticket(
         id="TAKT-L10-06",
@@ -773,7 +773,7 @@ TICKETS: List[Ticket] = [
         sp=5,
         status="À faire",
         deps=['TAKT-L03-06'],
-        exigences=['EX-SEC-01', 'ST_TAKT §5.4', 'TESTS.md §6.1.'],
+        exigences=['EX-SEC-01', 'ST_TAKT §5.4', 'TESTS.md §6.1'],
     ),
     Ticket(
         id="TAKT-L10-07",
@@ -782,7 +782,7 @@ TICKETS: List[Ticket] = [
         sp=5,
         status="À faire",
         deps=['TAKT-L06-01', 'TAKT-L06-10', 'TAKT-L09-11'],
-        exigences=['EX-WKF-06', 'EX-OUV-02', 'WF-02', 'EC-GES-14', 'UF-GES-08.'],
+        exigences=['EX-WKF-06', 'EX-OUV-02', 'WF-02', 'EC-GES-14', 'UF-GES-08'],
     ),
     Ticket(
         id="TAKT-L11-01",
@@ -791,7 +791,7 @@ TICKETS: List[Ticket] = [
         sp=6,
         status="Terminé",
         deps=['TAKT-L03-06', 'TAKT-L10-06'],
-        exigences=['EC-ADM-04', 'IX-ADM-07', 'IX-ADM-08', 'EX-DAT-05', 'TE-SEC-05.'],
+        exigences=['EC-ADM-04', 'IX-ADM-07', 'IX-ADM-08', 'EX-DAT-05', 'TE-SEC-05'],
     ),
     Ticket(
         id="TAKT-L11-02",
@@ -800,7 +800,7 @@ TICKETS: List[Ticket] = [
         sp=8,
         status="À faire",
         deps=['TAKT-L01-06', 'TAKT-L07-05'],
-        exigences=['SPEC_MONITORING §2–§10', 'PLAN_MACRO E5.3', 'GG-11.'],
+        exigences=['SPEC_MONITORING §2–§10', 'PLAN_MACRO E5.3', 'GG-11'],
     ),
     Ticket(
         id="TAKT-L11-03",
@@ -809,7 +809,7 @@ TICKETS: List[Ticket] = [
         sp=6,
         status="À faire",
         deps=['TAKT-L01-06', 'TAKT-L00-04'],
-        exigences=['SPEC_SECRETS.md', 'GG-11', 'PLAN_MACRO G4.'],
+        exigences=['SPEC_SECRETS.md', 'GG-11', 'PLAN_MACRO G4'],
     ),
     Ticket(
         id="TAKT-L11-04",
@@ -818,7 +818,7 @@ TICKETS: List[Ticket] = [
         sp=10,
         status="À faire",
         deps=['TAKT-L01-07', 'TAKT-L11-02', 'TAKT-L11-03', 'TAKT-L09-13'],
-        exigences=['PLAN_MACRO E5.4', 'TE-TEST-05', 'TESTS.md §8', '.github/workflows/ci.yml (existant à compléter).'],
+        exigences=['PLAN_MACRO E5.4', 'TE-TEST-05', 'TESTS.md §8', '.github/workflows/ci.yml (existant à compléter)'],
     ),
     Ticket(
         id="TAKT-L11-05",
@@ -827,7 +827,7 @@ TICKETS: List[Ticket] = [
         sp=8,
         status="À faire",
         deps=['TAKT-L11-04'],
-        exigences=['PLAN_MACRO E5.5', 'E5.6', 'TESTS.md §7', 'UF-* (12 parcours).'],
+        exigences=['PLAN_MACRO E5.5', 'E5.6', 'TESTS.md §7', 'UF-* (12 parcours)'],
     ),
     Ticket(
         id="TAKT-L11-06",
@@ -836,7 +836,7 @@ TICKETS: List[Ticket] = [
         sp=6,
         status="À faire",
         deps=['TAKT-L11-04'],
-        exigences=['LICENCE_AGPL.md', 'SPEC_SECRETS.md', 'TE-SEC-01…TE-SEC-06', 'PLAN_MACRO risque licence.'],
+        exigences=['LICENCE_AGPL.md', 'SPEC_SECRETS.md', 'TE-SEC-01…TE-SEC-06', 'PLAN_MACRO risque licence'],
     ),
     Ticket(
         id="TAKT-L11-07",
@@ -845,7 +845,7 @@ TICKETS: List[Ticket] = [
         sp=5,
         status="À faire",
         deps=['TAKT-L00-05', 'TAKT-L11-04'],
-        exigences=['PLAN_MACRO E5.6', 'docs/DEPLOIEMENT.md', 'docs/DOC_MIGRATION_DB.md', 'docs/TESTS.md.'],
+        exigences=['PLAN_MACRO E5.6', 'docs/DEPLOIEMENT.md', 'docs/DOC_MIGRATION_DB.md', 'docs/TESTS.md'],
     ),
 ]
 

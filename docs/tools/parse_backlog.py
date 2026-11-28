@@ -77,7 +77,11 @@ def parse_backlog(md_text: str) -> List[Ticket]:
             dep_match = re.search(r'\*\*Dépend de :\*\*\s*([^·\n]+)', block)
         if dep_match:
             dep_raw = dep_match.group(1)
-            raw_parts = [d.strip().strip('`') for d in dep_raw.split(',') if d.strip() and d.strip() != '—']
+            raw_parts = [
+                re.sub(r'\s*\([^)]*\)\s*$', '', d).strip().strip('`')
+                for d in dep_raw.split(',')
+                if d.strip() and d.strip() != '—'
+            ]
             deps = _expand_ranges(raw_parts)
 
         # Exigences - flexible
@@ -87,7 +91,7 @@ def parse_backlog(md_text: str) -> List[Ticket]:
             ex_match = re.search(r'\*\*Exigences :\*\*\s*([^\n]+)', block)
         if ex_match:
             ex_raw = ex_match.group(1)
-            ex_raw = ex_raw.replace('`', '')
+            ex_raw = ex_raw.replace('`', '').rstrip('.')
             parts = [p.strip() for p in ex_raw.split(',')]
             for p in parts:
                 if p:

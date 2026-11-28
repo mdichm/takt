@@ -726,13 +726,13 @@ L00 → L01 → L02 → L03 → L04 → L05 → L06 → L07 → L09 → L10 → 
 
 #### TAKT-L06-11 — Compléter le contrat de réponse de transition VersionItem (9 champs exigés par zVersionItem)
 
-- **Objectif :** Garantir que le service de transition de version retourne tous les champs exigés par le contrat `zVersionItem` (`id`, `etat`, `semestreId`, `datePublication`, `publiePar`, `anneeId`, `snapshotId`, `createdAt`, `updatedAt`), comblant l'écart où `transitionner()` ne sélectionne que 5 des 9 champs.
+- **Objectif :** Garantir que le service de transition de version retourne tous les champs exigés par le contrat `zVersionItem` (`id`, `etat`, `semestreId`, `datePublication`, `publiePar`, `anneeId`, `snapshotId`, `createdAt`, `updatedAt`), comblant l'écart où `transitionner()` ne retourne que 6 des 9 champs (il manque `anneeId`, `snapshotId`, `createdAt` ; `updatedAt` est déjà présent).
 - **Exigences :** `EX-WKF-04`, `TE-ARCH-03`, `TE-MET-06`, `GG-05`.
-- **Périmètre :** `apps/backend/src/modules/versions/workflow/workflow.service.ts`, `packages/contracts/src/versions.ts`, `apps/frontend/src/lib/direction.api.ts`. **Hors périmètre :** le worker CP-SAT et la génération des scénarios.
-- **Livrables :** `transitionner()` sélectionne et retourne les 9 champs du contrat ; le contournement côté frontend (`direction.api.ts`) est conservé pour compatibilité mais devient optionnel ; tests couvrant la matrice complète des champs.
-- **Critères :** _Given_ un appel à `transitionner()`, _Then_ la réponse contient `anneeId`, `snapshotId`, `createdAt` et `updatedAt` en plus des 5 champs existants. _Given_ un appel via l'API REST, _Then_ le payload JSON passe la validation Zod `zVersionItem` sans erreur.
-- **DoD :** 9 champs retournés par `transitionner()` ; test unitaire sur la matrice complète des champs ; test d'intégration de l'endpoint de transition ; aucune régression sur les 18 transitions existantes.
-- **Tests exigés :** tests unitaires (matrice 9 champs × 4 rôles) + test d'intégration de l'endpoint.
+- **Périmètre :** `apps/backend/src/modules/versions/workflow/workflow.service.ts`, `packages/contracts/src/versions.ts`, `apps/frontend/src/lib/direction.api.ts`, `apps/frontend/src/lib/publication.api.ts`. **Hors périmètre :** le worker CP-SAT et la génération des scénarios.
+- **Livrables :** `transitionner()` sélectionne et retourne les 9 champs du contrat sur tous les chemins frontend (`direction.api.ts` et `publication.api.ts`) ; les fallbacks `?? ''` dans `direction.api.ts` (`anneeId`, `createdAt`, `updatedAt`) sont supprimés car ils injectent des valeurs invalides (`zUuid` / `zDateIso` rejetent `''`) ; tests couvrant la matrice complète des champs.
+- **Critères :** _Given_ un appel à `transitionner()`, _Then_ la réponse contient `anneeId`, `snapshotId` et `createdAt` en plus des 6 champs existants. _Given_ un appel via l'API REST depuis `directionApi.transitionnerVersion` ou `publicationApi.transitionnerVersion`, _Then_ le payload JSON passe la validation Zod `zVersionItem` sans erreur. _Given_ `anneeId` manquant, _Then_ `publicationApi.transitionnerVersion` lève `VALIDATION_ERROR` 400 (pas de fallback silencieux).
+- **DoD :** 9 champs retournés par `transitionner()` sur les deux chemins frontend ; test unitaire sur la matrice complète des champs ; test d'intégration de l'endpoint de transition ; aucune régression sur les 18 transitions existantes ; `publicationApi.transitionnerVersion` couvert par test.
+- **Tests exigés :** tests unitaires (matrice 9 champs × 4 rôles) + test d'intégration de l'endpoint + test de `publicationApi.transitionnerVersion`.
 - **SP :** 2 · **Dépend de :** `TAKT-L06-02` · **Bloque :** —
 
 ### Lot L07 — Génération CP-SAT (7 tickets · 47 SP)
