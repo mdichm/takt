@@ -726,7 +726,7 @@ TICKETS: List[Ticket] = [
         lot="L10",
         titre="Implémenter la transition de publication (`valide → publie`)",
         sp=6,
-        status="À faire",
+        status="En cours",
         deps=['TAKT-L06-02', 'TAKT-L06-10'],
         exigences=['EX-WKF-04', 'EX-PRI-02', 'TE-ARCH-03', 'IX-GES-12', 'EC-GES-09'],
     ),
