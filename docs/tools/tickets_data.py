@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Source de vérité unique du backlog TAKT.
-Contient la liste complète des 91 tickets avec leurs métadonnées.
+Contient la liste complète des 92 tickets avec leurs métadonnées.
 Ne pas éditer les fichiers générés dans dist/ – modifier uniquement ce fichier.
 """
 from dataclasses import dataclass, asdict
@@ -71,7 +71,7 @@ TICKETS: List[Ticket] = [
         sp=2,
         status="Terminé",
         deps=[],
-        exigences=['DL-09'],
+        exigences=['DL-09.'],
     ),
     Ticket(
         id="TAKT-L01-01",
@@ -470,6 +470,15 @@ TICKETS: List[Ticket] = [
         exigences=['EX-PRI-06', 'EX-DAT-01', 'EX-DAT-02', 'EX-DAT-03', 'EX-PRI-02', 'TE-ARCH-03', 'TE-MET-06', 'DL-05.'],
     ),
     Ticket(
+        id="TAKT-L06-11",
+        lot="L06",
+        titre="Compléter le contrat de réponse de transition VersionItem (9 champs exigés par zVersionItem)",
+        sp=2,
+        status="À faire",
+        deps=['TAKT-L06-02'],
+        exigences=['EX-WKF-04', 'TE-ARCH-03', 'TE-MET-06', 'GG-05.'],
+    ),
+    Ticket(
         id="TAKT-L07-01",
         lot="L07",
         titre="Construire le fichier dérivé d'entrée du solveur",
@@ -628,7 +637,7 @@ TICKETS: List[Ticket] = [
         titre="Écrans `EC-ADM-01` à `EC-ADM-04` Administration",
         sp=13,
         status="Terminé",
-        deps=['TAKT-L04-06', 'TAKT-L11-01'],
+        deps=['TAKT-L04-06', 'TAKT-L11-01 (audit read)'],
         exigences=['EC-ADM-01…EC-ADM-04', 'IX-ADM-01…IX-ADM-08.'],
     ),
     Ticket(
