@@ -474,7 +474,7 @@ TICKETS: List[Ticket] = [
         lot="L06",
         titre="Compléter le contrat de réponse de transition VersionItem (9 champs exigés par zVersionItem)",
         sp=2,
-        status="En cours",
+        status="Terminé",
         deps=['TAKT-L06-02'],
         exigences=['EX-WKF-04', 'TE-ARCH-03', 'TE-MET-06', 'GG-05'],
     ),

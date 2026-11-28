@@ -2,13 +2,15 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import { api } from './api';
+import { validerReponseApi } from './validation';
 import {
   zEnvelope,
-  zTransition,
+  zVersionItem,
   type TransitionInput,
+  type VersionItem,
 } from '@takt/contracts';
 
-const zEnveloppeTransition = zEnvelope(zTransition);
+const zEnveloppeTransition = zEnvelope(zVersionItem);
 
 /**
  * Client API typé — Transitions de version de planning (workflow).
@@ -17,6 +19,7 @@ const zEnveloppeTransition = zEnvelope(zTransition);
 export const versionsApi = {
   /**
    * Déclenche une transition d'état de version.
+   * Retourne un VersionItem complet (9 champs du contrat zVersionItem).
    * Ex. : `transmettreDirection`, `rejeterPedagogique`, …
    *
    * @throws ErreurApi si la transition est interdite (409) ou le motif manquant (400).
@@ -24,7 +27,7 @@ export const versionsApi = {
   async transitionner(
     versionId: string,
     donnees: TransitionInput,
-  ): Promise<unknown> {
+  ): Promise<VersionItem> {
     const reponse = await api.post<unknown>(
       `/versions/${encodeURIComponent(versionId)}/transition`,
       donnees,
@@ -33,8 +36,8 @@ export const versionsApi = {
     if (!reponse.data) {
       throw new Error('Aucune donnée retournée par la transition de version.');
     }
-    return reponse.data;
+    return validerReponseApi(zVersionItem, reponse.data);
   },
 };
 
-export type { TransitionInput };
+export type { TransitionInput, VersionItem };

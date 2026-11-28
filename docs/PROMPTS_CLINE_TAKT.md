@@ -357,6 +357,13 @@ Les marqueurs permettent l'extraction automatisée d'un prompt vers un fichier e
 
 <!-- END PROMPT : TAKT-L06-10 -->
 
+<!-- BEGIN PROMPT : TAKT-L06-11 -->
+
+**Ticket :** `TAKT-L06-11` — Compléter le contrat de réponse de transition VersionItem (9 champs exigés par zVersionItem)
+**Instruction :** Suivre le modèle canonique avec la fiche `TAKT-L06-11`.
+
+<!-- END PROMPT : TAKT-L06-11 -->
+
 <!-- BEGIN PROMPT : TAKT-L07-01 -->
 
 **Ticket :** `TAKT-L07-01` — Construire le fichier dérivé d'entrée du solveur
