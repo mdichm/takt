@@ -81,6 +81,9 @@ export class ConfigSystemeService {
         }),
         ...(donnees.joursOuvres !== undefined && { joursOuvres: donnees.joursOuvres }),
         ...(donnees.creneauxParJour !== undefined && { creneauxParJour: donnees.creneauxParJour }),
+        ...(donnees.bailEditionDureeMinutes !== undefined && {
+          bailEditionDureeMinutes: donnees.bailEditionDureeMinutes,
+        }),
       },
     });
 
@@ -93,6 +96,7 @@ export class ConfigSystemeService {
         pasDeTempsMinutes: modifie.pasDeTempsMinutes,
         joursOuvres: modifie.joursOuvres,
         creneauxParJour: modifie.creneauxParJour,
+        bailEditionDureeMinutes: modifie.bailEditionDureeMinutes,
       },
     });
 

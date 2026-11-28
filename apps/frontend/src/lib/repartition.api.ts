@@ -11,6 +11,8 @@ import {
   type AffectationPedagogiqueUpdate,
   zEnseignant,
   type Enseignant,
+  zSalle,
+  type Salle,
   zGroupe,
   type Groupe,
   zMatiere,
@@ -33,6 +35,8 @@ import {
   type RevalidationValiderReponse,
   zTypeEnseignement,
   type TypeEnseignement,
+  zDepartement,
+  type Departement,
   zEnvelope,
   type MetaApi,
 } from '@takt/contracts';
@@ -93,8 +97,10 @@ const zEnveloppeAnnuler = zEnvelope(zRepartitionAnnuler);
 const zEnveloppeStatutValidation = zEnvelope(zStatutValidationRepartition);
 const zEnveloppeRevalidationDetecter = zEnvelope(zRevalidationDetecterReponse);
 const zEnveloppeRevalidationValider = zEnvelope(zRevalidationValiderReponse);
+const zEnveloppeDepartements = zEnvelope(zDepartement);
 const zEnveloppePlanEtudes = zEnvelope(zPlanEtudes);
 const zEnveloppeEnseignants = zEnvelope(zEnseignant);
+const zEnveloppeSalles = zEnvelope(zSalle);
 const zEnveloppeGroupes = zEnvelope(zGroupe);
 const zEnveloppeTypesEnseignement = zEnvelope(zTypeEnseignement);
 const zEnveloppeMatieres = zEnvelope(zMatiere);
@@ -203,6 +209,15 @@ export const repartitionApi = {
     return normaliserListe(reponse, zEnseignant);
   },
 
+  /** Liste les salles (pagination bornée pour résolution des libellés). */
+  async listerSalles(): Promise<ListeNormalisee<Salle>> {
+    const reponse = await api.get<unknown>(
+      '/referentiels/salles',
+      { schema: zEnveloppeSalles },
+    );
+    return normaliserListe(reponse, zSalle);
+  },
+
   /*───── Référentiels — groupes ─────*/
   /** Liste les groupes. */
   async listerGroupes(): Promise<ListeNormalisee<Groupe>> {
@@ -298,6 +313,16 @@ export const repartitionApi = {
     }
     return reponse.data as RevalidationValiderReponse;
   },
+
+  /*───── Référentiels — départements ─────*/
+  /** Liste tous les départements (GET /referentiels/departements). */
+  async listerDepartements(): Promise<ListeNormalisee<Departement>> {
+    const reponse = await api.get<unknown>(
+      '/referentiels/departements',
+      { schema: zEnveloppeDepartements },
+    );
+    return normaliserListe(reponse, zDepartement);
+  },
 };
 
 export type { ListeNormalisee };
@@ -305,6 +330,7 @@ export type {
   AffectationPedagogique,
   AffectationPedagogiqueCreate,
   AffectationPedagogiqueUpdate,
+  Departement,
   Enseignant,
   Groupe,
   Matiere,
@@ -312,6 +338,7 @@ export type {
   PlanEtudesMatiere,
   RepartitionValiderInput,
   RepartitionAnnulerInput,
+  Salle,
   StatutValidationRepartition,
   TypeEnseignement,
 };

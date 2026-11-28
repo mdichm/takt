@@ -9,6 +9,7 @@ import { PASSWORD_ARGON2_OPTIONS } from '../../config/password.config';
 import { CODES_ERREUR_API, ApiError } from '../common/http/api-error';
 import { appliquerFiltreDepartement } from '../common/rbac/filtre-departement.util';
 import { AuditService } from '../audit/audit.service';
+import { PasswordService } from '../auth/password.service';
 
 /**
  * Service de gestion des utilisateurs et de leurs rôles.
@@ -24,6 +25,7 @@ export class UsersService {
   constructor(
     @Inject(PRISMA) private readonly prisma: PrismaClient,
     @Inject(AuditService) private readonly auditService: AuditService,
+    @Inject(PasswordService) private readonly passwordService: PasswordService,
   ) {}
 
   /** Rôle administrateur, protégé contre la désactivation par soi-même. */
@@ -468,5 +470,215 @@ export class UsersService {
 
     this.logger.log(`Utilisateur supprim\u00e9 : ${utilisateur.email}`);
     return { id };
+  }
+
+  /** Récupère le profil de l'utilisateur connecté (GET /users/me). */
+  async getProfile(utilisateurId: string) {
+    const utilisateur = await this.prisma.utilisateur.findUnique({
+      where: { id: utilisateurId },
+      select: {
+        id: true,
+        email: true,
+        nom: true,
+        prenom: true,
+        estActif: true,
+        createdAt: true,
+        updatedAt: true,
+        role: { select: { code: true } },
+        departement: { select: { id: true, code: true } },
+      },
+    });
+    if (!utilisateur) {
+      throw new ApiError(
+        CODES_ERREUR_API.NOT_FOUND,
+        404,
+        'Utilisateur introuvable',
+      );
+    }
+    return {
+      id: utilisateur.id,
+      email: utilisateur.email,
+      nom: utilisateur.nom,
+      prenom: utilisateur.prenom,
+      role: utilisateur.role?.code ?? null,
+      departementId: utilisateur.departement?.id ?? null,
+      departementCode: utilisateur.departement?.code ?? null,
+      estActif: utilisateur.estActif,
+      createdAt: utilisateur.createdAt,
+      updatedAt: utilisateur.updatedAt,
+    };
+  }
+
+  /** Met à jour le profil de l'utilisateur connecté (PATCH /users/me). */
+  async updateProfile(
+    utilisateurId: string,
+    donnees: {
+      nom?: string;
+      prenom?: string;
+      email?: string;
+      departementId?: string | null;
+    },
+    contexte: { utilisateurIdDemandeur: string },
+  ) {
+    const utilisateur = await this.prisma.utilisateur.findUnique({
+      where: { id: utilisateurId },
+    });
+    if (!utilisateur) {
+      throw new ApiError(
+        CODES_ERREUR_API.NOT_FOUND,
+        404,
+        'Utilisateur introuvable',
+      );
+    }
+
+    // Unicité de l'e-mail si modifié.
+    if (
+      donnees.email !== undefined &&
+      donnees.email !== utilisateur.email
+    ) {
+      const existant = await this.prisma.utilisateur.findUnique({
+        where: { email: donnees.email },
+      });
+      if (existant) {
+        throw new ApiError(
+          CODES_ERREUR_API.BAD_REQUEST,
+          400,
+          'Un utilisateur avec cet e-mail existe déjà',
+          { champ: 'email' },
+        );
+      }
+    }
+
+    // Département existe si modifié.
+    if (
+      donnees.departementId !== undefined &&
+      donnees.departementId !== null
+    ) {
+      const departement = await this.prisma.departement.findUnique({
+        where: { id: donnees.departementId },
+      });
+      if (!departement) {
+        throw new ApiError(
+          CODES_ERREUR_API.BAD_REQUEST,
+          400,
+          'Le département spécifié est introuvable',
+          { champ: 'departementId' },
+        );
+      }
+    }
+
+    const miseAJour: {
+      nom?: string;
+      prenom?: string;
+      email?: string;
+      departementId?: string | null;
+    } = {};
+    if (donnees.nom !== undefined) miseAJour.nom = donnees.nom;
+    if (donnees.prenom !== undefined) miseAJour.prenom = donnees.prenom;
+    if (donnees.email !== undefined) miseAJour.email = donnees.email;
+    if (donnees.departementId !== undefined) miseAJour.departementId = donnees.departementId;
+
+    const modifie = await this.prisma.utilisateur.update({
+      where: { id: utilisateurId },
+      data: miseAJour,
+      select: {
+        id: true,
+        email: true,
+        nom: true,
+        prenom: true,
+        estActif: true,
+        createdAt: true,
+        updatedAt: true,
+        role: { select: { code: true } },
+        departement: { select: { id: true, code: true } },
+      },
+    });
+
+    await this.auditService.record({
+      action: 'UTILISATEUR_MODIFIE',
+      utilisateurId: contexte.utilisateurIdDemandeur,
+      entite: 'Utilisateur',
+      entiteId: utilisateurId,
+      metadonnees: {
+        propreProfil: true,
+        champsModifies: Object.keys(miseAJour),
+        email: modifie.email,
+      },
+    });
+
+    this.logger.log(`Profil mis à jour : ${modifie.email}`);
+    return {
+      id: modifie.id,
+      email: modifie.email,
+      nom: modifie.nom,
+      prenom: modifie.prenom,
+      role: modifie.role?.code ?? null,
+      departementId: modifie.departement?.id ?? null,
+      departementCode: modifie.departement?.code ?? null,
+      estActif: modifie.estActif,
+      createdAt: modifie.createdAt,
+      updatedAt: modifie.updatedAt,
+    };
+  }
+
+  /** Change le mot de passe de l'utilisateur connecté (POST /users/me/mot-de-passe). */
+  async changePassword(
+    utilisateurId: string,
+    motDePasseActuel: string,
+    nouveauMotDePasse: string,
+  ) {
+    const utilisateur = await this.prisma.utilisateur.findUnique({
+      where: { id: utilisateurId },
+      select: { id: true, email: true, motDePasseHash: true },
+    });
+    if (!utilisateur) {
+      throw new ApiError(
+        CODES_ERREUR_API.NOT_FOUND,
+        404,
+        'Utilisateur introuvable',
+      );
+    }
+    if (!utilisateur.motDePasseHash) {
+      throw new ApiError(
+        CODES_ERREUR_API.BAD_REQUEST,
+        400,
+        'Ce compte ne dispose pas de mot de passe local',
+      );
+    }
+    const motDePasseValide = await this.passwordService.verify(
+      utilisateur.motDePasseHash,
+      motDePasseActuel,
+    );
+    if (!motDePasseValide) {
+      throw new ApiError(
+        CODES_ERREUR_API.BAD_REQUEST,
+        400,
+        'Le mot de passe actuel est incorrect',
+        { champ: 'motDePasseActuel' },
+      );
+    }
+    const hash = await this.passwordService.hash(nouveauMotDePasse);
+    await this.prisma.utilisateur.update({
+      where: { id: utilisateurId },
+      data: { motDePasseHash: hash },
+    });
+
+    // Révoque toutes les sessions de rafraîchissement de l'utilisateur
+    // (tous les appareils) après un changement de mot de passe.
+    await this.prisma.sessionRefresh.updateMany({
+      where: { utilisateurId },
+      data: { estRevoque: true },
+    });
+
+    await this.auditService.record({
+      action: 'UTILISATEUR_MOT_DE_PASSE_CHANGE',
+      utilisateurId,
+      entite: 'Utilisateur',
+      entiteId: utilisateurId,
+      metadonnees: { email: utilisateur.email },
+    });
+
+    this.logger.log(`Mot de passe changé : ${utilisateur.email}`);
+    return { id: utilisateur.id, email: utilisateur.email };
   }
 }

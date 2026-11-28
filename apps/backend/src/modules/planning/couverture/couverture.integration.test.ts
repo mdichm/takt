@@ -178,8 +178,12 @@ describe('Couverture pédagogique (integration, TAKT-L06-09)', () => {
   });
 
   afterAll(async () => {
-    await application.close();
-    await prisma.$disconnect();
+    if (application) {
+      await application.close();
+    }
+    if (prisma) {
+      await prisma.$disconnect();
+    }
   });
 
   async function creerReferentiels() {

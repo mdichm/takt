@@ -36,11 +36,12 @@ describe('Sidebar (filtrage par rôle, UI_ARBORESCENCE §1)', () => {
     );
   }
 
-  it('admin voit 7 entrées : 4 dédiés admin + EC-GES-10 partagé + 2 transversaux', () => {
+  it('admin voit 8 entrées : 4 dédiés admin + EC-GES-01 partagé + EC-GES-10 partagé + 2 transversaux', () => {
     const { container } = monter('admin');
     const entries = container.querySelectorAll('[data-testid^="sidebar-entry-"]');
-    expect(entries).toHaveLength(7);
+    expect(entries).toHaveLength(8);
     expect(screen.getByTestId('sidebar-entry-EC-ADM-01')).toBeInTheDocument();
+    expect(screen.getByTestId('sidebar-entry-EC-GES-01')).toBeInTheDocument();
     expect(screen.getByTestId('sidebar-entry-EC-GES-10')).toBeInTheDocument();
     expect(screen.getByTestId('sidebar-entry-EC-COM-02')).toBeInTheDocument();
   });

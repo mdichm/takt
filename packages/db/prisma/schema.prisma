@@ -16,6 +16,25 @@ datasource db {
 }
 
 // ----------------------------------------------------------------------------
+// 17. SecurityEvent — Événements de sécurité (L11-01)
+// ----------------------------------------------------------------------------
+model SecurityEvent {
+  id          String   @id @default(uuid()) @db.Uuid
+  type        String   // ex: LOGIN_ECHEC, ACCES_INTERDIT, TENTATIVE_INTRUSION
+  utilisateurId String? @db.Uuid
+  ip          String?
+  userAgent   String?
+  details     Json?
+  createdAt   DateTime @default(now())
+
+  utilisateur Utilisateur? @relation(fields: [utilisateurId], references: [id])
+
+  @@index([createdAt])
+  @@index([type])
+  @@index([utilisateurId])
+}
+
+// ----------------------------------------------------------------------------
 // 1. Utilisateur — Comptes applicatifs (admin, gest, rdep, dir)
 // ----------------------------------------------------------------------------
 model Utilisateur {
@@ -36,6 +55,7 @@ model Utilisateur {
   verrous               VerrouSeance[]
   bails                 BailEdition[]     // baux d'édition détenus par cet utilisateur (TAKT-L06-07)
   journalAudit          JournalAudit[]
+  securityEvents        SecurityEvent[]    // événements de sécurité liés (L11-01)
   notifications         Notification[]      // notifications in-app (TAKT-L05-05)
   versionsPubliees      Version[]           // versions dont cet utilisateur est l'auteur de publication
 
@@ -476,6 +496,8 @@ model Contrainte {
   type      String   // ex: INDISPONIBILITE, EXIGENCE_SALLE, CONTRAINTE_ENSEIGNANT
   cibleId   String   // identifiant de la cible (enseignant, salle, groupe, etc.)
   valeur    String   // valeur de la contrainte (JSON ou texte selon le type)
+  poids     Int?     // poids de la contrainte (1-99 pour SOFT, null ⇒ poids canonique du type)
+  estActif  Boolean  @default(true) // contrainte active ou désactivée
   createdAt DateTime @default(now())
 
   version Version @relation(fields: [versionId], references: [id])
@@ -870,6 +892,8 @@ model ConfigSysteme {
   // Valeur canonique 75% arbitrée en L00-02 ; alias SPEC_CONTRAINTES_GENERATION §8.2 : seuil_verrouillage_risque_pct.
   seuilVerrouillageGeneration   Int      @default(75) // % max de séances verrouillées avant avertissement (borné 1-100)
   avertissementVerrouillageBloquant Boolean @default(true) // l'avertissement de taux élevé bloque-t-il le lancement ?
+  // Durée par défaut d’un bail d’édition (minutes) — TAKT-L09-04 (borné 5-240 au niveau applicatif)
+  bailEditionDureeMinutes         Int      @default(30)
   createdAt                     DateTime @default(now())
   updatedAt                     DateTime @updatedAt
 }

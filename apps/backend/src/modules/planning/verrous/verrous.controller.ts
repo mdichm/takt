@@ -40,7 +40,7 @@ interface RequeteAvecUtilisateur {
 }
 
 const ROLES_LECTURE = ['admin', 'gest', 'rdep', 'dir'] as const;
-const ROLES_ECRITURE = ['rdep', 'admin'] as const;
+const ROLES_ECRITURE = ['rdep', 'admin', 'gest'] as const;
 
 @ApiTags('Verrous')
 @ApiBearerAuth()

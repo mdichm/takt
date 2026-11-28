@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import { Outlet } from 'react-router-dom';
-import { ErrorBoundary } from '@/app/components/ErrorBoundary';
+import { ErrorBoundary } from '@/app/ErrorBoundary';
 import { Header } from '@/components/templates/Header/Header';
 import { Sidebar } from '@/components/templates/Sidebar/Sidebar';
 

@@ -115,6 +115,16 @@ export async function creerContexteTestReferentiels(): Promise<ContexteTestRefer
     update: {},
     create: { code: 'gest', libelle: 'Gestionnaire' },
   });
+  await prisma.role.upsert({
+    where: { code: 'rdep' },
+    update: {},
+    create: { code: 'rdep', libelle: 'Référent Département' },
+  });
+  await prisma.role.upsert({
+    where: { code: 'dir' },
+    update: {},
+    create: { code: 'dir', libelle: 'Direction' },
+  });
 
   const roleAdmin = await prisma.role.findUnique({ where: { code: 'admin' } });
   const hash = await hacherArgon2(MOT_DE_PASSE, PASSWORD_ARGON2_OPTIONS);

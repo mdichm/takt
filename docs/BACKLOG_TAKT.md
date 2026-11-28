@@ -918,13 +918,14 @@ L00 → L01 → L02 → L03 → L04 → L05 → L06 → L07 → L09 → L10 → 
 
 - **Objectif** : Fournir les 4 écrans d'administration (utilisateurs, référentiels durables, paramètres système, journal d'audit).
 - **Exigences** : `EC-ADM-01`…`EC-ADM-04`, `IX-ADM-01`…`IX-ADM-08`.
-- **Périmètre** : `apps/frontend/src/pages/admin/**`. **Hors périmètre** : écrans gestionnaire.
+- **Périmètre** : `apps/frontend/src/pages/admin/**`, `apps/backend/src/modules/referentiels/role/**`, `apps/backend/src/modules/referentiels/charge-rule-set/**`, `apps/backend/src/modules/planning/bail/bail.service.ts`, `packages/db/prisma/schema.prisma` + migrations. **Hors périmètre** : écrans gestionnaire ; écriture audit (L03-06, L10-06) ; API audit read (L11-01).
 - **Livrables** :
-  - `EC-ADM-01` : grille utilisateurs (CRUD, rôles, activation) réutilisant `ReferentielManager` (L04-06).
-  - `EC-ADM-02` : gestion types enseignement, grades, coefficients (CRUD).
-  - `EC-ADM-03` : formulaire paramètres système (pas de temps, jours ouvrés, seuil verrouillage génération).
-  - `EC-ADM-04` : tableau audit filtrable (action, date, utilisateur, entité) avec export CSV.
-- **Critères** : Chaque écran respecte la grille RBAC (admin seul en écriture) ; export CSV audit fonctionnel ; paramètres système modifient la config centrale.
+  - `EC-ADM-01` : grille utilisateurs (CRUD, rôles, activation) réutilisant `ReferentielManager` (L04-06) + `<select>` rôles via `GET /referentiels/roles` + département conditionnel si rôle `rdep`.
+  - `EC-ADM-02` : gestion types enseignement, grades, **coefficients de charge (CRUD `ChargeRuleSet`)** + champ couleur types enseignement.
+  - `EC-ADM-03` : formulaire paramètres système (pas de temps, jours ouvrés, seuil verrouillage génération, **durée bail édition**).
+  - `EC-ADM-04` : tableau audit filtrable (action, date, utilisateur, entité) avec export CSV (consomme API L11-01).
+  - Backend : `GET /referentiels/roles` ; CRUD `GET/POST/PATCH/DELETE /referentiels/charge-rule-sets` + `GET /actif` ; `bailEditionDureeMinutes` sur `ConfigSysteme` (migration + `down.sql`) consommé par `bail.service.ts`.
+- **Critères** : Chaque écran respecte la grille RBAC (admin seul en écriture) ; export CSV audit fonctionnel ; **paramètres système modifient la config centrale (y compris durée bail)** ; **CRUD ChargeRuleSet fonctionnel** ; durée bail effective dans `bail.service.ts`.
 - **DoD** : 4 écrans livrés, tests E2E sur CRUD utilisateurs et export audit, 0 axe-core.
 - **SP** : 13 · **Dépend de** : `TAKT-L04-06`, `TAKT-L11-01` (audit read) · **Bloque** : —
 
@@ -1116,12 +1117,12 @@ L00 → L01 → L02 → L03 → L04 → L05 → L06 → L07 → L09 → L10 → 
 
 - **Objectif** : Exposer `EC-ADM-04` : tableau filtrable, export CSV, conservation 3/5 ans.
 - **Exigences** : `EC-ADM-04`, `IX-ADM-07`, `IX-ADM-08`, `EX-DAT-05`, `TE-SEC-05`.
-- **Périmètre** : `apps/backend/src/modules/audit/read/**`, `apps/frontend/src/pages/admin/AuditPage.tsx`. **Hors périmètre** : écriture (L03-06, L10-06).
-- **Livrables** : Endpoints `GET /api/v1/audit` (filtres : action, dateFrom/To, utilisateur, entité, entitéId, pagination) ; `GET /api/v1/audit/export` (CSV) ; `GET /api/v1/security` (même pattern) ; UI : table paginée, filtres multiples, bouton export CSV ; respect rétention (pas de données au-delà).
+- **Périmètre** : `apps/backend/src/modules/audit/read/**`. **Hors périmètre** : écriture (L03-06, L10-06) ; UI `AuditPage.tsx` (livrée par TAKT-L09-04).
+- **Livrables** : Endpoints `GET /api/v1/audit` (filtres : action, dateFrom/To, utilisateur, entité, entitéId, pagination) ; `GET /api/v1/audit/export` (CSV) ; `GET /api/v1/security` (même pattern) ; respect rétention (pas de données au-delà).
 - **Critères** : _Given_ filtre `action=TRANSITION_ETAT` et plage 30 jours, _Then_ résultats exacts. _Given_ export CSV 10 000 lignes, _Then_ fichier téléchargeable < 5 s.
 - **DoD** : Lecture + export fonctionnels, filtres complets, performance acceptable, 0 axe-core.
 - **Tests exigés** : tests d'intégration (filtres, pagination, export CSV) + test E2E `UF-ADM-01`.
-- **SP** : 6 · **Dépend de** : `TAKT-L03-06`, `TAKT-L10-06`, `TAKT-L09-04` · **Bloque** : —
+- **SP** : 6 · **Dépend de** : `TAKT-L03-06`, `TAKT-L10-06` · **Bloque** : `TAKT-L09-04`
 
 #### TAKT-L11-02 — Mettre en place le monitoring (Prometheus, Grafana, Alertmanager)
 
