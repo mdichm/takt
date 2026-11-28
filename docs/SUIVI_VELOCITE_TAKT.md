@@ -23,7 +23,7 @@ Ce document est l'instrument de pilotage du projet TAKT. Il répond à trois que
 | ------------------------ | ----------------------------------- | ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Granularité de livraison | Binaire : fin de sprint             | Continue : journalière       | Le `PLAN_MACRO` raisonne en jalons de 2 semaines pour la gouvernance MOA ; l'exécution technique gagne à livrer en continu pour ne pas accumuler un lot d'intégration à J14. |
 | Mesure de la performance | Points par sprint                   | SP/semaine glissante + débit | Un sprint fige la mesure et masque les pics ; la moyenne glissante sur 4 semaines absorbe le bruit.                                                                          |
-| Adaptation du périmètre  | Gelée en début de sprint            | Backlog priorisé en continu  | Le `BACKLOG_TAKT.md` compte 91 tickets ; le gel par sprint serait artificiel.                                                                                                |
+| Adaptation du périmètre  | Gelée en début de sprint            | Backlog priorisé en continu  | Le `BACKLOG_TAKT.md` compte 92 tickets ; le gel par sprint serait artificiel.                                                                                                |
 | Reporting MOA            | Binaire                             | Continu + jalons             | Les jalons J10/J14/J28/J42/J56/J70 du `PLAN_MACRO` restent la contractualisation externe.                                                                                    |
 
 **Ce qui ne change pas :** les jalons contractuels du `PLAN_MACRO §4` restent opposables à la MOA. Le flux continu est un mode d'exécution interne, pas une renegociation du calendrier contractuel.
@@ -109,8 +109,8 @@ Date_fin_retenue(S) = max( P50_bySP , P50_byDébit , P80_bySP )
 ### 3.5 Taux d'avancement
 
 ```
-Avancement_SP(S)    = (SP_livrés(S) / 534) × 100 %
-Avancement_tickets(S)= (Tickets terminés(S) / 91) × 100 %
+Avancement_SP(S)    = (SP_livrés(S) / 536) × 100 %
+Avancement_tickets(S)= (Tickets terminés(S) / 92) × 100 %
 Couverture_forecast  = SP_livrés(S) / (SP_total × (S / S_proj))   //Detection du retard
 ```
 
@@ -128,7 +128,7 @@ Le tableau ci‑dessous donne des bornes de vélocité et de débit pour trois p
 | Vélocité SP/sem (hypothèse départ)        | 12 – 15                                         | 25 – 30                                           | 55 – 60                                              |
 | Débit tickets/sem                         | 4 – 6                                           | 8 – 11                                            | 16 – 20                                              |
 | WIP max global                            | 2                                               | 4                                                 | 7                                                    |
-| Charge backlog (534 SP, 91 tickets)       | 534 SP / 91 tickets                             | 534 SP / 91 tickets                               | 534 SP / 91 tickets                                  |
+| Charge backlog (536 SP, 92 tickets)       | 536 SP / 92 tickets                             | 536 SP / 92 tickets                               | 536 SP / 92 tickets                                  |
 | **Date fin P50** (à partir de S0 = sem 1) | **≈ 34 – 42 sem** (≈ fin juin – août 2027)      | **≈ 17 – 20 sem** (≈ mars – avril 2027)           | **≈ 9 – 10 sem** (≈ janvier 2027)                    |
 | **Date fin P80** (facteur 0,75)           | **≈ 45 – 56 sem** (≈ oct 2027 – jan 2028)       | **≈ 23 – 27 sem** (≈ juil – oct 2027)             | **≈ 12 – 13 sem** (≈ mars 2027)                      |
 | **Date retenue (max conservateur)**       | **≈ 56 sem** (jan 2028)                         | **≈ 27 sem** (oct 2027)                           | **≈ 13 sem** (mars 2027)                             |
@@ -139,7 +139,7 @@ Le tableau ci‑dessous donne des bornes de vélocité et de débit pour trois p
 
 | Semaine (S) | Date lundi | SP terminés (Σ) | SP cumulés | Tickets terminés | Tickets cumulés | V_moy (formule §3.1) | D_moy (formule §3.2) | SP restants | Tickets restants | Date fin P50 (SP) | Date fin P50 (Débit) | Date fin P80 (SP) | **Date retenue** | Écarts / Actions |
 | ----------- | ---------- | --------------- | ---------- | ---------------- | --------------- | -------------------- | -------------------- | ----------- | ---------------- | ----------------- | -------------------- | ----------------- | ---------------- | ---------------- |
-| 1           | 2026‑11‑02 |                 |            |                  |                 |                      |                      | 534         | 91               |                   |                      |                   |                  |                  |
+| 1           | 2026‑11‑02 |                 |            |                  |                 |                      |                      | 536         | 92               |                   |                      |                   |                  |                  |
 | 2           | 2026‑11‑09 |                 |            |                  |                 |                      |                      |             |                  |                   |                      |                   |                  |                  |
 | 3           | 2026‑11‑16 |                 |            |                  |                 |                      |                      |             |                  |                   |                      |                   |                  |                  |
 | 4           | 2026‑11‑23 |                 |            |                  |                 |                      |                      |             |                  |                   |                      |                   |                  |                  |
@@ -250,10 +250,10 @@ Le tableau ci‑dessous donne des bornes de vélocité et de débit pour trois p
 Le burn‑up se trace avec :
 
 - **Axe X** : semaines (S1, S2, …).
-- **Axe Y** : SP cumulés (0 → 534).
+- **Axe Y** : SP cumulés (0 → 536).
 - **Courbe réalisée** : points `(S, SP_cumulés)` du tableau §5.
-- **Courbe idéale P50** : droite reliant `(S0, 0)` à `(S_fin_P50, 534)` où `S_fin_P50` est la projection courante.
-- **Courbe idéale P80** : droite reliant `(S0, 0)` à `(S_fin_P80, 534)`.
+- **Courbe idéale P50** : droite reliant `(S0, 0)` à `(S_fin_P50, 536)` où `S_fin_P50` est la projection courante.
+- **Courbe idéale P80** : droite reliant `(S0, 0)` à `(S_fin_P80, 536)`.
 
 **Interprétation** :
 

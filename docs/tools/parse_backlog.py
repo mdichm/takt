@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Parse BACKLOG_TAKT.md and generate tickets_data.py with the full list of 91 tickets.
+Parse BACKLOG_TAKT.md and generate tickets_data.py with the full list of 92 tickets.
 Run from repo root: python3 docs/tools/parse_backlog.py
 """
 import re
@@ -25,6 +25,31 @@ class Ticket:
     status: str
     deps: List[str]
     exigences: List[str]
+
+def _expand_ranges(raw_ids: List[str]) -> List[str]:
+    """Développe les notations de range style ``TAKT-L00-01…TAKT-L00-04``
+    en liste explicite d'IDs (ex: [L00-01, L00-02, L00-03, L00-04])."""
+    expanded: List[str] = []
+    for rid in raw_ids:
+        rid = rid.replace('`', '').strip()
+        m = re.match(r'^(TAKT-L(\d{2})-(\d{2}))\s*…\s*(TAKT-L(\d{2})-(\d{2}))$', rid)
+        if m:
+            start_lot, start_num = int(m.group(2)), int(m.group(3))
+            end_lot, end_num = int(m.group(5)), int(m.group(6))
+            lot, num = start_lot, start_num
+            while True:
+                expanded.append(f'TAKT-L{lot:02d}-{num:02d}')
+                if lot == end_lot and num == end_num:
+                    break
+                num += 1
+                if num > 99:
+                    num = 1
+                    lot += 1
+                if lot > end_lot:
+                    break
+        else:
+            expanded.append(rid)
+    return expanded
 
 def parse_backlog(md_text: str) -> List[Ticket]:
     # Find all ticket headings
@@ -52,7 +77,8 @@ def parse_backlog(md_text: str) -> List[Ticket]:
             dep_match = re.search(r'\*\*Dépend de :\*\*\s*([^·\n]+)', block)
         if dep_match:
             dep_raw = dep_match.group(1)
-            deps = [d.strip().strip('`') for d in dep_raw.split(',') if d.strip() and d.strip() != '—']
+            raw_parts = [d.strip().strip('`') for d in dep_raw.split(',') if d.strip() and d.strip() != '—']
+            deps = _expand_ranges(raw_parts)
 
         # Exigences - flexible
         exigences = []
@@ -76,7 +102,7 @@ def generate_tickets_py(tickets: List[Ticket], out_path: Path):
     lines.append('#!/usr/bin/env python3')
     lines.append('"""')
     lines.append('Source de vérité unique du backlog TAKT.')
-    lines.append('Contient la liste complète des 91 tickets avec leurs métadonnées.')
+    lines.append('Contient la liste complète des 92 tickets avec leurs métadonnées.')
     lines.append('Ne pas éditer les fichiers générés dans dist/ – modifier uniquement ce fichier.')
     lines.append('"""')
     lines.append('from dataclasses import dataclass, asdict')

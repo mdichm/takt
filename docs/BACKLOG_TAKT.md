@@ -208,7 +208,7 @@ L00 → L01 → L02 → L03 → L04 → L05 → L06 → L07 → L09 → L10 → 
 
 #### TAKT-L00-05 — Constituer le registre de décision unifié
 
-- **Objectif :** Créer un registre unique des décisions structurantes couvrant les 3 Decision Logs existants, condition de la gouvernance des 91 tickets.
+- **Objectif :** Créer un registre unique des décisions structurantes couvrant les 3 Decision Logs existants, condition de la gouvernance des 92 tickets.
 - **Exigences :** `DL-01` à `DL-08`, `DL-TE-01` à `DL-TE-08`, `DL-UI-01` à `DL-UI-04`, `DL-FS-*`.
 - **Périmètre :** `docs/DECISIONS.md` (nouveau), `docs/SF_TAKT.md`, `docs/ST_TAKT.md`, `docs/UI_ARBORESCENCE.md`, `docs/UI_FRONTEND_SPECS.md`. **Hors périmètre :** aucun code.
 - **Livrables :** `docs/DECISIONS.md` : tableau `ID | Date | Statut | Décision | Conséquence technique | Documents impactés | Ticket backlog`, consolidant les ~25 décisions et les 7 arbitrages L00.
@@ -224,7 +224,7 @@ L00 → L01 → L02 → L03 → L04 → L05 → L06 → L07 → L09 → L10 → 
 - **Périmètre :** `packages/db/prisma/schema.prisma`, `packages/db/prisma/contract.prisma` (archivé), `docs/DOC_MIGRATION_DB.md`, `docs/ST_TAKT.md`, `docs/PLAN_MACRO.md`, `docs/TESTS.md`, `docs/SPEC_SOLVER_CPSAT.md`, `docs/DEPLOIEMENT.md`, `docs/BACKLOG_TAKT.md`, `docs/SF_TAKT.md`. **Hors périmètre :** aucun code applicatif.
 - **Livrables :** `contract.prisma` déplacé en archive avec bandeau ARCHIVÉ ; en-tête de `schema.prisma` corrigé (source : schema.prisma, ref DL-09) ; `schema.integration.test.ts` refactoré (contrôle des 15 modèles historiques + `ValidationRepartition`/`Notification`, contrat inexistant) ; 7 documents mis à jour ; décision `DL-09` ajoutée au Decision Log de `SF_TAKT.md`.
 - **Critères :** _Given_ le dépôt, _When_ on liste `packages/db/prisma/`, _Then_ `schema.prisma` est le seul schéma exécutable et `contract.prisma` n'y figure plus. _Given_ `prisma generate` et `prisma validate`, _Then_ ils passent sur `schema.prisma`. _Given_ la CI, _Then_ aucune tâche ne référence plus `contract.prisma` comme source.
-- **DoD :** Aucune référence à `contract.prisma` comme source de vérité exécutoire dans le corpus documentaire ; `schema.prisma` cité partout comme source unique ; `DL-09` au Decision Log ; tests de schéma verts ; backlog cohérent (91 tickets, 534 SP).
+- **DoD :** Aucune référence à `contract.prisma` comme source de vérité exécutoire dans le corpus documentaire ; `schema.prisma` cité partout comme source unique ; `DL-09` au Decision Log ; tests de schéma verts ; backlog cohérent (92 tickets, 536 SP).
 - **Tests exigés :** `pnpm --filter @takt/db db:validate`, `pnpm --filter @takt/db test`, revue documentaire croisée des 7 fichiers.
 - **SP :** 2 · **Dépend de :** — · **Bloque :** aucun (amélioration continue).
 
@@ -612,7 +612,7 @@ L00 → L01 → L02 → L03 → L04 → L05 → L06 → L07 → L09 → L10 → 
 - **Tests exigés :** tests d'intégration Testing Library (indicateurs, garde-fou, gel) + test E2E Playwright `UF-RDEP-01`.
 - **SP :** 8 · **Dépend de :** `TAKT-L05-04`, `TAKT-L08-04` · **Bloque :** `TAKT-L09-12`.
 
-### Lot L06 — Versions, séances, conflits, bail, verrous (10 tickets · 63 SP)
+### Lot L06 — Versions, séances, conflits, bail, verrous (11 tickets · 65 SP)
 
 #### TAKT-L06-01 — Modéliser la version d'EDT et ses 10 états
 
@@ -723,6 +723,17 @@ L00 → L01 → L02 → L03 → L04 → L05 → L06 → L07 → L09 → L10 → 
 - **DoD :** Snapshot complet (tous les champs listés) ; checksum déterministe ; immuabilité `publie` testée sur les 3 tables ; historique des générations conservé.
 - **Tests exigés :** tests d'intégration (création snapshot, checksum, immuabilité, non-suppression).
 - **SP :** 6 · **Dépend de :** `TAKT-L06-01`, `TAKT-L06-03` · **Bloque :** `TAKT-L07-01`, `TAKT-L10-07`.
+
+#### TAKT-L06-11 — Compléter le contrat de réponse de transition VersionItem (9 champs exigés par zVersionItem)
+
+- **Objectif :** Garantir que le service de transition de version retourne tous les champs exigés par le contrat `zVersionItem` (`id`, `etat`, `semestreId`, `datePublication`, `publiePar`, `anneeId`, `snapshotId`, `createdAt`, `updatedAt`), comblant l'écart où `transitionner()` ne sélectionne que 5 des 9 champs.
+- **Exigences :** `EX-WKF-04`, `TE-ARCH-03`, `TE-MET-06`, `GG-05`.
+- **Périmètre :** `apps/backend/src/modules/versions/workflow/workflow.service.ts`, `packages/contracts/src/versions.ts`, `apps/frontend/src/lib/direction.api.ts`. **Hors périmètre :** le worker CP-SAT et la génération des scénarios.
+- **Livrables :** `transitionner()` sélectionne et retourne les 9 champs du contrat ; le contournement côté frontend (`direction.api.ts`) est conservé pour compatibilité mais devient optionnel ; tests couvrant la matrice complète des champs.
+- **Critères :** _Given_ un appel à `transitionner()`, _Then_ la réponse contient `anneeId`, `snapshotId`, `createdAt` et `updatedAt` en plus des 5 champs existants. _Given_ un appel via l'API REST, _Then_ le payload JSON passe la validation Zod `zVersionItem` sans erreur.
+- **DoD :** 9 champs retournés par `transitionner()` ; test unitaire sur la matrice complète des champs ; test d'intégration de l'endpoint de transition ; aucune régression sur les 18 transitions existantes.
+- **Tests exigés :** tests unitaires (matrice 9 champs × 4 rôles) + test d'intégration de l'endpoint.
+- **SP :** 2 · **Dépend de :** `TAKT-L06-02` · **Bloque :** —
 
 ### Lot L07 — Génération CP-SAT (7 tickets · 47 SP)
 
@@ -1231,4 +1242,4 @@ L00 → L01 → L02 → L03 → L04 → L05 → L06 → L07 → L09 → L10 → 
 
 ---
 
-_Fin du BACKLOG_TAKT.md — 91 tickets, 534 SP, prêt pour exécution en flux continu._
+_Fin du BACKLOG_TAKT.md — 92 tickets, 536 SP, prêt pour exécution en flux continu._
