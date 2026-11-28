@@ -1,11 +1,12 @@
 // Copyright (C) 2026 TAKT
 // SPDX-License-Identifier: AGPL-3.0-only
 
-import { Suspense } from 'react';
-import { BrowserRouter, Navigate, Routes, Route } from 'react-router-dom';
+import { Suspense, useEffect } from 'react';
+import { useNavigate, Navigate, Routes, Route } from 'react-router-dom';
 import { Layout } from '@/components/templates/Layout/Layout';
-import { PageIntrouvable } from '@/app/components/PageIntrouvable';
-import { Chargement } from '@/app/components/Chargement';
+import { PageError } from '@/app/PageError';
+import { Skeleton } from '@/app/Skeleton';
+import { configurerNavigation } from '@/app/providers';
 import { GuestGuard } from '@/app/guards';
 import { ProtectedRoute } from '@/app/guards';
 import { ROUTES } from '@/app/routes';
@@ -22,40 +23,40 @@ import { ROUTES } from '@/app/routes';
  * - / redirige vers le tableau de bord ; /login est protege par GuestGuard.
  * - Les pages sont chargees paresseusement (React.lazy + Suspense).
  * - Les routes inconnues renvoient sur la page 404.
+ *
+ * Le BrowserRouter est fourni par main.tsx ; ce composant enregistre sa
+ * fonction navigate pour les redirections globales 401.
  */
 export function Router(): JSX.Element {
   const PageLogin = ROUTES.find((r) => r.chemin === '/login')!.composant;
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    configurerNavigation((url: string) => navigate(url, { replace: true }));
+  }, [navigate]);
 
   return (
-    <BrowserRouter>
-      <Suspense fallback={<Chargement />}>
-        <Routes>
-          <Route element={<Layout />}>
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+    <Suspense fallback={<Skeleton />}>
+      <Routes>
+        {/* /login est hors Layout (pas de sidebar ni header applicatif : écran pré-authentification) */}
+        <Route path="/login" element={<GuestGuard><PageLogin /></GuestGuard>} />
+        <Route element={<Layout />}>
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          {ROUTES.filter((r) => r.chemin !== '/login').map((route) => (
             <Route
-              path="/login"
+              key={route.code}
+              path={route.chemin}
               element={
-                <GuestGuard>
-                  <PageLogin />
-                </GuestGuard>
+                <ProtectedRoute roles={route.roles} departement={route.departement ?? false}>
+                  <route.composant />
+                </ProtectedRoute>
               }
             />
-            {ROUTES.filter((r) => r.chemin !== '/login').map((route) => (
-              <Route
-                key={route.code}
-                path={route.chemin}
-                element={
-                  <ProtectedRoute roles={route.roles} departement={route.departement ?? false}>
-                    <route.composant />
-                  </ProtectedRoute>
-                }
-              />
-            ))}
-            <Route path="*" element={<PageIntrouvable />} />
-          </Route>
-        </Routes>
-      </Suspense>
-    </BrowserRouter>
+          ))}
+          <Route path="*" element={<PageError />} />
+        </Route>
+      </Routes>
+    </Suspense>
   );
 }
 

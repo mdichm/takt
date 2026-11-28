@@ -26,6 +26,7 @@ interface SeancesTestCtx {
   agent: Agent;
   tokenAdmin: string;
   tokenRdep: string;
+  tokenGest: string;
   departementId: string;
   semestreId: string;
   anneeUniversitaireId: string;
@@ -75,6 +76,7 @@ describe('Seances (TAKT-L06-03)', () => {
   let agent: Agent;
   let tokenAdmin: string;
   let tokenRdep: string;
+  let tokenGest: string;
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -116,6 +118,11 @@ describe('Seances (TAKT-L06-03)', () => {
       update: {},
       create: { code: 'rdep', libelle: 'Responsable departement' },
     });
+    await prisma.role.upsert({
+      where: { code: 'gest' },
+      update: {},
+      create: { code: 'gest', libelle: 'Gestionnaire' },
+    });
 
     const emailUnique = () =>
       'takt-test-' + Date.now() + '-' + Math.random().toString(36).slice(2) + '@takt.test';
@@ -148,6 +155,21 @@ describe('Seances (TAKT-L06-03)', () => {
     tokenRdep = tokenService.signAccessToken({
       sub: rdep.id,
       role: 'rdep',
+      departementIds: [],
+    }).token;
+
+    const gest = await prisma.utilisateur.create({
+      data: {
+        email: emailUnique(),
+        motDePasseHash: hash,
+        nom: 'Gest',
+        prenom: 'Test',
+        role: { connect: { code: 'gest' } },
+      },
+    });
+    tokenGest = tokenService.signAccessToken({
+      sub: gest.id,
+      role: 'gest',
       departementIds: [],
     }).token;
     const etablissement = await prisma.etablissement.upsert({
@@ -244,7 +266,7 @@ describe('Seances (TAKT-L06-03)', () => {
 
     // any-justify: contexte de test global partagé entre hooks et tests
     globalThis.__seancesCtx! = {
-      application, prisma, agent, tokenAdmin, tokenRdep,
+      application, prisma, agent, tokenAdmin, tokenRdep, tokenGest,
       departementId: departement.id, semestreId: semestre.id, anneeUniversitaireId: anneeUniversitaire.id, versionId: version.id,
       matiereId: matiere.id, typeEnseignementId: typeEnseignement.id, enseignantId: enseignant.id,
       groupeId: groupe.id, salleId: salle.id, creneauId: creneau.id, affectationId: affectation.id,
@@ -319,6 +341,88 @@ describe('Seances (TAKT-L06-03)', () => {
       where: { id: ctx.versionId },
       data: { etat: 'edition' },
     });
+  });
+
+  it('POST /seances par gest : creation autorisee (201)', async () => {
+    const ctx = globalThis.__seancesCtx!;
+    const cree = await ctx.agent
+      .post('/api/v1/seances')
+      .set('Authorization', 'Bearer ' + ctx.tokenGest)
+      .send({
+        versionId: ctx.versionId,
+        jour: 1,
+        creneauDebutId: ctx.creneauId,
+        nbCreneaux: 1,
+        salleId: ctx.salleId,
+        affectationId: ctx.affectationId,
+      })
+      .expect(201);
+
+    expect(cree.body.data.id).toBeDefined();
+    expect(cree.body.data.salleId).toBe(ctx.salleId);
+
+    const audit = await ctx.prisma.journalAudit.findFirst({
+      where: { entite: 'Seance', entiteId: cree.body.data.id, action: 'CREATION' },
+    });
+    expect(audit).not.toBeNull();
+  });
+
+  it('PATCH /seances/:id par gest : modification autorisee (200)', async () => {
+    const ctx = globalThis.__seancesCtx!;
+    const cree = await ctx.agent
+      .post('/api/v1/seances')
+      .set('Authorization', 'Bearer ' + ctx.tokenGest)
+      .send({
+        versionId: ctx.versionId,
+        jour: 1,
+        creneauDebutId: ctx.creneauId,
+        nbCreneaux: 1,
+        salleId: ctx.salleId,
+        affectationId: ctx.affectationId,
+      })
+      .expect(201);
+
+    const modifiee = await ctx.agent
+      .patch('/api/v1/seances/' + cree.body.data.id)
+      .set('Authorization', 'Bearer ' + ctx.tokenGest)
+      .send({ nbCreneaux: 2 })
+      .expect(200);
+
+    expect(modifiee.body.data.nbCreneaux).toBe(2);
+
+    const audit = await ctx.prisma.journalAudit.findFirst({
+      where: { entite: 'Seance', entiteId: cree.body.data.id, action: 'MODIFICATION' },
+    });
+    expect(audit).not.toBeNull();
+  });
+
+  it('DELETE /seances/:id par gest : suppression autorisee (200)', async () => {
+    const ctx = globalThis.__seancesCtx!;
+    const cree = await ctx.agent
+      .post('/api/v1/seances')
+      .set('Authorization', 'Bearer ' + ctx.tokenGest)
+      .send({
+        versionId: ctx.versionId,
+        jour: 1,
+        creneauDebutId: ctx.creneauId,
+        nbCreneaux: 1,
+        salleId: ctx.salleId,
+        affectationId: ctx.affectationId,
+      })
+      .expect(201);
+
+    await ctx.agent
+      .delete('/api/v1/seances/' + cree.body.data.id)
+      .set('Authorization', 'Bearer ' + ctx.tokenGest)
+      .expect(200);
+
+    const existe = await ctx.prisma.seance.findUnique({ where: { id: cree.body.data.id } });
+    expect(existe).toBeNull();
+
+    const audit = await ctx.prisma.journalAudit.findFirst({
+      where: { entite: 'Seance', entiteId: cree.body.data.id, action: 'SUPPRESSION' },
+    });
+    expect(audit).not.toBeNull();
   });
 
   it('POST /seances : affectation hors version refuse (400)', async () => {

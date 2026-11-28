@@ -20,6 +20,7 @@ import { RolesGuard } from '../common/guards/roles.guard';
 import { ZodValidation } from '../common/pipes/zod-validation.decorator';
 import {
   zGeneration,
+  zGenerationAnnuler,
   zGenerationListFilters,
   GenerationItem,
   GenerationList,
@@ -96,6 +97,35 @@ export class GenerationsController {
 
     return {
       data: generation as unknown as GenerationItem,
+      error: null,
+      meta: { timestamp: new Date().toISOString() },
+    };
+  }
+
+  /**
+   * Annule une génération en cours (POST /api/v1/generations/:id/annuler).
+   * Retourne 409 si la génération n'est pas EN_COURS ou si un scénario a
+   * déjà été adopté.
+   */
+  @Post(':id/annuler')
+  @Roles('gest')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Annuler une génération' })
+  @ApiResponse({ status: 200, description: 'Génération annulée, version retournée à brouillon' })
+  @ApiResponse({ status: 404, description: 'Génération introuvable' })
+  @ApiResponse({ status: 409, description: 'Conflit (déjà adoptée ou terminée)' })
+  @ZodValidation({ body: zGenerationAnnuler })
+  async annuler(
+    @Param('id') id: string,
+    @Req() req: RequeteAvecUtilisateur,
+  ): Promise<{ data: { id: string; statut: string }; error: null; meta: { timestamp: string } }> {
+    const utilisateurId = req.user?.sub;
+    if (!utilisateurId) {
+      throw new Error('Utilisateur non authentifié');
+    }
+    const resultat = await this.generationsService.annulerGeneration(id, utilisateurId);
+    return {
+      data: resultat as unknown as { id: string; statut: string },
       error: null,
       meta: { timestamp: new Date().toISOString() },
     };

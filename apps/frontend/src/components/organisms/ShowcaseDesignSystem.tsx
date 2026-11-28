@@ -262,7 +262,7 @@ export function ShowcaseDesignSystem(): JSX.Element {
               background: 'var(--color-surface)',
             }}
           >
-            <Tabs onglets={onglets} valeur={ongletActif} onChange={(id) => setOngletActif(id)} />
+            <Tabs onglets={onglets} valeur={ongletActif} onChange={(id) => setOngletActif(id)} panels={[]} />
           </div>
         </div>
       </section>

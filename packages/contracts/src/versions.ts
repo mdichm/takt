@@ -10,6 +10,7 @@ import {
   zSearchFilter,
   zUuid,
 } from './common';
+import { zPlacementPersistee } from './generation';
 
 /** Données de création d’une version de planning. */
 export const zVersion = z.object({
@@ -32,7 +33,28 @@ export const zVersionList = zPaginationQuery
   .extend({
     etat: zEtatVersion.optional(),
     semestreId: zUuid.optional(),
+    /** Filtre par périmètre départemental (RB-UI-01 : rdep voit son département). */
+    departementId: zUuid.optional(),
   });
+
+/** Item de version en lecture seule (miroir du select Prisma de l'endpoint liste). */
+export const zVersionItem = z.object({
+  id: zUuid,
+  semestreId: zUuid,
+  anneeId: zUuid,
+  etat: zEtatVersion,
+  snapshotId: zUuid.nullish(),
+  datePublication: zDateIso.nullish(),
+  publiePar: zUuid.nullish(),
+  createdAt: zDateIso,
+  updatedAt: zDateIso,
+});
+
+/** Réponse paginée de l'endpoint liste (contenu de `data` dans l'enveloppe API). */
+export const zVersionListe = z.object({
+  items: z.array(zVersionItem),
+  meta: z.object({ page: z.number().int().positive(), pageSize: z.number().int().positive(), total: z.number().int().nonnegative() }),
+});
 
 /** Action de transition autorisée par la matrice workflow (18 transitions arbitrées). */
 export const zActionTransition = z.enum([
@@ -111,6 +133,8 @@ export const zScenario = z.object({
   scoreGlobal: z.number().int().min(0).max(100),
   sousScores: z.record(z.number().finite()),
   selectionne: z.boolean(),
+  /** Placements des séances (salle / enseignant / jour / créneau) exposés par le solveur. */
+  placements: z.array(zPlacementPersistee).default([]),
   createdAt: zDateIso,
 });
 
@@ -137,9 +161,11 @@ export const zAudit = z
       .default(20),
     action: z.string().trim().min(1).optional(),
     entite: z.string().trim().min(1).optional(),
+    entiteId: z.string().trim().min(1).optional(),
     utilisateurId: zUuid.optional(),
     dateDebut: zDateIso.optional(),
     dateFin: zDateIso.optional(),
+    search: z.string().trim().min(1).optional(),
   })
   .refine(
     (valeurs) =>
@@ -155,8 +181,61 @@ export const zAudit = z
 export type VersionInput = z.infer<typeof zVersion>;
 export type VersionParams = z.infer<typeof zVersionParams>;
 export type VersionListFilters = z.infer<typeof zVersionList>;
+export type VersionItem = z.infer<typeof zVersionItem>;
+export type VersionListe = z.infer<typeof zVersionListe>;
 export type GenerationInput = z.infer<typeof zGeneration>;
 export type Scenario = z.infer<typeof zScenario>;
 export type ScenarioSelectInput = z.infer<typeof zScenarioSelect>;
 export type ExportInput = z.infer<typeof zExport>;
 export type AuditFilters = z.infer<typeof zAudit>;
+
+/** Données d’initialisation d’un nouveau semestre (année + semestre + version initiale). */
+export const zInitialisationInput = z.object({
+  libelleAnnee: z.string().trim().min(1, 'Le libellé de l’année universitaire est obligatoire'),
+  numeroSemestre: z.number().int().min(1, 'Le numéro de semestre doit être 1 ou 2').max(2, 'Le numéro de semestre doit être 1 ou 2'),
+  dateDebutAnnee: zDateIso,
+  dateFinAnnee: zDateIso,
+  dateDebutSemestre: zDateIso,
+  dateFinSemestre: zDateIso,
+});
+
+export type InitialisationInput = z.infer<typeof zInitialisationInput>;
+
+/** Résultat de l’initialisation (version créée en état `initial`). */
+export const zInitialisationOutput = z.object({
+  id: zUuid,
+  semestreId: zUuid,
+  anneeId: zUuid,
+  etat: zEtatVersion.default('initial'),
+  createdAt: zDateIso,
+});
+
+export type InitialisationOutput = z.infer<typeof zInitialisationOutput>;
+
+/** Item d’année universitaire avec ses semestres et l’état de la version associée. */
+export const zSemestreUniversitaireItem = z.object({
+  id: zUuid,
+  numero: z.number().int(),
+  dateDebut: zDateIso,
+  dateFin: zDateIso,
+  versionId: zUuid.nullish(),
+  etatVersion: zEtatVersion.nullish(),
+});
+
+export const zAnneeUniversitaireItem = z.object({
+  id: zUuid,
+  libelle: z.string(),
+  dateDebut: zDateIso,
+  dateFin: zDateIso,
+  semestres: z.array(zSemestreUniversitaireItem),
+});
+
+/** Réponse paginée de l’endpoint liste des années universitaires. */
+export const zAnneesUniversitairesListe = z.object({
+  items: z.array(zAnneeUniversitaireItem),
+  meta: z.object({ page: z.number().int().positive(), pageSize: z.number().int().positive(), total: z.number().int().nonnegative() }),
+});
+
+export type SemestreUniversitaireItem = z.infer<typeof zSemestreUniversitaireItem>;
+export type AnneeUniversitaireItem = z.infer<typeof zAnneeUniversitaireItem>;
+export type AnneesUniversitairesListe = z.infer<typeof zAnneesUniversitairesListe>;

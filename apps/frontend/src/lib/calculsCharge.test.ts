@@ -44,6 +44,8 @@ const matierePlan = (
   planEtudesId: 'pe1',
   matiereId,
   typeEnseignementId: 't1',
+  matiereLibelle: null,
+  typeEnseignementLibelle: null,
   volumeHoraire,
   dureeCreneaux: 1,
   coefficient: 1,

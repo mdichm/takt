@@ -7,6 +7,9 @@ import { CODES_ERREUR_API, ApiError } from '../../common/http/api-error';
 import { BailService } from './bail.service';
 
 interface MockPrisma {
+  configSysteme: {
+    findFirst: ReturnType<typeof vi.fn>;
+  };
   version: {
     findUnique: ReturnType<typeof vi.fn>;
   };
@@ -36,6 +39,9 @@ const detenteurB = { nom: 'Martin', prenom: 'Bob' };
 
 function creerMockPrisma(): MockPrisma {
   return {
+    configSysteme: {
+      findFirst: vi.fn(),
+    },
     version: {
       findUnique: vi.fn(),
     },
@@ -87,6 +93,7 @@ describe('BailService (TAKT-L06-07)', () => {
     prisma = creerMockPrisma();
     service = new BailService(prisma as unknown as PrismaClient);
     vi.spyOn(Date, 'now').mockReturnValue(maintenant.getTime());
+    prisma.configSysteme.findFirst.mockResolvedValue(null);
   });
 
   afterEach(() => {

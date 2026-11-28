@@ -22,6 +22,8 @@ export const zReponseLogin = zEnvelope(
       nom: z.string().min(1),
       prenom: z.string().min(1),
       role: z.string().min(1),
+      /** Département rattaché (nullable : un utilisateur sans département n'a pas de département). */
+      departementId: z.string().uuid().optional(),
     }),
   }),
 );

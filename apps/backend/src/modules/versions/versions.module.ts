@@ -4,6 +4,7 @@
 import { Module } from '@nestjs/common';
 import { AuditModule } from '../audit/audit.module';
 import { CommonModule } from '../common/common.module';
+import { InitialisationModule } from './initialisation/initialisation.module';
 import { ReferentielsModule } from '../referentiels/referentiels.module';
 import { VersionsController } from './versions.controller';
 import { VersionsService } from './versions.service';
@@ -12,9 +13,9 @@ import { SnapshotModule } from './snapshot/snapshot.module';
 
 /** Module du cycle de vie des versions de planning. */
 @Module({
-  imports: [CommonModule, ReferentielsModule, AuditModule, SnapshotModule],
+  imports: [CommonModule, ReferentielsModule, AuditModule, InitialisationModule, SnapshotModule],
   controllers: [VersionsController],
   providers: [VersionsService, WorkflowService],
-  exports: [VersionsService, WorkflowService, SnapshotModule],
+  exports: [VersionsService, WorkflowService, SnapshotModule, InitialisationModule],
 })
 export class VersionsModule {}

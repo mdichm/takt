@@ -10,7 +10,9 @@ test('un utilisateur non authentifié ne peut pas accéder à une URL protégée
   expect(reponse?.status()).toBe(200);
   // L écran admin est protégé : redirection vers /login (pas de session).
   await expect(page).toHaveURL(/\/login/);
-  await expect(page.getByText('Écran EC-COM-01')).toBeVisible();
+  await expect(page.getByRole('textbox', { name: /adresse e-mail/i })).toBeVisible();
+  await expect(page.getByRole('textbox', { name: /mot de passe/i })).toBeVisible();
+  await expect(page.getByRole('button', { name: /se connecter/i })).toBeVisible();
   await expect(page.getByText('Écran EC-ADM-01')).not.toBeVisible();
 });
 

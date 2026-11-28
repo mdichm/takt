@@ -6,14 +6,18 @@
  * Ticket : TAKT-L02-02 — ST_TAKT §3.1, §3.2 et TE-API-02.
  */
 
+export * from './admin';
 export * from './affectations';
+export * from './audit';
 export * from './auth';
 export * from './bail';
 export * from './common';
+export * from './contraintes';
 export * from './couverture';
 export * from './events';
 export * from './generation';
 export * from './locks';
+export * from './profil';
 export * from './referentiels';
 export * from './repartition';
 export * from './seances';

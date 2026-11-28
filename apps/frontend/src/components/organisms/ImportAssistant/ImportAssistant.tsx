@@ -178,25 +178,37 @@ export default function ImportAssistant(): JSX.Element {
 
   return (
     <section className="space-y-6">
-      <h2 className="text-lg font-semibold text-gray-900">
+      <h2 className="text-lg font-semibold" style={{ color: 'var(--color-text-primary)' }}>
         {mode === 'csv' ? t('titre', DICO_CSV) : t('titre', DICO_ARCHIVE)}
       </h2>
-      <p className="text-sm text-gray-600">
+      <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
         {mode === 'csv' ? t('sousTitre', DICO_CSV) : t('sousTitre', DICO_ARCHIVE)}
       </p>
 
-      <div className="inline-flex rounded-md border border-gray-300">
+      <div className="inline-flex rounded-md p-1" style={{ border: `var(--border-width) solid var(--color-border)`, borderRadius: 'var(--radius-md)' }}>
         <button
           onClick={() => basculerMode('csv')}
           aria-pressed={mode === 'csv'}
-          className={`px-4 py-2 text-sm font-medium ${mode === 'csv' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'}`}
+          className={`px-4 py-2 text-sm font-medium`}
+          style={{
+            background: mode === 'csv' ? 'var(--color-primary)' : 'var(--color-surface)',
+            color: mode === 'csv' ? 'var(--color-surface)' : 'var(--color-text-primary)',
+            border: `var(--border-width) solid ${mode === 'csv' ? 'transparent' : 'var(--color-border)'}`,
+            borderRadius: 'var(--radius-md)',
+          }}
         >
           CSV
         </button>
         <button
           onClick={() => basculerMode('archive')}
           aria-pressed={mode === 'archive'}
-          className={`px-4 py-2 text-sm font-medium ${mode === 'archive' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'}`}
+          className={`px-4 py-2 text-sm font-medium`}
+          style={{
+            background: mode === 'archive' ? 'var(--color-primary)' : 'var(--color-surface)',
+            color: mode === 'archive' ? 'var(--color-surface)' : 'var(--color-text-primary)',
+            border: `var(--border-width) solid ${mode === 'archive' ? 'transparent' : 'var(--color-border)'}`,
+            borderRadius: 'var(--radius-md)',
+          }}
         >
           Année clôturée
         </button>
@@ -205,13 +217,14 @@ export default function ImportAssistant(): JSX.Element {
       {mode === 'csv' && estSaisie && (
         <>
           <div className="mt-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>
               {t('type', DICO_CSV)}
             </label>
             <select
               value={typeSelectionne}
               onChange={(e) => setTypeSelectionne(e.target.value as TypeReferentielImportable)}
-              className="w-full max-w-xs rounded-md border border-gray-300 bg-white px-3 py-2 text-sm"
+              className="w-full max-w-xs rounded-md p-3 text-sm"
+              style={{ border: `var(--border-width) solid var(--color-border)`, background: 'var(--color-surface)', color: 'var(--color-text-primary)', borderRadius: 'var(--radius-md)' }}
             >
               {TYPES_CSV.map((type) => (
                 <option key={type.valeur} value={type.valeur}>
@@ -221,27 +234,36 @@ export default function ImportAssistant(): JSX.Element {
             </select>
           </div>
           <div className="mt-4">
-            <label htmlFor="contenu-csv" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="contenu-csv" className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>
               {t('fichier', DICO_CSV)}
             </label>
             <textarea
               id="contenu-csv"
               value={contenuCsv}
               onChange={(e) => setContenuCsv(e.target.value)}
-              className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-mono"
+              className="w-full rounded-md p-3 text-sm font-mono"
               rows={6}
+              style={{ border: `var(--border-width) solid var(--color-border)`, background: 'var(--color-surface)', color: 'var(--color-text-primary)', borderRadius: 'var(--radius-md)' }}
             />
-            <p className="mt-1 text-xs text-gray-500">{t('fichierAide', DICO_CSV)}</p>
+            <p className="mt-1 text-xs" style={{ color: 'var(--color-text-secondary)' }}>{t('fichierAide', DICO_CSV)}</p>
           </div>
           {erreurApi && (
-            <div className="mt-3 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-800">
+            <div className="mt-3 rounded-md p-3 text-sm" style={{ border: `var(--border-width) solid var(--color-error)`, background: 'var(--color-error)', color: 'var(--color-surface)', borderRadius: 'var(--radius-md)' }}>
               {erreurApi}
             </div>
           )}
           <button
             onClick={executerApercu}
             disabled={chargement || contenuCsv.trim().length === 0}
-            className="mt-4 inline-flex items-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="mt-4 inline-flex items-center rounded-md p-3 text-sm font-medium"
+            style={{
+              background: 'var(--color-primary)',
+              color: 'var(--color-surface)',
+              border: `var(--border-width) solid transparent`,
+              borderRadius: 'var(--radius-md)',
+              opacity: (chargement || contenuCsv.trim().length === 0) ? 0.6 : 1,
+              cursor: (chargement || contenuCsv.trim().length === 0) ? 'not-allowed' : 'pointer',
+            }}
           >
             {chargement ? t('charger', DICO_CSV) : t('apercu', DICO_CSV)}
           </button>
@@ -250,14 +272,15 @@ export default function ImportAssistant(): JSX.Element {
       {mode === 'archive' && estSaisie && (
         <>
           <div className="mt-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>
               {t('anneeSource', DICO_ARCHIVE)}
             </label>
-            <p className="text-xs text-gray-500 mb-2">{t('anneeSourceAide', DICO_ARCHIVE)}</p>
+            <p className="text-xs mb-2" style={{ color: 'var(--color-text-secondary)' }}>{t('anneeSourceAide', DICO_ARCHIVE)}</p>
             <select
               value={anneeSourceId ?? ''}
               onChange={(e) => setAnneeSourceId(e.target.value || null)}
-              className="w-full max-w-xs rounded-md border border-gray-300 bg-white px-3 py-2 text-sm"
+              className="w-full max-w-xs rounded-md p-3 text-sm"
+              style={{ border: `var(--border-width) solid var(--color-border)`, background: 'var(--color-surface)', color: 'var(--color-text-primary)', borderRadius: 'var(--radius-md)' }}
             >
               <option value="">{t('anneeRequis', DICO_ARCHIVE)}</option>
               {anneesSource.map((a) => (
@@ -268,7 +291,7 @@ export default function ImportAssistant(): JSX.Element {
             </select>
           </div>
           <div className="mt-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>
               {t('types', DICO_ARCHIVE)}
             </label>
             <div className="grid grid-cols-2 gap-2 text-sm">
@@ -277,7 +300,12 @@ export default function ImportAssistant(): JSX.Element {
                 return (
                   <label
                     key={type.valeur}
-                    className="flex items-center gap-2 rounded-md border p-2 cursor-pointer hover:bg-gray-50"
+                    className="flex items-center gap-2 rounded-md p-2 cursor-pointer"
+                    style={{
+                      border: `var(--border-width) solid var(--color-border)`,
+                      borderRadius: 'var(--radius-md)',
+                      background: selectionne ? 'var(--color-primary-hover)' : 'transparent',
+                    }}
                   >
                     <input
                       type="checkbox"
@@ -291,7 +319,11 @@ export default function ImportAssistant(): JSX.Element {
                         }
                         setTypesSelectionnes(suivant);
                       }}
-                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      className="rounded"
+                      style={{
+                        border: `var(--border-width) solid var(--color-border)`,
+                        color: 'var(--color-primary)',
+                      }}
                     />
                     {type.libelle}
                   </label>
@@ -300,61 +332,69 @@ export default function ImportAssistant(): JSX.Element {
             </div>
           </div>
           {erreurApi && (
-            <div className="mt-3 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-800">
+            <div className="mt-3 rounded-md p-3 text-sm" style={{ border: `var(--border-width) solid var(--color-error)`, background: 'var(--color-error)', color: 'var(--color-surface)', borderRadius: 'var(--radius-md)' }}>
               {erreurApi}
             </div>
           )}
           <button
             onClick={executerApercu}
             disabled={chargement || !anneeSourceId || typesSelectionnes.size === 0}
-            className="mt-4 inline-flex items-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="mt-4 inline-flex items-center rounded-md p-3 text-sm font-medium"
+            style={{
+              background: 'var(--color-primary)',
+              color: 'var(--color-surface)',
+              border: `var(--border-width) solid transparent`,
+              borderRadius: 'var(--radius-md)',
+              opacity: (chargement || !anneeSourceId || typesSelectionnes.size === 0) ? 0.6 : 1,
+              cursor: (chargement || !anneeSourceId || typesSelectionnes.size === 0) ? 'not-allowed' : 'pointer',
+            }}
           >
             {chargement ? t('charger', DICO_CSV) : t('apercu', DICO_ARCHIVE)}
           </button>
         </>
       )}
       {estApercu && mode === 'csv' && apercuCsv && (
-        <section className="mt-6 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-          <h3 className="text-sm font-semibold text-gray-900">{t('apercu', DICO_CSV)}</h3>
+        <section className="mt-6 rounded-lg p-6" style={{ border: `var(--border-width) solid var(--color-border)`, background: 'var(--color-surface)', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-sm)' }}>
+          <h3 className="text-sm font-semibold" style={{ color: 'var(--color-text-primary)' }}>{t('apercu', DICO_CSV)}</h3>
           <div className="mt-3 grid grid-cols-3 gap-4 text-sm">
-            <div className="rounded-md border border-gray-200 p-3 text-center">
-              <div className="text-xs font-semibold text-gray-500 uppercase">
+            <div className="rounded-md p-3 text-center" style={{ border: `var(--border-width) solid var(--color-border)`, background: 'var(--color-surface-variant)' }}>
+              <div className="text-xs font-semibold uppercase" style={{ color: 'var(--color-text-secondary)' }}>
                 {t('lignesTotales', DICO_CSV)}
               </div>
-              <div className="mt-1 font-medium text-gray-900">{apercuCsv.totalLignes}</div>
+              <div className="mt-1 font-medium" style={{ color: 'var(--color-text-primary)' }}>{apercuCsv.totalLignes}</div>
             </div>
-            <div className="rounded-md border border-green-200 bg-green-50 p-3 text-center">
-              <div className="text-xs font-semibold text-green-700 uppercase">
+            <div className="rounded-md p-3 text-center" style={{ border: `var(--border-width) solid var(--color-success)`, background: 'var(--color-surface)', color: 'var(--color-success)' }}>
+              <div className="text-xs font-semibold uppercase" style={{ color: 'var(--color-success)' }}>
                 {t('lignesValides', DICO_CSV)}
               </div>
-              <div className="mt-1 font-medium text-green-900">{apercuCsv.lignesValides}</div>
+              <div className="mt-1 font-medium" style={{ color: 'var(--color-success)' }}>{apercuCsv.lignesValides}</div>
             </div>
-            <div className="rounded-md border border-red-200 bg-red-50 p-3 text-center">
-              <div className="text-xs font-semibold text-red-700 uppercase">
+            <div className="rounded-md p-3 text-center" style={{ border: `var(--border-width) solid var(--color-error)`, background: 'var(--color-surface)', color: 'var(--color-error)' }}>
+              <div className="text-xs font-semibold uppercase" style={{ color: 'var(--color-error)' }}>
                 {t('lignesRejetees', DICO_CSV)}
               </div>
-              <div className="mt-1 font-medium text-red-900">{apercuCsv.lignesInvalides}</div>
+              <div className="mt-1 font-medium" style={{ color: 'var(--color-error)' }}>{apercuCsv.lignesInvalides}</div>
             </div>
           </div>
           {lignesErreurApercu.length > 0 ? (
             <>
-              <h4 className="mt-4 mb-2 text-xs font-semibold text-gray-500 uppercase">
+              <h4 className="mt-4 mb-2 text-xs font-semibold uppercase" style={{ color: 'var(--color-text-secondary)' }}>
                 Erreurs ligne à ligne
               </h4>
               <div className="overflow-x-auto rounded-md border border-gray-200">
                 <table className="w-full text-sm">
                   <thead>
                     <tr>
-                      <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase">
+                      <th className="px-3 py-2 text-left text-xs font-semibold uppercase" style={{ color: 'var(--color-text-secondary)' }}>
                         {t('ligne', DICO_CSV)}
                       </th>
-                      <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase">
+                      <th className="px-3 py-2 text-left text-xs font-semibold uppercase" style={{ color: 'var(--color-text-secondary)' }}>
                         {t('champ', DICO_CSV)}
                       </th>
-                      <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase">
+                      <th className="px-3 py-2 text-left text-xs font-semibold uppercase" style={{ color: 'var(--color-text-secondary)' }}>
                         {t('valeur', DICO_CSV)}
                       </th>
-                      <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase">
+                      <th className="px-3 py-2 text-left text-xs font-semibold uppercase" style={{ color: 'var(--color-text-secondary)' }}>
                         {t('motif', DICO_CSV)}
                       </th>
                     </tr>
@@ -362,16 +402,16 @@ export default function ImportAssistant(): JSX.Element {
                   <tbody>
                     {lignesErreurApercu.map((erreur) => (
                       <tr key={`${erreur.ligne}-${erreur.champ}`}>
-                        <td className="px-3 py-2 text-left text-sm text-gray-700">
+                        <td className="px-3 py-2 text-left text-sm" style={{ color: 'var(--color-text-primary)' }}>
                           {erreur.ligne}
                         </td>
-                        <td className="px-3 py-2 text-left text-sm text-gray-700">
+                        <td className="px-3 py-2 text-left text-sm" style={{ color: 'var(--color-text-primary)' }}>
                           {erreur.champ}
                         </td>
-                        <td className="px-3 py-2 text-left text-sm text-gray-700">
+                        <td className="px-3 py-2 text-left text-sm" style={{ color: 'var(--color-text-primary)' }}>
                           {erreur.valeur}
                         </td>
-                        <td className="px-3 py-2 text-left text-sm text-gray-700">
+                        <td className="px-3 py-2 text-left text-sm" style={{ color: 'var(--color-text-primary)' }}>
                           {erreur.motif}
                         </td>
                       </tr>
@@ -385,7 +425,7 @@ export default function ImportAssistant(): JSX.Element {
             <button
               onClick={executerImport}
               disabled={chargement}
-              className="inline-flex items-center rounded-md border border-transparent bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="inline-flex items-center rounded-md p-3 text-sm font-medium" style={{ background: 'var(--color-success)', color: 'var(--color-surface)', border: `var(--border-width) solid transparent`, borderRadius: 'var(--radius-md)' }}
             >
               {t('executer', DICO_CSV)}
             </button>
@@ -394,7 +434,7 @@ export default function ImportAssistant(): JSX.Element {
                 setEtape('saisie');
                 setApercuCsv(null);
               }}
-              className="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+              className="inline-flex items-center rounded-md p-3 text-sm font-medium" style={{ border: `var(--border-width) solid var(--color-border)`, background: 'var(--color-surface)', color: 'var(--color-text-primary)', borderRadius: 'var(--radius-md)' }}
             >
               {t('modifier', DICO_CSV)}
             </button>
@@ -402,48 +442,48 @@ export default function ImportAssistant(): JSX.Element {
         </section>
       )}
       {estApercu && mode === 'archive' && apercuArchive && (
-        <section className="mt-6 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-          <h3 className="text-sm font-semibold text-gray-900">{t('apercu', DICO_ARCHIVE)}</h3>
+        <section className="mt-6 rounded-lg p-6" style={{ border: `var(--border-width) solid var(--color-border)`, background: 'var(--color-surface)', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-sm)' }}>
+          <h3 className="text-sm font-semibold" style={{ color: 'var(--color-text-primary)' }}>{t('apercu', DICO_ARCHIVE)}</h3>
           <div className="mt-3 grid grid-cols-4 gap-4 text-sm">
-            <div className="rounded-md border border-gray-200 p-3 text-center">
-              <div className="text-xs font-semibold text-gray-500 uppercase">
+            <div className="rounded-md p-3 text-center" style={{ border: `var(--border-width) solid var(--color-border)`, background: 'var(--color-surface-variant)' }}>
+              <div className="text-xs font-semibold uppercase" style={{ color: 'var(--color-text-secondary)' }}>
                 {t('lignesTotales', DICO_ARCHIVE)}
               </div>
-              <div className="mt-1 font-medium text-gray-900">{apercuArchive.totalLignes}</div>
+              <div className="mt-1 font-medium" style={{ color: 'var(--color-text-primary)' }}>{apercuArchive.totalLignes}</div>
             </div>
-            <div className="rounded-md border border-green-200 bg-green-50 p-3 text-center">
-              <div className="text-xs font-semibold text-green-700 uppercase">
+            <div className="rounded-md p-3 text-center" style={{ border: `var(--border-width) solid var(--color-success)`, background: 'var(--color-surface)', color: 'var(--color-success)' }}>
+              <div className="text-xs font-semibold uppercase" style={{ color: 'var(--color-success)' }}>
                 {t('lignesValides', DICO_ARCHIVE)}
               </div>
-              <div className="mt-1 font-medium text-green-900">{apercuArchive.lignesValides}</div>
+              <div className="mt-1 font-medium" style={{ color: 'var(--color-success)' }}>{apercuArchive.lignesValides}</div>
             </div>
-            <div className="rounded-md border border-blue-200 bg-blue-50 p-3 text-center">
-              <div className="text-xs font-semibold text-blue-700 uppercase">
+            <div className="rounded-md p-3 text-center" style={{ border: `var(--border-width) solid var(--color-info)`, background: 'var(--color-surface)', color: 'var(--color-info)' }}>
+              <div className="text-xs font-semibold uppercase" style={{ color: 'var(--color-info)' }}>
                 {t('dejaImports', DICO_ARCHIVE)}
               </div>
-              <div className="mt-1 font-medium text-blue-900">{apercuArchive.dejaImports}</div>
+              <div className="mt-1 font-medium" style={{ color: 'var(--color-info)' }}>{apercuArchive.dejaImports}</div>
             </div>
-            <div className="rounded-md border border-red-200 bg-red-50 p-3 text-center">
-              <div className="text-xs font-semibold text-red-700 uppercase">
+            <div className="rounded-md p-3 text-center" style={{ border: `var(--border-width) solid var(--color-error)`, background: 'var(--color-surface)', color: 'var(--color-error)' }}>
+              <div className="text-xs font-semibold uppercase" style={{ color: 'var(--color-error)' }}>
                 {t('lignesInvalides', DICO_ARCHIVE)}
               </div>
-              <div className="mt-1 font-medium text-red-900">{apercuArchive.lignesInvalides}</div>
+              <div className="mt-1 font-medium" style={{ color: 'var(--color-error)' }}>{apercuArchive.lignesInvalides}</div>
             </div>
           </div>
           <div className="mt-4 overflow-x-auto rounded-md border border-gray-200">
             <table className="w-full text-sm">
               <thead>
                 <tr>
-                  <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase">
+                  <th className="px-3 py-2 text-left text-xs font-semibold uppercase" style={{ color: 'var(--color-text-secondary)' }}>
                     {t('code', DICO_ARCHIVE)}
                   </th>
-                  <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase">
+                  <th className="px-3 py-2 text-left text-xs font-semibold uppercase" style={{ color: 'var(--color-text-secondary)' }}>
                     Libellé
                   </th>
-                  <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase">
+                  <th className="px-3 py-2 text-left text-xs font-semibold uppercase" style={{ color: 'var(--color-text-secondary)' }}>
                     {t('statut', DICO_ARCHIVE)}
                   </th>
-                  <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase">
+                  <th className="px-3 py-2 text-left text-xs font-semibold uppercase" style={{ color: 'var(--color-text-secondary)' }}>
                     {t('motif', DICO_ARCHIVE)}
                   </th>
                 </tr>
@@ -451,20 +491,29 @@ export default function ImportAssistant(): JSX.Element {
               <tbody>
                 {apercuArchive.apercuLignes.map((ligne) => (
                   <tr key={`${ligne.type}-${ligne.code}`}>
-                    <td className="px-3 py-2 text-left text-sm text-gray-700 font-mono">
+                    <td className="px-3 py-2 text-left text-sm font-mono" style={{ color: 'var(--color-text-primary)' }}>
                       {ligne.code}
                     </td>
-                    <td className="px-3 py-2 text-left text-sm text-gray-700">
+                    <td className="px-3 py-2 text-left text-sm" style={{ color: 'var(--color-text-primary)' }}>
                       {ligne.libelle ?? '-'}
                     </td>
-                    <td className="px-3 py-2 text-left text-sm text-gray-700">
+                    <td className="px-3 py-2 text-left text-sm" style={{ color: 'var(--color-text-primary)' }}>
                       <span
-                        className={`px-1.5 py-0.5 rounded text-xs ${ligne.statut === 'aImporter' ? 'bg-green-100 text-green-800' : ligne.statut === 'dejaImporte' ? 'bg-blue-100 text-blue-800' : 'bg-red-100 text-red-800'}`}
+                        className="px-1.5 py-0.5 rounded text-xs"
+                        style={{
+                          background:
+                            ligne.statut === 'aImporter'
+                              ? 'var(--color-success)'
+                              : ligne.statut === 'dejaImporte'
+                                ? 'var(--color-info)'
+                                : 'var(--color-error)',
+                          color: 'var(--color-surface)',
+                        }}
                       >
                         {statutLibelle(ligne.statut)}
                       </span>
                     </td>
-                    <td className="px-3 py-2 text-left text-sm text-gray-500">
+                    <td className="px-3 py-2 text-left text-sm" style={{ color: 'var(--color-text-secondary)' }}>
                       {ligne.motif ?? '-'}
                     </td>
                   </tr>
@@ -476,7 +525,7 @@ export default function ImportAssistant(): JSX.Element {
             <button
               onClick={executerImport}
               disabled={chargement}
-              className="inline-flex items-center rounded-md border border-transparent bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="inline-flex items-center rounded-md p-3 text-sm font-medium" style={{ background: 'var(--color-success)', color: 'var(--color-surface)', border: `var(--border-width) solid transparent`, borderRadius: 'var(--radius-md)' }}
             >
               {t('executer', DICO_ARCHIVE)}
             </button>
@@ -485,7 +534,7 @@ export default function ImportAssistant(): JSX.Element {
                 setEtape('saisie');
                 setApercuArchive(null);
               }}
-              className="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+              className="inline-flex items-center rounded-md p-3 text-sm font-medium" style={{ border: `var(--border-width) solid var(--color-border)`, background: 'var(--color-surface)', color: 'var(--color-text-primary)', borderRadius: 'var(--radius-md)' }}
             >
               {t('modifier', DICO_ARCHIVE)}
             </button>

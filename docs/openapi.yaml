@@ -1150,6 +1150,54 @@ paths:
       summary: Modifie une affectation pédagogique
       tags:
         - Répartition
+  /api/v1/audit:
+    get:
+      operationId: AuditReadController_lister
+      parameters: []
+      responses:
+        '200':
+          description: Entrées d'audit paginées
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit (réservé aux administrateurs)
+      security:
+        - bearerAuth: []
+      summary: Liste paginée du journal d'audit
+      tags:
+        - Journal d'audit et sécurité
+  /api/v1/audit/export:
+    get:
+      operationId: AuditReadController_exporter
+      parameters: []
+      responses:
+        '200':
+          description: Fichier CSV téléchargeable
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit (réservé aux administrateurs)
+      security:
+        - bearerAuth: []
+      summary: Export CSV du journal d'audit
+      tags:
+        - Journal d'audit et sécurité
+  /api/v1/audit/security:
+    get:
+      operationId: AuditReadController_listerSecurite
+      parameters: []
+      responses:
+        '200':
+          description: Événements de sécurité paginés
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit (réservé aux administrateurs)
+      security:
+        - bearerAuth: []
+      summary: Liste paginée des événements de sécurité
+      tags:
+        - Journal d'audit et sécurité
   /api/v1/auth/login:
     post:
       operationId: AuthController_login
@@ -1212,6 +1260,100 @@ paths:
       summary: Forcer la liberation d un bail d edition (admin)
       tags:
         - Bail d'édition - forçage admin
+  /api/v1/contraintes:
+    get:
+      operationId: ContraintesController_lister
+      parameters: []
+      responses:
+        '200':
+          description: Liste des contraintes
+        '401':
+          description: Non authentifie
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Liste paginée des contraintes d une version
+      tags:
+        - Contraintes
+    post:
+      operationId: ContraintesController_creer
+      parameters: []
+      responses:
+        '201':
+          description: Contrainte créée
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Version introuvable
+        '409':
+          description: Conflit (version publiée ou doublon)
+      security:
+        - bearerAuth: []
+      summary: Crée une contrainte de génération
+      tags:
+        - Contraintes
+  /api/v1/contraintes/conflits:
+    get:
+      operationId: ContraintesController_conflits
+      parameters: []
+      responses:
+        '200':
+          description: Conflits détectés
+        '401':
+          description: Non authentifie
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Détecte les conflits de contraintes d une version
+      tags:
+        - Contraintes
+  /api/v1/contraintes/{id}:
+    delete:
+      operationId: ContraintesController_supprimer
+      parameters: []
+      responses:
+        '200':
+          description: Contrainte supprimée
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Contrainte introuvable
+        '409':
+          description: Conflit (version publiée)
+      security:
+        - bearerAuth: []
+      summary: Supprime une contrainte
+      tags:
+        - Contraintes
+    patch:
+      operationId: ContraintesController_mettreAJour
+      parameters: []
+      responses:
+        '200':
+          description: Contrainte modifiée
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Contrainte introuvable
+        '409':
+          description: Conflit (version publiée ou doublon)
+      security:
+        - bearerAuth: []
+      summary: Modifie partiellement une contrainte
+      tags:
+        - Contraintes
   /api/v1/events:
     get:
       operationId: EventsController_fluxEvenements
@@ -1277,6 +1419,27 @@ paths:
       summary: Vérifie les préconditions de lancement de génération
       tags:
         - génération — préconditions
+  /api/v1/generations/{id}/annuler:
+    post:
+      operationId: GenerationsController_annuler
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Génération annulée, version retournée à brouillon
+        '404':
+          description: Génération introuvable
+        '409':
+          description: Conflit (déjà adoptée ou terminée)
+      security:
+        - bearerAuth: []
+      summary: Annuler une génération
+      tags:
+        - générations
   /api/v1/generations/{id}/scenarios:
     get:
       operationId: GenerationsController_scenarios
@@ -1614,6 +1777,107 @@ paths:
       security:
         - bearerAuth: []
       summary: Hiérarchie complète des référentiels
+      tags:
+        - Référentiels
+  /api/v1/referentiels/charge-rule-sets:
+    get:
+      operationId: ChargeRuleSetController_list
+      parameters: []
+      responses:
+        '200':
+          description: Liste des règles de charge
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Liste paginée des règles de charge
+      tags:
+        - Référentiels
+    post:
+      operationId: ChargeRuleSetController_create
+      parameters: []
+      responses:
+        '201':
+          description: Règle de charge créée
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Crée une règle de charge
+      tags:
+        - Référentiels
+  /api/v1/referentiels/charge-rule-sets/actif:
+    get:
+      operationId: ChargeRuleSetController_getActif
+      parameters: []
+      responses:
+        '200':
+          description: Règle de charge active
+        '404':
+          description: Aucune règle de charge active
+      security:
+        - bearerAuth: []
+      summary: Règle de charge active
+      tags:
+        - Référentiels
+  /api/v1/referentiels/charge-rule-sets/{id}:
+    delete:
+      operationId: ChargeRuleSetController_delete
+      parameters: []
+      responses:
+        '200':
+          description: Règle de charge supprimée
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Règle de charge introuvable
+      security:
+        - bearerAuth: []
+      summary: Supprime une règle de charge
+      tags:
+        - Référentiels
+    get:
+      operationId: ChargeRuleSetController_getOne
+      parameters: []
+      responses:
+        '200':
+          description: Règle de charge trouvée
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Règle de charge introuvable
+      security:
+        - bearerAuth: []
+      summary: Détail d’une règle de charge
+      tags:
+        - Référentiels
+    patch:
+      operationId: ChargeRuleSetController_update
+      parameters: []
+      responses:
+        '200':
+          description: Règle de charge modifiée
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '404':
+          description: Règle de charge introuvable
+      security:
+        - bearerAuth: []
+      summary: Modifie une règle de charge
       tags:
         - Référentiels
   /api/v1/referentiels/config-systeme:
@@ -2893,6 +3157,22 @@ paths:
       summary: Modifie un parcours
       tags:
         - Référentiels
+  /api/v1/referentiels/roles:
+    get:
+      operationId: RoleController_list
+      parameters: []
+      responses:
+        '200':
+          description: Liste des rôles
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Liste des rôles
+      tags:
+        - Référentiels
   /api/v1/referentiels/salles:
     get:
       operationId: SalleController_list
@@ -3514,6 +3794,51 @@ paths:
       summary: Crée un utilisateur
       tags:
         - Utilisateurs
+  /api/v1/users/me:
+    get:
+      operationId: UsersController_me
+      parameters: []
+      responses:
+        '200':
+          description: Profil utilisateur
+        '401':
+          description: Non authentifié
+      security:
+        - bearerAuth: []
+      summary: Profil de l’utilisateur connecté
+      tags:
+        - Utilisateurs
+    patch:
+      operationId: UsersController_updateMe
+      parameters: []
+      responses:
+        '200':
+          description: Profil modifié
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+      security:
+        - bearerAuth: []
+      summary: Modifie le profil de l’utilisateur connecté
+      tags:
+        - Utilisateurs
+  /api/v1/users/me/mot-de-passe:
+    post:
+      operationId: UsersController_changePassword
+      parameters: []
+      responses:
+        '200':
+          description: Mot de passe modifié
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+      security:
+        - bearerAuth: []
+      summary: Change le mot de passe de l’utilisateur connecté
+      tags:
+        - Utilisateurs
   /api/v1/users/{id}:
     delete:
       operationId: UsersController_disable
@@ -3573,7 +3898,69 @@ paths:
   /api/v1/versions:
     get:
       operationId: VersionsController_list
-      parameters: []
+      parameters:
+        - description: Filtre par département (périmètre rdep)
+          in: query
+          name: departementId
+          required: false
+          schema:
+            type: string
+        - description: Filtre par semestre
+          in: query
+          name: semestreId
+          required: false
+          schema:
+            type: string
+        - description: Filtre par état de version
+          in: query
+          name: etat
+          required: false
+          schema:
+            enum:
+              - initial
+              - rep_pedag
+              - brouillon
+              - generation
+              - edition
+              - valid_pedag
+              - valid_dir
+              - valide
+              - publie
+              - archive
+            type: string
+        - description: Direction de tri
+          in: query
+          name: direction
+          required: false
+          schema:
+            enum:
+              - asc
+              - desc
+            type: string
+        - description: Champ de tri (etat, createdAt, updatedAt)
+          in: query
+          name: sort
+          required: false
+          schema:
+            type: string
+        - description: Recherche textuelle
+          in: query
+          name: search
+          required: false
+          schema:
+            type: string
+        - description: Taille de page (défaut 20)
+          in: query
+          name: pageSize
+          required: false
+          schema:
+            type: number
+        - description: Numéro de page (défaut 1)
+          in: query
+          name: page
+          required: false
+          schema:
+            type: number
       responses:
         '200':
           description: Liste des versions
@@ -3605,6 +3992,60 @@ paths:
       summary: Crée une version de planning
       tags:
         - Versions
+  /api/v1/versions/initialisation:
+    post:
+      operationId: InitialisationController_initialiser
+      parameters: []
+      responses:
+        '201':
+          description: Version initiale créée
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+        '409':
+          description: Conflit (version non archivée déjà existante)
+      security:
+        - bearerAuth: []
+      summary: Initialise une année, un semestre et une version initiale
+      tags:
+        - Initialisation
+  /api/v1/versions/initialisation/annees-universitaires:
+    get:
+      operationId: InitialisationController_listerAnneesUniversitaires
+      parameters:
+        - description: Recherche textuelle sur le libellé
+          in: query
+          name: search
+          required: false
+          schema:
+            type: string
+        - description: Taille de page (défaut 20)
+          in: query
+          name: pageSize
+          required: false
+          schema:
+            type: number
+        - description: Numéro de page (défaut 1)
+          in: query
+          name: page
+          required: false
+          schema:
+            type: number
+      responses:
+        '200':
+          description: Liste des années universitaires
+        '401':
+          description: Non authentifié
+        '403':
+          description: Interdit
+      security:
+        - bearerAuth: []
+      summary: Liste paginée des années universitaires avec semestres et état de version
+      tags:
+        - Initialisation
   /api/v1/versions/{id}:
     get:
       operationId: VersionsController_getOne

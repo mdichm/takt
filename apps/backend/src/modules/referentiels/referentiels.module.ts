@@ -41,6 +41,10 @@ import { CreneauAffichageController } from './creneau-affichage/creneau-affichag
 import { CreneauAffichageService } from './creneau-affichage/creneau-affichage.service';
 import { ConfigSystemeController } from './config-systeme/config-systeme.controller';
 import { ConfigSystemeService } from './config-systeme/config-systeme.service';
+import { RoleController } from './role/role.controller';
+import { RoleService } from './role/role.service';
+import { ChargeRuleSetController } from './charge-rule-set/charge-rule-set.controller';
+import { ChargeRuleSetService } from './charge-rule-set/charge-rule-set.service';
 import { ImportReferentielController } from './import/import-referentiel.controller';
 import { ImportReferentielService } from './import/import-referentiel.service';
 import { ArchiveImportController } from './import/import-archive/archive.controller';
@@ -75,6 +79,8 @@ import { ArchiveImportService } from './import/import-archive/archive.service';
     CreneauController,
     CreneauAffichageController,
     ConfigSystemeController,
+    RoleController,
+    ChargeRuleSetController,
     ImportReferentielController,
     ArchiveImportController,
   ],
@@ -97,6 +103,8 @@ import { ArchiveImportService } from './import/import-archive/archive.service';
     CreneauService,
     CreneauAffichageService,
     ConfigSystemeService,
+    RoleService,
+    ChargeRuleSetService,
     ImportReferentielService,
     ArchiveImportService,
   ],
@@ -119,6 +127,8 @@ import { ArchiveImportService } from './import/import-archive/archive.service';
     CreneauService,
     CreneauAffichageService,
     ConfigSystemeService,
+    RoleService,
+    ChargeRuleSetService,
   ],
 })
 export class ReferentielsModule {}

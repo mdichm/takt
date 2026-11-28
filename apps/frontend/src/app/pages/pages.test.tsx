@@ -4,8 +4,11 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen, cleanup, waitFor, fireEvent } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { BrowserRouter, MemoryRouter } from 'react-router-dom';
 import { versionStore } from '@/stores/versionStore';
 import { repartitionApi } from '@/lib/repartition.api';
+import { contraintesApi } from '@/lib/contraintes.api';
+import { api } from '@/lib/api';
 
 vi.mock('@/lib/repartition.api', () => ({
   repartitionApi: {
@@ -19,7 +22,48 @@ vi.mock('@/lib/repartition.api', () => ({
     listerGroupes: vi.fn().mockResolvedValue({ items: [], meta: { page: 1, pageSize: 50, total: 0 } }),
     listerTypesEnseignement: vi.fn().mockResolvedValue({ items: [], meta: { page: 1, pageSize: 50, total: 0 } }),
     listerMatieres: vi.fn().mockResolvedValue({ items: [], meta: { page: 1, pageSize: 50, total: 0 } }),
+    listerDepartements: vi.fn().mockResolvedValue({
+      items: [],
+      meta: { page: 1, pageSize: 20, total: 0, requestId: 'test', timestamp: new Date().toISOString() },
+    }),
   },
+  }));
+
+vi.mock('@/lib/api', () => ({
+  api: {
+    get: vi.fn().mockResolvedValue({
+      data: { items: [], meta: { page: 1, pageSize: 20, total: 0 } },
+      meta: { requestId: 'test', timestamp: new Date().toISOString() },
+    }),
+    post: vi.fn().mockResolvedValue({
+      data: {},
+      meta: { requestId: 'test', timestamp: new Date().toISOString() },
+    }),
+  },
+}));
+
+vi.mock('@/lib/versions.api', () => ({
+  versionsApi: {
+    transitionner: vi.fn().mockResolvedValue({}),
+  },
+}));
+
+vi.mock('@/lib/contraintes.api', () => ({
+  contraintesApi: {
+    lister: vi.fn().mockResolvedValue({
+      items: [],
+      meta: { page: 1, pageSize: 50, total: 0, requestId: 'test', timestamp: new Date().toISOString() },
+    }),
+    supprimer: vi.fn().mockResolvedValue(undefined),
+  },
+}));
+
+vi.mock('@/app/useCanalEvenements', () => ({
+  useCanalEvenements: vi.fn(() => ({
+    notifications: [],
+    evenementsGeneration: [],
+    fermer: vi.fn(),
+  })),
 }));
 
 const queryClient = new QueryClient({
@@ -30,7 +74,9 @@ const queryClient = new QueryClient({
 
 const renderWithQuery = (component: React.ReactElement) =>
   render(
-    <QueryClientProvider client={queryClient}>{component}</QueryClientProvider>,
+    <BrowserRouter>
+      <QueryClientProvider client={queryClient}>{component}</QueryClientProvider>
+    </BrowserRouter>,
   );
 import EC_COM_01 from './EC-COM-01';
 import EC_COM_02 from './EC-COM-02';
@@ -43,14 +89,10 @@ import EC_GES_01 from './EC-GES-01';
 import EC_GES_02 from './EC-GES-02';
 import EC_GES_03 from './EC-GES-03';
 import EC_GES_04 from './EC-GES-04';
-import EC_GES_05 from './EC-GES-05';
-import EC_GES_06 from './EC-GES-06';
-import EC_GES_07 from './EC-GES-07';
 import EC_GES_08 from './EC-GES-08';
 import EC_GES_09 from './EC-GES-09';
 import EC_GES_10 from './EC-GES-10';
 import EC_GES_11 from './EC-GES-11';
-import EC_GES_12 from './EC-GES-12';
 
 import EC_RDEP_03 from './EC-RDEP-03';
 import EC_RDEP_04 from './EC-RDEP-04';
@@ -64,34 +106,8 @@ import EC_RDEP_01 from './EC-RDEP-01';
 import EC_RDEP_02 from './EC-RDEP-02';
 
 const PAGES_PLACEHOLDER = [
-
-  EC_COM_01,
-  EC_COM_02,
-  EC_COM_03,
-  EC_ADM_01,
-  EC_ADM_02,
-  EC_ADM_03,
-  EC_ADM_04,
   EC_GES_01,
-  EC_GES_02,
-  EC_GES_03,
-  EC_GES_04,
-  EC_GES_05,
-  EC_GES_06,
-  EC_GES_07,
   EC_GES_08,
-  EC_GES_09,
-  EC_GES_10,
-  EC_GES_11,
-  EC_GES_12,
-  EC_RDEP_03,
-  EC_RDEP_04,
-  EC_RDEP_05,
-  EC_DIR_01,
-  EC_DIR_02,
-  EC_DIR_03,
-  EC_DIR_04,
-  EC_DIR_05,
 ];
 
 /**
@@ -104,8 +120,8 @@ describe('pages EC-* (placeholders, lot L09)', () => {
     cleanup();
   });
 
-  it('existe exactement 29 fichiers de page', () => {
-    expect(PAGES_PLACEHOLDER).toHaveLength(27);
+  it('existe exactement 2 fichiers de page placeholder restants', () => {
+    expect(PAGES_PLACEHOLDER).toHaveLength(2);
   });
 
   it('chaque page affiche son code EC-*', () => {
@@ -116,10 +132,28 @@ describe('pages EC-* (placeholders, lot L09)', () => {
       codesRendus.add(texte.textContent!);
       cleanup();
     }
-    expect(codesRendus.size).toBe(27);
-    for (const code of ['EC-COM-01', 'EC-GES-06', 'EC-DIR-05']) {
-      expect(codesRendus.has(`Écran ${code}`)).toBe(true);
-    }
+    expect(codesRendus.size).toBe(2);
+  });
+});
+
+/**
+ * EC-COM-01 est une page réelle (lot L09-01) qui délègue à LoginPage.
+ * Ce test vérifie qu’elle se charge dans un router et rend le formulaire de connexion.
+ */
+describe('page EC-COM-01 (réelle, lot L09-01)', () => {
+  afterEach(() => {
+    cleanup();
+  });
+
+  it('EC-COM-01 se charge et rend le formulaire de connexion', () => {
+    render(
+      <MemoryRouter initialEntries={['/login']}>
+        <EC_COM_01 />
+      </MemoryRouter>,
+    );
+    expect(screen.getByLabelText(/adresse e-mail/i, { selector: 'input' })).toBeInTheDocument();
+    expect(screen.getByLabelText(/mot de passe/i, { selector: 'input' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /se connecter/i })).toBeInTheDocument();
   });
 });
 
@@ -233,4 +267,455 @@ describe('pages EC-RDEP-01 / EC-RDEP-02 (réelles, lot L05-06)', () => {
     );
     cleanup();
   });
+});
+
+/**
+ * EC-RDEP-03 / EC-RDEP-04 / EC-RDEP-05 sont des pages réelles (lot L09-12).
+ * Ce test vérifie qu'elles se chargent sans erreur et affichent leur en-tête.
+ */
+describe('pages EC-RDEP-03 / EC-RDEP-04 / EC-RDEP-05 (réelles, lot L09-12)', () => {
+  beforeEach(() => {
+    versionStore.setState({
+      contexteRepartition: {
+        versionId: 'v-test',
+        semestreId: 's-test',
+        departementId: 'd-test',
+        etatVersion: 'valid_pedag',
+      },
+    });
+  });
+
+  afterEach(() => {
+    cleanup();
+    queryClient.clear();
+    versionStore.setState({ contexteRepartition: null });
+  });
+
+  it('EC-RDEP-03 se charge et affiche le titre de validation', async () => {
+    vi.mocked(repartitionApi.listerStatutsValidation).mockResolvedValue([
+      { departementId: 'd-test', etat: 'VALIDE', revision: 1 },
+    ]);
+    renderWithQuery(<EC_RDEP_03 />);
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument(),
+    );
+    cleanup();
+  });
+
+  it('EC-RDEP-03 : bouton Valider désactivé si département non validé', async () => {
+    vi.mocked(repartitionApi.listerStatutsValidation).mockResolvedValue([
+      { departementId: 'd-test', etat: 'EN_COURS', revision: 1 },
+    ]);
+    renderWithQuery(<EC_RDEP_03 />);
+    await waitFor(() =>
+      expect(
+        screen.getByRole('button', { name: /Valider et transmettre/ }),
+      ).toBeDisabled(),
+    );
+    cleanup();
+  });
+
+  it('EC-RDEP-03 : bouton Rejeter désactivé si motif vide', async () => {
+    vi.mocked(repartitionApi.listerStatutsValidation).mockResolvedValue([
+      { departementId: 'd-test', etat: 'VALIDE', revision: 1 },
+    ]);
+    renderWithQuery(<EC_RDEP_03 />);
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: /Rejeter/ })).toBeDisabled(),
+    );
+    cleanup();
+  });
+
+  it('EC-RDEP-04 se charge et affiche le titre de revalidation', async () => {
+    vi.mocked(repartitionApi.listerStatutsValidation).mockResolvedValue([
+      { departementId: 'd-test', etat: 'REVALIDATION_REQUISE', revision: 1, motif: 'Rejet pédagogique' },
+    ]);
+    renderWithQuery(<EC_RDEP_04 />);
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument(),
+    );
+    cleanup();
+  });
+
+  it('EC-RDEP-04 : bouton Revalider désactivé si aucun REVALIDATION_REQUISE', async () => {
+    vi.mocked(repartitionApi.listerStatutsValidation).mockResolvedValue([
+      { departementId: 'd-test', etat: 'VALIDE', revision: 1 },
+    ]);
+    renderWithQuery(<EC_RDEP_04 />);
+    await waitFor(() =>
+      expect(
+        screen.getByRole('button', { name: /Revalider mon périmètre/ }),
+      ).toBeDisabled(),
+    );
+    cleanup();
+  });
+
+  it('EC-RDEP-05 se charge et affiche le titre de consultation', async () => {
+    vi.mocked(repartitionApi.listerStatutsValidation).mockResolvedValue([]);
+    vi.mocked(repartitionApi.listerDepartements).mockResolvedValue({
+      items: [],
+      meta: { page: 1, pageSize: 20, total: 0, requestId: 'test', timestamp: new Date().toISOString() },
+    });
+    renderWithQuery(<EC_RDEP_05 />);
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument(),
+    );
+    cleanup();
+  });
+});
+
+describe('page EC-COM-02 (réelle, lot L09-02)', () => {
+  afterEach(() => {
+    cleanup();
+    vi.clearAllMocks();
+  });
+
+  it('EC-COM-02 se charge et affiche le titre du tableau de bord', async () => {
+    renderWithQuery(<EC_COM_02 />);
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument(),
+    );
+    expect(screen.getByText(/Tableau de bord/i)).toBeInTheDocument();
+    cleanup();
+  });
+
+  it('EC-COM-02 affiche l’état vide quand aucune version', async () => {
+    renderWithQuery(<EC_COM_02 />);
+    await waitFor(() =>
+      expect(screen.getByText(/Aucune version disponible/i)).toBeInTheDocument(),
+    );
+    cleanup();
+  });
+
+
+/**
+ * EC-COM-03 est une page réale (lot L09-03) qui délègue à ProfilePage.
+ * Ce test vérifie qu'elle se charge dans un router et rend le titre du profil.
+ */
+describe('page EC-COM-03 (réelle, lot L09-03)', () => {
+  afterEach(() => {
+    cleanup();
+    vi.clearAllMocks();
+  });
+
+  it('EC-COM-03 se charge et affiche le titre du profil utilisateur', async () => {
+    renderWithQuery(<EC_COM_03 />);
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument(),
+    );
+    expect(screen.getByText(/Profil utilisateur/i)).toBeInTheDocument();
+    cleanup();
+  });
+});
+
+/** EC-ADM-01 est une page réelle (lot L09-04) qui délègue à UsersAdminPage. */
+describe('page EC-ADM-01 (réelle, lot L09-04)', () => {
+  beforeEach(() => {
+    vi.mocked(api.get).mockResolvedValue({
+      data: [],
+      meta: { requestId: 'test', timestamp: new Date().toISOString() },
+    });
+  });
+  afterEach(() => {
+    cleanup();
+    vi.clearAllMocks();
+  });
+
+  it('EC-ADM-01 se charge et affiche le titre Utilisateurs', async () => {
+    renderWithQuery(<EC_ADM_01 />);
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument(),
+    );
+    expect(screen.getAllByText(/Utilisateurs/i).length).toBeGreaterThan(0);
+    cleanup();
+  });
+});
+
+/** EC-ADM-02 est une page réelle (lot L09-04) qui délègue à ReferentielsAdminPage. */
+describe('page EC-ADM-02 (réelle, lot L09-04)', () => {
+  beforeEach(() => {
+    vi.mocked(api.get).mockResolvedValue({
+      data: [],
+      meta: { requestId: 'test', timestamp: new Date().toISOString() },
+    });
+  });
+  afterEach(() => {
+    cleanup();
+    vi.clearAllMocks();
+  });
+
+  it('EC-ADM-02 se charge et affiche le titre Référentiels', async () => {
+    renderWithQuery(<EC_ADM_02 />);
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument(),
+    );
+    expect(screen.getAllByText(/Référentiels/i).length).toBeGreaterThan(0);
+    cleanup();
+  });
+});
+
+/** EC-ADM-03 est une page réelle (lot L09-04) qui délègue à ParametresAdminPage. */
+describe('page EC-ADM-03 (réelle, lot L09-04)', () => {
+  beforeEach(() => {
+    vi.mocked(api.get).mockResolvedValue({
+      data: [],
+      meta: { requestId: 'test', timestamp: new Date().toISOString() },
+    });
+  });
+  afterEach(() => {
+    cleanup();
+    vi.clearAllMocks();
+  });
+
+  it('EC-ADM-03 se charge et affiche le titre Paramètres système', async () => {
+    renderWithQuery(<EC_ADM_03 />);
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument(),
+    );
+    expect(screen.getAllByText(/Paramètres système/i).length).toBeGreaterThan(0);
+    cleanup();
+  });
+});
+
+/** EC-ADM-04 est une page réelle (lot L09-04) qui délègue à AuditAdminPage. */
+describe('page EC-ADM-04 (réelle, lot L09-04)', () => {
+  beforeEach(() => {
+    vi.mocked(api.get).mockResolvedValue({
+      data: [],
+      meta: { requestId: 'test', timestamp: new Date().toISOString() },
+    });
+  });
+  afterEach(() => {
+    cleanup();
+    vi.clearAllMocks();
+  });
+
+  it('EC-ADM-04 se charge et affiche le titre Journal d’audit', async () => {
+    renderWithQuery(<EC_ADM_04 />);
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument(),
+    );
+    expect(screen.getAllByText(/Journal d’audit/i).length).toBeGreaterThan(0);
+    cleanup();
+  });
+});
+
+/** EC-GES-02 est une page réelle (lot L09-06) qui délègue à PlanEtudesPage. */
+describe('page EC-GES-02 (réelle, lot L09-06)', () => {
+  beforeEach(() => {
+    vi.mocked(api.get).mockResolvedValue({
+      data: [],
+      meta: { requestId: 'test', timestamp: new Date().toISOString() },
+    });
+    vi.mocked(contraintesApi.lister).mockResolvedValue({
+      items: [],
+      meta: { page: 1, pageSize: 50, total: 0, requestId: 'test', timestamp: new Date().toISOString() },
+    });
+  });
+  afterEach(() => {
+    cleanup();
+    vi.clearAllMocks();
+  });
+
+  it('EC-GES-02 se charge et affiche le titre Plan d’études', async () => {
+    renderWithQuery(<EC_GES_02 />);
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument(),
+    );
+    expect(screen.getAllByText(/Plan d.études/i).length).toBeGreaterThan(0);
+    cleanup();
+  });
+});
+
+/** EC-GES-03 est une page réelle (lot L09-06) qui délègue à ContraintesPage. */
+describe('page EC-GES-03 (réelle, lot L09-06)', () => {
+  beforeEach(() => {
+    vi.mocked(api.get).mockResolvedValue({
+      data: [],
+      meta: { requestId: 'test', timestamp: new Date().toISOString() },
+    });
+    vi.mocked(contraintesApi.lister).mockResolvedValue({
+      items: [],
+      meta: { page: 1, pageSize: 50, total: 0, requestId: 'test', timestamp: new Date().toISOString() },
+    });
+  });
+  afterEach(() => {
+    cleanup();
+    vi.clearAllMocks();
+  });
+
+  it('EC-GES-03 se charge et affiche le titre Contraintes', async () => {
+    renderWithQuery(<EC_GES_03 />);
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument(),
+    );
+    expect(screen.getAllByText(/Contraintes/i).length).toBeGreaterThan(0);
+    cleanup();
+  });
+});
+
+/** EC-GES-04 est une page réelle (lot L10-01) qui délègue à GenerationPage. */
+describe('page EC-GES-04 (réelle, lot L10-01)', () => {
+  beforeEach(() => {
+    vi.mocked(api.get).mockResolvedValue({
+      data: [],
+      meta: { requestId: 'test', timestamp: new Date().toISOString() },
+    });
+    vi.mocked(contraintesApi.lister).mockResolvedValue({
+      items: [],
+      meta: { page: 1, pageSize: 50, total: 0, requestId: 'test', timestamp: new Date().toISOString() },
+    });
+  });
+  afterEach(() => {
+    cleanup();
+    vi.clearAllMocks();
+  });
+
+  it('EC-GES-04 se charge et affiche le titre Génération de scénarios', async () => {
+    renderWithQuery(<EC_GES_04 />);
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument(),
+    );
+    expect(screen.getAllByText(/Generation de scenarios/i).length).toBeGreaterThan(0);
+    cleanup();
+  });
+});
+
+/*───── Tests EC-GES-09 / EC-GES-10 / EC-GES-11 (lot L09-11) ─────*/
+
+vi.mock('@/lib/publication.api', () => ({
+  publicationApi: {
+    listerVersions: vi.fn().mockResolvedValue({
+      items: [],
+      meta: { page: 1, pageSize: 100, total: 0 },
+    }),
+    obtenirVersion: vi.fn().mockResolvedValue(null as any), // eslint-disable-line @typescript-eslint/no-explicit-any -- any-justify: mock de test, retour null pour simplifier
+    transitionnerVersion: vi.fn().mockResolvedValue(null as any), // eslint-disable-line @typescript-eslint/no-explicit-any -- any-justify: mock de test, retour null pour simplifier
+    dupliquerVersionArchivee: vi.fn().mockResolvedValue(null as any), // eslint-disable-line @typescript-eslint/no-explicit-any -- any-justify: mock de test, retour null pour simplifier
+    preparerExport: vi.fn().mockResolvedValue({
+      exportId: 'e-test',
+      url: 'http://test.local/export.xlsx',
+      expiresAt: new Date().toISOString(),
+    }),
+    listerExports: vi.fn().mockResolvedValue({
+      items: [],
+      meta: { page: 1, pageSize: 50, total: 0 },
+    }),
+  },
+}));
+
+describe('pages EC-GES-09 / EC-GES-10 / EC-GES-11 (lot L09-11)', () => {
+  afterEach(() => {
+    cleanup();
+    vi.clearAllMocks();
+  });
+
+  it('EC-GES-09 se charge et affiche le titre Publication', async () => {
+    renderWithQuery(<EC_GES_09 />);
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument(),
+    );
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
+      /Publication/i,
+    );
+    cleanup();
+  });
+
+  it('EC-GES-10 se charge et affiche le titre Archivage', async () => {
+    renderWithQuery(<EC_GES_10 />);
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument(),
+    );
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
+      /Archivage/i,
+    );
+    cleanup();
+  });
+
+  it('EC-GES-11 se charge et affiche le titre Exports', async () => {
+    renderWithQuery(<EC_GES_11 />);
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument(),
+    );
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
+      /Exports/i,
+    );
+    cleanup();
+  });
+});
+
+
+vi.mock('@/lib/direction.api', () => ({
+  directionApi: {
+    listerVersions: vi.fn().mockResolvedValue({
+      items: [],
+      meta: { page: 1, pageSize: 20, total: 0 },
+    }),
+    listerStatutsValidation: vi.fn().mockResolvedValue([]),
+    transitionnerVersion: vi.fn().mockResolvedValue({}),
+    dupliquerVersionArchivee: vi.fn().mockResolvedValue({}),
+    preparerExport: vi.fn().mockResolvedValue({
+      exportId: 'e-test',
+      url: 'http://test.local/export.xlsx',
+      expiresAt: new Date().toISOString(),
+    }),
+    listerExports: vi.fn().mockResolvedValue({
+      items: [],
+      meta: { page: 1, pageSize: 50, total: 0 },
+    }),
+  },
+}));
+
+/**
+ * EC-DIR-01 à EC-DIR-05 sont des pages réelles (lot L09-13).
+ * Ce test vérifie qu'elles se chargent sans erreur et affichent leur en-tête.
+ */
+describe('pages EC-DIR-01 à EC-DIR-05 (réelles, lot L09-13)', () => {
+  afterEach(() => {
+    cleanup();
+    queryClient.clear();
+    versionStore.setState({ contexteRepartition: null });
+  });
+
+  it('EC-DIR-01 se charge et affiche le titre des scénarios', async () => {
+    renderWithQuery(<EC_DIR_01 />);
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument(),
+    );
+    cleanup();
+  });
+
+  it('EC-DIR-02 se charge et affiche le titre de validation', async () => {
+    renderWithQuery(<EC_DIR_02 />);
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument(),
+    );
+    cleanup();
+  });
+
+  it('EC-DIR-03 se charge et affiche le titre de rejet', async () => {
+    renderWithQuery(<EC_DIR_03 />);
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument(),
+    );
+    cleanup();
+  });
+
+  it('EC-DIR-04 se charge et affiche le titre d’archivage', async () => {
+    renderWithQuery(<EC_DIR_04 />);
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument(),
+    );
+    cleanup();
+  });
+
+  it('EC-DIR-05 se charge et affiche le titre des exports', async () => {
+    renderWithQuery(<EC_DIR_05 />);
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument(),
+    );
+    cleanup();
+  });
+});
+
 });
