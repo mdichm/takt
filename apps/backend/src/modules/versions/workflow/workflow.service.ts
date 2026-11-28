@@ -10,7 +10,7 @@ import {
   canTransition,
   type TransitionContexte,
 } from './workflow-machine';
-import { type ActionTransition, type CodeErreurApi, type RoleCode } from '@takt/contracts';
+import { type ActionTransition, type CodeErreurApi, type RoleCode, type VersionItem } from '@takt/contracts';
 import { GARDE_COUVERTURE, type IGardeCouverture } from '../../common/di/garde-couverture.token';
 
 /**
@@ -48,7 +48,7 @@ export class WorkflowService {
     role: RoleCode,
     contexte: TransitionContexte,
     utilisateurId: string,
-  ) {
+  ): Promise<VersionItem> {
     const version = await this.prisma.version.findUnique({
       where: { id },
       select: {
@@ -111,9 +111,12 @@ export class WorkflowService {
       select: {
         id: true,
         semestreId: true,
+        anneeId: true,
         etat: true,
+        snapshotId: true,
         datePublication: true,
         publiePar: true,
+        createdAt: true,
         updatedAt: true,
       },
     });
@@ -138,6 +141,22 @@ export class WorkflowService {
       `Transition '${action}' appliquée sur la version ${id} : ${version.etat} -> ${regle.to}`,
     );
 
-    return miseAJour;
+    const toIso = (v: Date | string | null | undefined): string | null | undefined => {
+      if (v === null || v === undefined) return v;
+      if (typeof v === 'string') return v;
+      return v.toISOString();
+    };
+
+    return {
+      id: miseAJour.id,
+      semestreId: miseAJour.semestreId,
+      anneeId: miseAJour.anneeId,
+      etat: miseAJour.etat,
+      snapshotId: miseAJour.snapshotId ?? null,
+      datePublication: miseAJour.datePublication ? toIso(miseAJour.datePublication) : null,
+      publiePar: miseAJour.publiePar ?? null,
+      createdAt: toIso(miseAJour.createdAt) as string,
+      updatedAt: toIso(miseAJour.updatedAt) as string,
+    } as VersionItem;
   }
 }

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
+import { zVersionItem } from '@takt/contracts';
 import {
   creerContexteTestReferentiels,
   type ContexteTestReferentiels,
@@ -247,6 +248,38 @@ describe('Versions (TAKT-L06-01)', () => {
         .send({ action: 'archiver' })
         .expect(200);
       expect(reponse.body.data.etat).toBe('archive');
+    });
+
+    it('retourne les 9 champs du contrat zVersionItem sur une transition (TAKT-L06-11)', async () => {
+      const cree = await ctx.agent
+        .post('/api/v1/versions')
+        .set('Authorization', `Bearer ${ctx.tokenAdmin}`)
+        .send({ semestreId: SEMESTRE_TRANSITION_ID, etat: 'publie' })
+        .expect(201);
+      const id = cree.body.data.id;
+      ctx.idsACleaner.push(id);
+
+      const reponse = await ctx.agent
+        .post(`/api/v1/versions/${id}/transition`)
+        .set('Authorization', `Bearer ${ctx.tokenAdmin}`)
+        .send({ action: 'archiver' })
+        .expect(200);
+
+      const data = reponse.body.data;
+      for (const champ of [
+        'id',
+        'semestreId',
+        'anneeId',
+        'etat',
+        'snapshotId',
+        'datePublication',
+        'publiePar',
+        'createdAt',
+        'updatedAt',
+      ]) {
+        expect(data).toHaveProperty(champ);
+      }
+      expect(zVersionItem.safeParse(data).success).toBe(true);
     });
   });
 });

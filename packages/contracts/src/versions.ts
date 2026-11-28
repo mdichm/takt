@@ -37,7 +37,23 @@ export const zVersionList = zPaginationQuery
     departementId: zUuid.optional(),
   });
 
-/** Item de version en lecture seule (miroir du select Prisma de l'endpoint liste). */
+/**
+ * Item de version en lecture seule (miroir du select Prisma de l'endpoint liste et de la transition).
+ *
+ * TAKT-L06-11 : ce contrat exige exactement 9 champs, tous retournés par le backend :
+ *   1. id            (UUID, obligatoire)
+ *   2. semestreId    (UUID, obligatoire)
+ *   3. anneeId       (UUID, obligatoire — manquait dans la réponse de `update`)
+ *   4. etat          (EtatVersion, obligatoire)
+ *   5. snapshotId    (UUID | null, nullish)
+ *   6. datePublication (DateISO | null, nullish)
+ *   7. publiePar     (UUID | null, nullish)
+ *   8. createdAt     (DateISO, obligatoire — manquait dans la réponse de `update`)
+ *   9. updatedAt     (DateISO, obligatoire)
+ *
+ * Le select Prisma de `workflow.service.ts` (transition `update`) doit inclure ces 9 champs.
+ * Aucun fallback `?? ''` n'est autorisé côté frontend (cf. direction.api.ts).
+ */
 export const zVersionItem = z.object({
   id: zUuid,
   semestreId: zUuid,

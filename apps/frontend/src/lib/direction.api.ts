@@ -14,14 +14,7 @@ import {
   type VersionItem,
 } from '@takt/contracts';
 
-const zVersionItemTransition = zVersionItem.extend({
-  anneeId: z.string().uuid().optional(),
-  createdAt: z.string().datetime().optional(),
-  updatedAt: z.string().datetime().optional(),
-  snapshotId: z.string().uuid().nullable().optional(),
-});
-
-const zEnveloppeTransition = zEnvelope(zVersionItemTransition);
+const zEnveloppeTransition = zEnvelope(zVersionItem);
 
 interface ListePaginee<T> {
   items: T[];
@@ -84,8 +77,8 @@ export const directionApi = {
 
   /**
    * Applique une transition de workflow (POST /api/v1/versions/:id/transition).
-   * Retourne un VersionItem ; en cas de réponse incomplète (écart A TAKT-L06-11),
-   * les champs manquants sont complétés par des valeurs par défaut sûres.
+   * Retourne un VersionItem complet (9 champs exigés par le contrat zVersionItem).
+   * Le backend sélectionne désormais tous les champs : aucun fallback n'est nécessaire.
    */
   async transitionnerVersion(
     id: string,
@@ -105,18 +98,7 @@ export const directionApi = {
     if (!reponse.data) {
       throw new Error('Aucune version retournée par la transition.');
     }
-    const item = validerReponseApi(zVersionItemTransition, reponse.data);
-    return {
-      id: item.id,
-      semestreId: item.semestreId,
-      anneeId: item.anneeId ?? '',
-      etat: item.etat,
-      snapshotId: item.snapshotId ?? null,
-      datePublication: item.datePublication ?? null,
-      publiePar: item.publiePar ?? null,
-      createdAt: item.createdAt ?? '',
-      updatedAt: item.updatedAt ?? '',
-    };
+    return validerReponseApi(zVersionItem, reponse.data);
   },
 
   /** Duplique une version archivée en nouvel état initial (POST /api/v1/versions/:id/dupliquer). */
